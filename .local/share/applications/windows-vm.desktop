@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Windows Virtual Machine
+GenericName=Start Windows VM
+Comment=Launches a Windows VM with dedicated graphics for high-performance applications
+Exec=sh -c "virsh --connect=qemu:///session start win11; looking-glass-client -K -f /dev/kvmfr0;"
+Icon=Win10Logo.png
+Terminal=false
+Categories=Application;System

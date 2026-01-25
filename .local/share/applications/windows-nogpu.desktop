@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Windholes 10 (No GPU)
+GenericName=Start Windows VM
+Comment=Launches a Windows 10 VM with nogpu
+Exec=sh -c "virsh --connect=qemu:///session start windholes10-nogpu; virt-manager --connect qemu:///session --show-domain-console windholes10-nogpu"
+Icon=Windows-Logo.png
+Terminal=false
+Categories=Application;System
