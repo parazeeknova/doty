@@ -1,0 +1,19 @@
+# Parazeeknova's configuration
+theme = Gruvbox Dark Hard
+font-size = 8
+font-family = JetBrainsMono Nerd Font
+font-feature = "+liga"
+background-blur-radius = 20
+mouse-hide-while-typing = true
+window-decoration = true
+background-opacity = 0.95
+window-padding-x = 2
+window-padding-y = 2
+window-padding-balance = true
+
+# command = nu
+# command = /home/paper/scripts/ghostty-tmux.sh
+# command = "tmux new-session -A -s main"
+custom-shader = shaders/cursor_warp.glsl
+custom-shader = shaders/ripple_cursor.glsl
+keybind = shift+enter=text:\x1b\r
