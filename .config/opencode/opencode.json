@@ -1,0 +1,121 @@
+{
+	"plugin": ["opencode-antigravity-auth@beta"],
+	"provider": {
+		"google": {
+			"models": {
+				"antigravity-claude-sonnet-4-5-thinking": {
+					"name": "Claude Sonnet 4.5 Thinking",
+					"limit": {
+						"context": 200000,
+						"output": 64000
+					},
+					"modalities": {
+						"input": ["text", "image", "pdf"],
+						"output": ["text"]
+					},
+					"variants": {
+						"low": {
+							"thinkingConfig": {
+								"thinkingBudget": 8192
+							}
+						},
+						"max": {
+							"thinkingConfig": {
+								"thinkingBudget": 32768
+							}
+						}
+					}
+				},
+				"antigravity-claude-sonnet-4-5": {
+					"name": "Claude Sonnet 4.5 (no thinking) (Antigravity)",
+					"limit": {
+						"context": 200000,
+						"output": 64000
+					},
+					"modalities": {
+						"input": ["text", "image", "pdf"],
+						"output": ["text"]
+					}
+				},
+				"antigravity-gemini-3-pro": {
+					"name": "Gemini 3 Pro (Antigravity)",
+					"limit": {
+						"context": 1048576,
+						"output": 65535
+					},
+					"modalities": {
+						"input": ["text", "image", "pdf"],
+						"output": ["text"]
+					},
+					"variants": {
+						"low": {
+							"thinkingLevel": "low"
+						},
+						"high": {
+							"thinkingLevel": "high"
+						}
+					}
+				},
+				"antigravity-gemini-3-flash": {
+					"name": "Gemini 3 Flash (Antigravity)",
+					"limit": {
+						"context": 1048576,
+						"output": 65536
+					},
+					"modalities": {
+						"input": ["text", "image", "pdf"],
+						"output": ["text"]
+					},
+					"variants": {
+						"minimal": {
+							"thinkingLevel": "minimal"
+						},
+						"low": {
+							"thinkingLevel": "low"
+						},
+						"medium": {
+							"thinkingLevel": "medium"
+						},
+						"high": {
+							"thinkingLevel": "high"
+						}
+					}
+				},
+				"antigravity-claude-opus-4-5-thinking": {
+					"name": "Claude Opus 4.5 Thinking",
+					"limit": {
+						"context": 200000,
+						"output": 64000
+					},
+					"modalities": {
+						"input": ["text", "image", "pdf"],
+						"output": ["text"]
+					},
+					"variants": {
+						"low": {
+							"thinkingConfig": {
+								"thinkingBudget": 8192
+							}
+						},
+						"max": {
+							"thinkingConfig": {
+								"thinkingBudget": 32768
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"mcp": {
+		"context7": {
+			"type": "remote",
+			"url": "https://mcp.context7.com/mcp",
+			"headers": {
+				"CONTEXT7_API_KEY": "ctx7sk-ef173f48-afbe-4c06-af9c-73f93748022f"
+			},
+			"enabled": true
+		}
+	},
+	"$schema": "https://opencode.ai/config.json"
+}
