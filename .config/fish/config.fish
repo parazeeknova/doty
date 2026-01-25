@@ -36,8 +36,8 @@ alias pewsr="sudo pacman -Ss"
 
 # Commands
 alias cl clear
-alias fishy="nvim ~/.config/fish/config.fish"
-alias ghosy="nvim ~/.config/ghostty/config"
+alias fishy="nvim ~/doty/.config/fish/config.fish"
+alias ghosy="nvim ~/doty/.config/ghostty/config"
 
 # Development
 alias pn pnpm
@@ -45,7 +45,7 @@ alias buni="bun install"
 alias bunc="bun check"
 alias bunct="bun check-types"
 
-# Git Goes Brrr 
+# Git Goes Brrr
 alias gs="git status --short"
 alias gd="git diff --output-indicator-new=' ' --output-indicator-old=' '"
 alias gds="git diff --staged"
