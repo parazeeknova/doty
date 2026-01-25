@@ -1,0 +1,98 @@
+[user]
+  name = Harsh Sahu
+  email = blabla.bla@bla.bla
+  signingkey = blablablablabla
+
+[core]
+  compression = 9
+  whitespace = error
+  preloadindex = true
+
+[advice]
+  addEmptyPathSpec = false
+  pushNonFastForward = false
+  statusHints = false
+
+[url "git@github.com:parazeeknova/"]
+  insteadOf = "para:"
+
+[url "git@github.com:"]
+  insteadOf = "gh:"
+
+[url "git@github.com:singularityworks-xyz/"]
+  insteadOf = "sw:"
+
+[url "git@github.com:zephverse/"]
+  insteadOf = "zv:"
+
+[init]
+  defaultBranch = dev
+
+[status]
+  branch = true
+  showStash = true
+  showUntrackedFiles = all
+
+[diff]
+  context = 3
+  renames = copies
+  interHunkContext = 10
+
+[pager]
+  diff = diff-so-fancy | $PAGER
+  branch = false
+  tag = false
+
+[diff-so-fancy]
+  markEmptyLines = false
+
+[color "diff"]
+  meta = black bold
+  frag = magenta
+  context = white
+  whitespace = yellow reverse
+  old = red
+
+[interactive]
+  diffFilter = diff-so-fancy --patch
+  singleKey = true
+
+[push]
+  autoSetupRemote = true
+  default = current
+  followTags = true
+
+[pull]
+  default = current
+  rebase = true
+
+[rebase]
+  autoStash = true
+  missingCommitsCheck = warn
+
+[log]
+  abbrevCommit = true
+  graphColors = blue,yellow,cyan,magenta,green,red
+
+[color "decorate"]
+  HEAD = red
+  branch = blue
+  tag = yellow
+  remoteBranch = magenta
+
+[color "branch"]
+  current = magenta
+  local = default
+  remote = yellow
+  upstream = green
+  plain = blue
+
+[branch]
+  sort = -committerdate
+
+[tag]
+  sort = -taggerdate
+
+[commit]
+  gpgSign = true
+
