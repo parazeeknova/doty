@@ -67,6 +67,7 @@ alias cgb="cargo build"
 alias cgr="cargo run"
 
 fish_add_path /home/paper/.spicetify
+fish_add_path /home/paper/.bun/bin
 
 # TMUX
 alias tmu="tmux new-session -A -s monkie"
