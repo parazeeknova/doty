@@ -6,7 +6,7 @@ set -gx LC_ALL en_US.UTF-8
 # Starting Scripts
 starship init fish | source
 zoxide init --cmd cd fish | source
-colorscript -e zwaves
+# colorscript -e zwaves
 
 # General use aliases
 alias cp="cp -iv"
@@ -26,6 +26,7 @@ alias grep="grep --color=auto"
 # Alias's and Abbr's
 alias ahh paru
 alias ahhh="paru -S"
+alias nah="paru -R"
 alias nv nvim
 
 # system aliases
@@ -33,6 +34,8 @@ alias pewup="sudo pacman -Syyu"
 alias pewrm="sudo pacman -R"
 alias pewin="sudo pacman -S"
 alias pewsr="sudo pacman -Ss"
+alias pew sudo
+alias fasty fastfetch
 
 # Commands
 alias cl clear

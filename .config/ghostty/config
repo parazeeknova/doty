@@ -2,7 +2,8 @@
 theme = Gruvbox Dark Hard
 font-size = 8
 font-family = JetBrainsMono Nerd Font
-font-feature = "+liga"
+font-feature = calt
+font-feature = liga
 background-blur-radius = 20
 mouse-hide-while-typing = true
 window-decoration = true
