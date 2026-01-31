@@ -28,6 +28,7 @@ alias ahh paru
 alias ahhh="paru -S"
 alias nah="paru -R"
 alias nv nvim
+alias ai opencode
 
 # system aliases
 alias pewup="sudo pacman -Syyu"
