@@ -1,7 +1,79 @@
-source /usr/share/cachyos-fish-config/cachyos-config.fish
-
 set -gx LANG en_US.UTF-8
 set -gx LC_ALL en_US.UTF-8
+set -gx GPG_TTY (tty)
+
+function fish_greeting
+    # nah
+end
+
+# Format man pages
+set -x MANROFFOPT -c
+set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
+
+# Set settings for https://github.com/franciscolourenco/done
+set -U __done_min_cmd_duration 10000
+set -U __done_notification_urgency_level low
+
+## Environment setup
+# Apply .profile: use this to put fish compatible .profile stuff in
+if test -f ~/.fish_profile
+    source ~/.fish_profile
+end
+
+# Append common directories for executable files to $PATH
+fish_add_path ~/.local/bin ~/.cargo/bin ~/Applications/depot_tools
+
+## Functions
+# Functions needed for !! and !$ https://github.com/oh-my-fish/plugin-bang-bang
+function __history_previous_command
+    switch (commandline -t)
+        case "!"
+            commandline -t $history[1]
+            commandline -f repaint
+        case "*"
+            commandline -i !
+    end
+end
+
+function __history_previous_command_arguments
+    switch (commandline -t)
+        case "!"
+            commandline -t ""
+            commandline -f history-token-search-backward
+        case "*"
+            commandline -i '$'
+    end
+end
+
+if [ "$fish_key_bindings" = fish_vi_key_bindings ]
+
+    bind -Minsert ! __history_previous_command
+    bind -Minsert '$' __history_previous_command_arguments
+else
+    bind ! __history_previous_command
+    bind '$' __history_previous_command_arguments
+end
+
+# Fish command history
+function history
+    builtin history --show-time='%F %T '
+end
+
+function backup --argument filename
+    cp $filename $filename.bak
+end
+
+# Copy DIR1 DIR2
+function copy
+    set count (count $argv | tr -d \n)
+    if test "$count" = 2; and test -d "$argv[1]"
+        set from (echo $argv[1] | trim-right /)
+        set to (echo $argv[2])
+        command cp -r $from $to
+    else
+        command cp $argv
+    end
+end
 
 # Starting Scripts
 starship init fish | source
@@ -13,6 +85,33 @@ alias cp="cp -iv"
 alias mkdir="mkdir -pv"
 alias mv="mv -iv"
 alias rm="rm -rf"
+
+alias fixpacman="sudo rm /var/lib/pacman/db.lck"
+alias tarnow='tar -acf '
+alias untar='tar -zxvf '
+alias wget='wget -c '
+alias psmem='ps auxf | sort -nr -k 4'
+alias psmem10='ps auxf | sort -nr -k 4 | head -10'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ......='cd ../../../../..'
+alias dir='dir --color=auto'
+alias vdir='vdir --color=auto'
+alias grep='grep --color=auto'
+alias hw='hwinfo --short'
+alias big="expac -H M '%m\t%n' | sort -h | nl"
+alias gitpkg='pacman -Q | grep -i "\-git" | wc -l'
+alias update='sudo cachyos-rate-mirrors && sudo pacman -Syu'
+# Get fastest mirrors
+alias mirror="sudo cachyos-rate-mirrors"
+# Cleanup orphaned packages
+alias cleanup='sudo pacman -Rns (pacman -Qtdq)'
+# Get the error messages from journalctl
+alias jctl="journalctl -p 3 -xb"
+# Recent installed packages
+alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
 
 # eza aliases
 alias ls="exa --color=auto --icons"
@@ -42,6 +141,8 @@ alias fasty fastfetch
 alias cl clear
 alias fishy="nvim ~/doty/.config/fish/config.fish"
 alias ghosy="nvim ~/doty/.config/ghostty/config"
+alias cfon="warp-cli connect"
+alias cfoff="warp-cli disconnect"
 
 # Development
 alias pn pnpm

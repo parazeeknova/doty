@@ -1,7 +1,7 @@
 [user]
-  name = Harsh Sahu
-  email = blabla.bla@bla.bla
-  signingkey = blablablablabla
+	name = Harsh Sahu
+	email = yesh8harsh+github@gmail.com
+	signingkey = 53EE670DA9553613
 
 [core]
   compression = 9
@@ -92,7 +92,8 @@
 
 [tag]
   sort = -taggerdate
+	gpgsign = true
 
 [commit]
-  gpgSign = true
+	gpgsign = true
 
