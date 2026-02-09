@@ -3,7 +3,27 @@ set -gx LC_ALL en_US.UTF-8
 set -gx GPG_TTY (tty)
 
 function fish_greeting
-    # nah
+    rustmon print --hide-name
+end
+
+# SSH agent - lazy start only when needed
+function __ssh_agent_start
+    if not pgrep -u (id -u) ssh-agent >/dev/null
+        eval (ssh-agent -c) >/dev/null
+        set -Ux SSH_AGENT_PID $SSH_AGENT_PID
+        set -Ux SSH_AUTH_SOCK $SSH_AUTH_SOCK
+    end
+end
+
+# Auto-start ssh-agent for git/ssh commands
+function ssh
+    __ssh_agent_start
+    command ssh $argv
+end
+
+function git
+    __ssh_agent_start
+    command git $argv
 end
 
 # Format man pages

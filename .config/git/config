@@ -1,7 +1,7 @@
 [user]
 	name = Harsh Sahu
 	email = yesh8harsh+github@gmail.com
-	signingkey = 53EE670DA9553613
+	signingKey = /home/paper/.ssh/id_ed25519
 
 [core]
   compression = 9
@@ -17,7 +17,7 @@
   insteadOf = "para:"
 
 [url "git@github.com:"]
-  insteadOf = "gh:"
+	insteadOf = https://github.com/
 
 [url "git@github.com:singularityworks-xyz/"]
   insteadOf = "sw:"
@@ -97,3 +97,7 @@
 [commit]
 	gpgsign = true
 
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = ssh-keygen
