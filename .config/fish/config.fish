@@ -3,7 +3,7 @@ set -gx LC_ALL en_US.UTF-8
 set -gx GPG_TTY (tty)
 
 function fish_greeting
-    rustmon print --hide-name
+    # rustmon print --hide-name
 end
 
 # SSH agent - lazy start only when needed
@@ -163,12 +163,14 @@ alias fishy="nvim ~/doty/.config/fish/config.fish"
 alias ghosy="nvim ~/doty/.config/ghostty/config"
 alias cfon="warp-cli connect"
 alias cfoff="warp-cli disconnect"
+alias doty="cd ~/doty && stow ."
 
 # Development
 alias pn pnpm
 alias buni="bun install"
 alias bunc="bun check"
 alias bunct="bun check-types"
+alias brr="bun run dev"
 
 # Git Goes Brrr
 alias gs="git status --short"
