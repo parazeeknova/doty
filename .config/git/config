@@ -1,7 +1,7 @@
 [user]
 	name = Harsh Sahu
 	email = yesh8harsh+github@gmail.com
-	signingKey = /home/paper/.ssh/id_ed25519
+	signingkey = 53EE670DA9553613
 
 [core]
   compression = 9
@@ -93,12 +93,11 @@
 [tag]
   sort = -taggerdate
 	gpgsign = true
+	forceSignAnnotated = true
 
 [commit]
 	gpgsign = true
 
-[gpg]
-	format = ssh
 [gpg "ssh"]
 	program = ssh-keygen
 	allowedSignersFile = /home/paper/.ssh/allowed_signers
