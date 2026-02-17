@@ -1,1 +1,3 @@
 .config/git/config
+.local/share/icons/hicolor/
+.config/fish/conf.d/mcp-env.fish
