@@ -1,7 +1,7 @@
 # Parazeeknova's configuration
 theme = Gruvbox Dark Hard
 font-size = 8
-font-family = JetBrainsMono Nerd Font
+font-family = FiraCode Nerd Font Mono
 font-feature = calt
 font-feature = liga
 background-blur-radius = 20
