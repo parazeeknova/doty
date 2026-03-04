@@ -89,3 +89,50 @@ alias gcl="git clone"
 alias tarnow='tar -acf '
 alias untar='tar -zxvf '
 alias wget='wget -c '
+
+# Tmux Scripts
+function hebycode
+    set current_dir (pwd)
+    set home_dir $HOME
+
+    # Session name = folder name (sanitized)
+    set raw_name (basename $current_dir)
+    set session_name (string replace -ra '[^A-Za-z0-9_-]' '_' $raw_name)
+
+    if tmux has-session -t $session_name 2>/dev/null
+        tmux attach -t $session_name
+        return
+    end
+
+    # Create session
+    tmux new-session -d -s $session_name -n main -c $current_dir
+
+    # ---- WINDOW 1 (project dir) ----
+    set top_pane (tmux display-message -p -t $session_name "#{pane_id}")
+
+    # Bottom 25%
+    set bottom_pane (tmux split-window -v -p 25 -t $top_pane -c $current_dir -P -F "#{pane_id}")
+
+    # Split top vertically
+    set right_pane (tmux split-window -h -t $top_pane -c $current_dir -P -F "#{pane_id}")
+
+    # Run opencode in top-left
+    tmux send-keys -t $top_pane opencode C-m
+
+    # ---- WINDOW 2 (home dir) ----
+    tmux new-window -t $session_name -n second -c $home_dir
+
+    # Capture initial pane (top)
+    set home_top (tmux display-message -p -t $session_name "#{pane_id}")
+
+    # Create bottom 50%
+    set home_bottom (tmux split-window -v -p 50 -t $home_top -c $home_dir -P -F "#{pane_id}")
+
+    # Run lazygit in top pane
+    tmux send-keys -t $home_top lazygit C-m
+
+    # Focus back to main window
+    tmux select-window -t $session_name:main
+
+    tmux attach -t $session_name
+end
