@@ -4,10 +4,10 @@
     "context7": {
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
+      "enabled": true,
       "headers": {
         "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
-      },
-      "enabled": true
+      }
     },
     "Ref": {
       "type": "remote",
@@ -16,6 +16,11 @@
       "headers": {
         "x-ref-api-key": "{env:REF_API_KEY}"
       }
+    }
+  },
+  "permission": {
+    "read": {
+      "*": "allow"
     }
   }
 }

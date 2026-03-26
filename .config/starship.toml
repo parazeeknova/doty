@@ -9,12 +9,12 @@ $directory\
 ${custom.giturl}\
 $git_branch\
 $git_state\
-$git_status\
+${custom.git_wrapper}\
 $line_break\
 ➜ \
 """
 
-right_format = """$all"""
+right_format = """$all${custom.gcex}"""
 
 palette = "gruvbox_dark"
 
@@ -91,34 +91,76 @@ disabled = true
 #style = "bg:surface0 fg:text"
 
 [custom.giturl]
-# disabled = true
-description = "Display symbol for remote Git server"
+description = "Display symbol for remote Git server and username"
 command = """
-GIT_REMOTE=$(command git ls-remote --get-url 2> /dev/null)
-if [[ "$GIT_REMOTE" =~ "github" ]]; then
-    GIT_REMOTE_SYMBOL=" "
-elif [[ "$GIT_REMOTE" =~ "gitlab" ]]; then
-    GIT_REMOTE_SYMBOL=" "
-elif [[ "$GIT_REMOTE" =~ "bitbucket" ]]; then
-    GIT_REMOTE_SYMBOL=" "
-elif [[ "$GIT_REMOTE" =~ "git" ]]; then
-    GIT_REMOTE_SYMBOL=" "
-else
-    GIT_REMOTE_SYMBOL=" "
+bash -c '
+rem=$(git config --get remote.origin.url 2> /dev/null)
+sym=""
+if echo "$rem" | grep -q "github"; then sym="";
+elif echo "$rem" | grep -q "gitlab"; then sym="";
+elif echo "$rem" | grep -q "bitbucket"; then sym="";
+elif echo "$rem" | grep -q "git"; then sym=""; fi
+
+usr=$(awk "/user:/ {print \\$2; exit}" ~/.config/gh/hosts.yml 2>/dev/null)
+if [ -z "$usr" ]; then
+    usr=$(git config user.name 2>/dev/null)
 fi
-echo "$GIT_REMOTE_SYMBOL "
+
+if [ -n "$usr" ]; then
+    if [ "$usr" = "parazeeknova" ]; then
+        usr="pzk"
+    else
+        usr=$(echo "$usr" | cut -c1-3)
+    fi
+    echo "$sym $usr"
+else
+    echo "$sym"
+fi
+'
 """
 when = 'git rev-parse --is-inside-work-tree 2> /dev/null'
-format = "at $output"
+format = "at $output "
 
 [git_branch]
 symbol = "[](base) "
 # format =  ' [$symbol$branch(:$remote_branch)]($style)[]'
 style = "fg:lavender bg:base"
-format = '  on [$symbol$branch]($style)[](base)'
+format = 'on [$symbol$branch]($style)[](base)'
 
 [git_status]
-format = ' [($all_status$ahead_behind )]($style)'
+disabled = true
+
+[custom.git_wrapper]
+description = "Show git status with unstaged count"
+command = """
+bash -c '
+# Get ahead/behind
+ab=$(git rev-list --left-right --count HEAD...@{upstream} 2>/dev/null)
+ahead=$(echo "$ab" | cut -f1)
+behind=$(echo "$ab" | cut -f2)
+[ -n "$ahead" ] && [ "$ahead" -gt 0 ] && ab_str="⇡${ahead}"
+[ -n "$behind" ] && [ "$behind" -gt 0 ] && ab_str="${ab_str}⇣${behind}"
+
+# Get unstaged count
+c=$(git status --porcelain 2>/dev/null | grep -cE "^(.[^ ]|\\?\\?)")
+s=""
+[ "$c" -gt 0 ] && s="$c "
+
+# Get other statuses
+m=$(git status --porcelain 2>/dev/null | grep -q "^.M" && echo "!")
+u=$(git status --porcelain 2>/dev/null | grep -q "^\\?\\?" && echo "?")
+
+out=""
+[ -n "$ab_str" ] && out="$ab_str "
+if [ -n "$s" ] || [ -n "$m" ] || [ -n "$u" ]; then
+    out="${out}[$s$m$u]"
+fi
+echo "$out"
+'
+"""
+when = 'git rev-parse --is-inside-work-tree 2> /dev/null'
+format = ' [$output]($style)'
+style = "red bold"
 
 [nodejs]
 symbol = ""
@@ -180,3 +222,18 @@ vimcmd_symbol = '[](bold fg:creen)'
 vimcmd_replace_one_symbol = '[](bold fg:purple)'
 vimcmd_replace_symbol = '[](bold fg:purple)'
 vimcmd_visual_symbol = '[](bold fg:lavender)'
+
+[gcloud]
+disabled = true
+
+[custom.gcex]
+command = """awk -F'=' '/^account/ {gsub(/[ \t]+/, "", $2); print substr($2, 1, 2); exit}' ~/.config/gcloud/configurations/config_$(cat ~/.config/gcloud/active_config 2>/dev/null || echo "default") 2>/dev/null"""
+when = "test -d ~/.config/gcloud"
+format = '[ $output ]($style)'
+style = "yellow"
+ignore_timeout = true
+
+[bun]
+symbol = " "
+style = "peach"
+format = '[ $symbol($version) ]($style)'

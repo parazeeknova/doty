@@ -18,3 +18,4 @@ command = fish
 custom-shader = shaders/cursor_warp.glsl
 custom-shader = shaders/ripple_cursor.glsl
 keybind = shift+enter=text:\x1b\r
+keybind = ctrl+shift+t=unbind
