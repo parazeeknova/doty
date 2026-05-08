@@ -65,7 +65,9 @@ alias pn=pnpm
 alias buni="bun install"
 alias bunc="bun check"
 alias bunct="bun check-types"
+alias bunt="bun run test"
 alias brr="bun run dev"
+alias bct="bun run check && bun run check-types"
 
 # Rust (Cargo)
 alias cgin="cargo install"
@@ -77,6 +79,7 @@ alias cgr="cargo run"
 alias gs="git status --short"
 alias gd="git diff --output-indicator-new=' ' --output-indicator-old=' '"
 alias gds="git diff --staged"
+alias hkd="hunk diff"
 alias ga="git add"
 alias gap="git add --patch"
 alias gc="git commit"

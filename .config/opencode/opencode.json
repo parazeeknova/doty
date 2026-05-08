@@ -32,10 +32,13 @@
         "apiKey": "{env:MODAL_API_KEY}"
       },
       "models": {
-        "zai-org/GLM-5-FP8": {
-          "name": "GLM-5"
+        "zai-org/GLM-5.1-FP8": {
+          "name": "GLM-5.1"
         }
       }
-    }
+    },
+    "github-copilot": {},
+    "nvidia": {},
+    "groq": {}
   }
 }

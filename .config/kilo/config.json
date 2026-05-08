@@ -21,6 +21,11 @@
   "permission": {
     "read": {
       "*": "allow"
+    },
+    "bash": "allow",
+    "external_directory": {
+      "/home/paper/.bun/install/cache/*": "allow",
+      "/home/paper/Singulity/lumen/*": "allow"
     }
   }
 }
