@@ -8,14 +8,6 @@
       "headers": {
         "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
       }
-    },
-    "Ref": {
-      "type": "remote",
-      "url": "https://api.ref.tools/mcp",
-      "enabled": true,
-      "headers": {
-        "x-ref-api-key": "{env:REF_API_KEY}"
-      }
     }
   },
   "permission": {

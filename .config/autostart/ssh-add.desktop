@@ -1,0 +1,6 @@
+[Desktop Entry]
+Exec=/home/parazeeknova/.local/bin/ssh-add.sh
+Icon=dialog-scripts
+Name=ssh-add
+Type=Application
+X-KDE-AutostartScript=true

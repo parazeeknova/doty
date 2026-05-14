@@ -1,0 +1,21 @@
+{
+  "firstStartTime": "2026-05-13T13:17:05.725Z",
+  "opusProMigrationComplete": true,
+  "sonnet1m45MigrationComplete": true,
+  "seenNotifications": {},
+  "migrationVersion": 13,
+  "userID": "ec4a168acf826016d220dc7607473138006e8cee1dc6f40b69b439c660048d6c",
+  "mcpServers": {
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp",
+        "--api-key",
+        "{env:CONTEXT7_API_KEY}"
+      ],
+      "env": {}
+    }
+  }
+}

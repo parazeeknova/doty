@@ -2,6 +2,7 @@
 set -gx LANG en_US.UTF-8
 set -gx LC_ALL en_US.UTF-8
 set -gx GPG_TTY (tty)
+set -gx SSH_ASKPASS /usr/bin/ksshaskpass
 
 # Man Page Formatting
 set -x MANROFFOPT -c

@@ -1,7 +1,6 @@
 .config/git/config
 .local/share/icons/hicolor/
 .config/fish/conf.d/mcp-env.fish
-
 .config/kilo/package-lock.json
-
 .config/opencode/package-lock.json
+node_modules
