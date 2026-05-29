@@ -37,6 +37,12 @@ window#waybar {
   padding: 4px 0;
 }
 
+#network {
+  font-size: 0.8rem;
+  color: @fg1;
+  padding: 4px 0;
+}
+
 #window {
   font-size: 0.8rem;
   color: @grey1;

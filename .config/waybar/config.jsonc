@@ -14,10 +14,27 @@
     "clock#date"
   ],
   "modules-right": [
+    "network",
     "pulseaudio",
     "battery",
     "clock"
   ],
+  "network": {
+    "rotate": 270,
+    "interval": 10,
+    "format-wifi": "{essid} {icon}",
+    "format-ethernet": "lan {icon}",
+    "format-linked": "{icon}",
+    "format-disconnected": "󰖪",
+    "format-icons": [
+      "󰤯",
+      "󰤟",
+      "󰤢",
+      "󰤥",
+      "󰤨"
+    ],
+    "tooltip-format-wifi": "{essid}\n{ipaddr}"
+  },
   "hyprland/workspaces": {
     "format": "{icon}",
     "format-icons": {
@@ -43,7 +60,8 @@
     "tooltip-format": "<tt>{calendar}</tt>"
   },
   "clock#date": {
-    "format": "{:%d\n%m\n%y}"
+    "format": "{:%d\n%m\n%y}",
+    "on-click": "rofi -show noti"
   },
   "pulseaudio": {
     "rotate": 270,

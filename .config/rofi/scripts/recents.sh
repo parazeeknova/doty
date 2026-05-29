@@ -51,3 +51,5 @@ if command -v hyprctl &> /dev/null; then
         fi
     done < <(hyprctl clients 2>/dev/null)
 fi
+
+printf '\0message\x1frecents\n'
