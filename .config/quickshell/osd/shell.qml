@@ -70,6 +70,37 @@ Scope {
     onLoaded: root.refreshState()
   }
 
+  property int lastKbdBrightness: -1
+
+  Timer {
+    id: kbdPollTimer
+    interval: 350
+    repeat: true
+    running: true
+    onTriggered: {
+      kbdBacklightFile.reload()
+    }
+  }
+
+  FileView {
+    id: kbdBacklightFile
+    path: "file:///sys/class/leds/asus::kbd_backlight/brightness"
+    onLoaded: {
+      var val = kbdBacklightFile.text().trim()
+      var intVal = parseInt(val)
+      if (!isNaN(intVal)) {
+        if (lastKbdBrightness !== -1 && lastKbdBrightness !== intVal) {
+          var pct = Math.round((intVal / 3.0) * 100)
+          root.message = "kbd brightness " + pct + "%"
+          root.kind = "info"
+          root.visibleNow = true
+          hideTimer.restart()
+        }
+        lastKbdBrightness = intVal
+      }
+    }
+  }
+
   Component.onCompleted: root.refreshState()
 
   Variants {
@@ -94,8 +125,8 @@ Scope {
         exclusionMode: PanelWindow.ExclusionMode.Ignore
         visible: root.visibleNow
 
-        implicitWidth: label.implicitWidth + 12
-        implicitHeight: label.implicitHeight + 8
+        implicitWidth: label.implicitWidth + 18
+        implicitHeight: label.implicitHeight + 12
 
         Rectangle {
           anchors.fill: parent
@@ -111,7 +142,7 @@ Scope {
             text: root.message
             color: "#d4be98"
             font.family: "FiraCode Nerd Font"
-            font.pixelSize: 8
+            font.pixelSize: 11
             renderType: Text.NativeRendering
           }
         }

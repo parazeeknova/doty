@@ -32,6 +32,7 @@ hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("rofi -show drun -mesg 'applicati
 hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd("rofi -show recents"))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("rofi -show noti"))
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("rofi -show power"))
+hl.bind(mainMod .. " + O", hl.dsp.exec_cmd("rofi -show profile"))
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left", hl.dsp.focus({ direction = "left" }))
@@ -72,6 +73,8 @@ hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd(osdctl .. " volume mic-mute"),
   { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(osdctl .. " brightness up"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(osdctl .. " brightness down"), { locked = true, repeating = true })
+hl.bind("XF86KbdBrightnessUp", hl.dsp.exec_cmd(osdctl .. " kbdbrightness up"), { locked = true, repeating = true })
+hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd(osdctl .. " kbdbrightness down"), { locked = true, repeating = true })
 
 hl.bind("Caps_Lock", hl.dsp.exec_cmd(osdctl .. " caps toggle"), { locked = true })
 

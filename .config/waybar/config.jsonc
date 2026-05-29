@@ -33,7 +33,7 @@
       "󰤥",
       "󰤨"
     ],
-    "tooltip-format-wifi": "{essid}\n{ipaddr}"
+    "tooltip": false
   },
   "hyprland/workspaces": {
     "format": "{icon}",
@@ -82,15 +82,20 @@
       ]
     },
     "scroll-step": 1,
+    "on-scroll-up": "/home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl volume up",
+    "on-scroll-down": "/home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl volume down",
     "on-click": "pavucontrol",
     "ignored-sinks": [
       "Easy Effects Sink"
-    ]
+    ],
+    "tooltip": false
   },
   "battery": {
     "rotate": 270,
     "interval": 60,
     "format": "{capacity} {icon}",
+    "on-click": "rofi -show profile",
+    "tooltip": false,
     "format-icons": {
       "default": [
         "󰂎",

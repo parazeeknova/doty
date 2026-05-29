@@ -63,6 +63,33 @@ def set_brightness(direction: str) -> None:
     write_state(f"brightness {brightness_value()}", "info", 1200)
 
 
+def find_kbd_backlight_device() -> str:
+    for path in Path("/sys/class/leds").glob("*kbd_backlight"):
+        return path.name
+    return "asus::kbd_backlight"
+
+
+def kbd_brightness_value() -> str:
+    try:
+        dev = find_kbd_backlight_device()
+        out = run(["brightnessctl", "-d", dev, "-m"])
+        parts = out.split(",")
+        if len(parts) >= 4:
+            return parts[3].strip()
+    except Exception:
+        pass
+    return "0%"
+
+
+def set_kbd_brightness(direction: str) -> None:
+    dev = find_kbd_backlight_device()
+    if direction == "up":
+        run(["brightnessctl", "-d", dev, "set", "1+"])
+    else:
+        run(["brightnessctl", "-d", dev, "set", "1-"])
+    write_state(f"kbd brightness {kbd_brightness_value()}", "info", 1200)
+
+
 def sink_volume() -> tuple[int, bool]:
     out = run(["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"])
     muted = "MUTED" in out.upper()
@@ -93,18 +120,18 @@ def set_volume(action: str) -> None:
     if action == "up":
         run(["wpctl", "set-volume", "-l", "1", "@DEFAULT_AUDIO_SINK@", "5%+"])
         percent, muted = sink_volume()
-        write_state(f"volume {percent}%", "info", 1200)
+        write_state(f"vol {percent}%", "info", 1200)
     elif action == "down":
         run(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-"])
         percent, muted = sink_volume()
-        write_state(f"volume {percent}%", "info", 1200)
+        write_state(f"vol {percent}%", "info", 1200)
     elif action == "mute":
         run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
         percent, muted = sink_volume()
         if muted:
             write_state("vol muted", "warn", 1200)
         else:
-            write_state(f"volume {percent}%", "info", 1200)
+            write_state(f"vol {percent}%", "info", 1200)
     elif action == "mic-mute":
         run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SOURCE@", "toggle"])
         percent, muted = source_volume()
@@ -115,7 +142,6 @@ def set_volume(action: str) -> None:
 
 
 def get_caps_state() -> bool:
-    # Wait briefly for compositor to update keyboard states
     time.sleep(0.1)
     try:
         out = run(["hyprctl", "devices", "-j"])
@@ -124,7 +150,6 @@ def get_caps_state() -> bool:
             if kb.get("capsLock", False):
                 return True
     except Exception:
-        # Fallback to sysfs LEDs check
         for path in Path("/sys/class/leds").glob("*::capslock"):
             try:
                 val = (path / "brightness").read_text(encoding="utf-8").strip()
@@ -140,9 +165,7 @@ def set_caps(state: str) -> None:
         enabled = get_caps_state()
     else:
         enabled = state == "on"
-    write_state(
-        f"caps {'on' if enabled else 'off'}", "good" if enabled else "info", 1200
-    )
+    write_state(f"caps {'on' if enabled else 'off'}", "good" if enabled else "info", 1200)
 
 
 def show_text(args: list[str]) -> None:
@@ -164,6 +187,8 @@ def main(argv: list[str]) -> int:
     command = argv[1]
     if command == "brightness" and len(argv) >= 3:
         set_brightness(argv[2])
+    elif command == "kbdbrightness" and len(argv) >= 3:
+        set_kbd_brightness(argv[2])
     elif command == "volume" and len(argv) >= 3:
         set_volume(argv[2])
     elif command == "caps" and len(argv) >= 3:
