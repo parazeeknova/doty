@@ -8,7 +8,7 @@ current_profile=$(asusctl profile get | grep "Active profile" | cut -d' ' -f3 ||
 if [ "$#" -gt 0 ]; then
     profile_to_set="${ROFI_INFO:-}"
     if [ -n "$profile_to_set" ]; then
-        asusctl profile set "$profile_to_set"
+        asusctl profile set "$profile_to_set" >/dev/null 2>&1
         # Show on OSD
         /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "profile: ${profile_to_set,,}" good 1500
     fi

@@ -5,13 +5,25 @@ set -euo pipefail
 if [ "$#" -gt 0 ]; then
     case "${ROFI_INFO:-}" in
         poweroff)
-            systemctl poweroff
+            if command -v hyprshutdown &>/dev/null; then
+                hyprshutdown -t 'Shutting down...' --post-cmd 'systemctl poweroff'
+            else
+                systemctl poweroff
+            fi
             ;;
         reboot)
-            systemctl reboot
+            if command -v hyprshutdown &>/dev/null; then
+                hyprshutdown -t 'Restarting...' --post-cmd 'systemctl reboot'
+            else
+                systemctl reboot
+            fi
             ;;
         logout)
-            hyprctl dispatch exit >/dev/null 2>&1 || pkill -x Hyprland
+            if command -v hyprshutdown &>/dev/null; then
+                hyprshutdown -t 'Logging out...'
+            else
+                hyprctl dispatch exit >/dev/null 2>&1 || pkill -x Hyprland
+            fi
             ;;
         sleep)
             systemctl suspend

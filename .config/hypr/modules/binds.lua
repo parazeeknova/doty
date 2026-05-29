@@ -33,6 +33,7 @@ hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd("rofi -show recents"))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("rofi -show noti"))
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("rofi -show power"))
 hl.bind(mainMod .. " + O", hl.dsp.exec_cmd("rofi -show profile"))
+hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("rofi -show sunset"))
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left", hl.dsp.focus({ direction = "left" }))
@@ -77,6 +78,11 @@ hl.bind("XF86KbdBrightnessUp", hl.dsp.exec_cmd(osdctl .. " kbdbrightness up"), {
 hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd(osdctl .. " kbdbrightness down"), { locked = true, repeating = true })
 
 hl.bind("Caps_Lock", hl.dsp.exec_cmd(osdctl .. " caps toggle"), { locked = true })
+hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprpicker -a -n"))
+
+-- Screenshots using grim, slurp and swappy
+hl.bind("Print", hl.dsp.exec_cmd("sh -c 'grim -g \"$(slurp)\" - | swappy -f -'"))
+hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("sh -c 'grim - | swappy -f -'"))
 
 -- Requires playerctl
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
