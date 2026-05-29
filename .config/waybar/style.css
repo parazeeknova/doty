@@ -3,55 +3,53 @@
 * {
   all: unset;
   font-family: "FiraCode Nerd Font", monospace;
-  font-weight: 600;
 }
 
 window#waybar {
   background-color: @bg0;
   color: @fg;
-  border-radius: 0 0 10px 10px;
 }
 
 #workspaces {
-  min-width: 100px;
-  font-size: 0.4rem;
-  padding: 2px 4px;
-  margin: 11px 0;
-  border-radius: 99px;
+  font-size: 0.8rem;
+  padding: 4px 0;
 }
 
 #workspaces button {
-  background-color: @bg4;
-  color: transparent;
-  padding: 0px 5px;
-  border-radius: 99px;
-  margin: 0 2px;
-  min-width: 4px;
+  color: @grey2;
+  min-width: 22px;
+  padding: 2px 0;
 }
 
 #workspaces button.active {
-  background-color: @orange;
-  min-width: 1.2rem;
-  transition: none;
+  color: @fg1;
 }
 
-#clock,
-#clock#right {
-  margin: 0 10px;
-  font-weight: 700;
-  font-size: 1.12rem;
+#clock {
+  font-size: 0.8rem;
+  color: @fg1;
+  padding: 4px 0;
 }
 
-.modules-left {
-  margin-left: 12px;
+#pulseaudio {
+  font-size: 0.8rem;
+  color: @fg1;
+  padding: 4px 0;
 }
 
-.modules-right {
-  margin-right: 12px;
+#window {
+  font-size: 0.8rem;
+  color: @grey1;
+  padding: 4px 0;
 }
 
-#cava {
-  margin: 0 12px;
+#battery {
+  font-size: 0.8rem;
+  padding: 4px 0;
+}
+
+#clock-date {
   font-size: 0.7rem;
-  letter-spacing: 1px;
+  color: @blue;
+  padding: 4px 0;
 }

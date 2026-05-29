@@ -8,5 +8,6 @@
 -- Or execute your favorite apps at launch like this:
 --
 hl.on("hyprland.start", function()
-  hl.exec_cmd("hyperctl hyprpaper wallpaper ',~/Pictures/Anime/grey_lain_wallpaper.jpg,cover'")
+  hl.exec_cmd("waybar")
+  hl.exec_cmd("awww-daemon")
 end)
