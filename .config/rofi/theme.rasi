@@ -1,0 +1,75 @@
+* {
+    bg0:     #1d2021;
+    bg1:     #282828;
+    fg:      #d4be98;
+    fg1:     #ddc7a1;
+    grey1:   #928374;
+    grey2:   #7c6f64;
+    blue:    #7daea3;
+    green:   #a9b665;
+
+    background-color: transparent;
+    text-color: @fg;
+    font: "FiraCode Nerd Font 8";
+    text-transform: lowercase;
+}
+
+window {
+    location: northwest;
+    x-offset: 4px;
+    y-offset: 4px;
+    width: 200px;
+    background-color: @bg0;
+    border: 0;
+    padding: 2px;
+}
+
+mainbox {
+    spacing: 2px;
+}
+
+inputbar {
+    padding: 0 0 2px 0;
+    border: 0 0 1px 0;
+    border-color: @grey2;
+}
+
+prompt {
+    enabled: false;
+}
+
+entry {
+    placeholder: "run";
+    placeholder-color: @grey2;
+}
+
+listview {
+    lines: 12;
+    scrollbar: false;
+    fixed-height: false;
+}
+
+element {
+    padding: 2px 4px;
+}
+
+element normal.normal {
+    text-color: @fg;
+}
+
+element selected.normal {
+    background-color: @bg1;
+    text-color: @fg1;
+}
+
+element alternate.normal {
+    text-color: @grey1;
+}
+
+message {
+    padding: 0;
+}
+
+textbox {
+    text-color: @grey1;
+}

@@ -6,3 +6,4 @@
 node_modules
 fish_variables
 .config/tmux/.tmux/plugins/tpm
+.commandcode

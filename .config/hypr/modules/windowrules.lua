@@ -29,3 +29,9 @@ hl.window_rule({
 
   no_focus = true,
 })
+
+hl.layer_rule({
+  name = "rofi-dropdown",
+  match = { namespace = "rofi" },
+  animation = "slide top"
+})
