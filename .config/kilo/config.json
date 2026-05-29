@@ -18,7 +18,10 @@
     "external_directory": {
       "/home/paper/.bun/install/cache/*": "allow",
       "/home/paper/Singulity/lumen/*": "allow",
-      "/home/parazeeknova/.cargo/registry/src/*": "allow"
+      "/home/parazeeknova/.cargo/registry/src/*": "allow",
+      "/home/parazeeknova/.config/*": "allow",
+      "/home/parazeeknova/.local/share/*": "allow",
+      "/home/parazeeknova/.cache/*": "allow"
     }
   }
 }

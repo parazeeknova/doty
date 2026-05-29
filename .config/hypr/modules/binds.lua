@@ -22,14 +22,16 @@ hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + F", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- dwindle only
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock -c ~/.config/hypr/hyprlock.conf"))
 
--- Waybar hide/unhide toggle
+-- Waybar show/hide toggle
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/doty/.config/waybar/scripts/launch.sh"))
 
 -- Rofi menu's
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("rofi -show drun -mesg 'applications'"))
 hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd("rofi -show recents"))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("rofi -show noti"))
+hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("rofi -show power"))
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left", hl.dsp.focus({ direction = "left" }))

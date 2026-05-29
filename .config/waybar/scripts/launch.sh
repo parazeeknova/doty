@@ -1,4 +1,7 @@
 #!/bin/bash
 
-pkill waybar
-waybar &
+if pgrep -x waybar >/dev/null 2>&1; then
+  pkill -USR1 -x waybar
+else
+  waybar &
+fi
