@@ -8,7 +8,7 @@
 -- Or execute your favorite apps at launch like this:
 --
 hl.on("hyprland.start", function()
-  hl.exec_cmd("waybar")
-  hl.exec_cmd("awww-daemon")
-  hl.exec_cmd("~/.local/bin/ssh-add.sh")
+	hl.exec_cmd("waybar")
+	hl.exec_cmd("awww-daemon")
+	hl.exec_cmd("systemctl --user start ssh-agent.service && ssh-add ~/.ssh/id_ed25519")
 end)

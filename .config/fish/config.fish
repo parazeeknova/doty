@@ -51,11 +51,6 @@ if status is-interactive
         alias tmu="tmux new-session -A -s monkie"
     end
 
-    # SSH Agent Initialization
-    if not set -q SSH_AUTH_SOCK
-        eval (ssh-agent -c) >/dev/null
-        ssh-add ~/.ssh/id_ed25519 2>/dev/null
-    end
 end
 set -gx PATH $HOME/.npm-global/bin $PATH
 
