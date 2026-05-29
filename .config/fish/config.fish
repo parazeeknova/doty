@@ -1,3 +1,12 @@
+#Janky KDE to Hypr Switch
+if status is-login
+    if test (tty) = /dev/tty1
+        if not set -q HYPRLAND_INSTANCE_SIGNATURE
+            exec start-hyprland
+        end
+    end
+end
+
 # Environment Variables
 set -gx LANG en_US.UTF-8
 set -gx LC_ALL en_US.UTF-8
