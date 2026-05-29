@@ -1,0 +1,57 @@
+@import "colors/gruvbox-material.css";
+
+* {
+  all: unset;
+  font-family: "FiraCode Nerd Font", monospace;
+  font-weight: 600;
+}
+
+window#waybar {
+  background-color: @bg0;
+  color: @fg;
+  border-radius: 0 0 10px 10px;
+}
+
+#workspaces {
+  min-width: 100px;
+  font-size: 0.4rem;
+  padding: 2px 4px;
+  margin: 11px 0;
+  border-radius: 99px;
+}
+
+#workspaces button {
+  background-color: @bg4;
+  color: transparent;
+  padding: 0px 5px;
+  border-radius: 99px;
+  margin: 0 2px;
+  min-width: 4px;
+}
+
+#workspaces button.active {
+  background-color: @orange;
+  min-width: 1.2rem;
+  transition: none;
+}
+
+#clock,
+#clock#right {
+  margin: 0 10px;
+  font-weight: 700;
+  font-size: 1.12rem;
+}
+
+.modules-left {
+  margin-left: 12px;
+}
+
+.modules-right {
+  margin-right: 12px;
+}
+
+#cava {
+  margin: 0 12px;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+}
