@@ -17,7 +17,8 @@
     "bash": "allow",
     "external_directory": {
       "/home/paper/.bun/install/cache/*": "allow",
-      "/home/paper/Singulity/lumen/*": "allow"
+      "/home/paper/Singulity/lumen/*": "allow",
+      "/home/parazeeknova/.cargo/registry/src/*": "allow"
     }
   }
 }

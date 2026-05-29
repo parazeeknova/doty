@@ -4,3 +4,4 @@
 .config/kilo/package-lock.json
 .config/opencode/package-lock.json
 node_modules
+fish_variables

@@ -1,4 +1,21 @@
 {
+  "numStartups": 2,
+  "customApiKeyResponses": {
+    "approved": [
+      "rdrKFbUR4tb8W4Errosx"
+    ],
+    "rejected": []
+  },
+  "tipsHistory": {
+    "new-user-warmup": 1,
+    "plan-mode-for-complex-tasks": 1,
+    "memory-command": 1,
+    "theme-command": 2,
+    "status-line": 2,
+    "prompt-queue": 2,
+    "enter-to-steer-in-relatime": 2,
+    "todo-list": 2
+  },
   "firstStartTime": "2026-05-13T13:17:05.725Z",
   "opusProMigrationComplete": true,
   "sonnet1m45MigrationComplete": true,
@@ -17,5 +34,65 @@
       ],
       "env": {}
     }
+  },
+  "changelogLastFetched": 1779047179424,
+  "hasCompletedOnboarding": true,
+  "lastOnboardingVersion": "2.1.143",
+  "lastReleaseNotesSeen": "2.1.143",
+  "projects": {
+    "/home/parazeeknova": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 1,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [],
+      "lastGracefulShutdown": true,
+      "lastVersionBase": "2.1.143",
+      "lastHintSessionId": "4b5655a7-bbbc-4ac7-a930-d86cacecbf5c",
+      "lastSessionFirstPrompt": "sup",
+      "lastSessionModified": 1779090695028,
+      "lastCost": 0,
+      "lastAPIDuration": 0,
+      "lastAPIDurationWithoutRetries": 0,
+      "lastToolDuration": 0,
+      "lastDuration": 65381,
+      "lastLinesAdded": 0,
+      "lastLinesRemoved": 0,
+      "lastTotalInputTokens": 0,
+      "lastTotalOutputTokens": 0,
+      "lastTotalCacheCreationInputTokens": 0,
+      "lastTotalCacheReadInputTokens": 0,
+      "lastTotalWebSearchRequests": 0,
+      "lastFpsAverage": 3.99,
+      "lastFpsLow1Pct": 168.96,
+      "lastModelUsage": {},
+      "lastSessionId": "4b5655a7-bbbc-4ac7-a930-d86cacecbf5c",
+      "lastSessionMetrics": {
+        "frame_duration_ms_count": 256,
+        "frame_duration_ms_min": 0.08385399999679066,
+        "frame_duration_ms_max": 7.327763999999661,
+        "frame_duration_ms_avg": 0.6435168437500229,
+        "frame_duration_ms_p50": 0.3293080000039481,
+        "frame_duration_ms_p95": 3.3834142500013513,
+        "frame_duration_ms_p99": 5.894274600000198,
+        "hook_duration_ms_count": 3,
+        "hook_duration_ms_min": 34,
+        "hook_duration_ms_max": 111,
+        "hook_duration_ms_avg": 60.333333333333336,
+        "hook_duration_ms_p50": 36,
+        "hook_duration_ms_p95": 103.5,
+        "hook_duration_ms_p99": 109.5
+      }
+    }
+  },
+  "officialMarketplaceAutoInstallAttempted": true,
+  "officialMarketplaceAutoInstalled": true,
+  "metricsStatusCache": {
+    "timestamp": 1779090742715
   }
 }

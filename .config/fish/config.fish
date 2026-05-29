@@ -12,6 +12,10 @@ set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 set -U __done_min_cmd_duration 10000
 set -U __done_notification_urgency_level low
 
+# Global package PATH for node & bun
+export PATH="/home/parazeeknova/.bun/bin:$PATH"
+export DOCKER_COMPOSE_PROVIDER_WARNING=0
+
 # Path Configuration
 fish_add_path ~/.local/bin
 fish_add_path ~/.cargo/bin
@@ -45,3 +49,7 @@ if status is-interactive
     end
 end
 set -gx PATH $HOME/.npm-global/bin $PATH
+
+# >>> grok installer >>>
+fish_add_path $HOME/.grok/bin
+# <<< grok installer <<<
