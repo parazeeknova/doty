@@ -7,3 +7,6 @@ node_modules
 fish_variables
 .config/tmux/.tmux/plugins/tpm
 .commandcode
+__pycache__
+.antigravitycli
+.config/quickshell/osd/state.json

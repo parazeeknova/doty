@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parent.parent
+STATE_FILE = ROOT / "state.json"
+
+DEFAULT_STATE = {
+    "visible": False,
+    "text": "",
+    "kind": "info",
+    "timeout_ms": 1200,
+}
+
+
+def atomic_write(path: Path, content: str) -> None:
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(content, encoding="utf-8")
+    tmp.replace(path)
+
+
+def write_state(text: str, kind: str = "info", timeout_ms: int = 1200) -> None:
+    state = {
+        "visible": True,
+        "text": text,
+        "kind": kind,
+        "timeout_ms": timeout_ms,
+    }
+    atomic_write(STATE_FILE, json.dumps(state, separators=(",", ":")))
+
+
+def clear_state() -> None:
+    atomic_write(STATE_FILE, json.dumps(DEFAULT_STATE, separators=(",", ":")))
+
+
+def run(command: list[str]) -> str:
+    return subprocess.check_output(command, text=True).strip()
+
+
+def brightness_value() -> str:
+    try:
+        out = run(["brightnessctl", "-m"])
+        parts = out.split(",")
+        if len(parts) >= 4:
+            return parts[3].strip()
+    except Exception:
+        pass
+    return "0%"
+
+
+def set_brightness(direction: str) -> None:
+    if direction == "up":
+        run(["brightnessctl", "-e4", "-n2", "set", "5%+"])
+    else:
+        run(["brightnessctl", "-e4", "-n2", "set", "5%-"])
+    write_state(f"brightness {brightness_value()}", "info", 1200)
+
+
+def sink_volume() -> tuple[int, bool]:
+    out = run(["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"])
+    muted = "MUTED" in out.upper()
+    parts = out.replace(":", "").split()
+    value = 0.0
+    if len(parts) >= 2:
+        try:
+            value = float(parts[1])
+        except ValueError:
+            value = 0.0
+    return round(value * 100), muted
+
+
+def source_volume() -> tuple[int, bool]:
+    out = run(["wpctl", "get-volume", "@DEFAULT_AUDIO_SOURCE@"])
+    muted = "MUTED" in out.upper()
+    parts = out.replace(":", "").split()
+    value = 0.0
+    if len(parts) >= 2:
+        try:
+            value = float(parts[1])
+        except ValueError:
+            value = 0.0
+    return round(value * 100), muted
+
+
+def set_volume(action: str) -> None:
+    if action == "up":
+        run(["wpctl", "set-volume", "-l", "1", "@DEFAULT_AUDIO_SINK@", "5%+"])
+        percent, muted = sink_volume()
+        write_state(f"volume {percent}%", "info", 1200)
+    elif action == "down":
+        run(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-"])
+        percent, muted = sink_volume()
+        write_state(f"volume {percent}%", "info", 1200)
+    elif action == "mute":
+        run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
+        percent, muted = sink_volume()
+        if muted:
+            write_state("vol muted", "warn", 1200)
+        else:
+            write_state(f"volume {percent}%", "info", 1200)
+    elif action == "mic-mute":
+        run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SOURCE@", "toggle"])
+        percent, muted = source_volume()
+        if muted:
+            write_state("mic muted", "warn", 1200)
+        else:
+            write_state(f"mic {percent}%", "info", 1200)
+
+
+def get_caps_state() -> bool:
+    # Wait briefly for compositor to update keyboard states
+    time.sleep(0.1)
+    try:
+        out = run(["hyprctl", "devices", "-j"])
+        devices = json.loads(out)
+        for kb in devices.get("keyboards", []):
+            if kb.get("capsLock", False):
+                return True
+    except Exception:
+        # Fallback to sysfs LEDs check
+        for path in Path("/sys/class/leds").glob("*::capslock"):
+            try:
+                val = (path / "brightness").read_text(encoding="utf-8").strip()
+                if val != "0":
+                    return True
+            except Exception:
+                pass
+    return False
+
+
+def set_caps(state: str) -> None:
+    if state == "toggle":
+        enabled = get_caps_state()
+    else:
+        enabled = state == "on"
+    write_state(
+        f"caps {'on' if enabled else 'off'}", "good" if enabled else "info", 1200
+    )
+
+
+def show_text(args: list[str]) -> None:
+    if not args:
+        sys.exit(1)
+    timeout = 1200
+    kind = "info"
+    if len(args) >= 2 and args[-1].isdigit():
+        timeout = int(args.pop())
+    if len(args) >= 2 and args[-1] in {"info", "good", "warn", "bad"}:
+        kind = args.pop()
+    write_state(" ".join(args), kind, timeout)
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) < 2:
+        return 1
+
+    command = argv[1]
+    if command == "brightness" and len(argv) >= 3:
+        set_brightness(argv[2])
+    elif command == "volume" and len(argv) >= 3:
+        set_volume(argv[2])
+    elif command == "caps" and len(argv) >= 3:
+        set_caps(argv[2])
+    elif command == "show":
+        show_text(argv[2:])
+    elif command == "clear":
+        clear_state()
+    else:
+        return 1
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))
