@@ -97,6 +97,14 @@ hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("sh -c 'grim -g \"$(slurp)\" 
 
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("rofi -show clip"))
 
+local hyprspace = require("hyprspace")
+
+-- Overview (Hyprspace plugin) triggered by SUPER + O
+hl.bind("ALT + TAB", function()
+	hyprspace.toggle()
+end)
+
+
 -- Requires playerctl
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
