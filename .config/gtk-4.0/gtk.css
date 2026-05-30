@@ -329,3 +329,21 @@ flowbox flowboxchild {
 *:visited {
   color: @purple;
 }
+
+/* Generic dialog action area buttons override to fix fallback white backgrounds */
+.dialog-action-area button,
+.dialog-action-box button,
+.response-area button,
+window.dialog button {
+  background-color: alpha(#d5c4a1, 0.07) !important;
+  color: @fg_color !important;
+  border: 1px solid @border_color !important;
+}
+
+.dialog-action-area button:hover,
+.dialog-action-box button:hover,
+.response-area button:hover,
+window.dialog button:hover {
+  background-color: alpha(#d5c4a1, 0.12) !important;
+  color: @fg_color !important;
+}

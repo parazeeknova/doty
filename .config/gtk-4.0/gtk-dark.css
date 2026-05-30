@@ -9160,3 +9160,22 @@ read if you used those and something break with a version upgrade you're on your
 @define-color popover_fg_color #fbf1c7;
 @define-color shade_color rgba(251, 241, 199, 0.12);
 @define-color scrollbar_outline_color rgba(251, 241, 199, 0.12);
+
+/* Generic dialog action area buttons override to fix fallback white backgrounds */
+.dialog-action-area button,
+.dialog-action-box button,
+.response-area button,
+window.dialog button {
+  background-color: rgba(251, 241, 199, 0.08) !important;
+  color: #fbf1c7 !important;
+  border: 1px solid rgba(251, 241, 199, 0.12) !important;
+  box-shadow: none !important;
+}
+
+.dialog-action-area button:hover,
+.dialog-action-box button:hover,
+.response-area button:hover,
+window.dialog button:hover {
+  background-color: rgba(251, 241, 199, 0.15) !important;
+  color: #fbf1c7 !important;
+}
