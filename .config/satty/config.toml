@@ -1,0 +1,70 @@
+[general]
+fullscreen = false
+resize = { mode = "size", width = 1000, height = 800 }
+floating-hack = true
+early-exit = true
+early-exit-save-as = true
+corner-roundness = 0
+initial-tool = "brush"
+copy-command = "wl-copy"
+annotation-size-factor = 2
+output-filename = "/tmp/screenshot-%Y-%m-%d_%H:%M:%S.png"
+save-after-copy = true
+default-hide-toolbars = false
+focus-toggles-toolbars = false
+default-fill-shapes = false
+primary-highlighter = "block"
+disable-notifications = false
+actions-on-right-click = []
+actions-on-enter = ["save-to-clipboard"]
+actions-on-escape = ["exit"]
+no-window-decoration = true
+brush-smooth-history-size = 10
+pan-step-size = 50.0
+zoom-factor = 1.1
+text-move-length = 50.0
+input-scale = 2.0
+
+[keybinds]
+pointer = "p"
+crop = "c"
+brush = "b"
+line = "i"
+arrow = "z"
+rectangle = "r"
+ellipse = "e"
+text = "t"
+marker = "m"
+blur = "u"
+highlight = "g"
+
+[font]
+family = "FiraCode Nerd Font"
+style = "Regular"
+fallback = [
+    "Noto Sans CJK JP",
+    "Noto Sans CJK SC",
+    "Noto Sans CJK TC",
+    "Noto Sans CJK KR",
+    "Noto Serif CJK JP",
+    "Noto Serif JP",
+    "IPAGothic",
+    "IPAexGothic",
+    "Source Han Sans",
+]
+
+[color-palette]
+palette = ["#b8bb26", "#fabd2f", "#fe8019", "#fb4934", "#d3869b", "#83a598"]
+
+custom = [
+    "#b8bb26",
+    "#fabd2f",
+    "#fe8019",
+    "#fb4934",
+    "#d3869b",
+    "#83a598",
+    "#d4be98",
+    "#a89984",
+    "#928374",
+    "#ebdbb2",
+]

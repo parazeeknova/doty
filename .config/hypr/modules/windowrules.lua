@@ -35,3 +35,11 @@ hl.layer_rule({
   match = { namespace = "rofi" },
   animation = "slide top"
 })
+
+hl.window_rule({
+  name   = "satty-float",
+  match  = { class = "satty" },
+  float  = true,
+  size   = { 800, 400 },
+  center = true,
+})
