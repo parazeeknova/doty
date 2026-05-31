@@ -822,7 +822,7 @@ Scope {
 
               // Volume Button
               Item {
-                width: parent.width / 5
+                width: parent.width / 6
                 height: 14
 
                 Text {
@@ -849,7 +849,7 @@ Scope {
 
               // Network Button
               Item {
-                width: parent.width / 5
+                width: parent.width / 6
                 height: 14
 
                 Text {
@@ -876,7 +876,7 @@ Scope {
 
               // Bluetooth Button
               Item {
-                width: parent.width / 5
+                width: parent.width / 6
                 height: 14
 
                 Text {
@@ -903,7 +903,7 @@ Scope {
 
               // Brightness Button
               Item {
-                width: parent.width / 5
+                width: parent.width / 6
                 height: 14
 
                 Text {
@@ -930,7 +930,7 @@ Scope {
 
               // Battery Button
               Item {
-                width: parent.width / 5
+                width: parent.width / 6
                 height: 14
 
                 Text {
@@ -950,6 +950,33 @@ Scope {
                   onExited: btnBat.color = "#d5c4a1"
                   onClicked: {
                     Quickshell.execDetached(["quickshell", "--config", "battery_popup"])
+                    Qt.quit()
+                  }
+                }
+              }
+
+              // System Monitor Button
+              Item {
+                width: parent.width / 6
+                height: 14
+
+                Text {
+                  id: btnSysmon
+                  anchors.centerIn: parent
+                  text: "󰣖"
+                  color: "#d5c4a1"
+                  font.family: "FiraCode Nerd Font"
+                  font.pixelSize: 12
+                  renderType: Text.NativeRendering
+                }
+
+                MouseArea {
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  onEntered: btnSysmon.color = "#ebdbb2"
+                  onExited: btnSysmon.color = "#d5c4a1"
+                  onClicked: {
+                    Quickshell.execDetached(["quickshell", "--config", "sysmon_popup"])
                     Qt.quit()
                   }
                 }

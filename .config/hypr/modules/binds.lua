@@ -81,7 +81,6 @@ end)
 
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("rofi -show drun -mesg 'applications'"))
 hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd("rofi -show recents"))
-hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("quickshell --config notif_popup"))
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("rofi -show power"))
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("rofi -show sunset"))
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("rofi -show clip"))
@@ -92,6 +91,7 @@ hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exec_cmd("quickshell --config volume_p
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("quickshell --config network_popup"))
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.exec_cmd("quickshell --config bluetooth_popup"))
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("quickshell --config brightness_popup"))
+hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("quickshell --config notif_popup"))
 
 ---------------------
 ---   Screenshots ---
