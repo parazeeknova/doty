@@ -1,6 +1,6 @@
+use helpers_rs::{battery_snapshot, print_json, quickshell_dir, round_to};
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::path::Path;
 use std::process::Command;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -16,50 +16,23 @@ struct BatteryResult {
     history: Vec<f64>,
 }
 
-fn read_sys_file(path: &Path) -> String {
-    fs::read_to_string(path)
-        .map(|s| s.trim().to_string())
-        .unwrap_or_default()
-}
-
 fn main() {
-    let config_dir = Path::new("/home/parazeeknova/.config/quickshell/battery_popup");
+    let config_dir = quickshell_dir().join("battery_popup");
     let history_file = config_dir.join("history.json");
-    let bat_dir = Path::new("/sys/class/power_supply/BAT1");
 
-    let capacity_str = read_sys_file(&bat_dir.join("capacity"));
-    let status = {
-        let s = read_sys_file(&bat_dir.join("status"));
-        if s.is_empty() {
-            "Unknown".to_string()
-        } else {
-            s
-        }
-    };
-    let charge_full_str = read_sys_file(&bat_dir.join("charge_full"));
-    let charge_full_design_str = read_sys_file(&bat_dir.join("charge_full_design"));
-    let charge_now_str = read_sys_file(&bat_dir.join("charge_now"));
-    let current_now_str = read_sys_file(&bat_dir.join("current_now"));
-    let voltage_now_str = read_sys_file(&bat_dir.join("voltage_now"));
-
-    let capacity = capacity_str.parse::<i32>().unwrap_or(0);
-    let charge_full = charge_full_str.parse::<f64>().unwrap_or(0.0);
-    let charge_full_design = charge_full_design_str.parse::<f64>().unwrap_or(0.0);
-    let charge_now = charge_now_str.parse::<f64>().unwrap_or(0.0);
-    let current_now = current_now_str.parse::<f64>().unwrap_or(0.0);
-    let voltage_now = voltage_now_str.parse::<f64>().unwrap_or(0.0);
-
+    let battery = battery_snapshot();
+    let status = battery.status.clone();
     let mut health = 100.0;
-    if charge_full_design > 0.0 {
-        health = (charge_full / charge_full_design) * 100.0;
+    if battery.full_design > 0.0 {
+        health = (battery.full / battery.full_design) * 100.0;
     }
 
-    let power_draw_w = (voltage_now * current_now) / 1e12;
+    let power_draw_w = battery.power_w;
 
     let time_remaining_str = if status == "Charging" {
-        if current_now > 0.0 {
-            let rem_charge = charge_full - charge_now;
-            let hours = rem_charge / current_now;
+        if battery.rate > 0.0 {
+            let rem_charge = (battery.full - battery.now).max(0.0);
+            let hours = rem_charge / battery.rate;
             let h = hours as i32;
             let m = ((hours - h as f64) * 60.0) as i32;
             if h > 0 {
@@ -71,8 +44,8 @@ fn main() {
             "Not charging".to_string()
         }
     } else if status == "Discharging" {
-        if current_now > 0.0 {
-            let hours = charge_now / current_now;
+        if battery.rate > 0.0 {
+            let hours = battery.now / battery.rate;
             let h = hours as i32;
             let m = ((hours - h as f64) * 60.0) as i32;
             if h > 0 {
@@ -127,17 +100,15 @@ fn main() {
     let sparkline = sparkline_chars.concat();
 
     let result = BatteryResult {
-        capacity,
+        capacity: battery.capacity,
         status,
-        health: (health * 10.0).round() / 10.0,
-        power_draw_w: (power_draw_w * 100.0).round() / 100.0,
+        health: round_to(health, 10.0),
+        power_draw_w: round_to(power_draw_w, 100.0),
         time_remaining_str,
         active_profile,
         sparkline,
         history,
     };
 
-    if let Ok(json_out) = serde_json::to_string(&result) {
-        println!("{}", json_out);
-    }
+    print_json(&result);
 }

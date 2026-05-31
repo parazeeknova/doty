@@ -1,3 +1,4 @@
+use helpers_rs::{parse_percent, print_json};
 use serde::{Deserialize, Serialize};
 use std::process::Command;
 
@@ -86,11 +87,10 @@ fn get_pactl_json(category: &str) -> serde_json::Value {
 fn parse_volume(vol_obj: &serde_json::Value) -> i64 {
     if let Some(obj) = vol_obj.as_object() {
         for (_chan, val_dict) in obj {
-            if let Some(val_str) = val_dict.get("value_percent").and_then(|v| v.as_str()) {
-                let digits: String = val_str.chars().filter(|c| c.is_ascii_digit()).collect();
-                if let Ok(vol) = digits.parse::<i64>() {
-                    return vol;
-                }
+            if let Some(val_str) = val_dict.get("value_percent").and_then(|v| v.as_str())
+                && let Some(vol) = parse_percent(val_str)
+            {
+                return vol;
             }
         }
     }
@@ -102,10 +102,9 @@ fn main() {
     let mut default_source_name = String::new();
     let mut pipewire_version = "Running".to_string();
 
-    let Ok(output) = Command::new("pactl").arg("info").output() else {
-        return;
-    };
-    if output.status.success() {
+    if let Ok(output) = Command::new("pactl").arg("info").output()
+        && output.status.success()
+    {
         let out_str = String::from_utf8_lossy(&output.stdout);
         for line in out_str.lines() {
             if let Some(suffix) = line.strip_prefix("Default Sink:") {
@@ -304,9 +303,7 @@ fn main() {
         media,
     };
 
-    if let Ok(json_out) = serde_json::to_string(&result) {
-        println!("{}", json_out);
-    }
+    print_json(&result);
 }
 
 fn get_media_info() -> Option<MediaInfo> {
@@ -335,14 +332,14 @@ fn get_media_info() -> Option<MediaInfo> {
         let status_out = Command::new("playerctl")
             .args(["--player", player, "status"])
             .output();
-        if let Ok(out) = status_out {
-            if out.status.success() {
-                let status = String::from_utf8_lossy(&out.stdout).trim().to_string();
-                if status == "Playing" {
-                    best_player = Some(player.clone());
-                    best_status = status;
-                    break;
-                }
+        if let Ok(out) = status_out
+            && out.status.success()
+        {
+            let status = String::from_utf8_lossy(&out.stdout).trim().to_string();
+            if status == "Playing" {
+                best_player = Some(player.clone());
+                best_status = status;
+                break;
             }
         }
     }
@@ -353,14 +350,14 @@ fn get_media_info() -> Option<MediaInfo> {
             let status_out = Command::new("playerctl")
                 .args(["--player", player, "status"])
                 .output();
-            if let Ok(out) = status_out {
-                if out.status.success() {
-                    let status = String::from_utf8_lossy(&out.stdout).trim().to_string();
-                    if status == "Paused" {
-                        best_player = Some(player.clone());
-                        best_status = status;
-                        break;
-                    }
+            if let Ok(out) = status_out
+                && out.status.success()
+            {
+                let status = String::from_utf8_lossy(&out.stdout).trim().to_string();
+                if status == "Paused" {
+                    best_player = Some(player.clone());
+                    best_status = status;
+                    break;
                 }
             }
         }
@@ -374,55 +371,75 @@ fn get_media_info() -> Option<MediaInfo> {
         let status_out = Command::new("playerctl")
             .args(["--player", &target_player, "status"])
             .output();
-        if let Ok(out) = status_out {
-            if out.status.success() {
-                best_status = String::from_utf8_lossy(&out.stdout).trim().to_string();
-            }
+        if let Ok(out) = status_out
+            && out.status.success()
+        {
+            best_status = String::from_utf8_lossy(&out.stdout).trim().to_string();
         }
     }
 
-    // 3. Query metadata for the selected target player
-    let meta_out = Command::new("playerctl")
-        .args(["--player", &target_player, "metadata", "--format", "{{playerName}};;{{title}};;{{artist}};;{{mpris:artUrl}}"])
+    // 3. Query metadata for the selected target player. Separate calls avoid
+    // delimiter collisions with track titles or artists.
+    let player = playerctl_metadata(&target_player, "{{playerName}}")?;
+    let title = playerctl_metadata(&target_player, "{{title}}").unwrap_or_default();
+    let artist = playerctl_metadata(&target_player, "{{artist}}").unwrap_or_default();
+    let art_url = playerctl_metadata(&target_player, "{{mpris:artUrl}}").unwrap_or_default();
+
+    Some(MediaInfo {
+        player,
+        title,
+        artist,
+        art_url,
+        status: best_status,
+        position: playerctl_position(&target_player),
+        length: playerctl_length(&target_player),
+    })
+}
+
+fn playerctl_metadata(player: &str, format: &str) -> Option<String> {
+    let output = Command::new("playerctl")
+        .args(["--player", player, "metadata", "--format", format])
         .output()
         .ok()?;
+    output
+        .status
+        .success()
+        .then(|| String::from_utf8_lossy(&output.stdout).trim().to_string())
+}
 
-    if !meta_out.status.success() {
-        return None;
-    }
-
-    let meta_str = String::from_utf8_lossy(&meta_out.stdout).trim().to_string();
-    let parts: Vec<&str> = meta_str.split(";;").collect();
-    if parts.len() >= 4 {
-        let player = parts[0].to_string();
-        
-        let position = Command::new("playerctl")
-            .args(["--player", &target_player, "position"])
-            .output()
-            .ok()
-            .filter(|o| o.status.success())
-            .and_then(|o| String::from_utf8_lossy(&o.stdout).trim().parse::<f64>().ok())
-            .unwrap_or(0.0);
-
-        let length = Command::new("playerctl")
-            .args(["--player", &target_player, "metadata", "--format", "{{mpris:length}}"])
-            .output()
-            .ok()
-            .filter(|o| o.status.success())
-            .and_then(|o| String::from_utf8_lossy(&o.stdout).trim().parse::<f64>().ok())
-            .map(|l| l / 1_000_000.0)
-            .unwrap_or(0.0);
-
-        Some(MediaInfo {
-            player,
-            title: parts[1].to_string(),
-            artist: parts[2].to_string(),
-            art_url: parts[3].to_string(),
-            status: best_status,
-            position,
-            length,
+fn playerctl_position(player: &str) -> f64 {
+    Command::new("playerctl")
+        .args(["--player", player, "position"])
+        .output()
+        .ok()
+        .filter(|o| o.status.success())
+        .and_then(|o| {
+            String::from_utf8_lossy(&o.stdout)
+                .trim()
+                .parse::<f64>()
+                .ok()
         })
-    } else {
-        None
-    }
+        .unwrap_or(0.0)
+}
+
+fn playerctl_length(player: &str) -> f64 {
+    Command::new("playerctl")
+        .args([
+            "--player",
+            player,
+            "metadata",
+            "--format",
+            "{{mpris:length}}",
+        ])
+        .output()
+        .ok()
+        .filter(|o| o.status.success())
+        .and_then(|o| {
+            String::from_utf8_lossy(&o.stdout)
+                .trim()
+                .parse::<f64>()
+                .ok()
+        })
+        .map(|l| l / 1_000_000.0)
+        .unwrap_or(0.0)
 }

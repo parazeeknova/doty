@@ -1,5 +1,6 @@
-use std::process::Command;
+use helpers_rs::{active_wifi_device, cidr_to_netmask, print_json, run_cmd, split_nmcli_t_line};
 use serde::Serialize;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Serialize)]
 struct WifiNetwork {
@@ -44,22 +45,14 @@ struct NetworkStatus {
     vpns: Vec<VpnConnection>,
 }
 
-fn run_cmd(cmd: &str, args: &[&str]) -> String {
-    Command::new(cmd)
-        .args(args)
-        .output()
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
-        .unwrap_or_default()
-}
-
 fn is_wifi_enabled() -> bool {
-    let out = run_cmd("nmcli", &["radio", "wifi"]);
+    let out = run_cmd("nmcli", &["radio", "wifi"]).unwrap_or_default();
     out.to_lowercase().contains("enabled")
 }
 
 fn is_airplane_mode() -> bool {
     // Check if wifi and bluetooth are both blocked in rfkill
-    let out = run_cmd("rfkill", &["-no", "TYPE,SOFT"]);
+    let out = run_cmd("rfkill", &["-no", "TYPE,SOFT"]).unwrap_or_default();
     let lines = out.lines();
     let mut wlan_blocked = false;
     let mut bt_blocked = false;
@@ -94,9 +87,39 @@ fn is_airplane_mode() -> bool {
     }
 }
 
+fn wifi_autoconnect_by_ssid() -> HashMap<String, bool> {
+    let out = run_cmd(
+        "nmcli",
+        &[
+            "-t",
+            "-f",
+            "NAME,TYPE,802-11-wireless.ssid,connection.autoconnect",
+            "connection",
+            "show",
+        ],
+    )
+    .unwrap_or_default();
+    let mut map = HashMap::new();
+
+    for line in out.lines() {
+        let parts = split_nmcli_t_line(line);
+        if parts.len() >= 4 && parts[1] == "802-11-wireless" {
+            let ssid = if parts[2].is_empty() {
+                parts[0].clone()
+            } else {
+                parts[2].clone()
+            };
+            map.insert(ssid, parts[3].eq_ignore_ascii_case("yes"));
+        }
+    }
+
+    map
+}
+
 fn main() {
     let wifi_enabled = is_wifi_enabled();
     let airplane_mode = is_airplane_mode();
+    let wifi_device = active_wifi_device();
 
     let mut connected = false;
     let mut active_ssid = String::new();
@@ -114,37 +137,30 @@ fn main() {
 
     let mut networks: Vec<WifiNetwork> = Vec::new();
     let mut vpns: Vec<VpnConnection> = Vec::new();
+    let autoconnect_by_ssid = wifi_autoconnect_by_ssid();
 
     // 1. Get scanned wifi networks
     if wifi_enabled {
         let wifi_list_out = run_cmd(
             "nmcli",
-            &["-t", "-f", "active,ssid,bssid,signal,rate,security", "dev", "wifi", "list", "--rescan", "auto"],
-        );
+            &[
+                "-t",
+                "-f",
+                "active,ssid,bssid,signal,rate,security",
+                "dev",
+                "wifi",
+                "list",
+                "--rescan",
+                "auto",
+            ],
+        )
+        .unwrap_or_default();
 
         // Keep track of SSIDs to avoid duplicates in scan list
-        let mut seen_ssids = std::collections::HashSet::new();
+        let mut seen_ssids = HashSet::new();
 
         for line in wifi_list_out.lines() {
-            // Split fields by ':' but handle escaped colons in BSSID
-            // Format: active:ssid:bssid:signal:rate:security
-            // Colons in BSSID are escaped with backslash
-            let mut parts = Vec::new();
-            let mut current = String::new();
-            let mut chars = line.chars().peekable();
-
-            while let Some(c) = chars.next() {
-                if c == '\\' && chars.peek() == Some(&':') {
-                    current.push(':');
-                    chars.next();
-                } else if c == ':' {
-                    parts.push(current.clone());
-                    current.clear();
-                } else {
-                    current.push(c);
-                }
-            }
-            parts.push(current);
+            let parts = split_nmcli_t_line(line);
 
             if parts.len() >= 6 {
                 let active = parts[0].to_lowercase().contains("yes");
@@ -166,17 +182,28 @@ fn main() {
                     details.bssid = bssid.clone();
 
                     // Get real negotiated bitrate from iw instead of PHY link rate
-                    let iw_out = run_cmd("iw", &["dev", "wlan0", "link"]);
+                    let iw_out = wifi_device
+                        .as_deref()
+                        .and_then(|dev| run_cmd("iw", &["dev", dev, "link"]))
+                        .unwrap_or_default();
                     let mut rx_rate = String::new();
                     let mut tx_rate = String::new();
                     for iw_line in iw_out.lines() {
                         let trimmed = iw_line.trim();
                         if trimmed.starts_with("rx bitrate:") {
-                            rx_rate = trimmed.trim_start_matches("rx bitrate:").trim()
-                                .split_whitespace().take(2).collect::<Vec<&str>>().join(" ");
+                            rx_rate = trimmed
+                                .trim_start_matches("rx bitrate:")
+                                .split_whitespace()
+                                .take(2)
+                                .collect::<Vec<&str>>()
+                                .join(" ");
                         } else if trimmed.starts_with("tx bitrate:") {
-                            tx_rate = trimmed.trim_start_matches("tx bitrate:").trim()
-                                .split_whitespace().take(2).collect::<Vec<&str>>().join(" ");
+                            tx_rate = trimmed
+                                .trim_start_matches("tx bitrate:")
+                                .split_whitespace()
+                                .take(2)
+                                .collect::<Vec<&str>>()
+                                .join(" ");
                         }
                     }
                     if !tx_rate.is_empty() {
@@ -191,10 +218,8 @@ fn main() {
 
                 if !seen_ssids.contains(&ssid) {
                     seen_ssids.insert(ssid.clone());
-                    
-                    // Check autoconnect setting for this connection name
-                    let autoconnect_out = run_cmd("nmcli", &["-g", "connection.autoconnect", "connection", "show", &ssid]);
-                    let autoconnect = autoconnect_out.to_lowercase().contains("yes");
+
+                    let autoconnect = autoconnect_by_ssid.get(&ssid).copied().unwrap_or(false);
 
                     networks.push(WifiNetwork {
                         ssid,
@@ -219,9 +244,9 @@ fn main() {
         }
     });
 
-    // 2. Fetch IP details for wlan0 if connected
-    if connected {
-        let dev_info = run_cmd("nmcli", &["dev", "show", "wlan0"]);
+    // 2. Fetch IP details for the active Wi-Fi device if connected
+    if connected && let Some(dev) = wifi_device.as_deref() {
+        let dev_info = run_cmd("nmcli", &["dev", "show", dev]).unwrap_or_default();
         for line in dev_info.lines() {
             let parts: Vec<&str> = line.splitn(2, ':').collect();
             if parts.len() == 2 {
@@ -233,15 +258,10 @@ fn main() {
                     details.ip_address = addr_parts[0].to_string();
                     if addr_parts.len() >= 2 {
                         // Calculate subnet mask from CIDR prefix
-                        if let Ok(prefix) = addr_parts[1].parse::<u32>() {
-                            let mask = !0u32 << (32 - prefix);
-                            details.subnet = format!(
-                                "{}.{}.{}.{}",
-                                (mask >> 24) & 0xFF,
-                                (mask >> 16) & 0xFF,
-                                (mask >> 8) & 0xFF,
-                                mask & 0xFF
-                            );
+                        if let Ok(prefix) = addr_parts[1].parse::<u32>()
+                            && let Some(mask) = cidr_to_netmask(prefix)
+                        {
+                            details.subnet = mask;
                         }
                     }
                 } else if key.contains("IP4.GATEWAY") {
@@ -258,17 +278,23 @@ fn main() {
     }
 
     // 3. Get NM VPN / Wireguard / tunnel connections
-    let vpn_out = run_cmd("nmcli", &["-t", "-f", "name,type,device,active", "connection", "show"]);
+    let vpn_out = run_cmd(
+        "nmcli",
+        &["-t", "-f", "name,type,device,active", "connection", "show"],
+    )
+    .unwrap_or_default();
     for line in vpn_out.lines() {
-        let parts: Vec<&str> = line.split(':').collect();
+        let parts = split_nmcli_t_line(line);
         if parts.len() >= 4 {
-            let name = parts[0].to_string();
-            let conn_type = parts[1].to_string();
-            let device = parts[2].to_string();
+            let name = parts[0].clone();
+            let conn_type = parts[1].clone();
+            let device = parts[2].clone();
             let active = parts[3].to_lowercase().contains("yes");
 
             // Filter for VPN / Wireguard / tun connections (excluding bridge, loopback, wifi, ethernet)
-            let is_vpn = conn_type.contains("vpn") || conn_type.contains("wireguard") || conn_type.contains("tun");
+            let is_vpn = conn_type.contains("vpn")
+                || conn_type.contains("wireguard")
+                || conn_type.contains("tun");
             if is_vpn && !device.is_empty() && device != "lo" && !device.starts_with("virbr") {
                 vpns.push(VpnConnection {
                     name,
@@ -281,8 +307,9 @@ fn main() {
     }
 
     // 4. Check WARP status
-    let warp_out = run_cmd("warp-cli", &["status"]);
-    let warp_connected = warp_out.lines()
+    let warp_out = run_cmd("warp-cli", &["status"]).unwrap_or_default();
+    let warp_connected = warp_out
+        .lines()
         .any(|l| l.to_lowercase().contains("status update: connected"));
 
     let status = NetworkStatus {
@@ -298,7 +325,5 @@ fn main() {
         vpns,
     };
 
-    if let Ok(json_str) = serde_json::to_string(&status) {
-        println!("{}", json_str);
-    }
+    print_json(&status);
 }

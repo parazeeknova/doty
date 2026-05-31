@@ -1,8 +1,8 @@
-use std::fs;
-use std::process::Command;
+use helpers_rs::{quickshell_dir, run_cmd};
 use serde::Serialize;
-
-const STATE_FILE: &str = "/home/parazeeknova/.config/quickshell/osd/state.json";
+use std::fs;
+use std::path::PathBuf;
+use std::process::Command;
 
 #[derive(Serialize)]
 struct State {
@@ -12,6 +12,23 @@ struct State {
     timeout_ms: u64,
 }
 
+fn state_file() -> PathBuf {
+    quickshell_dir().join("osd/state.json")
+}
+
+fn write_state_file(state: &State) {
+    let path = state_file();
+    if let Some(parent) = path.parent() {
+        let _ = fs::create_dir_all(parent);
+    }
+    if let Ok(json_str) = serde_json::to_string(state) {
+        let tmp_path = path.with_extension("json.tmp");
+        if fs::write(&tmp_path, json_str).is_ok() {
+            let _ = fs::rename(&tmp_path, path);
+        }
+    }
+}
+
 fn write_state(text: &str, kind: &str, timeout_ms: u64) {
     let state = State {
         visible: true,
@@ -19,12 +36,7 @@ fn write_state(text: &str, kind: &str, timeout_ms: u64) {
         kind: kind.to_string(),
         timeout_ms,
     };
-    if let Ok(json_str) = serde_json::to_string(&state) {
-        let tmp_path = format!("{}.tmp", STATE_FILE);
-        if fs::write(&tmp_path, json_str).is_ok() {
-            let _ = fs::rename(&tmp_path, STATE_FILE);
-        }
-    }
+    write_state_file(&state);
 }
 
 fn clear_state() {
@@ -34,24 +46,11 @@ fn clear_state() {
         kind: "info".to_string(),
         timeout_ms: 1200,
     };
-    if let Ok(json_str) = serde_json::to_string(&state) {
-        let tmp_path = format!("{}.tmp", STATE_FILE);
-        if fs::write(&tmp_path, json_str).is_ok() {
-            let _ = fs::rename(&tmp_path, STATE_FILE);
-        }
-    }
-}
-
-fn run_cmd(cmd: &str, args: &[&str]) -> String {
-    Command::new(cmd)
-        .args(args)
-        .output()
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
-        .unwrap_or_default()
+    write_state_file(&state);
 }
 
 fn brightness_value() -> String {
-    let out = run_cmd("brightnessctl", &["-m"]);
+    let out = run_cmd("brightnessctl", &["-m"]).unwrap_or_default();
     let parts: Vec<&str> = out.split(',').collect();
     if parts.len() >= 4 {
         parts[3].trim().to_string()
@@ -76,10 +75,10 @@ fn set_brightness(direction: &str) {
 fn find_kbd_backlight_device() -> String {
     if let Ok(entries) = fs::read_dir("/sys/class/leds") {
         for entry in entries.flatten() {
-            if let Some(name) = entry.file_name().to_str() {
-                if name.ends_with("kbd_backlight") {
-                    return name.to_string();
-                }
+            if let Some(name) = entry.file_name().to_str()
+                && name.ends_with("kbd_backlight")
+            {
+                return name.to_string();
             }
         }
     }
@@ -88,7 +87,7 @@ fn find_kbd_backlight_device() -> String {
 
 fn kbd_brightness_value() -> String {
     let dev = find_kbd_backlight_device();
-    let out = run_cmd("brightnessctl", &["-d", &dev, "-m"]);
+    let out = run_cmd("brightnessctl", &["-d", &dev, "-m"]).unwrap_or_default();
     let parts: Vec<&str> = out.split(',').collect();
     if parts.len() >= 4 {
         parts[3].trim().to_string()
@@ -108,33 +107,37 @@ fn set_kbd_brightness(direction: &str) {
             .args(["-d", &dev, "set", "1-"])
             .output();
     }
-    write_state(&format!("kbd brightness {}", kbd_brightness_value()), "info", 1200);
+    write_state(
+        &format!("kbd brightness {}", kbd_brightness_value()),
+        "info",
+        1200,
+    );
 }
 
 fn sink_volume() -> (i64, bool) {
-    let out = run_cmd("wpctl", &["get-volume", "@DEFAULT_AUDIO_SINK@"]);
+    let out = run_cmd("wpctl", &["get-volume", "@DEFAULT_AUDIO_SINK@"]).unwrap_or_default();
     let muted = out.to_uppercase().contains("MUTED");
     let clean = out.replace(":", "");
     let parts: Vec<&str> = clean.split_whitespace().collect();
     let mut val = 0.0;
-    if parts.len() >= 2 {
-        if let Ok(parsed) = parts[1].parse::<f64>() {
-            val = parsed;
-        }
+    if parts.len() >= 2
+        && let Ok(parsed) = parts[1].parse::<f64>()
+    {
+        val = parsed;
     }
     ((val * 100.0).round() as i64, muted)
 }
 
 fn source_volume() -> (i64, bool) {
-    let out = run_cmd("wpctl", &["get-volume", "@DEFAULT_AUDIO_SOURCE@"]);
+    let out = run_cmd("wpctl", &["get-volume", "@DEFAULT_AUDIO_SOURCE@"]).unwrap_or_default();
     let muted = out.to_uppercase().contains("MUTED");
     let clean = out.replace(":", "");
     let parts: Vec<&str> = clean.split_whitespace().collect();
     let mut val = 0.0;
-    if parts.len() >= 2 {
-        if let Ok(parsed) = parts[1].parse::<f64>() {
-            val = parsed;
-        }
+    if parts.len() >= 2
+        && let Ok(parsed) = parts[1].parse::<f64>()
+    {
+        val = parsed;
     }
     ((val * 100.0).round() as i64, muted)
 }
@@ -183,31 +186,33 @@ fn set_volume(action: &str) {
 
 fn get_caps_state() -> bool {
     std::thread::sleep(std::time::Duration::from_millis(100));
-    
+
     if let Ok(out) = Command::new("hyprctl").args(["devices", "-j"]).output() {
         let out_str = String::from_utf8_lossy(&out.stdout);
-        if let Ok(devices) = serde_json::from_str::<serde_json::Value>(&out_str) {
-            if let Some(keyboards) = devices.get("keyboards").and_then(|v| v.as_array()) {
-                for kb in keyboards {
-                    if kb.get("capsLock").and_then(|v| v.as_bool()).unwrap_or(false) {
-                        return true;
-                    }
+        if let Ok(devices) = serde_json::from_str::<serde_json::Value>(&out_str)
+            && let Some(keyboards) = devices.get("keyboards").and_then(|v| v.as_array())
+        {
+            for kb in keyboards {
+                if kb
+                    .get("capsLock")
+                    .and_then(|v| v.as_bool())
+                    .unwrap_or(false)
+                {
+                    return true;
                 }
             }
         }
     }
-    
+
     if let Ok(entries) = fs::read_dir("/sys/class/leds") {
         for entry in entries.flatten() {
             let path = entry.path();
-            if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
-                if name.ends_with("::capslock") {
-                    if let Ok(val) = fs::read_to_string(path.join("brightness")) {
-                        if val.trim() != "0" {
-                            return true;
-                        }
-                    }
-                }
+            if let Some(name) = path.file_name().and_then(|n| n.to_str())
+                && name.ends_with("::capslock")
+                && let Ok(val) = fs::read_to_string(path.join("brightness"))
+                && val.trim() != "0"
+            {
+                return true;
             }
         }
     }
@@ -235,11 +240,11 @@ fn show_text(args: &[String]) {
     let mut timeout = 1200;
     let mut kind = "info".to_string();
 
-    if text_parts.len() >= 2 {
-        if let Ok(parsed) = text_parts.last().unwrap().parse::<u64>() {
-            timeout = parsed;
-            text_parts.pop();
-        }
+    if text_parts.len() >= 2
+        && let Ok(parsed) = text_parts.last().unwrap().parse::<u64>()
+    {
+        timeout = parsed;
+        text_parts.pop();
     }
     if text_parts.len() >= 2 {
         let last = text_parts.last().unwrap();
