@@ -85,7 +85,7 @@
     "scroll-step": 1,
     "on-scroll-up": "/home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl volume up",
     "on-scroll-down": "/home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl volume down",
-    "on-click": "pavucontrol",
+    "on-click": "quickshell --config volume_popup",
     "ignored-sinks": [
       "Easy Effects Sink"
     ],

@@ -40,6 +40,7 @@ hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("rofi -show noti"))
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("rofi -show power"))
 hl.bind("XF86Launch3", hl.dsp.exec_cmd("rofi -show profile"))
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("rofi -show sunset"))
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("quickshell --config volume_popup"))
 
 -- Power button opens power menu
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("rofi -show power"))

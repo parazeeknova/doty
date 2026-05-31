@@ -15,10 +15,10 @@ Scope {
   property string activeProfile: "Unknown"
   property var history: []
 
-  // Process to run the python helper
+  // Process to run the Rust helper
   Process {
     id: checkStatusProc
-    command: ["/home/parazeeknova/doty/.config/quickshell/battery_popup/get_battery_status.py"]
+    command: ["/home/parazeeknova/doty/.config/quickshell/battery_popup/get_battery_status"]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
@@ -96,6 +96,9 @@ Scope {
 
         exclusionMode: PanelWindow.ExclusionMode.Ignore
         
+        // Enable keyboard focus for key events (Esc key)
+        focusable: true
+
         // Use HyprlandFocusGrab to automatically close the widget when clicking outside
         HyprlandFocusGrab {
           active: true
@@ -115,6 +118,18 @@ Scope {
           border.color: "#d5c4a1"
           radius: 0
           antialiasing: false
+          
+          // Request keyboard focus and listen for Escape key
+          focus: true
+          Keys.onPressed: (event) => {
+            if (event.key === Qt.Key_Escape) {
+              Qt.quit()
+            }
+          }
+
+          Component.onCompleted: {
+            forceActiveFocus()
+          }
 
           // Main Layout Container
           Item {
