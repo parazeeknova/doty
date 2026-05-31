@@ -108,7 +108,7 @@ Scope {
           }
         }
 
-        implicitWidth: 250
+        implicitWidth: 240
         implicitHeight: 150
 
         Rectangle {

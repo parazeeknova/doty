@@ -44,7 +44,7 @@ restart_sunset() {
 }
 
 if [ "$#" -gt 0 ]; then
-    selection="${ROFI_INFO:-}"
+    selection="${ROFI_INFO:-$1}"
     case "$selection" in
         off)
             clear_config
@@ -91,6 +91,12 @@ if [ "$#" -gt 0 ]; then
             else
                 /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "sunset auto: off" info 1200
             fi
+            ;;
+        [0-9]*)
+            clear_config
+            restart_sunset -t "$selection"
+            echo -n "$selection" > "$STATE_FILE"
+            /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "sunset ${selection}k" info 1200
             ;;
     esac
     exit 0

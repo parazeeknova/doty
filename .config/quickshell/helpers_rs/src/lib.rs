@@ -118,6 +118,31 @@ pub fn parse_percent(value: &str) -> Option<i64> {
     pct.parse::<f64>().ok().map(|v| v.round() as i64)
 }
 
+pub fn brightnessctl_percent(device: Option<&str>) -> i32 {
+    let out = if let Some(device) = device {
+        run_cmd("brightnessctl", &["-d", device, "-m"]).unwrap_or_default()
+    } else {
+        run_cmd("brightnessctl", &["-m"]).unwrap_or_default()
+    };
+    let parts: Vec<&str> = out.split(',').collect();
+    parts
+        .get(3)
+        .and_then(|value| parse_percent(value))
+        .map(|value| value.clamp(0, 100) as i32)
+        .unwrap_or(0)
+}
+
+pub fn find_kbd_backlight_device() -> Option<String> {
+    let entries = fs::read_dir("/sys/class/leds").ok()?;
+    let mut candidates: Vec<String> = entries
+        .flatten()
+        .filter_map(|entry| entry.file_name().to_str().map(|name| name.to_string()))
+        .filter(|name| name.ends_with("kbd_backlight"))
+        .collect();
+    candidates.sort();
+    candidates.into_iter().next()
+}
+
 pub fn split_nmcli_t_line(line: &str) -> Vec<String> {
     let mut parts = Vec::new();
     let mut current = String::new();

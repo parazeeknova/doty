@@ -1,4 +1,4 @@
-use helpers_rs::{quickshell_dir, run_cmd};
+use helpers_rs::{find_kbd_backlight_device, quickshell_dir, run_cmd};
 use serde::Serialize;
 use std::fs;
 use std::path::PathBuf;
@@ -72,21 +72,10 @@ fn set_brightness(direction: &str) {
     write_state(&format!("brightness {}", brightness_value()), "info", 1200);
 }
 
-fn find_kbd_backlight_device() -> String {
-    if let Ok(entries) = fs::read_dir("/sys/class/leds") {
-        for entry in entries.flatten() {
-            if let Some(name) = entry.file_name().to_str()
-                && name.ends_with("kbd_backlight")
-            {
-                return name.to_string();
-            }
-        }
-    }
-    "asus::kbd_backlight".to_string()
-}
-
 fn kbd_brightness_value() -> String {
-    let dev = find_kbd_backlight_device();
+    let Some(dev) = find_kbd_backlight_device() else {
+        return "0%".to_string();
+    };
     let out = run_cmd("brightnessctl", &["-d", &dev, "-m"]).unwrap_or_default();
     let parts: Vec<&str> = out.split(',').collect();
     if parts.len() >= 4 {
@@ -97,7 +86,10 @@ fn kbd_brightness_value() -> String {
 }
 
 fn set_kbd_brightness(direction: &str) {
-    let dev = find_kbd_backlight_device();
+    let Some(dev) = find_kbd_backlight_device() else {
+        write_state("kbd brightness unavailable", "warn", 1200);
+        return;
+    };
     if direction == "up" {
         let _ = Command::new("brightnessctl")
             .args(["-d", &dev, "set", "1+"])

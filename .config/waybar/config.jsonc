@@ -63,7 +63,7 @@
   "clock#date": {
     "format": "{:%d\n%m\n%y}",
     "tooltip": false,
-    "on-click": "rofi -show noti"
+    "on-click": "quickshell --config notif_popup"
   },
   "pulseaudio": {
     "rotate": 270,

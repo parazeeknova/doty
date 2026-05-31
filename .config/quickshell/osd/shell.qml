@@ -186,7 +186,37 @@ Scope {
     running: true
     onTriggered: {
       batteryStatusFile.reload()
+      batteryCapacityFile.reload()
       platformProfileFile.reload()
+    }
+  }
+
+  property int lastBatteryCapacity: -1
+  property bool lowBatteryAlerted: false
+  FileView {
+    id: batteryCapacityFile
+    path: "file:///sys/class/power_supply/BAT1/capacity"
+    onLoaded: {
+      var val = parseInt(batteryCapacityFile.text().trim())
+      if (!isNaN(val)) {
+        // Alert once when crossing down to 30% while discharging
+        if (val <= 30 && lastBatteryCapacity > 30 && root.lastBatteryStatus === "Discharging") {
+          root.showOSD("low battery " + val + "%", "bad", 2500)
+          lowBatteryAlerted = true
+        }
+        // Also alert at 15% and 5% critical
+        if (val <= 15 && lastBatteryCapacity > 15 && root.lastBatteryStatus === "Discharging") {
+          root.showOSD("critical battery " + val + "%", "bad", 3000)
+        }
+        if (val <= 5 && lastBatteryCapacity > 5 && root.lastBatteryStatus === "Discharging") {
+          root.showOSD("battery dying " + val + "%", "bad", 4000)
+        }
+        // Reset alert flag when charging
+        if (root.lastBatteryStatus === "Charging") {
+          lowBatteryAlerted = false
+        }
+        lastBatteryCapacity = val
+      }
     }
   }
 
@@ -268,12 +298,12 @@ Scope {
             spacing: 4
             width: parent.width - 18
 
-            // Single line: volume <bar> percentage
+            // Single line layout: prefix <bar> percentage (for volume/brightness)
             Row {
               id: osdStatusRow
               spacing: 6
               anchors.horizontalCenter: parent.horizontalCenter
-              visible: root.getPercentage(root.message) !== -1
+              visible: root.getPercentage(root.message) !== -1 && !root.message.includes("kbd")
 
               Text {
                 text: root.getPrefix(root.message)
@@ -311,6 +341,56 @@ Scope {
                 font.pixelSize: 9
                 renderType: Text.NativeRendering
                 anchors.verticalCenter: parent.verticalCenter
+              }
+            }
+
+            // Two-line layout for keyboard backlight: label on top, bar + pct below
+            Column {
+              id: kbdOsdLayout
+              spacing: 3
+              anchors.horizontalCenter: parent.horizontalCenter
+              visible: root.getPercentage(root.message) !== -1 && root.message.includes("kbd")
+
+              Text {
+                text: root.getPrefix(root.message)
+                color: "#d4be98"
+                font.family: "FiraCode Nerd Font"
+                font.pixelSize: 9
+                renderType: Text.NativeRendering
+                anchors.horizontalCenter: parent.horizontalCenter
+              }
+
+              Row {
+                spacing: 6
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                Row {
+                  id: kbdBlockSlider
+                  spacing: 1
+                  height: 4
+                  anchors.verticalCenter: parent.verticalCenter
+
+                  property int totalBlocks: 15
+                  property double currentVal: root.getPercentage(root.message) / 100.0
+
+                  Repeater {
+                    model: kbdBlockSlider.totalBlocks
+                    delegate: Rectangle {
+                      height: parent.height
+                      width: 5
+                      color: (index < Math.round(kbdBlockSlider.currentVal * kbdBlockSlider.totalBlocks)) ? "#d5c4a1" : "#3c3836"
+                    }
+                  }
+                }
+
+                Text {
+                  text: root.getPercentText(root.message)
+                  color: "#d4be98"
+                  font.family: "FiraCode Nerd Font"
+                  font.pixelSize: 9
+                  renderType: Text.NativeRendering
+                  anchors.verticalCenter: parent.verticalCenter
+                }
               }
             }
 
