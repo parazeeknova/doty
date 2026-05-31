@@ -15,7 +15,9 @@ build:
 	cargo build --release
 
 install: build
+	mkdir -p ../battery_popup ../volume_popup ../osd/bin ../network_popup
 	cp target/release/get_battery_status ../battery_popup/get_battery_status
 	cp target/release/log_battery ../battery_popup/log_battery
 	cp target/release/get_audio_status ../volume_popup/get_audio_status
 	cp target/release/osdctl ../osd/bin/osdctl
+	cp target/release/get_network_status ../network_popup/get_network_status

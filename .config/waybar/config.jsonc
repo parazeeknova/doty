@@ -33,6 +33,7 @@
       "󰤥",
       "󰤨"
     ],
+    "on-click": "quickshell --config network_popup",
     "tooltip": false
   },
   "hyprland/workspaces": {
