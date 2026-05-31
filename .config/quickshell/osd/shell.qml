@@ -70,6 +70,14 @@ Scope {
     onLoaded: root.refreshState()
   }
 
+  function showOSD(text, kind, timeout_ms) {
+    message = text
+    root.kind = kind
+    visibleNow = true
+    hideTimer.interval = timeout_ms || 1200
+    hideTimer.restart()
+  }
+
   property int lastKbdBrightness: -1
 
   Timer {
@@ -91,12 +99,58 @@ Scope {
       if (!isNaN(intVal)) {
         if (lastKbdBrightness !== -1 && lastKbdBrightness !== intVal) {
           var pct = Math.round((intVal / 3.0) * 100)
-          root.message = "kbd brightness " + pct + "%"
-          root.kind = "info"
-          root.visibleNow = true
-          hideTimer.restart()
+          root.showOSD("kbd brightness " + pct + "%", "info", 1200)
         }
         lastKbdBrightness = intVal
+      }
+    }
+  }
+
+  // System Monitor Poller (Battery & Power Profiles)
+  Timer {
+    id: systemMonitorTimer
+    interval: 1000
+    repeat: true
+    running: true
+    onTriggered: {
+      batteryStatusFile.reload()
+      platformProfileFile.reload()
+    }
+  }
+
+  property string lastBatteryStatus: ""
+  FileView {
+    id: batteryStatusFile
+    path: "file:///sys/class/power_supply/BAT1/status"
+    onLoaded: {
+      var val = batteryStatusFile.text().trim()
+      if (val !== "") {
+        if (lastBatteryStatus !== "" && lastBatteryStatus !== val) {
+          if (val === "Charging") {
+            root.showOSD("charging", "good", 1200)
+          } else if (val === "Discharging") {
+            root.showOSD("battery", "warn", 1200)
+          } else if (val === "Full") {
+            root.showOSD("battery full", "good", 1500)
+          }
+        }
+        lastBatteryStatus = val
+      }
+    }
+  }
+
+  property string lastPlatformProfile: ""
+  FileView {
+    id: platformProfileFile
+    path: "file:///sys/firmware/acpi/platform_profile"
+    onLoaded: {
+      var val = platformProfileFile.text().trim()
+      if (val !== "") {
+        if (lastPlatformProfile !== "" && lastPlatformProfile !== val) {
+          var displayProfile = val.toLowerCase()
+          root.showOSD("profile: " + displayProfile, "good", 1500)
+        }
+        lastPlatformProfile = val
       }
     }
   }

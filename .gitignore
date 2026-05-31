@@ -10,3 +10,5 @@ fish_variables
 __pycache__
 .antigravitycli
 .config/quickshell/osd/state.json
+.config/quickshell/battery_popup/history.json
+.config/gtk-3.0/bookmarks

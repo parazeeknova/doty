@@ -1,0 +1,7 @@
+[Unit]
+Description=Log battery discharge rate to history.json
+After=basic.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/parazeeknova/.config/quickshell/battery_popup/log_battery.py

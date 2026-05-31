@@ -57,10 +57,11 @@
   },
   "clock": {
     "format": "{:%I\n%M\n%p}",
-    "tooltip-format": "<tt>{calendar}</tt>"
+    "tooltip": false
   },
   "clock#date": {
     "format": "{:%d\n%m\n%y}",
+    "tooltip": false,
     "on-click": "rofi -show noti"
   },
   "pulseaudio": {
@@ -94,7 +95,7 @@
     "rotate": 270,
     "interval": 60,
     "format": "{capacity} {icon}",
-    "on-click": "rofi -show profile",
+    "on-click": "quickshell --config battery_popup",
     "tooltip": false,
     "format-icons": {
       "default": [

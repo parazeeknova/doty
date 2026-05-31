@@ -1,0 +1,10 @@
+[Unit]
+Description=Log battery discharge rate timer
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=6min
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target
