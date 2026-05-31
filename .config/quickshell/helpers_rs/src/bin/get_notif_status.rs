@@ -19,6 +19,7 @@ struct NotifStatus {
     bt_enabled: bool,
     wifi_enabled: bool,
     audio_muted: bool,
+    uptime: String,
 }
 
 fn parse_items(raw_json: &str) -> Vec<NotifItem> {
@@ -109,6 +110,25 @@ fn is_audio_muted() -> bool {
     wpctl_out.to_uppercase().contains("MUTED")
 }
 
+fn get_uptime() -> String {
+    let out = run_cmd("uptime", &["-p"]).unwrap_or_default();
+    let clean = out.trim()
+        .replace("up ", "")
+        .replace(" hours,", "h")
+        .replace(" hour,", "h")
+        .replace(" minutes", "m")
+        .replace(" minute", "m")
+        .replace(" days,", "d")
+        .replace(" day,", "d")
+        .replace(" weeks,", "w")
+        .replace(" week,", "w");
+    if clean.is_empty() {
+        "UP 0M".to_string()
+    } else {
+        format!("UP {}", clean.to_uppercase())
+    }
+}
+
 fn main() {
     let active_raw = run_cmd("makoctl", &["list", "-j"]).unwrap_or_default();
     let history_raw = run_cmd("makoctl", &["history", "-j"]).unwrap_or_default();
@@ -119,6 +139,7 @@ fn main() {
         bt_enabled: is_bluetooth_enabled(),
         wifi_enabled: is_wifi_enabled(),
         audio_muted: is_audio_muted(),
+        uptime: get_uptime(),
     };
     print_json(&status);
 }
