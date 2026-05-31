@@ -38,7 +38,7 @@ Scope {
       if (pendingOutVol !== -1 && root.defaultSink) {
         Quickshell.execDetached(["pactl", "set-sink-volume", String(root.defaultSink.index), pendingOutVol + "%"]);
         // Trigger OSD
-        Quickshell.execDetached(["/home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl", "show", "vol " + pendingOutVol + "%", "info", "1200"]);
+        Quickshell.execDetached(["/home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl", "show", "volume " + pendingOutVol + "%", "info", "1200"]);
         pendingOutVol = -1;
       }
       if (pendingInVol !== -1 && root.defaultSource) {

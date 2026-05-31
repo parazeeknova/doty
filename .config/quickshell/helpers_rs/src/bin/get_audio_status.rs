@@ -310,8 +310,80 @@ fn main() {
 }
 
 fn get_media_info() -> Option<MediaInfo> {
+    // 1. Get all players
+    let players_out = Command::new("playerctl").arg("-l").output().ok()?;
+    if !players_out.status.success() {
+        return None;
+    }
+    let players_str = String::from_utf8_lossy(&players_out.stdout);
+    let players: Vec<String> = players_str
+        .lines()
+        .map(|l| l.trim().to_string())
+        .filter(|l| !l.is_empty())
+        .collect();
+
+    if players.is_empty() {
+        return None;
+    }
+
+    // 2. Query statuses to select the best player
+    let mut best_player: Option<String> = None;
+    let mut best_status = "Stopped".to_string();
+
+    // Pass 1: Look for "Playing"
+    for player in &players {
+        let status_out = Command::new("playerctl")
+            .args(["--player", player, "status"])
+            .output();
+        if let Ok(out) = status_out {
+            if out.status.success() {
+                let status = String::from_utf8_lossy(&out.stdout).trim().to_string();
+                if status == "Playing" {
+                    best_player = Some(player.clone());
+                    best_status = status;
+                    break;
+                }
+            }
+        }
+    }
+
+    // Pass 2: Look for "Paused" if no playing player was found
+    if best_player.is_none() {
+        for player in &players {
+            let status_out = Command::new("playerctl")
+                .args(["--player", player, "status"])
+                .output();
+            if let Ok(out) = status_out {
+                if out.status.success() {
+                    let status = String::from_utf8_lossy(&out.stdout).trim().to_string();
+                    if status == "Paused" {
+                        best_player = Some(player.clone());
+                        best_status = status;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // Pass 3: Fallback to the first player
+    let target_player = best_player.unwrap_or_else(|| players[0].clone());
+
+    // If we fell back without finding status, query it now
+    if best_status == "Stopped" {
+        let status_out = Command::new("playerctl")
+            .args(["--player", &target_player, "status"])
+            .output();
+        if let Ok(out) = status_out {
+            if out.status.success() {
+                best_status = String::from_utf8_lossy(&out.stdout).trim().to_string();
+            }
+        }
+    }
+
+    // 3. Query metadata for the selected target player
     let meta_out = Command::new("playerctl")
-        .args(["metadata", "--format", "{{playerName}};;{{title}};;{{artist}};;{{mpris:artUrl}}"])
+        .args(["--player", &target_player, "metadata", "--format", "{{playerName}};;{{title}};;{{artist}};;{{mpris:artUrl}}"])
         .output()
         .ok()?;
 
@@ -323,17 +395,9 @@ fn get_media_info() -> Option<MediaInfo> {
     let parts: Vec<&str> = meta_str.split(";;").collect();
     if parts.len() >= 4 {
         let player = parts[0].to_string();
-        let status_out = Command::new("playerctl")
-            .args(["--player", &player, "status"])
-            .output()
-            .ok();
-        let status = status_out
-            .filter(|o| o.status.success())
-            .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
-            .unwrap_or_else(|| "Stopped".to_string());
-
+        
         let position = Command::new("playerctl")
-            .args(["--player", &player, "position"])
+            .args(["--player", &target_player, "position"])
             .output()
             .ok()
             .filter(|o| o.status.success())
@@ -341,7 +405,7 @@ fn get_media_info() -> Option<MediaInfo> {
             .unwrap_or(0.0);
 
         let length = Command::new("playerctl")
-            .args(["--player", &player, "metadata", "--format", "{{mpris:length}}"])
+            .args(["--player", &target_player, "metadata", "--format", "{{mpris:length}}"])
             .output()
             .ok()
             .filter(|o| o.status.success())
@@ -354,7 +418,7 @@ fn get_media_info() -> Option<MediaInfo> {
             title: parts[1].to_string(),
             artist: parts[2].to_string(),
             art_url: parts[3].to_string(),
-            status,
+            status: best_status,
             position,
             length,
         })
