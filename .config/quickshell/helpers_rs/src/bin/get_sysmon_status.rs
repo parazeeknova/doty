@@ -1,9 +1,21 @@
-use helpers_rs::{print_json, run_cmd};
+use helpers_rs::{print_json, read_trimmed, run_cmd};
 use serde::Serialize;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{BufRead, BufReader};
+use std::path::Path;
 use std::thread::sleep;
-use std::time::Duration;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
+
+#[derive(Serialize)]
+struct DiskInfo {
+    name: String,
+    read_rate: f64,
+    write_rate: f64,
+    total_gb: f64,
+    used_gb: f64,
+    free_gb: f64,
+    usage_pct: i32,
+}
 
 #[derive(Serialize)]
 struct SysmonStatus {
@@ -22,6 +34,8 @@ struct SysmonStatus {
     ram_speed: String,
     ram_total: f64,
     ram_used: f64,
+    disk0: DiskInfo,
+    disk1: DiskInfo,
 }
 
 fn read_cpu_times() -> Option<(u64, u64)> {
@@ -251,6 +265,134 @@ fn get_static_ram_info() -> (String, String) {
     (ram_type, speed)
 }
 
+// --- Disk helpers ---
+
+const SECTOR_SIZE: u64 = 512;
+const STAT_DIR: &str = "/tmp/.doty_disk_stats";
+
+/// Read sectors_read (field 3) and sectors_written (field 7) from /sys/block/<dev>/stat
+fn read_disk_sectors(dev: &str) -> Option<(u64, u64)> {
+    let stat_path = format!("/sys/block/{dev}/stat");
+    let content = fs::read_to_string(stat_path).ok()?;
+    let fields: Vec<&str> = content.split_whitespace().collect();
+    if fields.len() >= 7 {
+        let sectors_read = fields[2].parse::<u64>().unwrap_or(0);
+        let sectors_written = fields[6].parse::<u64>().unwrap_or(0);
+        Some((sectors_read, sectors_written))
+    } else {
+        None
+    }
+}
+
+fn now_nanos() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_nanos() as u64
+}
+
+/// Compute read/write rates in MB/s by comparing current sectors with a previous snapshot.
+fn disk_io_rates(dev: &str) -> (f64, f64) {
+    let _ = fs::create_dir_all(STAT_DIR);
+    let prev_file = format!("{STAT_DIR}/{dev}");
+    let (sectors_read, sectors_written) = read_disk_sectors(dev).unwrap_or((0, 0));
+    let now = now_nanos();
+
+    let mut read_rate = 0.0;
+    let mut write_rate = 0.0;
+
+    if let Ok(content) = fs::read_to_string(&prev_file) {
+        let lines: Vec<&str> = content.lines().collect();
+        if lines.len() >= 3 {
+            let prev_time: u64 = lines[0].parse().unwrap_or(0);
+            let prev_read: u64 = lines[1].parse().unwrap_or(0);
+            let prev_write: u64 = lines[2].parse().unwrap_or(0);
+            let dt_ns = now.saturating_sub(prev_time);
+            if dt_ns > 100_000_000 {
+                // at least 100ms
+                let dt_s = dt_ns as f64 / 1_000_000_000.0;
+                let dr = sectors_read.saturating_sub(prev_read);
+                let dw = sectors_written.saturating_sub(prev_write);
+                read_rate = (dr as f64 * SECTOR_SIZE as f64) / (1024.0 * 1024.0) / dt_s;
+                write_rate = (dw as f64 * SECTOR_SIZE as f64) / (1024.0 * 1024.0) / dt_s;
+            }
+        }
+    }
+
+    // Save current snapshot
+    let snapshot = format!("{now}\n{sectors_read}\n{sectors_written}\n");
+    let _ = fs::write(&prev_file, snapshot);
+
+    (read_rate, write_rate)
+}
+
+/// Get disk usage (total, used, free in GB and usage%) via lsblk FSSIZE/FSUSED.
+fn disk_usage(dev: &str) -> (f64, f64, f64, i32) {
+    let output = run_cmd(
+        "lsblk",
+        &["-lnb", "-o", "FSSIZE,FSUSED", &format!("/dev/{dev}")],
+    )
+    .unwrap_or_default();
+
+    let mut agg_total: u64 = 0;
+    let mut agg_used: u64 = 0;
+    let mut seen_totals: Vec<u64> = Vec::new();
+
+    for line in output.lines() {
+        let fields: Vec<&str> = line.split_whitespace().collect();
+        if fields.len() >= 2 {
+            let fs_size: u64 = fields[0].parse().unwrap_or(0);
+            let fs_used: u64 = fields[1].parse().unwrap_or(0);
+            if fs_size == 0 {
+                continue;
+            }
+            // Deduplicate btrfs subvolumes (they share the same pool, same FSSIZE)
+            if seen_totals.contains(&fs_size) {
+                continue;
+            }
+            seen_totals.push(fs_size);
+            agg_total += fs_size;
+            agg_used += fs_used;
+        }
+    }
+
+    let gb = 1024.0 * 1024.0 * 1024.0;
+    if agg_total > 0 {
+        let total_gb = agg_total as f64 / gb;
+        let used_gb = agg_used as f64 / gb;
+        let free_gb = (agg_total - agg_used) as f64 / gb;
+        let usage_pct = ((agg_used as f64 / agg_total as f64) * 100.0).round() as i32;
+        (total_gb, used_gb, free_gb, usage_pct)
+    } else {
+        // Fallback: raw disk size
+        let raw = read_trimmed(Path::new(&format!("/sys/block/{dev}/size")))
+            .and_then(|s| s.parse::<u64>().ok())
+            .unwrap_or(0);
+        let total_gb = (raw * SECTOR_SIZE) as f64 / gb;
+        (total_gb, 0.0, total_gb, 0)
+    }
+}
+
+fn get_disk_name(dev: &str) -> String {
+    read_trimmed(Path::new(&format!("/sys/block/{dev}/device/model")))
+        .unwrap_or_else(|| dev.to_string())
+}
+
+fn get_disk_info(dev: &str) -> DiskInfo {
+    let name = get_disk_name(dev);
+    let (read_rate, write_rate) = disk_io_rates(dev);
+    let (total_gb, used_gb, free_gb, usage_pct) = disk_usage(dev);
+    DiskInfo {
+        name,
+        read_rate: (read_rate * 10.0).round() / 10.0,
+        write_rate: (write_rate * 10.0).round() / 10.0,
+        total_gb: (total_gb * 10.0).round() / 10.0,
+        used_gb: (used_gb * 10.0).round() / 10.0,
+        free_gb: (free_gb * 10.0).round() / 10.0,
+        usage_pct,
+    }
+}
+
 fn main() {
     let cpu_n = get_cpu_name();
     let cpu = get_cpu_usage();
@@ -264,6 +406,8 @@ fn main() {
     let (gpu_mem_u, gpu_mem_t) = get_gpu_memory();
     let (ram_tot, ram_usd) = get_ram_usage_info();
     let (ram_name, ram_speed) = get_static_ram_info();
+    let disk0 = get_disk_info("nvme0n1");
+    let disk1 = get_disk_info("nvme1n1");
 
     let status = SysmonStatus {
         cpu_name: cpu_n,
@@ -281,6 +425,8 @@ fn main() {
         ram_speed,
         ram_total: ram_tot,
         ram_used: ram_usd,
+        disk0,
+        disk1,
     };
     print_json(&status);
 }

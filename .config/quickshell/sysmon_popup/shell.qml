@@ -24,6 +24,24 @@ Scope {
 
   property int ramUsage: ramTotal > 0 ? Math.round((ramUsed / ramTotal) * 100) : 0
 
+  // Disk properties - NVMe 0 (Samsung)
+  property string disk0Name: ""
+  property double disk0ReadRate: 0.0
+  property double disk0WriteRate: 0.0
+  property double disk0TotalGb: 0.0
+  property double disk0UsedGb: 0.0
+  property double disk0FreeGb: 0.0
+  property int disk0UsagePct: 0
+
+  // Disk properties - NVMe 1 (Crucial)
+  property string disk1Name: ""
+  property double disk1ReadRate: 0.0
+  property double disk1WriteRate: 0.0
+  property double disk1TotalGb: 0.0
+  property double disk1UsedGb: 0.0
+  property double disk1FreeGb: 0.0
+  property int disk1UsagePct: 0
+
   function centerText(str, width) {
     var pad = width - str.length;
     if (pad <= 0) return str.substring(0, width);
@@ -64,6 +82,26 @@ Scope {
           root.ramSpeed = data.ram_speed || "N/A"
           root.ramTotal = data.ram_total || 0.0
           root.ramUsed = data.ram_used || 0.0
+          // Disk 0
+          if (data.disk0) {
+            root.disk0Name = data.disk0.name || "NVMe 0"
+            root.disk0ReadRate = data.disk0.read_rate || 0.0
+            root.disk0WriteRate = data.disk0.write_rate || 0.0
+            root.disk0TotalGb = data.disk0.total_gb || 0.0
+            root.disk0UsedGb = data.disk0.used_gb || 0.0
+            root.disk0FreeGb = data.disk0.free_gb || 0.0
+            root.disk0UsagePct = data.disk0.usage_pct || 0
+          }
+          // Disk 1
+          if (data.disk1) {
+            root.disk1Name = data.disk1.name || "NVMe 1"
+            root.disk1ReadRate = data.disk1.read_rate || 0.0
+            root.disk1WriteRate = data.disk1.write_rate || 0.0
+            root.disk1TotalGb = data.disk1.total_gb || 0.0
+            root.disk1UsedGb = data.disk1.used_gb || 0.0
+            root.disk1FreeGb = data.disk1.free_gb || 0.0
+            root.disk1UsagePct = data.disk1.usage_pct || 0
+          }
         } catch (e) {
           console.log("Failed to parse sysmon status: " + e)
         }
@@ -266,6 +304,96 @@ Scope {
                 horizontalAlignment: Text.AlignHCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 renderType: Text.NativeRendering
+              }
+
+              // 󰋊 DISKS heading
+              Text {
+                text: "󰋊 DISKS"
+                color: "#d5c4a1"
+                font.family: "FiraCode Nerd Font"
+                font.pixelSize: 9
+                font.bold: true
+                renderType: Text.NativeRendering
+                topPadding: 4
+              }
+
+              Row {
+                width: parent.width
+                spacing: 0
+
+                // NVMe 0 Column (Left)
+                Column {
+                  width: parent.width / 2
+                  spacing: 0
+
+                  Text {
+                    text: root.disk0Name
+                    color: "#d5c4a1"
+                    font.family: "FiraCode Nerd Font"
+                    font.pixelSize: 9
+                    font.bold: true
+                    renderType: Text.NativeRendering
+                    leftPadding: 4
+                    elide: Text.ElideRight
+                    width: parent.width
+                  }
+
+                  Text {
+                    text: "┏━━━━━━━━━━━━━━━━━┓\n" +
+                          "┃" + root.formatLabelVal("R:", root.disk0ReadRate.toFixed(1), "M/s", 17) + "┃\n" +
+                          "┃" + root.formatLabelVal("W:", root.disk0WriteRate.toFixed(1), "M/s", 17) + "┃\n" +
+                          "┃" + root.formatLabelVal("total:", root.disk0TotalGb.toFixed(0), "G", 17) + "┃\n" +
+                          "┃" + root.formatLabelVal("used:", root.disk0UsedGb.toFixed(0), "G", 17) + "┃\n" +
+                          "┃" + root.formatLabelVal("free:", root.disk0FreeGb.toFixed(0), "G", 17) + "┃\n" +
+                          "┃" + root.formatLabelVal("usg:", String(root.disk0UsagePct), "%", 17) + "┃\n" +
+                          "┗━━━━━━━━━━━━━━━━━┛"
+                    color: "#d5c4a1"
+                    font.family: "FiraCode Nerd Font"
+                    font.pixelSize: 9
+                    font.bold: false
+                    lineHeight: 1.15
+                    horizontalAlignment: Text.AlignHCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    renderType: Text.NativeRendering
+                  }
+                }
+
+                // NVMe 1 Column (Right)
+                Column {
+                  width: parent.width / 2
+                  spacing: 0
+
+                  Text {
+                    text: root.disk1Name
+                    color: "#d5c4a1"
+                    font.family: "FiraCode Nerd Font"
+                    font.pixelSize: 9
+                    font.bold: true
+                    renderType: Text.NativeRendering
+                    leftPadding: 4
+                    elide: Text.ElideRight
+                    width: parent.width
+                  }
+
+                  Text {
+                    text: "┏━━━━━━━━━━━━━━━━━┓\n" +
+                          "┃" + root.formatLabelVal("R:", root.disk1ReadRate.toFixed(1), "M/s", 17) + "┃\n" +
+                          "┃" + root.formatLabelVal("W:", root.disk1WriteRate.toFixed(1), "M/s", 17) + "┃\n" +
+                          "┃" + root.formatLabelVal("total:", root.disk1TotalGb.toFixed(0), "G", 17) + "┃\n" +
+                          "┃" + root.formatLabelVal("used:", root.disk1UsedGb.toFixed(0), "G", 17) + "┃\n" +
+                          "┃" + root.formatLabelVal("free:", root.disk1FreeGb.toFixed(0), "G", 17) + "┃\n" +
+                          "┃" + root.formatLabelVal("usg:", String(root.disk1UsagePct), "%", 17) + "┃\n" +
+                          "┗━━━━━━━━━━━━━━━━━┛"
+                    color: "#d5c4a1"
+                    font.family: "FiraCode Nerd Font"
+                    font.pixelSize: 9
+                    font.bold: false
+                    lineHeight: 1.15
+                    horizontalAlignment: Text.AlignHCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    renderType: Text.NativeRendering
+                  }
+                }
               }
             }
           }
