@@ -58,7 +58,8 @@
   },
   "clock": {
     "format": "{:%I\n%M\n%p}",
-    "tooltip": false
+    "tooltip": false,
+    "on-click": "quickshell --config sysmon_popup"
   },
   "clock#date": {
     "format": "{:%d\n%m\n%y}",
