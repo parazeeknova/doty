@@ -26,6 +26,7 @@ Scope {
     property real dragOffsetX: 0
     property real dragOffsetY: 0
     property int hoveredWorkspaceId: -1
+    property string hoveredWindowAddress: ""
     property real draggedWidth: 80
     property real draggedHeight: 50
     // Concise, Single Color Theme (Gruvbox Material Dark / fg: #d5c4a1)
@@ -89,7 +90,156 @@ Scope {
         return -1;
     }
 
-    // Helper to resolve an absolute file path or image provider URI for window class icons
+    // Find which window in the hovered workspace cell is hovered by global coordinates
+    function findHoveredWindowAddress(container, globalX, globalY, repeater) {
+        if (root.hoveredWorkspaceId === -1)
+            return "";
+
+        var cell = repeater.itemAt(root.hoveredWorkspaceId - 1);
+        if (!cell)
+            return "";
+
+        var cellPt = container.mapToItem(cell, globalX, globalY);
+        var monitorWidth = 1920;
+        var monitorHeight = 1080;
+        var pwWidth = cell.width - 2;
+        var pwHeight = cell.height - 2;
+        var scaleX = pwWidth / monitorWidth;
+        var scaleY = pwHeight / monitorHeight;
+        var scale = Math.min(scaleX, scaleY);
+        var wsWindows = root.windowList.filter(function(w) {
+            return w.workspace.id === root.hoveredWorkspaceId;
+        });
+        for (var i = 0; i < wsWindows.length; i++) {
+            var w = wsWindows[i];
+            if (w.address === root.draggedAddress)
+                continue;
+
+            var wx = Math.round(w.at[0] * scale) + 1;
+            var wy = Math.round(w.at[1] * scale) + 1;
+            var ww = Math.max(Math.round(w.size[0] * scale), 12);
+            var wh = Math.max(Math.round(w.size[1] * scale), 12);
+            if (cellPt.x >= wx && cellPt.x <= wx + ww && cellPt.y >= wy && cellPt.y <= wy + wh)
+                return w.address;
+
+        }
+        return "";
+    }
+
+    // Tiling simulation for drag-and-drop visual reflow
+    function getSimulatedLayout(wsId) {
+        var list = root.windowList.filter(function(w) {
+            return w.workspace.id === wsId;
+        });
+        var isSource = (root.dragActive && wsId === root.draggedSourceWorkspace);
+        var isHovered = (root.dragActive && wsId === root.hoveredWorkspaceId);
+        var activeWindows = [];
+        for (var i = 0; i < list.length; i++) {
+            if (root.dragActive && list[i].address === root.draggedAddress)
+                continue;
+
+            activeWindows.push(list[i]);
+        }
+        var draggedItem = root.dragActive ? root.windowByAddress[root.draggedAddress] : null;
+        if (isHovered && draggedItem)
+            activeWindows.push(draggedItem);
+
+        var layout = {
+        };
+        var N = activeWindows.length;
+        if (N === 1) {
+            layout[activeWindows[0].address] = {
+                "x": 20,
+                "y": 20,
+                "width": 1920 - 40,
+                "height": 1080 - 40
+            };
+        } else if (N === 2) {
+            layout[activeWindows[0].address] = {
+                "x": 20,
+                "y": 20,
+                "width": 960 - 30,
+                "height": 1080 - 40
+            };
+            layout[activeWindows[1].address] = {
+                "x": 960 + 10,
+                "y": 20,
+                "width": 960 - 30,
+                "height": 1080 - 40
+            };
+        } else if (N >= 3) {
+            layout[activeWindows[0].address] = {
+                "x": 20,
+                "y": 20,
+                "width": 960 - 30,
+                "height": 1080 - 40
+            };
+            var rightCount = N - 1;
+            var itemHeight = (1080 - 40 - (10 * (rightCount - 1))) / rightCount;
+            for (var idx = 1; idx < N; idx++) {
+                layout[activeWindows[idx].address] = {
+                    "x": 960 + 10,
+                    "y": 20 + (idx - 1) * (itemHeight + 10),
+                    "width": 960 - 30,
+                    "height": itemHeight
+                };
+            }
+        }
+        if (isSource && draggedItem)
+            layout[draggedItem.address] = {
+                "x": draggedItem.at[0],
+                "y": draggedItem.at[1],
+                "width": draggedItem.size[0],
+                "height": draggedItem.size[1],
+                "isDraggedSelf": true
+            };
+
+        return layout;
+    }
+
+    // Resolves coordinates and sizes based on real vs simulated layouts
+    function getVisualGeometry(wsId, modelData, scale) {
+        var isSource = (root.dragActive && wsId === root.draggedSourceWorkspace);
+        var isHovered = (root.dragActive && wsId === root.hoveredWorkspaceId);
+        var isIntraSwap = isSource && isHovered && root.hoveredWindowAddress !== "";
+        if (!root.dragActive || (!isSource && !isHovered) || isIntraSwap)
+            return {
+                "x": Math.round(modelData.at[0] * scale),
+                "y": Math.round(modelData.at[1] * scale),
+                "width": Math.max(Math.round(modelData.size[0] * scale), 12),
+                "height": Math.max(Math.round(modelData.size[1] * scale), 12),
+                "opacity": (root.dragActive && root.draggedAddress === modelData.address) ? 0.2 : 0.8
+            };
+
+        var simLayout = root.getSimulatedLayout(wsId);
+        var geom = simLayout[modelData.address];
+        if (geom) {
+            if (geom.isDraggedSelf)
+                return {
+                    "x": Math.round(modelData.at[0] * scale),
+                    "y": Math.round(modelData.at[1] * scale),
+                    "width": Math.max(Math.round(modelData.size[0] * scale), 12),
+                    "height": Math.max(Math.round(modelData.size[1] * scale), 12),
+                    "opacity": 0.2
+                };
+
+            return {
+                "x": Math.round(geom.x * scale),
+                "y": Math.round(geom.y * scale),
+                "width": Math.round(geom.width * scale),
+                "height": Math.round(geom.height * scale),
+                "opacity": 0.8
+            };
+        }
+        return {
+            "x": Math.round(modelData.at[0] * scale),
+            "y": Math.round(modelData.at[1] * scale),
+            "width": Math.max(Math.round(modelData.size[0] * scale), 12),
+            "height": Math.max(Math.round(modelData.size[1] * scale), 12),
+            "opacity": 0.8
+        };
+    }
+
     function getWindowIconPath(winClass) {
         if (!winClass)
             return "";
@@ -239,7 +389,7 @@ Scope {
 
                 required property var modelData
                 property bool isClosing: false
-                property real animOffsetX: -430
+                property real animOffsetX: -550
                 property real animOpacity: 0
 
                 function closePopup() {
@@ -281,7 +431,7 @@ Scope {
                     NumberAnimation {
                         target: win
                         property: "animOffsetX"
-                        from: -430
+                        from: -550
                         to: 32 // standard left margin of 32px
                         duration: 120
                         easing.type: Easing.OutCubic
@@ -308,7 +458,7 @@ Scope {
                         target: win
                         property: "animOffsetX"
                         from: 32
-                        to: -430
+                        to: -550
                         duration: 100
                         easing.type: Easing.InCubic
                     }
@@ -380,10 +530,10 @@ Scope {
 
                                     implicitWidth: 190
                                     implicitHeight: 107
-                                    // Filled shades without borders
                                     color: root.hoveredWorkspaceId === wsId ? root.colorBgCellHover : root.activeWorkspaceId === wsId ? root.colorBgCellActive : root.colorBgCell
                                     radius: 0 // Sharp corners
                                     border.width: 0
+                                    scale: root.hoveredWorkspaceId === wsId ? 1.03 : 1
 
                                     // Workspace index indicator centered in the middle
                                     Text {
@@ -429,16 +579,69 @@ Scope {
                                                 id: winPreview
 
                                                 required property var modelData
+                                                // Shift geometry outwards from the center when a window is hovered over this workspace
+                                                readonly property real cellCenterX: previewContainer.width / 2
+                                                readonly property real cellCenterY: previewContainer.height / 2
+                                                readonly property real winCenterX: Math.round((modelData.at[0]) * previewContainer.scale) + Math.max(Math.round(modelData.size[0] * previewContainer.scale), 12) / 2
+                                                readonly property real winCenterY: Math.round((modelData.at[1]) * previewContainer.scale) + Math.max(Math.round(modelData.size[1] * previewContainer.scale), 12) / 2
+                                                readonly property bool isSwapTarget: root.hoveredWindowAddress === modelData.address && root.draggedSourceWorkspace === wsCell.wsId
+                                                readonly property real offsetX: (root.hoveredWorkspaceId === wsCell.wsId && root.dragActive && root.draggedAddress !== modelData.address && !isSwapTarget) ? (winCenterX > cellCenterX ? 10 : -10) : 0
+                                                readonly property real offsetY: (root.hoveredWorkspaceId === wsCell.wsId && root.dragActive && root.draggedAddress !== modelData.address && !isSwapTarget) ? (winCenterY > cellCenterY ? 10 : -10) : 0
 
                                                 // Scale geometry
-                                                x: Math.round((modelData.at[0]) * previewContainer.scale)
-                                                y: Math.round((modelData.at[1]) * previewContainer.scale)
-                                                width: Math.max(Math.round(modelData.size[0] * previewContainer.scale), 12)
-                                                height: Math.max(Math.round(modelData.size[1] * previewContainer.scale), 12)
+                                                x: {
+                                                    var _active = root.dragActive;
+                                                    var _hovered = root.hoveredWorkspaceId;
+                                                    var _addr = root.draggedAddress;
+                                                    var _swapAddr = root.hoveredWindowAddress;
+                                                    if (isSwapTarget) {
+                                                        var draggedWin = root.windowByAddress[root.draggedAddress];
+                                                        if (draggedWin)
+                                                            return Math.round(draggedWin.at[0] * previewContainer.scale);
+
+                                                    }
+                                                    return root.getVisualGeometry(wsCell.wsId, modelData, previewContainer.scale).x;
+                                                }
+                                                y: {
+                                                    var _active = root.dragActive;
+                                                    var _hovered = root.hoveredWorkspaceId;
+                                                    var _addr = root.draggedAddress;
+                                                    var _swapAddr = root.hoveredWindowAddress;
+                                                    if (isSwapTarget) {
+                                                        var draggedWin = root.windowByAddress[root.draggedAddress];
+                                                        if (draggedWin)
+                                                            return Math.round(draggedWin.at[1] * previewContainer.scale);
+
+                                                    }
+                                                    return root.getVisualGeometry(wsCell.wsId, modelData, previewContainer.scale).y;
+                                                }
+                                                width: {
+                                                    var _active = root.dragActive;
+                                                    var _hovered = root.hoveredWorkspaceId;
+                                                    var _addr = root.draggedAddress;
+                                                    var _swapAddr = root.hoveredWindowAddress;
+                                                    return root.getVisualGeometry(wsCell.wsId, modelData, previewContainer.scale).width;
+                                                }
+                                                height: {
+                                                    var _active = root.dragActive;
+                                                    var _hovered = root.hoveredWorkspaceId;
+                                                    var _addr = root.draggedAddress;
+                                                    var _swapAddr = root.hoveredWindowAddress;
+                                                    return root.getVisualGeometry(wsCell.wsId, modelData, previewContainer.scale).height;
+                                                }
                                                 color: "transparent"
-                                                border.width: 0
+                                                border.width: root.hoveredWindowAddress === modelData.address ? 1 : 0
+                                                border.color: root.colorTheme
                                                 radius: 0 // Sharp corners
-                                                opacity: (root.dragActive && root.draggedAddress === modelData.address) ? 0.3 : 0.8
+                                                clip: true
+                                                opacity: {
+                                                    var _active = root.dragActive;
+                                                    var _hovered = root.hoveredWorkspaceId;
+                                                    var _addr = root.draggedAddress;
+                                                    var _swapAddr = root.hoveredWindowAddress;
+                                                    return root.getVisualGeometry(wsCell.wsId, modelData, previewContainer.scale).opacity;
+                                                }
+                                                scale: (root.dragActive && root.draggedAddress === modelData.address) ? 0.8 : (root.hoveredWindowAddress === modelData.address) ? 0.75 : 1
 
                                                 // Draw the window content live
                                                 Loader {
@@ -449,7 +652,9 @@ Scope {
                                                     sourceComponent: ScreencopyView {
                                                         captureSource: root.getToplevelForAddress(winPreview.modelData.address)
                                                         live: true
-                                                        anchors.fill: parent
+                                                        width: Math.max(Math.round(winPreview.modelData.size[0] * previewContainer.scale), 12)
+                                                        height: Math.max(Math.round(winPreview.modelData.size[1] * previewContainer.scale), 12)
+                                                        constraintSize: Qt.size(width, height)
                                                     }
 
                                                 }
@@ -498,19 +703,39 @@ Scope {
                                                             root.dragY = globalPt.y - root.dragOffsetY;
                                                             // Handle visual collision mapping using the global coordinates helper
                                                             root.hoveredWorkspaceId = root.findHoveredWorkspace(contentContainer, globalPt.x, globalPt.y, wsGridRepeater);
+                                                            if (root.hoveredWorkspaceId === root.draggedSourceWorkspace)
+                                                                root.hoveredWindowAddress = root.findHoveredWindowAddress(contentContainer, globalPt.x, globalPt.y, wsGridRepeater);
+                                                            else
+                                                                root.hoveredWindowAddress = "";
                                                         }
                                                     }
                                                     onReleased: {
                                                         if (root.dragActive) {
                                                             root.dragActive = false;
-                                                            if (root.hoveredWorkspaceId !== -1 && root.hoveredWorkspaceId !== root.draggedSourceWorkspace) {
-                                                                Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.window.move({ workspace = " + root.hoveredWorkspaceId + ", follow = false, window = \"address:" + root.draggedAddress + "\" })"]);
-                                                                root.updateAll();
+                                                            if (root.hoveredWorkspaceId !== -1) {
+                                                                if (root.hoveredWorkspaceId !== root.draggedSourceWorkspace) {
+                                                                    Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.window.move({ workspace = " + root.hoveredWorkspaceId + ", follow = false, window = \"address:" + root.draggedAddress + "\" })"]);
+                                                                    root.updateAll();
+                                                                } else {
+                                                                    if (root.hoveredWindowAddress !== "" && root.hoveredWindowAddress !== root.draggedAddress) {
+                                                                        var wsWindows = root.windowList.filter(function(w) {
+                                                                            return w.workspace.id === root.hoveredWorkspaceId;
+                                                                        });
+                                                                        if (wsWindows.length === 2)
+                                                                            // Silent swap: move the dragged window to temp workspace 99 and back silently
+                                                                            Quickshell.execDetached(["hyprctl", "--batch", "dispatch hl.dsp.window.move({ workspace = 99, follow = false, window = \"address:" + root.draggedAddress + "\" }) ; " + "dispatch hl.dsp.window.move({ workspace = " + root.hoveredWorkspaceId + ", follow = false, window = \"address:" + root.draggedAddress + "\" })"]);
+                                                                        else
+                                                                            // Fallback for 3+ windows (warps cursor)
+                                                                            Quickshell.execDetached(["hyprctl", "--batch", "dispatch hl.dsp.focus({ window = \"address:" + root.draggedAddress + "\" }) ; " + "dispatch hl.dsp.window.swap({ target = \"address:" + root.hoveredWindowAddress + "\" })"]);
+                                                                        root.updateAll();
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                         root.draggedWindow = null;
                                                         root.draggedAddress = "";
                                                         root.hoveredWorkspaceId = -1;
+                                                        root.hoveredWindowAddress = "";
                                                     }
                                                 }
 
@@ -550,8 +775,70 @@ Scope {
 
                                                 }
 
+                                                Behavior on x {
+                                                    NumberAnimation {
+                                                        duration: 180
+                                                        easing.type: Easing.OutCubic
+                                                    }
+
+                                                }
+
+                                                Behavior on y {
+                                                    NumberAnimation {
+                                                        duration: 180
+                                                        easing.type: Easing.OutCubic
+                                                    }
+
+                                                }
+
+                                                Behavior on width {
+                                                    NumberAnimation {
+                                                        duration: 180
+                                                        easing.type: Easing.OutCubic
+                                                    }
+
+                                                }
+
+                                                Behavior on height {
+                                                    NumberAnimation {
+                                                        duration: 180
+                                                        easing.type: Easing.OutCubic
+                                                    }
+
+                                                }
+
+                                                Behavior on scale {
+                                                    NumberAnimation {
+                                                        duration: 180
+                                                        easing.type: Easing.OutCubic
+                                                    }
+
+                                                }
+
+                                                Behavior on opacity {
+                                                    NumberAnimation {
+                                                        duration: 180
+                                                    }
+
+                                                }
+
                                             }
 
+                                        }
+
+                                    }
+
+                                    Behavior on scale {
+                                        NumberAnimation {
+                                            duration: 150
+                                            easing.type: Easing.OutCubic
+                                        }
+
+                                    }
+
+                                    Behavior on color {
+                                        ColorAnimation {
+                                            duration: 150
                                         }
 
                                     }
@@ -582,6 +869,7 @@ Scope {
                     radius: 0 // Sharp corners
                     z: 9999
                     opacity: 0.8
+                    scale: 1
 
                     Loader {
                         anchors.fill: parent
@@ -591,6 +879,8 @@ Scope {
                         sourceComponent: ScreencopyView {
                             captureSource: root.draggedWindow
                             live: false
+                            anchors.fill: parent
+                            constraintSize: Qt.size(parent.width, parent.height)
                         }
 
                     }
@@ -608,6 +898,14 @@ Scope {
                             anchors.margins: 1
                             fillMode: Image.PreserveAspectFit
                             source: root.windowByAddress[root.draggedAddress] ? root.getWindowIconPath(root.windowByAddress[root.draggedAddress].class) : ""
+                        }
+
+                    }
+
+                    Behavior on scale {
+                        NumberAnimation {
+                            duration: 150
+                            easing.type: Easing.OutCubic
                         }
 
                     }
