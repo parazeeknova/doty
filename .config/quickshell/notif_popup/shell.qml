@@ -22,6 +22,14 @@ Scope {
     property var expandedNotifIds: ({
     })
 
+    // Pomodoro properties
+    property bool pomoActive: false
+    property double pomoEndTime: 0
+    property int pomoDuration: 1500
+    property bool pomoPaused: false
+    property int pomoPausedTimeLeft: 0
+    property int pomoTimeLeft: 0
+
     signal requestClose()
 
     function getCalendarDays(offset) {
@@ -135,6 +143,79 @@ Scope {
         }
 
     }
+
+    FileView {
+        id: pomoStateFile
+
+        path: "file:///tmp/quickshell_pomodoro.json"
+        watchChanges: true
+        onLoaded: {
+            try {
+                var raw = pomoStateFile.text().trim();
+                if (raw === "") return;
+                var parsed = JSON.parse(raw);
+                root.pomoActive = parsed.active ?? false;
+                root.pomoEndTime = parsed.endTime ?? 0;
+                root.pomoDuration = parsed.duration ?? 1500;
+                root.pomoPaused = parsed.paused ?? false;
+                root.pomoPausedTimeLeft = parsed.pausedTimeLeft ?? 0;
+
+                if (root.pomoActive) {
+                    if (root.pomoPaused) {
+                        root.pomoTimeLeft = root.pomoPausedTimeLeft;
+                    } else {
+                        root.pomoTimeLeft = Math.max(0, Math.round((root.pomoEndTime - Date.now()) / 1000));
+                    }
+                } else {
+                    root.pomoTimeLeft = 0;
+                }
+            } catch (e) {
+                console.log("Failed to parse pomodoro state: " + e);
+            }
+        }
+        onFileChanged: reload()
+    }
+
+    Timer {
+        id: pomoLocalTimer
+        interval: 1000
+        repeat: true
+        running: root.pomoActive && !root.pomoPaused
+        onTriggered: {
+            var diff = Math.max(0, Math.round((root.pomoEndTime - Date.now()) / 1000));
+            root.pomoTimeLeft = diff;
+            if (diff <= 0) {
+                root.pomoActive = false;
+                root.pomoTimeLeft = 0;
+            }
+        }
+    }
+
+    Process {
+        id: savePomoProc
+        running: false
+    }
+
+    function savePomoState() {
+        var state = {
+            "active": root.pomoActive,
+            "endTime": root.pomoEndTime,
+            "duration": root.pomoDuration,
+            "paused": root.pomoPaused,
+            "pausedTimeLeft": root.pomoPausedTimeLeft
+        };
+        var stateStr = JSON.stringify(state);
+        savePomoProc.command = ["sh", "-c", "echo '" + stateStr + "' > /tmp/quickshell_pomodoro.json"];
+        savePomoProc.running = false;
+        savePomoProc.running = true;
+    }
+
+    function formatPomoTime(secs) {
+        var m = Math.floor(secs / 60);
+        var s = secs % 60;
+        return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }
+
 
     Variants {
         model: Quickshell.screens
@@ -1110,7 +1191,7 @@ Scope {
                                     id: btnSysmon
 
                                     anchors.centerIn: parent
-                                    text: "󰣖"
+                                    text: ""
                                     color: "#d5c4a1"
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
@@ -1144,7 +1225,7 @@ Scope {
                                     id: btnPodman
 
                                     anchors.centerIn: parent
-                                    text: ""
+                                    text: ""
                                     color: "#d5c4a1"
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
@@ -1173,7 +1254,7 @@ Scope {
                                     id: btnEmoji
 
                                     anchors.centerIn: parent
-                                    text: "󰞅"
+                                    text: "󰄛"
                                     color: "#d5c4a1"
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
@@ -1193,7 +1274,7 @@ Scope {
 
                             }
 
-                            // OCR Button
+                            // Media Button
                             Item {
                                 width: parent.width / 6
                                 height: 14
@@ -1202,7 +1283,7 @@ Scope {
                                     id: btnOcr
 
                                     anchors.centerIn: parent
-                                    text: "󰚢"
+                                    text: "󰕧"
                                     color: "#d5c4a1"
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
@@ -1215,7 +1296,7 @@ Scope {
                                     onEntered: btnOcr.color = "#ebdbb2"
                                     onExited: btnOcr.color = "#d5c4a1"
                                     onClicked: {
-                                        Quickshell.execDetached(["quickshell", "--config", "ocr_popup"]);
+                                        Quickshell.execDetached(["quickshell", "--config", "media_popup"]);
                                         win.closePopup();
                                     }
                                 }
@@ -1224,7 +1305,204 @@ Scope {
 
                         }
 
+                        // Pomodoro Timer Control Column Wrapper
+                        Column {
+                            width: parent.width
+                            spacing: 1
+
+                            Rectangle {
+                                width: parent.width
+                                height: 1
+                                color: "#d5c4a1"
+                                opacity: 0.1
+                            }
+
+                            Text {
+                                text: "Pomodoro"
+                                color: "#ebdbb2"
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 8
+                                font.bold: true
+                                renderType: Text.NativeRendering
+                                topPadding: 5
+                                bottomPadding: 1
+                            }
+
+                            Row {
+                                id: pomoMainRow
+                                width: parent.width
+                                height: 16
+                                spacing: 4
+
+                                Text {
+                                    id: pomoIconText
+                                    text: "󰔛"
+                                    color: "#d5c4a1"
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                    renderType: Text.NativeRendering
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                // Input Box (or Countdown Label if active)
+                                Item {
+                                    id: pomoInputBox
+                                    width: root.pomoActive ? 34 : 20
+                                    height: 12
+                                    anchors.verticalCenter: parent.verticalCenter
+
+                                    TextInput {
+                                        id: pomoInput
+                                        anchors.fill: parent
+                                        verticalAlignment: TextInput.AlignVCenter
+                                        horizontalAlignment: TextInput.AlignHCenter
+                                        text: root.pomoActive ? root.formatPomoTime(root.pomoTimeLeft) : String(Math.round(root.pomoDuration / 60))
+                                        color: "#ebdbb2"
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        selectByMouse: true
+                                        inputMethodHints: Qt.ImhDigitsOnly
+                                        enabled: !root.pomoActive
+                                        renderType: Text.NativeRendering
+
+                                        onAccepted: {
+                                            var val = parseInt(text);
+                                            if (!isNaN(val) && val > 0) {
+                                                root.pomoDuration = val * 60;
+                                            }
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: parent.width
+                                        height: 1
+                                        color: "#d5c4a1"
+                                        opacity: 0.3
+                                        anchors.bottom: parent.bottom
+                                        visible: !root.pomoActive
+                                    }
+                                }
+
+                                // Presets Row
+                                Row {
+                                    id: pomoPresetsRow
+                                    spacing: 4
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    visible: !root.pomoActive
+
+                                    Repeater {
+                                        model: [5, 10, 25, 50]
+                                        delegate: Text {
+                                            text: modelData + "m"
+                                            color: (root.pomoDuration === modelData * 60) ? "#ebdbb2" : "#a89984"
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                            renderType: Text.NativeRendering
+
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                onClicked: {
+                                                    root.pomoDuration = modelData * 60;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Animated progress bar (only when active)
+                                Rectangle {
+                                    id: pomoProgressBar
+                                    width: parent.width - pomoIconText.implicitWidth - pomoInputBox.width - pomoActionsRow.implicitWidth - (pomoMainRow.spacing * 4)
+                                    height: 2
+                                    color: "#3c3836"
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    visible: root.pomoActive
+
+                                    Rectangle {
+                                        height: parent.height
+                                        width: parent.width * (root.pomoTimeLeft / root.pomoDuration)
+                                        color: "#d5c4a1"
+
+                                        Behavior on width {
+                                            NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
+                                        }
+                                    }
+                                }
+
+                                // Spacer to push actions to the right (only when inactive)
+                                Item {
+                                    id: pomoSpacer
+                                    width: parent.width - pomoIconText.implicitWidth - pomoInputBox.width - pomoPresetsRow.implicitWidth - pomoActionsRow.implicitWidth - (pomoMainRow.spacing * 5)
+                                    height: 1
+                                    visible: !root.pomoActive
+                                }
+
+                                // Actions
+                                Row {
+                                    id: pomoActionsRow
+                                    spacing: 4
+                                    anchors.verticalCenter: parent.verticalCenter
+
+                                    Text {
+                                        text: root.pomoActive ? (root.pomoPaused ? "Resume" : "Pause") : "Start"
+                                        color: "#d5c4a1"
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: true
+                                        renderType: Text.NativeRendering
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                if (!root.pomoActive) {
+                                                    var val = parseInt(pomoInput.text);
+                                                    if (!isNaN(val) && val > 0) {
+                                                        root.pomoDuration = val * 60;
+                                                    }
+                                                    root.pomoActive = true;
+                                                    root.pomoPaused = false;
+                                                    root.pomoEndTime = Date.now() + root.pomoDuration * 1000;
+                                                    root.pomoTimeLeft = root.pomoDuration;
+                                                } else if (root.pomoPaused) {
+                                                    root.pomoPaused = false;
+                                                    root.pomoEndTime = Date.now() + root.pomoPausedTimeLeft * 1000;
+                                                    root.pomoTimeLeft = root.pomoPausedTimeLeft;
+                                                } else {
+                                                    root.pomoPaused = true;
+                                                    root.pomoPausedTimeLeft = root.pomoTimeLeft;
+                                                }
+                                                root.savePomoState();
+                                            }
+                                        }
+                                    }
+
+                                    Text {
+                                        text: "Reset"
+                                        color: "#d5c4a1"
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: true
+                                        renderType: Text.NativeRendering
+                                        visible: root.pomoActive
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                root.pomoActive = false;
+                                                root.pomoPaused = false;
+                                                root.pomoTimeLeft = 0;
+                                                root.pomoEndTime = 0;
+                                                root.savePomoState();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+
                     }
+
 
                 }
 

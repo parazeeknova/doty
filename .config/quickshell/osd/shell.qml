@@ -21,6 +21,107 @@ Scope {
     property string lastPlatformProfile: ""
     property int trayItemCount: 0
 
+    // Pomodoro Timer State
+    property bool pomoActive: false
+    property double pomoEndTime: 0
+    property int pomoDuration: 1500
+    property bool pomoPaused: false
+    property int pomoPausedTimeLeft: 0
+    property int pomoTimeLeft: 0
+    property bool pomoHovered: false
+    property bool pomoShowAlways: false
+
+    function formatPomoTime(secs) {
+        var m = Math.floor(secs / 60);
+        var s = secs % 60;
+        return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }
+
+    Timer {
+        id: pomoShowTimer
+        interval: 5000
+        repeat: false
+        onTriggered: {
+            root.pomoShowAlways = false;
+        }
+    }
+
+    function resetPomoShowTimer() {
+        root.pomoShowAlways = true;
+        pomoShowTimer.restart();
+    }
+
+    Timer {
+        id: pomoCountdownTimer
+        interval: 1000
+        repeat: true
+        running: root.pomoActive && !root.pomoPaused
+        onTriggered: {
+            var diff = Math.max(0, Math.round((root.pomoEndTime - Date.now()) / 1000));
+            root.pomoTimeLeft = diff;
+            if (diff <= 0) {
+                root.pomoActive = false;
+                root.pomoTimeLeft = 0;
+                root.savePomoState();
+                root.showOSD("Pomodoro Finished!", "good", 5000);
+                Quickshell.execDetached(["notify-send", "Pomodoro", "Time's up! Take a break."]);
+            }
+        }
+    }
+
+    FileView {
+        id: pomoStateFile
+
+        path: "file:///tmp/quickshell_pomodoro.json"
+        watchChanges: true
+        onLoaded: {
+            try {
+                var raw = pomoStateFile.text().trim();
+                if (raw === "") return;
+                var parsed = JSON.parse(raw);
+                root.pomoActive = parsed.active ?? false;
+                root.pomoEndTime = parsed.endTime ?? 0;
+                root.pomoDuration = parsed.duration ?? 1500;
+                root.pomoPaused = parsed.paused ?? false;
+                root.pomoPausedTimeLeft = parsed.pausedTimeLeft ?? 0;
+
+                if (root.pomoActive) {
+                    if (root.pomoPaused) {
+                        root.pomoTimeLeft = root.pomoPausedTimeLeft;
+                    } else {
+                        root.pomoTimeLeft = Math.max(0, Math.round((root.pomoEndTime - Date.now()) / 1000));
+                    }
+                    root.resetPomoShowTimer();
+                } else {
+                    root.pomoTimeLeft = 0;
+                }
+            } catch (e) {
+                console.log("Failed to parse pomodoro state: " + e);
+            }
+        }
+        onFileChanged: reload()
+    }
+
+    Process {
+        id: savePomoProc
+        running: false
+    }
+
+    function savePomoState() {
+        var state = {
+            "active": root.pomoActive,
+            "endTime": root.pomoEndTime,
+            "duration": root.pomoDuration,
+            "paused": root.pomoPaused,
+            "pausedTimeLeft": root.pomoPausedTimeLeft
+        };
+        var stateStr = JSON.stringify(state);
+        savePomoProc.command = ["sh", "-c", "echo '" + stateStr + "' > /tmp/quickshell_pomodoro.json"];
+        savePomoProc.running = false;
+        savePomoProc.running = true;
+    }
+
+
     function updateTrayCount() {
         if (SystemTray.items !== undefined && SystemTray.items !== null) {
             try {
@@ -520,16 +621,39 @@ Scope {
                         }
 
                         // Fallback label for text-only messages
-                        Text {
-                            id: fallbackLabel
-
+                        Row {
+                            spacing: 6
                             anchors.horizontalCenter: parent.horizontalCenter
-                            text: root.message
-                            color: "#d4be98"
-                            font.family: "FiraCode Nerd Font"
-                            font.pixelSize: 9
-                            renderType: Text.NativeRendering
                             visible: root.getPercentage(root.message) === -1
+
+                            Text {
+                                text: {
+                                    if (root.message.includes("Recording Started")) return "󰑋";
+                                    if (root.message.includes("Recording Saved") || root.message.includes("Recording Stopped")) return "󰻃";
+                                    if (root.message.includes("Extracted") || root.message.includes("OCR")) return "󰙎";
+                                    return "";
+                                }
+                                color: {
+                                    if (root.message.includes("Recording Started")) return "#ea6962";
+                                    if (root.message.includes("Recording Saved") || root.message.includes("Recording Stopped")) return "#a9b665";
+                                    if (root.message.includes("Extracted") || root.message.includes("OCR")) return "#e78a4e";
+                                    return "#d4be98";
+                                }
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 10
+                                renderType: Text.NativeRendering
+                                visible: text !== ""
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                text: root.message
+                                color: "#d4be98"
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 9
+                                renderType: Text.NativeRendering
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
                         }
 
                         // Separator
@@ -658,6 +782,78 @@ Scope {
         }
 
     }
+
+    Variants {
+        model: Quickshell.screens
+
+        delegate: Component {
+            PanelWindow {
+                id: pomoWin
+
+                required property var modelData
+                screen: modelData
+                color: "transparent"
+                exclusionMode: PanelWindow.ExclusionMode.Ignore
+                visible: root.pomoActive
+
+                anchors {
+                    top: true
+                    right: true
+                }
+
+                width: (root.pomoShowAlways || root.pomoHovered) ? 45 : 8
+                height: (root.pomoShowAlways || root.pomoHovered) ? 22 : 8
+
+                margins {
+                    top: (root.pomoShowAlways || root.pomoHovered) ? 4 : 0
+                    right: (root.pomoShowAlways || root.pomoHovered) ? 4 : 0
+                }
+
+                Rectangle {
+                    id: pomoContent
+                    anchors.fill: parent
+                    color: (root.pomoShowAlways || root.pomoHovered) ? "#e61d2021" : "#01000000"
+                    border.width: (root.pomoShowAlways || root.pomoHovered) ? 1 : 0
+                    border.color: "#d5c4a1"
+                    radius: 0
+
+                    opacity: (root.pomoShowAlways || root.pomoHovered) ? 1.0 : 0.01
+                    Behavior on opacity {
+                        NumberAnimation { duration: 150 }
+                    }
+
+                    Row {
+                        anchors.centerIn: parent
+                        visible: (root.pomoShowAlways || root.pomoHovered)
+
+                        Text {
+                            text: root.formatPomoTime(root.pomoTimeLeft)
+                            color: "#ebdbb2"
+                            font.family: "FiraCode Nerd Font"
+                            font.pixelSize: 8
+                            font.bold: true
+                            renderType: Text.NativeRendering
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onEntered: {
+                        root.pomoHovered = true;
+                        root.resetPomoShowTimer();
+                    }
+                    onExited: {
+                        root.pomoHovered = false;
+                        root.resetPomoShowTimer();
+                    }
+                }
+            }
+        }
+    }
+
 
     Process {
         id: waybarSignalProc

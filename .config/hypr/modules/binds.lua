@@ -102,6 +102,7 @@ hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("rofi -show drun -mesg 'applicati
 hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd("rofi -show recents"))
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("rofi -show power"))
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("rofi -show sunset"))
+hl.bind(mainMod .. " + slash", hl.dsp.exec_cmd("rofi -show ports -mesg 'occupied ports'"))
 hl.bind("XF86Launch3", hl.dsp.exec_cmd("rofi -show profile"))
 
 -- Quickshell popups
@@ -121,6 +122,8 @@ hl.bind(mainMod .. " + SHIFT + N",
     hl.dsp.exec_cmd("quickshell -c notif_popup ipc call notif_popup close || quickshell --config notif_popup"))
 hl.bind(mainMod .. " + ALT + slash",
     hl.dsp.exec_cmd("quickshell -c podman_popup ipc call podman_popup close || quickshell --config podman_popup"))
+hl.bind(mainMod .. " + G",
+    hl.dsp.exec_cmd("quickshell -c media_popup ipc call media_popup close || quickshell --config media_popup"))
 hl.bind("SUPER_L", hl.dsp
     .exec_cmd("quickshell -c workspace_popup ipc call workspace_popup close || quickshell --config workspace_popup"), {
     release = true,

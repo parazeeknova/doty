@@ -51,7 +51,7 @@ window#waybar {
 
 #window {
   font-size: 0.8rem;
-  color: @grey1;
+  color: @fg1;
   padding: 4px 0;
 }
 

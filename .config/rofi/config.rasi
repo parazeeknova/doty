@@ -1,5 +1,5 @@
 configuration {
-    modi: "drun,recents:~/.config/rofi/scripts/recents.sh,noti:~/.config/rofi/scripts/notif-center.sh,power:~/.config/rofi/scripts/power-menu.sh,profile:~/.config/rofi/scripts/profile.sh,sunset:~/.config/rofi/scripts/sunset.sh,clip:~/.config/rofi/scripts/cliphist.sh";
+    modi: "drun,recents:~/.config/rofi/scripts/recents.sh,noti:~/.config/rofi/scripts/notif-center.sh,power:~/.config/rofi/scripts/power-menu.sh,profile:~/.config/rofi/scripts/profile.sh,sunset:~/.config/rofi/scripts/sunset.sh,clip:~/.config/rofi/scripts/cliphist.sh,ports:~/.config/rofi/scripts/ports_menu";
     show-icons: false;
     display-drun: "";
     drun-display-format: "{name}";
