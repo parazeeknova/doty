@@ -11,7 +11,7 @@ local osdctl = "~/doty/.config/quickshell/osd/bin/osdctl"
 ---------------------
 
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("kitty"))
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd("warp-terminal"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 
