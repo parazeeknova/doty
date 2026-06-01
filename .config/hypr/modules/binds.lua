@@ -117,6 +117,11 @@ hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("quickshell --config network_
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.exec_cmd("quickshell --config bluetooth_popup"))
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("quickshell --config brightness_popup"))
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("quickshell --config notif_popup"))
+hl.bind("SUPER_L", hl.dsp.exec_cmd("sh -c \"pkill -f '^quickshell --config workspace_popup' || quickshell --config workspace_popup\""), {
+    release = true,
+    ignore_mods = true
+})
+
 
 ---------------------
 ---   Screenshots ---

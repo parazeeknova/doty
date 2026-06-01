@@ -62,6 +62,7 @@
   },
   "hyprland/window": {
     "format": "{title}",
+    "tooltip": false,
     "max-length": 40,
     "rotate": 270,
     "on-click": "quickshell --config workspace_popup"
@@ -83,8 +84,8 @@
     "format-muted": "",
     "format-icons": {
       "headphone": "",
-      "hands-free": "",
-      "headset": "",
+      "hands-free": "",
+      "headset": "󰋎",
       "phone": "",
       "phone-muted": "",
       "portable": "",
