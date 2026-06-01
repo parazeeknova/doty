@@ -63,7 +63,8 @@
   "hyprland/window": {
     "format": "{title}",
     "max-length": 40,
-    "rotate": 270
+    "rotate": 270,
+    "on-click": "quickshell --config workspace_popup"
   },
   "clock": {
     "format": "{:%I\n%M\n%p}",
