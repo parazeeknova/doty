@@ -270,14 +270,34 @@ Scope {
 
         delegate: Component {
             PanelWindow {
-                required property var modelData
+                id: win
 
+                required property var modelData
+                property bool isShown: root.visibleNow
+                property real animTopMargin: -50
+                property real animOpacity: 0
+
+                onIsShownChanged: {
+                    if (isShown) {
+                        exitAnim.stop();
+                        introAnim.start();
+                    } else {
+                        introAnim.stop();
+                        exitAnim.start();
+                    }
+                }
                 screen: modelData
                 color: "transparent"
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
-                visible: root.visibleNow
+                visible: root.visibleNow || exitAnim.running
                 implicitWidth: (root.getPercentage(root.message) !== -1) ? 180 : (fallbackLabel.implicitWidth + 18)
                 implicitHeight: mainLayout.implicitHeight + 12
+                Component.onCompleted: {
+                    if (root.visibleNow) {
+                        animTopMargin = 5;
+                        animOpacity = 1;
+                    }
+                }
 
                 anchors {
                     top: true
@@ -285,13 +305,62 @@ Scope {
                 }
 
                 margins {
-                    top: 5
+                    top: win.animTopMargin
                     left: 30
+                }
+
+                // Slide-in + fade-in
+                ParallelAnimation {
+                    id: introAnim
+
+                    NumberAnimation {
+                        target: win
+                        property: "animTopMargin"
+                        from: -50
+                        to: 5
+                        duration: 120
+                        easing.type: Easing.OutCubic
+                    }
+
+                    NumberAnimation {
+                        target: win
+                        property: "animOpacity"
+                        from: 0
+                        to: 1
+                        duration: 120
+                        easing.type: Easing.OutCubic
+                    }
+
+                }
+
+                // Slide-out + fade-out
+                ParallelAnimation {
+                    id: exitAnim
+
+                    NumberAnimation {
+                        target: win
+                        property: "animTopMargin"
+                        from: 5
+                        to: -50
+                        duration: 100
+                        easing.type: Easing.InCubic
+                    }
+
+                    NumberAnimation {
+                        target: win
+                        property: "animOpacity"
+                        from: 1
+                        to: 0
+                        duration: 100
+                        easing.type: Easing.InCubic
+                    }
+
                 }
 
                 Rectangle {
                     anchors.fill: parent
-                    color: "#1d2021"
+                    opacity: win.animOpacity
+                    color: "#801d2021"
                     border.width: 1
                     border.color: root.kind === "good" ? "#a9b665" : root.kind === "bad" ? "#ea6962" : root.kind === "warn" ? "#e78a4e" : "#7c6f64"
                     radius: 0

@@ -118,6 +118,17 @@ Scope {
                 id: win
 
                 required property var modelData
+                property bool isClosing: false
+                property real animLeftMargin: -260
+                property real animOpacity: 0
+
+                function closePopup() {
+                    if (isClosing)
+                        return ;
+
+                    isClosing = true;
+                    exitAnim.start();
+                }
 
                 screen: modelData
                 color: "transparent"
@@ -125,6 +136,7 @@ Scope {
                 focusable: true
                 implicitWidth: 240
                 implicitHeight: mainLayout.implicitHeight + 20
+                Component.onCompleted: introAnim.start()
 
                 anchors {
                     bottom: true
@@ -133,20 +145,71 @@ Scope {
 
                 margins {
                     bottom: 18
-                    left: 32
+                    left: win.animLeftMargin
+                }
+
+                // Slide-in + fade-in
+                ParallelAnimation {
+                    id: introAnim
+
+                    NumberAnimation {
+                        target: win
+                        property: "animLeftMargin"
+                        from: -260
+                        to: 32
+                        duration: 120
+                        easing.type: Easing.OutCubic
+                    }
+
+                    NumberAnimation {
+                        target: win
+                        property: "animOpacity"
+                        from: 0
+                        to: 1
+                        duration: 120
+                        easing.type: Easing.OutCubic
+                    }
+
+                }
+
+                // Slide-out + fade-out
+                ParallelAnimation {
+                    id: exitAnim
+
+                    onStopped: Qt.quit()
+
+                    NumberAnimation {
+                        target: win
+                        property: "animLeftMargin"
+                        from: 32
+                        to: -260
+                        duration: 100
+                        easing.type: Easing.InCubic
+                    }
+
+                    NumberAnimation {
+                        target: win
+                        property: "animOpacity"
+                        from: 1
+                        to: 0
+                        duration: 100
+                        easing.type: Easing.InCubic
+                    }
+
                 }
 
                 HyprlandFocusGrab {
-                    active: true
+                    active: !win.isClosing
                     windows: [win]
                     onCleared: {
-                        Qt.quit();
+                        win.closePopup();
                     }
                 }
 
                 Rectangle {
                     anchors.fill: parent
-                    color: "#1d2021"
+                    opacity: win.animOpacity
+                    color: "#801d2021"
                     border.width: 1
                     border.color: "#d5c4a1"
                     radius: 0
@@ -154,7 +217,7 @@ Scope {
                     focus: true
                     Keys.onPressed: (event) => {
                         if (event.key === Qt.Key_Escape)
-                            Qt.quit();
+                            win.closePopup();
 
                     }
                     Component.onCompleted: {

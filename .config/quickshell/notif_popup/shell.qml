@@ -138,6 +138,15 @@ Scope {
       PanelWindow {
         id: win
         required property var modelData
+        property bool isClosing: false
+        property real animLeftMargin: -260
+        property real animOpacity: 0
+
+        function closePopup() {
+          if (isClosing) return;
+          isClosing = true;
+          exitAnim.start();
+        }
         screen: modelData
         color: "transparent"
 
@@ -147,17 +156,68 @@ Scope {
 
         // Center vertically on the left screen edge
         margins {
-          left: 32
+          left: win.animLeftMargin
         }
+
+        // Slide-in + fade-in
+        ParallelAnimation {
+          id: introAnim
+
+          NumberAnimation {
+            target: win
+            property: "animLeftMargin"
+            from: -260
+            to: 32
+            duration: 120
+            easing.type: Easing.OutCubic
+          }
+
+          NumberAnimation {
+            target: win
+            property: "animOpacity"
+            from: 0
+            to: 1
+            duration: 120
+            easing.type: Easing.OutCubic
+          }
+
+        }
+
+        // Slide-out + fade-out
+        ParallelAnimation {
+          id: exitAnim
+
+          NumberAnimation {
+            target: win
+            property: "animLeftMargin"
+            from: 32
+            to: -260
+            duration: 100
+            easing.type: Easing.InCubic
+          }
+
+          NumberAnimation {
+            target: win
+            property: "animOpacity"
+            from: 1
+            to: 0
+            duration: 100
+            easing.type: Easing.InCubic
+          }
+
+          onStopped: Qt.quit()
+        }
+
+        Component.onCompleted: introAnim.start()
 
         exclusionMode: PanelWindow.ExclusionMode.Ignore
         focusable: true
 
         HyprlandFocusGrab {
-          active: true
+          active: !win.isClosing
           windows: [win]
           onCleared: {
-            Qt.quit()
+            win.closePopup()
           }
         }
 
@@ -166,7 +226,8 @@ Scope {
 
         Rectangle {
           anchors.fill: parent
-          color: "#1d2021"
+          opacity: win.animOpacity
+          color: "#801d2021"
           border.width: 1
           border.color: "#d5c4a1"
           radius: 0
@@ -175,7 +236,7 @@ Scope {
           focus: true
           Keys.onPressed: (event) => {
             if (event.key === Qt.Key_Escape) {
-              Qt.quit()
+              win.closePopup()
             }
           }
 
@@ -842,7 +903,7 @@ Scope {
                   onExited: btnVol.color = "#d5c4a1"
                   onClicked: {
                     Quickshell.execDetached(["quickshell", "--config", "volume_popup"])
-                    Qt.quit()
+                    win.closePopup()
                   }
                 }
               }
@@ -869,7 +930,7 @@ Scope {
                   onExited: btnNet.color = "#d5c4a1"
                   onClicked: {
                     Quickshell.execDetached(["quickshell", "--config", "network_popup"])
-                    Qt.quit()
+                    win.closePopup()
                   }
                 }
               }
@@ -896,7 +957,7 @@ Scope {
                   onExited: btnBt.color = "#d5c4a1"
                   onClicked: {
                     Quickshell.execDetached(["quickshell", "--config", "bluetooth_popup"])
-                    Qt.quit()
+                    win.closePopup()
                   }
                 }
               }
@@ -923,7 +984,7 @@ Scope {
                   onExited: btnBright.color = "#d5c4a1"
                   onClicked: {
                     Quickshell.execDetached(["quickshell", "--config", "brightness_popup"])
-                    Qt.quit()
+                    win.closePopup()
                   }
                 }
               }
@@ -950,7 +1011,7 @@ Scope {
                   onExited: btnBat.color = "#d5c4a1"
                   onClicked: {
                     Quickshell.execDetached(["quickshell", "--config", "battery_popup"])
-                    Qt.quit()
+                    win.closePopup()
                   }
                 }
               }
@@ -977,7 +1038,7 @@ Scope {
                   onExited: btnSysmon.color = "#d5c4a1"
                   onClicked: {
                     Quickshell.execDetached(["quickshell", "--config", "sysmon_popup"])
-                    Qt.quit()
+                    win.closePopup()
                   }
                 }
               }

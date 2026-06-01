@@ -43,3 +43,9 @@ hl.window_rule({
   size   = { 800, 400 },
   center = true,
 })
+
+hl.layer_rule({
+  name  = "quickshell-blur",
+  match = { namespace = "quickshell" },
+  blur  = true,
+})
