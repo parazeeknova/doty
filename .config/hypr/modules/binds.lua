@@ -105,8 +105,10 @@ hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("rofi -show sunset"))
 hl.bind("XF86Launch3", hl.dsp.exec_cmd("rofi -show profile"))
 
 -- Quickshell popups
-hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("quickshell -c clipboard_popup ipc call clipboard_popup close || quickshell --config clipboard_popup"))
-hl.bind(mainMod .. " + comma", hl.dsp.exec_cmd("quickshell -c emoji_popup ipc call emoji_popup close || quickshell --config emoji_popup"))
+hl.bind(mainMod .. " + V", hl.dsp
+    .exec_cmd("quickshell -c clipboard_popup ipc call clipboard_popup close || quickshell --config clipboard_popup"))
+hl.bind(mainMod .. " + comma",
+    hl.dsp.exec_cmd("quickshell -c emoji_popup ipc call emoji_popup close || quickshell --config emoji_popup"))
 hl.bind(mainMod .. " + SHIFT + M",
     hl.dsp.exec_cmd("quickshell -c volume_popup ipc call volume_popup close || quickshell --config volume_popup"))
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp
@@ -127,9 +129,28 @@ hl.bind("SUPER_L", hl.dsp
 ---   Screenshots ---
 ---------------------
 
-hl.bind("Print", hl.dsp.exec_cmd("sh -c 'grim -g \"$(slurp)\" - | swappy -f -'"))
-hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("sh -c 'grim - | swappy -f -'"))
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("sh -c 'grim -g \"$(slurp)\" - | satty -f -'"))
+local grimhyprctl = "grim -o \"$(hyprctl activeworkspace -j | jq -r '.monitor')\""
+hl.bind("Print", hl.dsp.exec_cmd(grimhyprctl .. " - | wl-copy"), {
+    locked = true
+})
+hl.bind("CTRL + Print", hl.dsp.exec_cmd("mkdir -p $(xdg-user-dir PICTURES)/Screenshots && " .. grimhyprctl ..
+                                            " $(xdg-user-dir PICTURES)/Screenshots/Screenshot_\"$(date '+%Y-%m-%d_%H.%M.%S')\".png"),
+    {
+        locked = true,
+        non_consuming = true
+    })
+hl.bind("CTRL + Print", hl.dsp.exec_cmd(grimhyprctl .. " - | wl-copy"), {
+    locked = true,
+    non_consuming = true
+})
+
+local slurp_cmd = "slurp -b \\#1d2021b0 -c \\#d5c4a1ff -s \\#00000000"
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("sh -c 'grim -g \"$(" .. slurp_cmd .. ")\" - | swappy -f -'"))
+hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("sh -c 'grim -g \"$(" .. slurp_cmd .. ")\" - | wl-copy'"))
+hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd(
+    "sh -c 'if ! command -v tesseract &> /dev/null; then notify-send -t 4000 -a \"OCR\" \"Tesseract not installed\" \"Please run: sudo pacman -S tesseract tesseract-data-eng\"; exit 1; fi; grim -g \"$(" ..
+        slurp_cmd ..
+        ")\" /tmp/ocr_image.png && tesseract /tmp/ocr_image.png stdout | wl-copy && rm /tmp/ocr_image.png && notify-send -t 1500 -h string:x-canonical-private-synchronous:ocr-notify -a \"OCR\" \"Extracted text copied to clipboard\"'"))
 
 ---------------------
 ---    System     ---

@@ -41,7 +41,7 @@ Scope {
         if (!entry)
             return "text";
 
-        if (entry.indexOf("[[  binary data") !== -1)
+        if (entry.indexOf("binary data") !== -1)
             return "image";
 
         return "text";
