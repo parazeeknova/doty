@@ -12,3 +12,4 @@ __pycache__
 .config/quickshell/osd/state.json
 .config/quickshell/battery_popup/history.json
 .config/gtk-3.0/bookmarks
+references/

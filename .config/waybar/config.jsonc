@@ -14,11 +14,20 @@
     "clock#date"
   ],
   "modules-right": [
+    "custom/tray_toggle",
     "network",
     "pulseaudio",
     "battery",
     "clock"
   ],
+  "custom/tray_toggle": {
+    "format": "{}",
+    "return-type": "json",
+    "exec": "/home/parazeeknova/doty/.config/waybar/scripts/tray_count.sh",
+    "signal": 5,
+    "on-click": "quickshell --config tray_popup",
+    "tooltip": false
+  },
   "network": {
     "rotate": 270,
     "interval": 10,
@@ -97,6 +106,9 @@
     "rotate": 270,
     "interval": 60,
     "format": "{capacity} {icon}",
+    "format-charging": "{capacity} {icon}",
+    "format-full": "",
+    "format-plugged": "",
     "on-click": "quickshell --config battery_popup",
     "tooltip": false,
     "format-icons": {

@@ -1,6 +1,8 @@
+//@ pragma UseQApplication
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.SystemTray
 
 Scope {
     id: root
@@ -17,6 +19,7 @@ Scope {
     property bool lowBatteryAlerted: false
     property string lastBatteryStatus: ""
     property string lastPlatformProfile: ""
+    property int trayItemCount: (SystemTray.items !== undefined && SystemTray.items !== null) ? SystemTray.items.count : 0
 
     function getPercentage(msg) {
         var match = msg.match(/(\d+)%/);
@@ -94,7 +97,14 @@ Scope {
         }
     }
 
-    Component.onCompleted: root.refreshState()
+    Component.onCompleted: {
+        root.refreshState();
+        SystemTray.isService = true;
+    }
+    onTrayItemCountChanged: {
+        waybarSignalProc.running = false;
+        waybarSignalProc.running = true;
+    }
 
     Process {
         id: checkAudioStatusProc
@@ -620,6 +630,13 @@ Scope {
 
         }
 
+    }
+
+    Process {
+        id: waybarSignalProc
+
+        command: ["pkill", "-RTMIN+5", "waybar"]
+        running: false
     }
 
 }
