@@ -1132,6 +1132,98 @@ Scope {
 
                         }
 
+                        Row {
+                            width: parent.width
+
+                            // Podman Button
+                            Item {
+                                width: parent.width / 6
+                                height: 14
+
+                                Text {
+                                    id: btnPodman
+
+                                    anchors.centerIn: parent
+                                    text: ""
+                                    color: "#d5c4a1"
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 12
+                                    renderType: Text.NativeRendering
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onEntered: btnPodman.color = "#ebdbb2"
+                                    onExited: btnPodman.color = "#d5c4a1"
+                                    onClicked: {
+                                        Quickshell.execDetached(["quickshell", "--config", "podman_popup"]);
+                                        win.closePopup();
+                                    }
+                                }
+
+                            }
+
+                            // Emoji Button
+                            Item {
+                                width: parent.width / 6
+                                height: 14
+
+                                Text {
+                                    id: btnEmoji
+
+                                    anchors.centerIn: parent
+                                    text: "󰞅"
+                                    color: "#d5c4a1"
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 12
+                                    renderType: Text.NativeRendering
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onEntered: btnEmoji.color = "#ebdbb2"
+                                    onExited: btnEmoji.color = "#d5c4a1"
+                                    onClicked: {
+                                        Quickshell.execDetached(["quickshell", "--config", "emoji_popup"]);
+                                        win.closePopup();
+                                    }
+                                }
+
+                            }
+
+                            // OCR Button
+                            Item {
+                                width: parent.width / 6
+                                height: 14
+
+                                Text {
+                                    id: btnOcr
+
+                                    anchors.centerIn: parent
+                                    text: "󰚢"
+                                    color: "#d5c4a1"
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 12
+                                    renderType: Text.NativeRendering
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onEntered: btnOcr.color = "#ebdbb2"
+                                    onExited: btnOcr.color = "#d5c4a1"
+                                    onClicked: {
+                                        Quickshell.execDetached(["quickshell", "--config", "ocr_popup"]);
+                                        win.closePopup();
+                                    }
+                                }
+
+                            }
+
+                        }
+
                     }
 
                 }

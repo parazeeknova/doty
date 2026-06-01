@@ -48,6 +48,8 @@ alias pewup="sudo pacman -Syyu"
 alias pewrm="sudo pacman -R"
 alias pewin="sudo pacman -S"
 alias pewsr="sudo pacman -Ss"
+alias ctl="sudo systemctl"
+alias uctl="systemctl --user"
 alias pew=sudo
 
 # Development

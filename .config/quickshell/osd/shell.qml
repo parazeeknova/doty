@@ -19,7 +19,33 @@ Scope {
     property bool lowBatteryAlerted: false
     property string lastBatteryStatus: ""
     property string lastPlatformProfile: ""
-    property int trayItemCount: (SystemTray.items !== undefined && SystemTray.items !== null) ? SystemTray.items.count : 0
+    property int trayItemCount: 0
+
+    function updateTrayCount() {
+        if (SystemTray.items !== undefined && SystemTray.items !== null) {
+            try {
+                trayItemCount = SystemTray.items.rowCount();
+            } catch (e) {
+                trayItemCount = 0;
+            }
+        } else {
+            trayItemCount = 0;
+        }
+    }
+
+    Connections {
+        target: SystemTray.items
+        ignoreUnknownSignals: true
+        function onRowsInserted() {
+            root.updateTrayCount();
+        }
+        function onRowsRemoved() {
+            root.updateTrayCount();
+        }
+        function onModelReset() {
+            root.updateTrayCount();
+        }
+    }
 
     function getPercentage(msg) {
         var match = msg.match(/(\d+)%/);
@@ -100,6 +126,7 @@ Scope {
     Component.onCompleted: {
         root.refreshState();
         SystemTray.isService = true;
+        root.updateTrayCount();
     }
     onTrayItemCountChanged: {
         waybarSignalProc.running = false;
