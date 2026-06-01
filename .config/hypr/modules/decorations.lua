@@ -55,34 +55,6 @@ hl.config({
 
     animations = {
         enabled = true
-    },
-
-    plugin = {
-        hyprspace = {
-            panel_height = 200,
-            panel_border_width = 2,
-            workspace_margin = 4,
-            reserved_area = 4,
-            workspace_border_size = 1,
-
-            center_aligned = true,
-            on_bottom = false,
-            draw_active_workspace = true,
-            hide_real_layers = false,
-            affect_strut = false,
-
-            auto_drag = false,
-            auto_scroll = true,
-            exit_on_click = true,
-            exit_on_switch = true,
-
-            disable_gestures = false,
-            swipe_fingers = 3,
-            swipe_distance = 300,
-            swipe_force_speed = 30,
-            swipe_cancel_ratio = 0.5,
-            click_release_threshold_ms = 200
-        }
     }
 })
 
