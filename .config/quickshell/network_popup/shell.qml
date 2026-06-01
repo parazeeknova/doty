@@ -26,12 +26,22 @@ Scope {
     property bool detailsExpanded: false
     property string expandedNetworkSsid: "" // Tracks which scanned network is expanded for actions
 
+    signal requestClose()
+
     function triggerRefresh() {
         refreshTimer.restart();
     }
 
     Component.onCompleted: {
         checkStatusProc.running = true;
+    }
+
+    IpcHandler {
+        function close() {
+            root.requestClose();
+        }
+
+        target: "network_popup"
     }
 
     // Process to run the Rust helper
@@ -124,6 +134,14 @@ Scope {
                 implicitWidth: 240
                 implicitHeight: mainLayout.implicitHeight + 20
                 Component.onCompleted: introAnim.start()
+
+                Connections {
+                    function onRequestClose() {
+                        win.closePopup();
+                    }
+
+                    target: root
+                }
 
                 anchors {
                     bottom: true
@@ -668,10 +686,12 @@ Scope {
                                                         onEntered: connActionBtn.color = "#ebdbb2"
                                                         onExited: connActionBtn.color = "#d5c4a1"
                                                         onClicked: {
-                                                            if (modelData.active)
+                                                            if (modelData.active) {
                                                                 Quickshell.execDetached(["nmcli", "device", "disconnect", "wlan0"]);
-                                                            else
-                                                                Quickshell.execDetached(["nmcli", "device", "wifi", "connect", modelData.ssid]);
+                                                            } else {
+                                                                var script = "SSID=\"$1\"; SECURITY=\"$2\"; " + "if nmcli connection show id \"$SSID\" >/dev/null 2>&1; then " + "  nmcli device wifi connect \"$SSID\"; " + "else " + "  if [ \"$SECURITY\" != \"--\" ] && [ -n \"$SECURITY\" ]; then " + "    pass=$(rofi -dmenu -password -p \"Password for $SSID\"); " + "    [ -n \"$pass\" ] && nmcli device wifi connect \"$SSID\" password \"$pass\"; " + "  else " + "    nmcli device wifi connect \"$SSID\"; " + "  fi; " + "fi";
+                                                                Quickshell.execDetached(["sh", "-c", script, "sh", modelData.ssid, modelData.security]);
+                                                            }
                                                             root.expandedNetworkSsid = "";
                                                             root.triggerRefresh();
                                                         }
@@ -769,7 +789,7 @@ Scope {
                                     onEntered: settingsBtn.color = "#ebdbb2"
                                     onExited: settingsBtn.color = "#d5c4a1"
                                     onClicked: {
-                                        Quickshell.execDetached(["nm-connection-editor"]);
+                                        Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] ghostty --title=impala -e impala")']);
                                         win.closePopup(); // Close popup when launching settings editor
                                     }
                                 }

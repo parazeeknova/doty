@@ -47,6 +47,8 @@ Scope {
     // High contrast hover color
     readonly property string fontName: "FiraCode Nerd Font"
 
+    signal requestClose()
+
     // Update Hyprland info
     function updateAll() {
         getClients.running = true;
@@ -222,6 +224,14 @@ Scope {
         updateAll();
     }
 
+    IpcHandler {
+        function close() {
+            root.requestClose();
+        }
+
+        target: "workspace_popup"
+    }
+
     Connections {
         function onRawEvent(event) {
             if (["openlayer", "closelayer", "screencast"].includes(event.name))
@@ -358,6 +368,14 @@ Scope {
                 implicitHeight: Math.max(mainColumn.implicitHeight + 24, 0)
                 Component.onCompleted: introAnim.start()
 
+                Connections {
+                    function onRequestClose() {
+                        win.closePopup();
+                    }
+
+                    target: root
+                }
+
                 // Layout: Top Left Sidebar Popup with margins
                 anchors {
                     top: true
@@ -404,8 +422,8 @@ Scope {
                         property: "animOffsetX"
                         from: 32
                         to: -550
-                        duration: 100
-                        easing.type: Easing.InCubic
+                        duration: 120
+                        easing.type: Easing.OutCubic
                     }
 
                     NumberAnimation {
@@ -413,8 +431,8 @@ Scope {
                         property: "animOpacity"
                         from: 1
                         to: 0
-                        duration: 100
-                        easing.type: Easing.InCubic
+                        duration: 120
+                        easing.type: Easing.OutCubic
                     }
 
                 }

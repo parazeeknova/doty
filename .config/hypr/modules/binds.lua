@@ -5,7 +5,6 @@ local mainMod = "SUPER"
 local terminal = "ghostty"
 local fileManager = "thunar"
 local osdctl = "~/doty/.config/quickshell/osd/bin/osdctl"
-local hyprspace = require("hyprspace")
 
 ---------------------
 ---  Applications ---
@@ -95,11 +94,6 @@ hl.bind(mainMod .. " + SHIFT + Z", hl.dsp.window.move({
     workspace = "special:terminal"
 }))
 
--- Overview (Hyprspace)
-hl.bind("ALT + TAB", function()
-    hyprspace.toggle()
-end)
-
 ---------------------
 ---     Rofi      ---
 ---------------------
@@ -112,16 +106,21 @@ hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("rofi -show clip"))
 hl.bind("XF86Launch3", hl.dsp.exec_cmd("rofi -show profile"))
 
 -- Quickshell popups
-hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exec_cmd("quickshell --config volume_popup"))
-hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("quickshell --config network_popup"))
-hl.bind(mainMod .. " + SHIFT + F", hl.dsp.exec_cmd("quickshell --config bluetooth_popup"))
-hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("quickshell --config brightness_popup"))
-hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("quickshell --config notif_popup"))
-hl.bind("SUPER_L", hl.dsp.exec_cmd("sh -c \"pkill -f '^quickshell --config workspace_popup' || quickshell --config workspace_popup\""), {
+hl.bind(mainMod .. " + SHIFT + M",
+    hl.dsp.exec_cmd("quickshell -c volume_popup ipc call volume_popup close || quickshell --config volume_popup"))
+hl.bind(mainMod .. " + SHIFT + W", hl.dsp
+    .exec_cmd("quickshell -c network_popup ipc call network_popup close || quickshell --config network_popup"))
+hl.bind(mainMod .. " + SHIFT + F", hl.dsp
+    .exec_cmd("quickshell -c bluetooth_popup ipc call bluetooth_popup close || quickshell --config bluetooth_popup"))
+hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(
+    "quickshell -c brightness_popup ipc call brightness_popup close || quickshell --config brightness_popup"))
+hl.bind(mainMod .. " + SHIFT + N",
+    hl.dsp.exec_cmd("quickshell -c notif_popup ipc call notif_popup close || quickshell --config notif_popup"))
+hl.bind("SUPER_L", hl.dsp
+    .exec_cmd("quickshell -c workspace_popup ipc call workspace_popup close || quickshell --config workspace_popup"), {
     release = true,
     ignore_mods = true
 })
-
 
 ---------------------
 ---   Screenshots ---

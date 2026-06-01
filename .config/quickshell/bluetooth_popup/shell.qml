@@ -13,12 +13,22 @@ Scope {
     property bool pendingScan: false
     property bool loading: true
 
+    signal requestClose()
+
     function triggerRefresh() {
         refreshTimer.restart();
     }
 
     Component.onCompleted: {
         checkStatusProc.running = true;
+    }
+
+    IpcHandler {
+        function close() {
+            root.requestClose();
+        }
+
+        target: "bluetooth_popup"
     }
 
     Process {
@@ -115,6 +125,14 @@ Scope {
                 implicitWidth: 240
                 implicitHeight: Math.max(100, mainLayout.implicitHeight)
                 Component.onCompleted: introAnim.start()
+
+                Connections {
+                    function onRequestClose() {
+                        win.closePopup();
+                    }
+
+                    target: root
+                }
 
                 anchors {
                     bottom: true

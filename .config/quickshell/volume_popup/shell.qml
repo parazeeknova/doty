@@ -25,6 +25,8 @@ Scope {
     property var pendingAppVols: ({
     })
 
+    signal requestClose()
+
     function formatTime(secs) {
         if (isNaN(secs) || secs < 0)
             return "0:00";
@@ -36,6 +38,14 @@ Scope {
 
     Component.onCompleted: {
         checkStatusProc.running = true;
+    }
+
+    IpcHandler {
+        function close() {
+            root.requestClose();
+        }
+
+        target: "volume_popup"
     }
 
     // Timer to apply volume updates at most once every 50ms (prevents process spawning bottleneck)
@@ -204,6 +214,14 @@ Scope {
                 implicitWidth: 240
                 implicitHeight: mainLayout.implicitHeight + 20
                 Component.onCompleted: introAnim.start()
+
+                Connections {
+                    function onRequestClose() {
+                        win.closePopup();
+                    }
+
+                    target: root
+                }
 
                 anchors {
                     bottom: true

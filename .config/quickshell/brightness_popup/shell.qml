@@ -17,12 +17,22 @@ Scope {
     property int pendingKbdVol: -1
     property int pendingSunsetTemp: -1
 
+    signal requestClose()
+
     function triggerRefresh() {
         delayRefreshTimer.restart();
     }
 
     Component.onCompleted: {
         checkStatusProc.running = true;
+    }
+
+    IpcHandler {
+        function close() {
+            root.requestClose();
+        }
+
+        target: "brightness_popup"
     }
 
     // Timer to apply brightness/temperature changes at most once every 50ms to prevent bottlenecking
@@ -137,6 +147,14 @@ Scope {
                 implicitWidth: 240
                 implicitHeight: mainLayout.implicitHeight + 20
                 Component.onCompleted: introAnim.start()
+
+                Connections {
+                    function onRequestClose() {
+                        win.closePopup();
+                    }
+
+                    target: root
+                }
 
                 anchors {
                     bottom: true

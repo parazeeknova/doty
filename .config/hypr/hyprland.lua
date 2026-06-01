@@ -1,7 +1,6 @@
-package.path = package.path .. ";/home/parazeeknova/.config/hypr/Hyprspace/?.lua"
-local hyprspace = require("hyprspace")
-hyprspace.setup()
-
+--------------------------------
+-- parazeeknova's hypr config --
+--------------------------------
 require('modules.core.monitors')
 require('modules.core.input')
 require('modules.binds')
