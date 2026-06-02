@@ -12,6 +12,8 @@ Scope {
     property string kind: "info"
     property bool visibleNow: false
     property var media: null
+    property var mediaSources: []
+    property string currentMediaSource: ""
     property string sunsetState: "Off"
     property bool caffeineActive: false
     property int lastKbdBrightness: -1
@@ -163,6 +165,14 @@ Scope {
         return match ? match[1] : "";
     }
 
+    function currentMediaSourceIndex() {
+        for (var i = 0; i < root.mediaSources.length; i++) {
+            if (root.mediaSources[i].name === root.currentMediaSource)
+                return i;
+        }
+        return -1;
+    }
+
     function defaultState() {
         return {
             "visible": false,
@@ -203,10 +213,14 @@ Scope {
                 checkAudioStatusProc.running = true;
             } else {
                 root.media = null;
+                root.mediaSources = [];
+                root.currentMediaSource = "";
             }
         } else {
             hideTimer.stop();
             root.media = null;
+            root.mediaSources = [];
+            root.currentMediaSource = "";
         }
     }
 
@@ -221,6 +235,8 @@ Scope {
             checkAudioStatusProc.running = true;
         } else {
             root.media = null;
+            root.mediaSources = [];
+            root.currentMediaSource = "";
         }
     }
 
@@ -245,12 +261,33 @@ Scope {
                 try {
                     var data = JSON.parse(this.text);
                     root.media = data.media || null;
+                    root.mediaSources = data.media_sources || [];
+                    root.currentMediaSource = data.current_media_source || "";
                 } catch (e) {
                     root.media = null;
+                    root.mediaSources = [];
+                    root.currentMediaSource = "";
                 }
             }
         }
 
+    }
+
+    // Watch the current-player file. When the volume popup changes the active
+    // media source, the OSD re-fetches the audio status so the displayed
+    // track + indicator reflect the new player even if no volume event fires.
+    FileView {
+        id: currentMediaSourceFile
+
+        path: "file:///tmp/quickshell_current_media_player"
+        blockLoading: true
+        watchChanges: true
+        onFileChanged: {
+            if (root.visibleNow && root.message.includes("volume")) {
+                checkAudioStatusProc.running = false;
+                checkAudioStatusProc.running = true;
+            }
+        }
     }
 
     FileView {
@@ -710,15 +747,46 @@ Scope {
                                 spacing: 1
                                 anchors.verticalCenter: parent.verticalCenter
 
-                                Text {
+                                // Title row with source indicator on the right
+                                Row {
                                     width: parent.width
-                                    text: root.media ? root.media.title : ""
-                                    color: "#ebdbb2"
-                                    font.family: "FiraCode Nerd Font"
-                                    font.pixelSize: 8
-                                    font.bold: true
-                                    elide: Text.ElideRight
-                                    renderType: Text.NativeRendering
+                                    spacing: 4
+
+                                    Text {
+                                        width: parent.width - osdSourceIndicator.implicitWidth - 4
+                                        text: root.media ? root.media.title : ""
+                                        color: "#ebdbb2"
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: true
+                                        elide: Text.ElideRight
+                                        renderType: Text.NativeRendering
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Row {
+                                        id: osdSourceIndicator
+
+                                        spacing: 2
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        visible: root.mediaSources.length > 1
+
+                                        Repeater {
+                                            model: root.mediaSources
+
+                                            delegate: Rectangle {
+                                                width: 3
+                                                height: 3
+                                                color: index === root.currentMediaSourceIndex() ? "#d5c4a1" : "#3c3836"
+                                                border.width: 1
+                                                border.color: "#d5c4a1"
+                                                opacity: index === root.currentMediaSourceIndex() ? 1.0 : 0.55
+                                            }
+
+                                        }
+
+                                    }
+
                                 }
 
                                 Text {

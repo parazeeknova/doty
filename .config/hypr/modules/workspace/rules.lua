@@ -15,3 +15,169 @@
 --     border_size = 0,
 --     rounding    = 0,
 -- })
+-- Disable blur for xwayland context menus
+hl.window_rule({
+    match = {
+        class = "^()$",
+        title = "^()$"
+    },
+    no_blur = true,
+    opacity = 1
+})
+
+-- Floating for dialogs
+hl.window_rule({
+    match = {
+        title = "^(Open File)(.*)$"
+    },
+    center = true
+})
+hl.window_rule({
+    match = {
+        title = "^(Open File)(.*)$"
+    },
+    float = true
+})
+hl.window_rule({
+    match = {
+        title = "^(Select a File)(.*)$"
+    },
+    center = true
+})
+hl.window_rule({
+    match = {
+        title = "^(Select a File)(.*)$"
+    },
+    float = true
+})
+hl.window_rule({
+    match = {
+        title = "^(Open Folder)(.*)$"
+    },
+    center = true
+})
+hl.window_rule({
+    match = {
+        title = "^(Open Folder)(.*)$"
+    },
+    float = true
+})
+hl.window_rule({
+    match = {
+        title = "^(Save As)(.*)$"
+    },
+    center = true
+})
+hl.window_rule({
+    match = {
+        title = "^(Save As)(.*)$"
+    },
+    float = true
+})
+hl.window_rule({
+    match = {
+        title = "^(Library)(.*)$"
+    },
+    center = true
+})
+hl.window_rule({
+    match = {
+        title = "^(Library)(.*)$"
+    },
+    float = true
+})
+hl.window_rule({
+    match = {
+        title = "^(File Upload)(.*)$"
+    },
+    center = true
+})
+hl.window_rule({
+    match = {
+        title = "^(File Upload)(.*)$"
+    },
+    float = true
+})
+hl.window_rule({
+    match = {
+        title = "^(.*)(wants to save)$"
+    },
+    center = true
+})
+hl.window_rule({
+    match = {
+        title = "^(.*)(wants to save)$"
+    },
+    float = true
+})
+hl.window_rule({
+    match = {
+        title = "^(.*)(wants to open)$"
+    },
+    center = true
+})
+hl.window_rule({
+    match = {
+        title = "^(.*)(wants to open)$"
+    },
+    float = true
+})
+
+-- Picture-in-Picture
+hl.window_rule({
+    match = {
+        title = "^([Pp]icture[-\\s]?[Ii]n[-\\s]?[Pp]icture)(.*)$"
+    },
+    float = true
+})
+hl.window_rule({
+    match = {
+        title = "^([Pp]icture[-\\s]?[Ii]n[-\\s]?[Pp]icture)(.*)$"
+    },
+    keep_aspect_ratio = true
+})
+hl.window_rule({
+    match = {
+        title = "^([Pp]icture[-\\s]?[Ii]n[-\\s]?[Pp]icture)(.*)$"
+    },
+    move = {"(monitor_w*0.73)", "(monitor_h*0.72)"}
+})
+hl.window_rule({
+    match = {
+        title = "^([Pp]icture[-\\s]?[Ii]n[-\\s]?[Pp]icture)(.*)$"
+    },
+    size = {"(monitor_w*0.25)", "(monitor_h*0.25)"}
+})
+hl.window_rule({
+    match = {
+        title = "^([Pp]icture[-\\s]?[Ii]n[-\\s]?[Pp]icture)(.*)$"
+    },
+    float = true
+})
+hl.window_rule({
+    match = {
+        title = "^([Pp]icture[-\\s]?[Ii]n[-\\s]?[Pp]icture)(.*)$"
+    },
+    pin = true
+})
+
+-- Screen sharing
+hl.window_rule({
+    match = {
+        title = ".*is sharing (a window|your screen).*"
+    },
+    float = true
+})
+hl.window_rule({
+    match = {
+        title = ".*is sharing (a window|your screen).*"
+    },
+    pin = true
+})
+hl.window_rule({
+    match = {
+        title = ".*is sharing (a window|your screen).*"
+    },
+    move = {"(monitor_w*.5-window_w*.5)", "(monitor_h-window_h-12)"}
+})
+

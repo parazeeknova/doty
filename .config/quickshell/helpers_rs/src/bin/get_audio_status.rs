@@ -1,6 +1,26 @@
 use helpers_rs::{parse_percent, print_json};
 use serde::{Deserialize, Serialize};
+use std::fs;
+use std::path::PathBuf;
 use std::process::Command;
+
+const CURRENT_PLAYER_FILE: &str = "/tmp/quickshell_current_media_player";
+
+fn current_player_path() -> PathBuf {
+    PathBuf::from(CURRENT_PLAYER_FILE)
+}
+
+fn load_current_player() -> Option<String> {
+    fs::read_to_string(current_player_path())
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+}
+
+#[allow(dead_code)]
+fn save_current_player(name: &str) {
+    let _ = fs::write(current_player_path(), name);
+}
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct SinkInfo {
@@ -50,6 +70,14 @@ struct MediaInfo {
     length: f64,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+struct MediaSource {
+    name: String,
+    status: String,
+    title: String,
+    artist: String,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 struct AudioResult {
     default_sink: Option<SinkInfo>,
@@ -59,6 +87,8 @@ struct AudioResult {
     apps: Vec<AppInfo>,
     diagnostics: Diagnostics,
     media: Option<MediaInfo>,
+    media_sources: Vec<MediaSource>,
+    current_media_source: Option<String>,
 }
 
 fn get_pactl_json(category: &str) -> serde_json::Value {
@@ -287,7 +317,9 @@ fn main() {
         .unwrap_or_else(|| "Unknown".to_string());
     diag_desc = diag_desc.replace("Analog Stereo", "").trim().to_string();
 
-    let media = get_media_info();
+    let media_sources = get_all_media_sources();
+    let current_player = resolve_current_player(&media_sources);
+    let media = get_media_info_for(current_player.as_deref());
 
     let result = AudioResult {
         default_sink,
@@ -301,98 +333,104 @@ fn main() {
             output_desc: diag_desc,
         },
         media,
+        media_sources,
+        current_media_source: current_player,
     };
 
     print_json(&result);
 }
 
-fn get_media_info() -> Option<MediaInfo> {
-    // 1. Get all players
-    let players_out = Command::new("playerctl").arg("-l").output().ok()?;
+fn get_all_media_sources() -> Vec<MediaSource> {
+    let Ok(players_out) = Command::new("playerctl").arg("-l").output() else {
+        return Vec::new();
+    };
     if !players_out.status.success() {
-        return None;
+        return Vec::new();
     }
+
     let players_str = String::from_utf8_lossy(&players_out.stdout);
-    let players: Vec<String> = players_str
-        .lines()
-        .map(|l| l.trim().to_string())
-        .filter(|l| !l.is_empty())
-        .collect();
+    let mut sources: Vec<MediaSource> = Vec::new();
 
-    if players.is_empty() {
+    for line in players_str.lines() {
+        let player = line.trim();
+        if player.is_empty() {
+            continue;
+        }
+        let status = Command::new("playerctl")
+            .args(["--player", player, "status"])
+            .output()
+            .ok()
+            .filter(|o| o.status.success())
+            .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+            .unwrap_or_else(|| "Stopped".to_string());
+
+        let title = playerctl_metadata(player, "{{title}}").unwrap_or_default();
+        let artist = playerctl_metadata(player, "{{artist}}").unwrap_or_default();
+
+        sources.push(MediaSource {
+            name: player.to_string(),
+            status,
+            title,
+            artist,
+        });
+    }
+
+    sources
+}
+
+fn resolve_current_player(sources: &[MediaSource]) -> Option<String> {
+    if sources.is_empty() {
         return None;
     }
 
-    // 2. Query statuses to select the best player
-    let mut best_player: Option<String> = None;
-    let mut best_status = "Stopped".to_string();
+    let stored = load_current_player();
 
-    // Pass 1: Look for "Playing"
-    for player in &players {
-        let status_out = Command::new("playerctl")
-            .args(["--player", player, "status"])
-            .output();
-        if let Ok(out) = status_out
-            && out.status.success()
-        {
-            let status = String::from_utf8_lossy(&out.stdout).trim().to_string();
-            if status == "Playing" {
-                best_player = Some(player.clone());
-                best_status = status;
-                break;
-            }
-        }
+    // Prefer the stored player if it still exists in the source list
+    if let Some(ref name) = stored
+        && sources.iter().any(|s| &s.name == name)
+    {
+        return Some(name.clone());
     }
 
-    // Pass 2: Look for "Paused" if no playing player was found
-    if best_player.is_none() {
-        for player in &players {
-            let status_out = Command::new("playerctl")
-                .args(["--player", player, "status"])
-                .output();
-            if let Ok(out) = status_out
-                && out.status.success()
-            {
-                let status = String::from_utf8_lossy(&out.stdout).trim().to_string();
-                if status == "Paused" {
-                    best_player = Some(player.clone());
-                    best_status = status;
-                    break;
-                }
-            }
-        }
+    // Fall back to the first "Playing" player
+    if let Some(playing) = sources.iter().find(|s| s.status == "Playing") {
+        return Some(playing.name.clone());
     }
 
-    // Pass 3: Fallback to the first player
-    let target_player = best_player.unwrap_or_else(|| players[0].clone());
-
-    // If we fell back without finding status, query it now
-    if best_status == "Stopped" {
-        let status_out = Command::new("playerctl")
-            .args(["--player", &target_player, "status"])
-            .output();
-        if let Ok(out) = status_out
-            && out.status.success()
-        {
-            best_status = String::from_utf8_lossy(&out.stdout).trim().to_string();
-        }
+    // Then the first "Paused" player
+    if let Some(paused) = sources.iter().find(|s| s.status == "Paused") {
+        return Some(paused.name.clone());
     }
 
-    // 3. Query metadata for the selected target player. Separate calls avoid
-    // delimiter collisions with track titles or artists.
-    let player = playerctl_metadata(&target_player, "{{playerName}}")?;
-    let title = playerctl_metadata(&target_player, "{{title}}").unwrap_or_default();
-    let artist = playerctl_metadata(&target_player, "{{artist}}").unwrap_or_default();
-    let art_url = playerctl_metadata(&target_player, "{{mpris:artUrl}}").unwrap_or_default();
+    // Then just the first one available
+    Some(sources[0].name.clone())
+}
+
+fn get_media_info_for(player: Option<&str>) -> Option<MediaInfo> {
+    let target_player = player?;
+
+    let status_out = Command::new("playerctl")
+        .args(["--player", target_player, "status"])
+        .output()
+        .ok()
+        .filter(|o| o.status.success())
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+        .unwrap_or_else(|| "Stopped".to_string());
+
+    let player_name = playerctl_metadata(target_player, "{{playerName}}")
+        .unwrap_or_else(|| target_player.to_string());
+    let title = playerctl_metadata(target_player, "{{title}}").unwrap_or_default();
+    let artist = playerctl_metadata(target_player, "{{artist}}").unwrap_or_default();
+    let art_url = playerctl_metadata(target_player, "{{mpris:artUrl}}").unwrap_or_default();
 
     Some(MediaInfo {
-        player,
+        player: player_name,
         title,
         artist,
         art_url,
-        status: best_status,
-        position: playerctl_position(&target_player),
-        length: playerctl_length(&target_player),
+        status: status_out,
+        position: playerctl_position(target_player),
+        length: playerctl_length(target_player),
     })
 }
 

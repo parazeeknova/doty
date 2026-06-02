@@ -19,6 +19,13 @@ Scope {
     }
     property bool devicesDropdownOpen: false
     property var media: null
+    property var mediaSources: []
+    property string currentMediaSource: ""
+    // Media source switch animation state
+    property bool mediaSwitching: false
+    property real mediaFade: 1
+    property real mediaSlide: 0
+    property int mediaSwitchToken: 0
     // Pending volume changes for throttling
     property int pendingOutVol: -1
     property int pendingInVol: -1
@@ -34,6 +41,42 @@ Scope {
         var m = Math.floor(secs / 60);
         var s = Math.floor(secs % 60);
         return m + ":" + (s < 10 ? "0" : "") + s;
+    }
+
+    function currentMediaSourceIndex() {
+        for (var i = 0; i < root.mediaSources.length; i++) {
+            if (root.mediaSources[i].name === root.currentMediaSource)
+                return i;
+
+        }
+        return -1;
+    }
+
+    function switchMediaSource() {
+        if (root.mediaSwitching || root.mediaSources.length <= 1)
+            return ;
+
+        root.mediaSwitching = true;
+        switchMediaAnim.start();
+    }
+
+    function applyMediaSourceSwitch() {
+        if (root.mediaSources.length === 0)
+            return ;
+
+        var idx = root.currentMediaSourceIndex();
+        var nextIdx = (idx + 1) % root.mediaSources.length;
+        var nextName = root.mediaSources[nextIdx].name;
+        // Persist the selection so OSD and next reads agree.
+        // Escape any single quotes in the name to keep the shell call safe.
+        var escaped = nextName.replace(/'/g, "'\\''");
+        currentMediaWriteProc.command = ["sh", "-c", "printf '%s' '" + escaped + "' > /tmp/quickshell_current_media_player"];
+        currentMediaWriteProc.running = false;
+        currentMediaWriteProc.running = true;
+        // Refresh so media/cover reflect the new source
+        root.mediaSwitchToken = root.mediaSwitchToken + 1;
+        checkStatusProc.running = false;
+        checkStatusProc.running = true;
     }
 
     Component.onCompleted: {
@@ -100,10 +143,86 @@ Scope {
                     root.diagnostics = data.diagnostics || {
                     };
                     root.media = data.media || null;
+                    root.mediaSources = data.media_sources || [];
+                    root.currentMediaSource = data.current_media_source || "";
                 } catch (e) {
                     console.log("Failed to parse: " + e);
                 }
             }
+        }
+
+    }
+
+    // Process used to persist the user's current media-source selection
+    Process {
+        id: currentMediaWriteProc
+
+        running: false
+    }
+
+    // Elegant media-source switch animation. Fades the media widget out + slides
+    // it up, swaps the active source, then fades it back in from below.
+    SequentialAnimation {
+        id: switchMediaAnim
+
+        // Fade + slide out
+        ParallelAnimation {
+            NumberAnimation {
+                target: root
+                property: "mediaFade"
+                from: 1
+                to: 0
+                duration: 140
+                easing.type: Easing.OutCubic
+            }
+
+            NumberAnimation {
+                target: root
+                property: "mediaSlide"
+                from: 0
+                to: -8
+                duration: 140
+                easing.type: Easing.OutCubic
+            }
+
+        }
+
+        // Swap data while hidden
+        ScriptAction {
+            script: root.applyMediaSourceSwitch()
+        }
+
+        // Snap slide position to the opposite side so we can animate back in
+        PropertyAction {
+            target: root
+            property: "mediaSlide"
+            value: 8
+        }
+
+        // Fade + slide in
+        ParallelAnimation {
+            NumberAnimation {
+                target: root
+                property: "mediaFade"
+                from: 0
+                to: 1
+                duration: 240
+                easing.type: Easing.OutCubic
+            }
+
+            NumberAnimation {
+                target: root
+                property: "mediaSlide"
+                from: 8
+                to: 0
+                duration: 240
+                easing.type: Easing.OutCubic
+            }
+
+        }
+
+        ScriptAction {
+            script: root.mediaSwitching = false
         }
 
     }
@@ -323,9 +442,13 @@ Scope {
 
                         // --- SECTION 0: MEDIA PLAYER WIDGET ---
                         Column {
+                            id: mediaSection
+
                             width: parent.width
                             spacing: 6
                             visible: root.media !== null
+                            // Animated fade + slide when switching media source
+                            opacity: root.mediaFade
 
                             Row {
                                 width: parent.width
@@ -368,15 +491,50 @@ Scope {
                                     spacing: 2
                                     anchors.verticalCenter: parent.verticalCenter
 
-                                    Text {
+                                    // Title row with source indicator on the right
+                                    Row {
                                         width: parent.width
-                                        text: root.media ? root.media.title : ""
-                                        color: "#ebdbb2"
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 9
-                                        font.bold: true
-                                        elide: Text.ElideRight
-                                        renderType: Text.NativeRendering
+                                        spacing: 6
+
+                                        Text {
+                                            width: parent.width - sourceIndicator.implicitWidth - 6
+                                            text: root.media ? root.media.title : ""
+                                            color: "#ebdbb2"
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 9
+                                            font.bold: true
+                                            elide: Text.ElideRight
+                                            renderType: Text.NativeRendering
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
+                                        // Source indicator: small dots, one filled per available source
+                                        Row {
+                                            id: sourceIndicator
+
+                                            spacing: 3
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            visible: root.mediaSources.length > 1
+                                            height: 8
+
+                                            Repeater {
+                                                model: root.mediaSources
+
+                                                delegate: Rectangle {
+                                                    width: 5
+                                                    height: 5
+                                                    radius: 0
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                    color: index === root.currentMediaSourceIndex() ? "#d5c4a1" : "#3c3836"
+                                                    border.width: 1
+                                                    border.color: "#d5c4a1"
+                                                    opacity: index === root.currentMediaSourceIndex() ? 1 : 0.55
+                                                }
+
+                                            }
+
+                                        }
+
                                     }
 
                                     Text {
@@ -474,6 +632,30 @@ Scope {
 
                                         }
 
+                                        // Media source switch button: cycles through available players
+                                        Text {
+                                            id: switchSrcBtn
+
+                                            text: "󰑖"
+                                            color: "#d5c4a1"
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 11
+                                            opacity: root.mediaSources.length > 1 ? 1 : 0.35
+                                            enabled: root.mediaSources.length > 1
+                                            renderType: Text.NativeRendering
+                                            visible: root.mediaSources.length > 1
+
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                enabled: parent.enabled
+                                                onEntered: switchSrcBtn.color = "#ebdbb2"
+                                                onExited: switchSrcBtn.color = "#d5c4a1"
+                                                onClicked: root.switchMediaSource()
+                                            }
+
+                                        }
+
                                     }
 
                                     // Duration Slider Row
@@ -556,6 +738,12 @@ Scope {
                                 height: 1
                                 color: "#d5c4a1"
                                 opacity: 0.25
+                            }
+
+                            transform: Translate {
+                                id: mediaSectionTranslate
+
+                                y: root.mediaSlide
                             }
 
                         }
