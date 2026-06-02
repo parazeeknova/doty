@@ -108,4 +108,3 @@ function gac
         echo "Cancelled: Commit message cannot be empty."
     end
 end
-

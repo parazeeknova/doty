@@ -121,19 +121,12 @@ fn needs_regen(wallpaper: &Wallpaper, thumb: &Path) -> bool {
 }
 
 fn notify_new_image(name: &str) {
-    let osdctl_path = home_dir()
-        .join(".config")
-        .join("quickshell")
-        .join("osd")
-        .join("bin")
-        .join("osdctl");
-    
-    let message = format!("Thumbnail: {}", name);
-    let _ = Command::new(osdctl_path)
-        .arg("show")
+    let message = format!("Generated thumbnail for {}", name);
+    let _ = Command::new("notify-send")
+        .arg("Wallpaper Watcher")
         .arg(message)
-        .arg("good")
-        .arg("2000")
+        .arg("-i")
+        .arg("image-x-generic")
         .status();
 }
 
@@ -272,11 +265,31 @@ fn interval() -> Duration {
     Duration::from_secs(secs)
 }
 
+fn print_wallpapers(dirs: &[PathBuf], cache_dir: &Path) {
+    link_anime_wallpapers();
+    let wallpapers = scan_wallpapers(dirs);
+    for wallpaper in wallpapers.values() {
+        let thumb = thumb_path(cache_dir, &wallpaper.path);
+        let thumb_display = if thumb.exists() {
+            thumb
+        } else {
+            wallpaper.path.clone()
+        };
+        println!("{}\t{}", wallpaper.path.display(), thumb_display.display());
+    }
+}
+
 fn main() {
     let once = env::args().any(|arg| arg == "--once");
+    let print_mode = env::args().any(|arg| arg == "--print");
     let clean = !env::args().any(|arg| arg == "--no-clean");
     let dirs = watch_dirs();
     let cache = cache_dir();
+
+    if print_mode {
+        print_wallpapers(&dirs, &cache);
+        return;
+    }
 
     if once {
         sync_once(&dirs, &cache, clean);

@@ -85,11 +85,11 @@ Scope {
         }
     }
 
-    // Scan wallpapers and build small preview thumbnails so the UI never decodes full wallpapers.
+    // Scan wallpapers using the rust helper watcher in print mode for maximum speed.
     Process {
         id: scanProc
 
-        command: ["sh", "-c", "thumb_dir=/home/parazeeknova/.cache/quickshell/wallpaper_switcher/thumbs\nmkdir -p \"$thumb_dir\"\nfind -L \"$1\" -maxdepth 1 -type f \\( -iname '*.jpg' -o -iname '*.png' -o -iname '*.jpeg' -o -iname '*.gif' \\) | sort | while IFS= read -r file; do\n  resolved=$(readlink -f \"$file\") || resolved=\"$file\"\n  hash=$(printf %s \"$resolved\" | sha256sum | cut -c 1-16)\n  thumb=\"$thumb_dir/$hash.jpg\"\n  if [ ! -s \"$thumb\" ] || [ \"$resolved\" -nt \"$thumb\" ]; then\n    magick \"$resolved\" -auto-orient -thumbnail '440x248^' -gravity center -extent 440x248 \"$thumb\" >/dev/null 2>&1 || thumb=\"$resolved\"\n  fi\n  printf '%s\\t%s\\n' \"$resolved\" \"$thumb\"\ndone", "sh", root.animeDir]
+        command: ["/home/parazeeknova/.config/quickshell/wallpaper_switcher/wallpaper_thumb_watcher", "--print"]
         running: false
 
         stdout: StdioCollector {
