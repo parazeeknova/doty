@@ -12,6 +12,7 @@ Scope {
     property bool btEnabled: false
     property bool wifiEnabled: false
     property bool audioMuted: false
+    property bool glassEnabled: theme.glassEnabled
     property string hourStr: ""
     property string minStr: ""
     property string secStr: ""
@@ -21,7 +22,6 @@ Scope {
     // Track expanded notification IDs
     property var expandedNotifIds: ({
     })
-
     // Pomodoro properties
     property bool pomoActive: false
     property double pomoEndTime: 0
@@ -72,10 +72,36 @@ Scope {
     function triggerRefresh() {
         checkNotifsProc.running = false;
         checkNotifsProc.running = true;
+        checkGlassProc.running = false;
+        checkGlassProc.running = true;
+    }
+
+    function savePomoState() {
+        var state = {
+            "active": root.pomoActive,
+            "endTime": root.pomoEndTime,
+            "duration": root.pomoDuration,
+            "paused": root.pomoPaused,
+            "pausedTimeLeft": root.pomoPausedTimeLeft
+        };
+        var stateStr = JSON.stringify(state);
+        savePomoProc.command = ["sh", "-c", "echo '" + stateStr + "' > /tmp/quickshell_pomodoro.json"];
+        savePomoProc.running = false;
+        savePomoProc.running = true;
+    }
+
+    function formatPomoTime(secs) {
+        var m = Math.floor(secs / 60);
+        var s = secs % 60;
+        return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
     }
 
     Component.onCompleted: {
         triggerRefresh();
+    }
+
+    Theme {
+        id: theme
     }
 
     IpcHandler {
@@ -144,6 +170,25 @@ Scope {
 
     }
 
+    Process {
+        id: checkGlassProc
+
+        command: ["hyprctl", "getoption", "decoration:blur:enabled", "-j"]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    var data = JSON.parse(this.text);
+                    root.glassEnabled = data.bool || false;
+                } catch (e) {
+                    console.log("Failed to parse glass status: " + e);
+                }
+            }
+        }
+
+    }
+
     FileView {
         id: pomoStateFile
 
@@ -152,20 +197,20 @@ Scope {
         onLoaded: {
             try {
                 var raw = pomoStateFile.text().trim();
-                if (raw === "") return;
+                if (raw === "")
+                    return ;
+
                 var parsed = JSON.parse(raw);
                 root.pomoActive = parsed.active ?? false;
                 root.pomoEndTime = parsed.endTime ?? 0;
                 root.pomoDuration = parsed.duration ?? 1500;
                 root.pomoPaused = parsed.paused ?? false;
                 root.pomoPausedTimeLeft = parsed.pausedTimeLeft ?? 0;
-
                 if (root.pomoActive) {
-                    if (root.pomoPaused) {
+                    if (root.pomoPaused)
                         root.pomoTimeLeft = root.pomoPausedTimeLeft;
-                    } else {
+                    else
                         root.pomoTimeLeft = Math.max(0, Math.round((root.pomoEndTime - Date.now()) / 1000));
-                    }
                 } else {
                     root.pomoTimeLeft = 0;
                 }
@@ -178,6 +223,7 @@ Scope {
 
     Timer {
         id: pomoLocalTimer
+
         interval: 1000
         repeat: true
         running: root.pomoActive && !root.pomoPaused
@@ -193,29 +239,9 @@ Scope {
 
     Process {
         id: savePomoProc
+
         running: false
     }
-
-    function savePomoState() {
-        var state = {
-            "active": root.pomoActive,
-            "endTime": root.pomoEndTime,
-            "duration": root.pomoDuration,
-            "paused": root.pomoPaused,
-            "pausedTimeLeft": root.pomoPausedTimeLeft
-        };
-        var stateStr = JSON.stringify(state);
-        savePomoProc.command = ["sh", "-c", "echo '" + stateStr + "' > /tmp/quickshell_pomodoro.json"];
-        savePomoProc.running = false;
-        savePomoProc.running = true;
-    }
-
-    function formatPomoTime(secs) {
-        var m = Math.floor(secs / 60);
-        var s = secs % 60;
-        return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
-    }
-
 
     Variants {
         model: Quickshell.screens
@@ -323,7 +349,7 @@ Scope {
                 Rectangle {
                     anchors.fill: parent
                     opacity: win.animOpacity
-                    color: "#801d2021"
+                    color: theme.popupBgColor
                     border.width: 1
                     border.color: "#d5c4a1"
                     radius: 0
@@ -1254,7 +1280,7 @@ Scope {
                                     id: btnEmoji
 
                                     anchors.centerIn: parent
-                                    text: "󰄛"
+                                    text: "󰙃"
                                     color: "#d5c4a1"
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
@@ -1283,7 +1309,7 @@ Scope {
                                     id: btnOcr
 
                                     anchors.centerIn: parent
-                                    text: "󰕧"
+                                    text: ""
                                     color: "#d5c4a1"
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
@@ -1298,6 +1324,67 @@ Scope {
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "media_popup"]);
                                         win.closePopup();
+                                    }
+                                }
+
+                            }
+
+                            // Virtual Machine Manager
+                            Item {
+                                width: parent.width / 6
+                                height: 14
+
+                                Text {
+                                    id: btnVmm
+
+                                    anchors.centerIn: parent
+                                    text: ""
+                                    color: "#d5c4a1"
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 12
+                                    renderType: Text.NativeRendering
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onEntered: btnOcr.color = "#ebdbb2"
+                                    onExited: btnOcr.color = "#d5c4a1"
+                                    onClicked: {
+                                        Quickshell.execDetached(["quickshell", "--config", "vm_popup"]);
+                                        win.closePopup();
+                                    }
+                                }
+
+                            }
+
+                            // Glass/Blur Button
+                            Item {
+                                width: parent.width / 6
+                                height: 14
+
+                                Text {
+                                    id: btnGlass
+
+                                    anchors.centerIn: parent
+                                    text: root.glassEnabled ? "" : ""
+                                    color: "#d5c4a1"
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 12
+                                    renderType: Text.NativeRendering
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onEntered: btnGlass.opacity = 0.7
+                                    onExited: btnGlass.opacity = 1
+                                    onClicked: {
+                                        var targetEnabled = !root.glassEnabled;
+                                        var opacity = targetEnabled ? "0.85" : "1.0";
+                                        var blurVal = targetEnabled ? "true" : "false";
+                                        var evalStr = "hl.config({ decoration = { active_opacity = " + opacity + ", blur = { enabled = " + blurVal + " } } })";
+                                        Quickshell.execDetached(["sh", "-c", "hyprctl eval '" + evalStr + "' && echo '" + targetEnabled + "' > /tmp/quickshell_glass_state && /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show 'Glass: " + (targetEnabled ? "On" : "Off") + "' " + (targetEnabled ? "good" : "bad") + " 1200"]);
                                     }
                                 }
 
@@ -1330,12 +1417,14 @@ Scope {
 
                             Row {
                                 id: pomoMainRow
+
                                 width: parent.width
                                 height: 16
                                 spacing: 4
 
                                 Text {
                                     id: pomoIconText
+
                                     text: "󰔛"
                                     color: "#d5c4a1"
                                     font.family: "FiraCode Nerd Font"
@@ -1347,12 +1436,14 @@ Scope {
                                 // Input Box (or Countdown Label if active)
                                 Item {
                                     id: pomoInputBox
+
                                     width: root.pomoActive ? 34 : 20
                                     height: 12
                                     anchors.verticalCenter: parent.verticalCenter
 
                                     TextInput {
                                         id: pomoInput
+
                                         anchors.fill: parent
                                         verticalAlignment: TextInput.AlignVCenter
                                         horizontalAlignment: TextInput.AlignHCenter
@@ -1364,12 +1455,11 @@ Scope {
                                         inputMethodHints: Qt.ImhDigitsOnly
                                         enabled: !root.pomoActive
                                         renderType: Text.NativeRendering
-
                                         onAccepted: {
                                             var val = parseInt(text);
-                                            if (!isNaN(val) && val > 0) {
+                                            if (!isNaN(val) && val > 0)
                                                 root.pomoDuration = val * 60;
-                                            }
+
                                         }
                                     }
 
@@ -1381,17 +1471,20 @@ Scope {
                                         anchors.bottom: parent.bottom
                                         visible: !root.pomoActive
                                     }
+
                                 }
 
                                 // Presets Row
                                 Row {
                                     id: pomoPresetsRow
+
                                     spacing: 4
                                     anchors.verticalCenter: parent.verticalCenter
                                     visible: !root.pomoActive
 
                                     Repeater {
                                         model: [5, 10, 25, 50]
+
                                         delegate: Text {
                                             text: modelData + "m"
                                             color: (root.pomoDuration === modelData * 60) ? "#ebdbb2" : "#a89984"
@@ -1405,13 +1498,17 @@ Scope {
                                                     root.pomoDuration = modelData * 60;
                                                 }
                                             }
+
                                         }
+
                                     }
+
                                 }
 
                                 // Animated progress bar (only when active)
                                 Rectangle {
                                     id: pomoProgressBar
+
                                     width: parent.width - pomoIconText.implicitWidth - pomoInputBox.width - pomoActionsRow.implicitWidth - (pomoMainRow.spacing * 4)
                                     height: 2
                                     color: "#3c3836"
@@ -1424,14 +1521,21 @@ Scope {
                                         color: "#d5c4a1"
 
                                         Behavior on width {
-                                            NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
+                                            NumberAnimation {
+                                                duration: 250
+                                                easing.type: Easing.OutCubic
+                                            }
+
                                         }
+
                                     }
+
                                 }
 
                                 // Spacer to push actions to the right (only when inactive)
                                 Item {
                                     id: pomoSpacer
+
                                     width: parent.width - pomoIconText.implicitWidth - pomoInputBox.width - pomoPresetsRow.implicitWidth - pomoActionsRow.implicitWidth - (pomoMainRow.spacing * 5)
                                     height: 1
                                     visible: !root.pomoActive
@@ -1440,6 +1544,7 @@ Scope {
                                 // Actions
                                 Row {
                                     id: pomoActionsRow
+
                                     spacing: 4
                                     anchors.verticalCenter: parent.verticalCenter
 
@@ -1456,9 +1561,9 @@ Scope {
                                             onClicked: {
                                                 if (!root.pomoActive) {
                                                     var val = parseInt(pomoInput.text);
-                                                    if (!isNaN(val) && val > 0) {
+                                                    if (!isNaN(val) && val > 0)
                                                         root.pomoDuration = val * 60;
-                                                    }
+
                                                     root.pomoActive = true;
                                                     root.pomoPaused = false;
                                                     root.pomoEndTime = Date.now() + root.pomoDuration * 1000;
@@ -1474,6 +1579,7 @@ Scope {
                                                 root.savePomoState();
                                             }
                                         }
+
                                     }
 
                                     Text {
@@ -1495,14 +1601,16 @@ Scope {
                                                 root.savePomoState();
                                             }
                                         }
+
                                     }
+
                                 }
+
                             }
+
                         }
 
-
                     }
-
 
                 }
 

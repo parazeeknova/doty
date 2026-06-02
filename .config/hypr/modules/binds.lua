@@ -112,6 +112,8 @@ hl.bind(mainMod .. " + comma",
     hl.dsp.exec_cmd("quickshell -c emoji_popup ipc call emoji_popup close || quickshell --config emoji_popup"))
 hl.bind(mainMod .. " + SHIFT + M",
     hl.dsp.exec_cmd("quickshell -c volume_popup ipc call volume_popup close || quickshell --config volume_popup"))
+hl.bind(mainMod .. " + SHIFT + V",
+    hl.dsp.exec_cmd("quickshell -c vm_popup ipc call vm_popup close || quickshell --config vm_popup"))
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp
     .exec_cmd("quickshell -c network_popup ipc call network_popup close || quickshell --config network_popup"))
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp

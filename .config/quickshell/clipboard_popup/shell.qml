@@ -87,6 +87,10 @@ Scope {
         refreshClipboard();
     }
 
+    Theme {
+        id: theme
+    }
+
     IpcHandler {
         function close() {
             root.requestClose();
@@ -281,7 +285,7 @@ Scope {
                 Rectangle {
                     anchors.fill: parent
                     opacity: win.animOpacity
-                    color: "#801d2021" // transparent matching other widgets
+                    color: theme.popupBgColor // transparent matching other widgets
                     border.width: 0
                     radius: 0
                     focus: true

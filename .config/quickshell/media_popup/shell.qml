@@ -30,6 +30,10 @@ Scope {
         updateStatus();
     }
 
+    Theme {
+        id: theme
+    }
+
     IpcHandler {
         function close() {
             root.requestClose();

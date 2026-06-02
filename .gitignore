@@ -13,3 +13,4 @@ __pycache__
 .config/quickshell/battery_popup/history.json
 .config/gtk-3.0/bookmarks
 references/
+vm_password

@@ -30,6 +30,10 @@ Scope {
         root.refreshStatus();
     }
 
+    Theme {
+        id: theme
+    }
+
     Timer {
         id: actionRefreshTimer
 
@@ -180,7 +184,7 @@ Scope {
                 Rectangle {
                     anchors.fill: parent
                     opacity: win.animOpacity
-                    color: "#e61d2021" // Sleek dark semi-transparent bg matching clipboard
+                    color: theme.podmanBgColor // Sleek dark semi-transparent bg matching clipboard
                     border.width: 1
                     border.color: "#d5c4a1"
                     radius: 0

@@ -22,8 +22,6 @@ Scope {
     property string lastBatteryStatus: ""
     property string lastPlatformProfile: ""
     property int trayItemCount: 0
-
-    // Pomodoro Timer State
     property bool pomoActive: false
     property double pomoEndTime: 0
     property int pomoDuration: 1500
@@ -39,74 +37,9 @@ Scope {
         return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
     }
 
-    Timer {
-        id: pomoShowTimer
-        interval: 5000
-        repeat: false
-        onTriggered: {
-            root.pomoShowAlways = false;
-        }
-    }
-
     function resetPomoShowTimer() {
         root.pomoShowAlways = true;
         pomoShowTimer.restart();
-    }
-
-    Timer {
-        id: pomoCountdownTimer
-        interval: 1000
-        repeat: true
-        running: root.pomoActive && !root.pomoPaused
-        onTriggered: {
-            var diff = Math.max(0, Math.round((root.pomoEndTime - Date.now()) / 1000));
-            root.pomoTimeLeft = diff;
-            if (diff <= 0) {
-                root.pomoActive = false;
-                root.pomoTimeLeft = 0;
-                root.savePomoState();
-                root.showOSD("Pomodoro Finished!", "good", 5000);
-                Quickshell.execDetached(["notify-send", "Pomodoro", "Time's up! Take a break."]);
-            }
-        }
-    }
-
-    FileView {
-        id: pomoStateFile
-
-        path: "file:///tmp/quickshell_pomodoro.json"
-        watchChanges: true
-        onLoaded: {
-            try {
-                var raw = pomoStateFile.text().trim();
-                if (raw === "") return;
-                var parsed = JSON.parse(raw);
-                root.pomoActive = parsed.active ?? false;
-                root.pomoEndTime = parsed.endTime ?? 0;
-                root.pomoDuration = parsed.duration ?? 1500;
-                root.pomoPaused = parsed.paused ?? false;
-                root.pomoPausedTimeLeft = parsed.pausedTimeLeft ?? 0;
-
-                if (root.pomoActive) {
-                    if (root.pomoPaused) {
-                        root.pomoTimeLeft = root.pomoPausedTimeLeft;
-                    } else {
-                        root.pomoTimeLeft = Math.max(0, Math.round((root.pomoEndTime - Date.now()) / 1000));
-                    }
-                    root.resetPomoShowTimer();
-                } else {
-                    root.pomoTimeLeft = 0;
-                }
-            } catch (e) {
-                console.log("Failed to parse pomodoro state: " + e);
-            }
-        }
-        onFileChanged: reload()
-    }
-
-    Process {
-        id: savePomoProc
-        running: false
     }
 
     function savePomoState() {
@@ -123,7 +56,6 @@ Scope {
         savePomoProc.running = true;
     }
 
-
     function updateTrayCount() {
         if (SystemTray.items !== undefined && SystemTray.items !== null) {
             try {
@@ -133,20 +65,6 @@ Scope {
             }
         } else {
             trayItemCount = 0;
-        }
-    }
-
-    Connections {
-        target: SystemTray.items
-        ignoreUnknownSignals: true
-        function onRowsInserted() {
-            root.updateTrayCount();
-        }
-        function onRowsRemoved() {
-            root.updateTrayCount();
-        }
-        function onModelReset() {
-            root.updateTrayCount();
         }
     }
 
@@ -169,6 +87,7 @@ Scope {
         for (var i = 0; i < root.mediaSources.length; i++) {
             if (root.mediaSources[i].name === root.currentMediaSource)
                 return i;
+
         }
         return -1;
     }
@@ -248,6 +167,95 @@ Scope {
     onTrayItemCountChanged: {
         waybarSignalProc.running = false;
         waybarSignalProc.running = true;
+    }
+
+    Theme {
+        id: theme
+    }
+
+    Timer {
+        id: pomoShowTimer
+
+        interval: 5000
+        repeat: false
+        onTriggered: {
+            root.pomoShowAlways = false;
+        }
+    }
+
+    Timer {
+        id: pomoCountdownTimer
+
+        interval: 1000
+        repeat: true
+        running: root.pomoActive && !root.pomoPaused
+        onTriggered: {
+            var diff = Math.max(0, Math.round((root.pomoEndTime - Date.now()) / 1000));
+            root.pomoTimeLeft = diff;
+            if (diff <= 0) {
+                root.pomoActive = false;
+                root.pomoTimeLeft = 0;
+                root.savePomoState();
+                root.showOSD("Pomodoro Finished!", "good", 5000);
+                Quickshell.execDetached(["notify-send", "Pomodoro", "Time's up! Take a break."]);
+            }
+        }
+    }
+
+    FileView {
+        id: pomoStateFile
+
+        path: "file:///tmp/quickshell_pomodoro.json"
+        watchChanges: true
+        onLoaded: {
+            try {
+                var raw = pomoStateFile.text().trim();
+                if (raw === "")
+                    return ;
+
+                var parsed = JSON.parse(raw);
+                root.pomoActive = parsed.active ?? false;
+                root.pomoEndTime = parsed.endTime ?? 0;
+                root.pomoDuration = parsed.duration ?? 1500;
+                root.pomoPaused = parsed.paused ?? false;
+                root.pomoPausedTimeLeft = parsed.pausedTimeLeft ?? 0;
+                if (root.pomoActive) {
+                    if (root.pomoPaused)
+                        root.pomoTimeLeft = root.pomoPausedTimeLeft;
+                    else
+                        root.pomoTimeLeft = Math.max(0, Math.round((root.pomoEndTime - Date.now()) / 1000));
+                    root.resetPomoShowTimer();
+                } else {
+                    root.pomoTimeLeft = 0;
+                }
+            } catch (e) {
+                console.log("Failed to parse pomodoro state: " + e);
+            }
+        }
+        onFileChanged: reload()
+    }
+
+    Process {
+        id: savePomoProc
+
+        running: false
+    }
+
+    Connections {
+        function onRowsInserted() {
+            root.updateTrayCount();
+        }
+
+        function onRowsRemoved() {
+            root.updateTrayCount();
+        }
+
+        function onModelReset() {
+            root.updateTrayCount();
+        }
+
+        target: SystemTray.items
+        ignoreUnknownSignals: true
     }
 
     Process {
@@ -535,7 +543,7 @@ Scope {
                 Rectangle {
                     anchors.fill: parent
                     opacity: win.animOpacity
-                    color: "#801d2021"
+                    color: theme.popupBgColor
                     border.width: 1
                     border.color: root.kind === "good" ? "#a9b665" : root.kind === "bad" ? "#ea6962" : root.kind === "warn" ? "#e78a4e" : "#7c6f64"
                     radius: 0
@@ -665,15 +673,36 @@ Scope {
 
                             Text {
                                 text: {
-                                    if (root.message.includes("Recording Started")) return "󰑋";
-                                    if (root.message.includes("Recording Saved") || root.message.includes("Recording Stopped")) return "󰻃";
-                                    if (root.message.includes("Extracted") || root.message.includes("OCR")) return "󰙎";
+                                    if (root.message.includes("Recording Started"))
+                                        return "󰑋";
+
+                                    if (root.message.includes("Recording Saved") || root.message.includes("Recording Stopped"))
+                                        return "󰻃";
+
+                                    if (root.message.includes("Extracted") || root.message.includes("OCR"))
+                                        return "󰙎";
+
+                                    if (root.message.includes("Glass:"))
+                                        return "󰖆";
+
                                     return "";
                                 }
                                 color: {
-                                    if (root.message.includes("Recording Started")) return "#ea6962";
-                                    if (root.message.includes("Recording Saved") || root.message.includes("Recording Stopped")) return "#a9b665";
-                                    if (root.message.includes("Extracted") || root.message.includes("OCR")) return "#e78a4e";
+                                    if (root.message.includes("Recording Started"))
+                                        return "#ea6962";
+
+                                    if (root.message.includes("Recording Saved") || root.message.includes("Recording Stopped"))
+                                        return "#a9b665";
+
+                                    if (root.message.includes("Extracted") || root.message.includes("OCR"))
+                                        return "#e78a4e";
+
+                                    if (root.message.includes("Glass: On"))
+                                        return "#a9b665";
+
+                                    if (root.message.includes("Glass: Off"))
+                                        return "#ea6962";
+
                                     return "#d4be98";
                                 }
                                 font.family: "FiraCode Nerd Font"
@@ -691,6 +720,7 @@ Scope {
                                 renderType: Text.NativeRendering
                                 anchors.verticalCenter: parent.verticalCenter
                             }
+
                         }
 
                         // Separator
@@ -780,7 +810,7 @@ Scope {
                                                 color: index === root.currentMediaSourceIndex() ? "#d5c4a1" : "#3c3836"
                                                 border.width: 1
                                                 border.color: "#d5c4a1"
-                                                opacity: index === root.currentMediaSourceIndex() ? 1.0 : 0.55
+                                                opacity: index === root.currentMediaSourceIndex() ? 1 : 0.55
                                             }
 
                                         }
@@ -859,18 +889,18 @@ Scope {
                 id: pomoWin
 
                 required property var modelData
+
                 screen: modelData
                 color: "transparent"
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
                 visible: root.pomoActive
+                width: (root.pomoShowAlways || root.pomoHovered) ? 45 : 8
+                height: (root.pomoShowAlways || root.pomoHovered) ? 22 : 8
 
                 anchors {
                     top: true
                     right: true
                 }
-
-                width: (root.pomoShowAlways || root.pomoHovered) ? 45 : 8
-                height: (root.pomoShowAlways || root.pomoHovered) ? 22 : 8
 
                 margins {
                     top: (root.pomoShowAlways || root.pomoHovered) ? 4 : 0
@@ -879,16 +909,13 @@ Scope {
 
                 Rectangle {
                     id: pomoContent
+
                     anchors.fill: parent
                     color: (root.pomoShowAlways || root.pomoHovered) ? "#e61d2021" : "#01000000"
                     border.width: (root.pomoShowAlways || root.pomoHovered) ? 1 : 0
                     border.color: "#d5c4a1"
                     radius: 0
-
-                    opacity: (root.pomoShowAlways || root.pomoHovered) ? 1.0 : 0.01
-                    Behavior on opacity {
-                        NumberAnimation { duration: 150 }
-                    }
+                    opacity: (root.pomoShowAlways || root.pomoHovered) ? 1 : 0.01
 
                     Row {
                         anchors.centerIn: parent
@@ -903,7 +930,16 @@ Scope {
                             renderType: Text.NativeRendering
                             anchors.verticalCenter: parent.verticalCenter
                         }
+
                     }
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 150
+                        }
+
+                    }
+
                 }
 
                 MouseArea {
@@ -918,10 +954,12 @@ Scope {
                         root.resetPomoShowTimer();
                     }
                 }
-            }
-        }
-    }
 
+            }
+
+        }
+
+    }
 
     Process {
         id: waybarSignalProc

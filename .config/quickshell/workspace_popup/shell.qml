@@ -224,6 +224,10 @@ Scope {
         updateAll();
     }
 
+    Theme {
+        id: theme
+    }
+
     IpcHandler {
         function close() {
             root.requestClose();
@@ -596,7 +600,7 @@ Scope {
                                                 Rectangle {
                                                     width: 24
                                                     height: 24
-                                                    color: "#801d2021"
+                                                    color: theme.popupBgColor
                                                     border.width: 0
                                                     radius: 0
                                                     anchors.centerIn: parent
@@ -697,7 +701,7 @@ Scope {
                                                     }
                                                     width: Math.min(tooltipText.implicitWidth + 8, 200)
                                                     height: tooltipText.implicitHeight + 4
-                                                    color: "#e61d2021"
+                                                    color: theme.podmanBgColor
                                                     border.width: 0
                                                     radius: 0
 

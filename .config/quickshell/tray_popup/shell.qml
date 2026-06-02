@@ -11,6 +11,10 @@ Scope {
         SystemTray.isService = false;
     }
 
+    Theme {
+        id: theme
+    }
+
     Variants {
         model: Quickshell.screens
 
@@ -132,7 +136,7 @@ Scope {
                     visible: win.isMenuOpen
                     width: 180
                     implicitHeight: menuColumn.implicitHeight + 8
-                    color: "#f21d2021" // Semi-transparent Gruvbox dark background
+                    color: theme.trayBgColor // Semi-transparent Gruvbox dark background
                     border.width: 1
                     border.color: "#d5c4a1" // Gruvbox retro warm text/border color
                     radius: 0
@@ -232,7 +236,7 @@ Scope {
                     width: Math.max(34, mainLayout.implicitWidth + 16)
                     height: Math.max(34, mainLayout.implicitHeight + 16)
                     opacity: win.animOpacity
-                    color: win.isMenuOpen ? "transparent" : "#801d2021"
+                    color: win.isMenuOpen ? "transparent" : theme.popupBgColor
                     border.width: win.isMenuOpen ? 0 : 1
                     border.color: "#d5c4a1"
                     radius: 0

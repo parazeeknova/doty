@@ -59,6 +59,10 @@ Scope {
         return " " + label + " ".repeat(pad) + valStr + unit + " ";
     }
 
+    Theme {
+        id: theme
+    }
+
     // Process to fetch sysmon status
     Process {
         id: checkStatusProc
@@ -227,7 +231,7 @@ Scope {
                 Rectangle {
                     anchors.fill: parent
                     opacity: win.animOpacity
-                    color: "#801d2021"
+                    color: theme.popupBgColor
                     border.width: 1
                     border.color: "#d5c4a1"
                     radius: 0
