@@ -134,6 +134,8 @@ hl.bind(mainMod .. " + ALT + slash",
     hl.dsp.exec_cmd("quickshell -c podman_popup ipc call podman_popup close || quickshell --config podman_popup"))
 hl.bind(mainMod .. " + SHIFT + G",
     hl.dsp.exec_cmd("quickshell -c media_popup ipc call media_popup close || quickshell --config media_popup"))
+hl.bind(mainMod .. " + ALT + W",
+    hl.dsp.exec_cmd("quickshell -c wallpaper_switcher ipc call wallpaper_switcher close || quickshell --config wallpaper_switcher"))
 hl.bind("SUPER_L", hl.dsp
     .exec_cmd("quickshell -c workspace_popup ipc call workspace_popup close || quickshell --config workspace_popup"), {
     release = true,

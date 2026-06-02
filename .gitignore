@@ -15,3 +15,5 @@ __pycache__
 references/
 vm_password
 vm_guest_credentials
+Makefile
+!.config/quickshell/helpers_rs/Makefile

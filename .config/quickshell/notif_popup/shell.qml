@@ -1348,8 +1348,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnOcr.color = "#ebdbb2"
-                                    onExited: btnOcr.color = "#d5c4a1"
+                                    onEntered: btnVmm.color = "#ebdbb2"
+                                    onExited: btnVmm.color = "#d5c4a1"
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "vm_popup"]);
                                         win.closePopup();
@@ -1381,6 +1381,35 @@ Scope {
                                     onExited: btnGlass.opacity = 1
                                     onClicked: {
                                         Quickshell.execDetached(["/home/parazeeknova/doty/.config/rofi/scripts/toggle-glass.sh"]);
+                                    }
+                                }
+
+                            }
+
+                            // Wallpaper Switcher Button
+                            Item {
+                                width: parent.width / 6
+                                height: 14
+
+                                Text {
+                                    id: btnWallpaper
+
+                                    anchors.centerIn: parent
+                                    text: ""
+                                    color: "#d5c4a1"
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 12
+                                    renderType: Text.NativeRendering
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onEntered: btnWallpaper.color = "#ebdbb2"
+                                    onExited: btnWallpaper.color = "#d5c4a1"
+                                    onClicked: {
+                                        Quickshell.execDetached(["quickshell", "--config", "wallpaper_switcher"]);
+                                        win.closePopup();
                                     }
                                 }
 
