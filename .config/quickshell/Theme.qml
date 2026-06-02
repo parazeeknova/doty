@@ -5,9 +5,14 @@ QtObject {
     id: theme
 
     property bool glassEnabled: true
-    readonly property color popupBgColor: glassEnabled ? "#801d2021" : "#1d2021"
-    readonly property color podmanBgColor: glassEnabled ? "#e61d2021" : "#1d2021"
-    readonly property color trayBgColor: glassEnabled ? "#f21d2021" : "#1d2021"
+    property color popupBgColor: glassEnabled ? "#801d2021" : "#1d2021"
+    Behavior on popupBgColor { ColorAnimation { duration: 300 } }
+
+    property color podmanBgColor: glassEnabled ? "#e61d2021" : "#1d2021"
+    Behavior on podmanBgColor { ColorAnimation { duration: 300 } }
+
+    property color trayBgColor: glassEnabled ? "#f21d2021" : "#1d2021"
+    Behavior on trayBgColor { ColorAnimation { duration: 300 } }
     property FileView glassState
 
     glassState: FileView {

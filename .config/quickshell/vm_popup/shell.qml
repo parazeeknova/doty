@@ -9,11 +9,10 @@ Scope {
     property string helperPath: "/home/parazeeknova/doty/.config/quickshell/vm_popup/get_vm_status"
     property string thumbDir: "/tmp/vm_thumbs"
     property var vms: []
+    property var qemuVms: []
     // Per-VM transitioning state (e.g. starting/stopping) so we can disable the action button
     property var pendingActions: ({
     })
-    // Bumped after each capture cycle to force Image reload
-    property int thumbTick: 0
 
     signal requestClose()
 
@@ -24,15 +23,6 @@ Scope {
 
     function screenshotPathFor(vmx) {
         return thumbDir + "/" + vmx.replace(/[^a-zA-Z0-9]/g, "_") + ".png";
-    }
-
-    function captureAllScreens() {
-        for (var i = 0; i < root.vms.length; i++) {
-            var vm = root.vms[i];
-            if (vm.running)
-                Quickshell.execDetached([root.helperPath, "screenshot", vm.vmx, screenshotPathFor(vm.vmx)]);
-
-        }
     }
 
     function setPending(vmx, on) {
@@ -62,8 +52,53 @@ Scope {
         actionCooldown.restart();
     }
 
+    function deleteVm(vmx) {
+        if (root.pendingActions[vmx])
+            return ;
+
+        root.setPending(vmx, true);
+        Quickshell.execDetached([root.helperPath, "delete", vmx]);
+        actionCooldown.restart();
+    }
+
+    function startQemuVm(name) {
+        var key = "qemu:" + name;
+        if (root.pendingActions[key])
+            return ;
+
+        root.setPending(key, true);
+        Quickshell.execDetached([root.helperPath, "qemu-start", name]);
+        actionCooldown.restart();
+    }
+
+    function stopQemuVm(name) {
+        var key = "qemu:" + name;
+        if (root.pendingActions[key])
+            return ;
+
+        root.setPending(key, true);
+        Quickshell.execDetached([root.helperPath, "qemu-stop", name]);
+        actionCooldown.restart();
+    }
+
+    function openQemuVmGui(name) {
+        Quickshell.execDetached(["virt-viewer", "-c", "qemu:///system", "--domain-name", name]);
+        Quickshell.execDetached(["hyprctl", "dispatch", "workspace", "10"]);
+    }
+
+    function deleteQemuVm(name) {
+        var key = "qemu:" + name;
+        if (root.pendingActions[key])
+            return ;
+
+        root.setPending(key, true);
+        Quickshell.execDetached([root.helperPath, "qemu-delete", name]);
+        actionCooldown.restart();
+    }
+
     function openVmGui(vmx) {
         Quickshell.execDetached(["vmware", vmx]);
+        Quickshell.execDetached(["hyprctl", "dispatch", "workspace", "10"]);
     }
 
     function formatRam(mb) {
@@ -110,6 +145,7 @@ Scope {
                 try {
                     var data = JSON.parse(this.text);
                     root.vms = data.vms || [];
+                    root.qemuVms = data.qemu_vms || [];
                     // Clear any stale pending flags - the VM may have transitioned successfully
                     root.pendingActions = ({
                     });
@@ -146,31 +182,6 @@ Scope {
         }
     }
 
-    // Capture screenshots on an interval while the popup exists.
-    // Quickshell exits when the popup is closed, so this only runs while open.
-    Timer {
-        id: captureTimer
-
-        interval: 3000
-        repeat: true
-        running: true
-        triggeredOnStart: true
-        onTriggered: {
-            root.captureAllScreens();
-            // Reload images a moment later to pick up the freshly written files
-            reloadTrigger.restart();
-        }
-    }
-
-    Timer {
-        id: reloadTrigger
-
-        interval: 1500
-        repeat: false
-        running: false
-        onTriggered: root.thumbTick++
-    }
-
     Variants {
         model: Quickshell.screens
 
@@ -180,7 +191,7 @@ Scope {
 
                 required property var modelData
                 property bool isClosing: false
-                property real animLeftMargin: -260
+                property real animLeftMargin: -360
                 property real animOpacity: 0
 
                 function closePopup() {
@@ -195,7 +206,7 @@ Scope {
                 color: "transparent"
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
                 focusable: true
-                implicitWidth: 240
+                implicitWidth: 340
                 implicitHeight: mainLayout.implicitHeight + 20
                 Component.onCompleted: introAnim.start()
 
@@ -213,7 +224,7 @@ Scope {
                 }
 
                 margins {
-                    top: 32
+                    top: 4
                     left: win.animLeftMargin
                 }
 
@@ -224,7 +235,7 @@ Scope {
                     NumberAnimation {
                         target: win
                         property: "animLeftMargin"
-                        from: -260
+                        from: -360
                         to: 32
                         duration: 140
                         easing.type: Easing.OutCubic
@@ -251,7 +262,7 @@ Scope {
                         target: win
                         property: "animLeftMargin"
                         from: 32
-                        to: -260
+                        to: -360
                         duration: 110
                         easing.type: Easing.InCubic
                     }
@@ -302,28 +313,24 @@ Scope {
                         anchors.margins: 10
                         spacing: 6
 
-                        // Header
-                        Row {
+                        // Title Heading & Refresh Button
+                        Item {
                             width: parent.width
-                            spacing: 6
-                            anchors.bottomMargin: 2
+                            height: 16
 
                             Text {
+                                anchors.left: parent.left
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: " " + root.vms.length + " Virtual Machine" + (root.vms.length === 1 ? "" : "s")
-                                color: "#d5c4a1"
+                                text: "Virtual Machines"
+                                color: "#ebdbb2"
                                 font.family: "FiraCode Nerd Font"
-                                font.pixelSize: 9
+                                font.pixelSize: 10
                                 font.bold: true
                                 renderType: Text.NativeRendering
                             }
 
-                            Item {
-                                width: parent.width - 150
-                                height: 1
-                            }
-
                             Text {
+                                anchors.right: parent.right
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: "refresh"
                                 color: "#d5c4a1"
@@ -340,6 +347,24 @@ Scope {
                                     onClicked: root.refresh()
                                 }
 
+                            }
+
+                        }
+
+                        // Header / Info Row
+                        Row {
+                            width: parent.width
+                            spacing: 6
+                            anchors.bottomMargin: 2
+
+                            Text {
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: "󰆧 " + root.vms.length + " vmware · " + root.qemuVms.length + " kvm/qemu"
+                                color: "#d5c4a1"
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 9
+                                font.bold: true
+                                renderType: Text.NativeRendering
                             }
 
                         }
@@ -366,20 +391,42 @@ Scope {
                                 required property int index
                                 // Track pending action for this VM (so the button can be disabled)
                                 property bool isPending: root.pendingActions[modelData.vmx] === true
+                                property int localTick: 0
 
                                 width: parent.width
-                                height: 56
+                                height: Math.max(thumbBox.height, infoColumn.implicitHeight) + 4
+
+                                // Local capture timer: only runs when this specific VM is active
+                                Timer {
+                                    interval: 10000
+                                    repeat: true
+                                    running: modelData.running
+                                    triggeredOnStart: true
+                                    onTriggered: {
+                                        Quickshell.execDetached([root.helperPath, "screenshot", modelData.vmx, root.screenshotPathFor(modelData.vmx)]);
+                                        localReloadTimer.restart();
+                                    }
+                                }
+
+                                Timer {
+                                    id: localReloadTimer
+
+                                    interval: 1500
+                                    repeat: false
+                                    running: false
+                                    onTriggered: vmRow.localTick++
+                                }
 
                                 Row {
                                     anchors.fill: parent
-                                    spacing: 8
+                                    spacing: 10
 
                                     // Thumbnail square with logo overlay
                                     Rectangle {
                                         id: thumbBox
 
-                                        width: 56
-                                        height: 56
+                                        width: 120
+                                        height: 88
                                         color: "#3c3836"
                                         radius: 0
                                         border.width: 1
@@ -389,30 +436,37 @@ Scope {
                                         Image {
                                             id: thumbImage
 
+                                            property bool hasLoaded: false
+
                                             anchors.fill: parent
-                                            source: modelData.running ? "file://" + root.screenshotPathFor(modelData.vmx) + "?t=" + root.thumbTick : ""
+                                            source: "file://" + root.screenshotPathFor(modelData.vmx) + "?t=" + vmRow.localTick
                                             fillMode: Image.PreserveAspectCrop
                                             asynchronous: true
                                             cache: false
-                                            visible: status === Image.Ready
+                                            visible: hasLoaded && status !== Image.Error
                                             smooth: false
+                                            onStatusChanged: {
+                                                if (status === Image.Ready)
+                                                    hasLoaded = true;
+
+                                            }
                                         }
 
                                         // Placeholder when no screenshot yet
                                         Text {
                                             anchors.centerIn: parent
-                                            visible: !thumbImage.visible
+                                            visible: !thumbImage.hasLoaded || thumbImage.status === Image.Error
                                             text: modelData.icon
                                             color: "#7c6f64"
                                             font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 22
+                                            font.pixelSize: 36
                                             renderType: Text.NativeRendering
                                         }
 
                                         // OS logo overlay (bottom-left, always shown on top of screenshot)
                                         Rectangle {
-                                            width: 16
-                                            height: 16
+                                            width: 18
+                                            height: 18
                                             anchors.left: parent.left
                                             anchors.bottom: parent.bottom
                                             color: "#cc1d2021"
@@ -423,7 +477,7 @@ Scope {
                                                 text: modelData.icon
                                                 color: "#d5c4a1"
                                                 font.family: "FiraCode Nerd Font"
-                                                font.pixelSize: 11
+                                                font.pixelSize: 12
                                                 renderType: Text.NativeRendering
                                             }
 
@@ -440,9 +494,11 @@ Scope {
 
                                     // Right-side info
                                     Column {
-                                        width: parent.width - 64
+                                        id: infoColumn
+
+                                        width: parent.width - thumbBox.width - 10
                                         anchors.verticalCenter: parent.verticalCenter
-                                        spacing: 1
+                                        spacing: 2
 
                                         // Title
                                         Text {
@@ -463,7 +519,7 @@ Scope {
 
                                             Text {
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                text: modelData.running ? "● running" : "○ stopped"
+                                                text: modelData.running ? "● running (" + modelData.cpu_usage.toFixed(1) + "% cpu)" : "○ stopped"
                                                 color: modelData.running ? "#a9b665" : "#7c6f64"
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
@@ -504,6 +560,38 @@ Scope {
 
                                         }
 
+                                        // Snapshots row
+                                        Row {
+                                            width: parent.width
+                                            visible: modelData.snapshots && modelData.snapshots.count > 0
+
+                                            Text {
+                                                text: "  snapshots: " + modelData.snapshots.count + " (" + modelData.snapshots.last_time_ago + ")"
+                                                color: "#a89984"
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 8
+                                                renderType: Text.NativeRendering
+                                            }
+
+                                        }
+
+                                        // Shared Folders row
+                                        Row {
+                                            width: parent.width
+                                            visible: modelData.shared_folders && modelData.shared_folders.length > 0
+
+                                            Text {
+                                                text: "  shared: " + modelData.shared_folders.map(function(f) {
+                                                    return f.guest_name + " ➜ " + f.host_path;
+                                                }).join(", ")
+                                                color: "#a89984"
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 8
+                                                renderType: Text.NativeRendering
+                                            }
+
+                                        }
+
                                         // Action buttons
                                         Item {
                                             width: parent.width
@@ -513,36 +601,25 @@ Scope {
                                                 anchors.left: parent.left
                                                 anchors.top: parent.top
                                                 anchors.topMargin: 6
-                                                spacing: 4
+                                                spacing: 12
 
-                                                Rectangle {
-                                                    id: actionBtn
+                                                Text {
+                                                    id: actionLbl
 
-                                                    width: actionLbl.implicitWidth + 10
-                                                    height: 14
-                                                    color: actionMa.containsMouse ? (modelData.running ? "#3c3836" : "#3c3836") : "transparent"
-                                                    border.color: modelData.running ? "#ea6962" : "#a9b665"
-                                                    border.width: 1
-                                                    opacity: vmRow.isPending ? 0.5 : 1
+                                                    text: {
+                                                        if (vmRow.isPending)
+                                                            return "...";
 
-                                                    Text {
-                                                        id: actionLbl
+                                                        if (modelData.running)
+                                                            return " stop";
 
-                                                        anchors.centerIn: parent
-                                                        text: {
-                                                            if (vmRow.isPending)
-                                                                return "...";
-
-                                                            if (modelData.running)
-                                                                return " stop";
-
-                                                            return " start";
-                                                        }
-                                                        color: modelData.running ? "#ea6962" : "#a9b665"
-                                                        font.family: "FiraCode Nerd Font"
-                                                        font.pixelSize: 8
-                                                        renderType: Text.NativeRendering
+                                                        return " start";
                                                     }
+                                                    color: modelData.running ? "#ea6962" : "#a9b665"
+                                                    font.family: "FiraCode Nerd Font"
+                                                    font.pixelSize: 8
+                                                    renderType: Text.NativeRendering
+                                                    opacity: actionMa.containsMouse ? 1.0 : 0.7
 
                                                     MouseArea {
                                                         id: actionMa
@@ -558,28 +635,17 @@ Scope {
                                                                 root.startVm(modelData.vmx);
                                                         }
                                                     }
-
                                                 }
 
-                                                Rectangle {
-                                                    id: openBtn
+                                                Text {
+                                                    id: openLbl
 
-                                                    width: openLbl.implicitWidth + 10
-                                                    height: 14
-                                                    color: openMa.containsMouse ? "#3c3836" : "transparent"
-                                                    border.color: "#7c6f64"
-                                                    border.width: 1
-
-                                                    Text {
-                                                        id: openLbl
-
-                                                        anchors.centerIn: parent
-                                                        text: " open"
-                                                        color: "#d5c4a1"
-                                                        font.family: "FiraCode Nerd Font"
-                                                        font.pixelSize: 8
-                                                        renderType: Text.NativeRendering
-                                                    }
+                                                    text: " open"
+                                                    color: "#d5c4a1"
+                                                    font.family: "FiraCode Nerd Font"
+                                                    font.pixelSize: 8
+                                                    renderType: Text.NativeRendering
+                                                    opacity: openMa.containsMouse ? 1.0 : 0.7
 
                                                     MouseArea {
                                                         id: openMa
@@ -589,9 +655,28 @@ Scope {
                                                         cursorShape: Qt.PointingHandCursor
                                                         onClicked: root.openVmGui(modelData.vmx)
                                                     }
-
                                                 }
 
+                                                Text {
+                                                    id: deleteLbl
+
+                                                    text: " delete"
+                                                    color: "#ea6962"
+                                                    font.family: "FiraCode Nerd Font"
+                                                    font.pixelSize: 8
+                                                    renderType: Text.NativeRendering
+                                                    opacity: deleteMa.containsMouse ? 1.0 : 0.7
+
+                                                    MouseArea {
+                                                        id: deleteMa
+
+                                                        anchors.fill: parent
+                                                        hoverEnabled: true
+                                                        enabled: !vmRow.isPending
+                                                        cursorShape: Qt.PointingHandCursor
+                                                        onClicked: root.deleteVm(modelData.vmx)
+                                                    }
+                                                }
                                             }
 
                                         }
@@ -604,14 +689,305 @@ Scope {
 
                         }
 
+                        // Dotted separator between vmware and qemu/libvirt sections
+                        Text {
+                            visible: root.vms.length > 0 || root.qemuVms.length > 0
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            text: "·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·"
+                            color: "#7c6f64"
+                            opacity: 0.6
+                            font.family: "FiraCode Nerd Font"
+                            font.pixelSize: 8
+                            renderType: Text.NativeRendering
+                        }
+
+                        // Qemu / libvirt empty state
+                        Text {
+                            visible: root.qemuVms.length === 0
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            text: "0 kvm/qemu vms"
+                            color: "#7c6f64"
+                            font.family: "FiraCode Nerd Font"
+                            font.pixelSize: 8
+                        }
+
+                        // Qemu / libvirt VM list
+                        Repeater {
+                            model: root.qemuVms
+
+                            delegate: Item {
+                                id: qemuRow
+
+                                required property var modelData
+                                required property int index
+                                property string pendingKey: "qemu:" + modelData.name
+                                property bool isPending: root.pendingActions[pendingKey] === true
+                                property int localTick: 0
+
+                                // Local capture timer: only runs when this specific VM is active
+                                Timer {
+                                    interval: 10000
+                                    repeat: true
+                                    running: modelData.running
+                                    triggeredOnStart: true
+                                    onTriggered: {
+                                        Quickshell.execDetached([root.helperPath, "screenshot", modelData.name, root.screenshotPathFor(modelData.name)]);
+                                        qemuLocalReloadTimer.restart();
+                                    }
+                                }
+
+                                Timer {
+                                    id: qemuLocalReloadTimer
+
+                                    interval: 1500
+                                    repeat: false
+                                    running: false
+                                    onTriggered: qemuRow.localTick++
+                                }
+
+                                width: parent.width
+                                height: Math.max(qemuThumbBox.height, qemuInfoColumn.implicitHeight) + 4
+
+                                Row {
+                                    anchors.fill: parent
+                                    spacing: 10
+
+                                    // Thumbnail square with logo overlay
+                                    Rectangle {
+                                        id: qemuThumbBox
+
+                                        width: 120
+                                        height: 88
+                                        color: "#3c3836"
+                                        radius: 0
+                                        border.width: 1
+                                        border.color: modelData.running ? "#a9b665" : "#7c6f64"
+
+                                        // Live screenshot when running
+                                        Image {
+                                            id: qemuThumbImage
+
+                                            property bool hasLoaded: false
+
+                                            anchors.fill: parent
+                                            source: "file://" + root.screenshotPathFor(modelData.name) + "?t=" + qemuRow.localTick
+                                            fillMode: Image.PreserveAspectCrop
+                                            asynchronous: true
+                                            cache: false
+                                            visible: hasLoaded && status !== Image.Error
+                                            smooth: false
+                                            onStatusChanged: {
+                                                if (status === Image.Ready)
+                                                    hasLoaded = true;
+                                            }
+                                        }
+
+                                        // Placeholder when no screenshot yet
+                                        Text {
+                                            anchors.centerIn: parent
+                                            visible: !qemuThumbImage.hasLoaded || qemuThumbImage.status === Image.Error
+                                            text: modelData.icon
+                                            color: "#7c6f64"
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 36
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                        // OS logo overlay (bottom-left, always shown on top)
+                                        Rectangle {
+                                            width: 18
+                                            height: 18
+                                            anchors.left: parent.left
+                                            anchors.bottom: parent.bottom
+                                            color: "#cc1d2021"
+                                            radius: 0
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: modelData.icon
+                                                color: "#d5c4a1"
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 12
+                                                renderType: Text.NativeRendering
+                                            }
+                                        }
+
+                                        // Click opens VM GUI
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: root.openQemuVmGui(modelData.name)
+                                        }
+                                    }
+
+                                    // Right-side info
+                                    Column {
+                                        id: qemuInfoColumn
+                                        width: parent.width - qemuThumbBox.width - 10
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: 2
+
+                                        // Title
+                                        Text {
+                                            width: parent.width
+                                            text: modelData.name
+                                            color: "#ebdbb2"
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 9
+                                            font.bold: true
+                                            elide: Text.ElideRight
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                        // Status row
+                                        Row {
+                                            width: parent.width
+                                            spacing: 6
+
+                                            Text {
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text: modelData.running ? "● running (" + modelData.cpu_usage.toFixed(1) + "% cpu)" : "○ " + modelData.state
+                                                color: modelData.running ? "#a9b665" : "#7c6f64"
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 8
+                                                renderType: Text.NativeRendering
+                                            }
+
+                                            Text {
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text: "libvirt"
+                                                color: "#7c6f64"
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 7
+                                                renderType: Text.NativeRendering
+                                            }
+                                        }
+
+                                        // Resources row
+                                        Row {
+                                            width: parent.width
+                                            spacing: 6
+
+                                            Text {
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text: " " + root.formatRam(modelData.ram_mb) + " ·  " + modelData.cpus + "c · 󰋊 " + root.formatStorage(modelData.storage_bytes)
+                                                color: "#d5c4a1"
+                                                opacity: 0.7
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 8
+                                                renderType: Text.NativeRendering
+                                            }
+                                        }
+
+                                        // Connection URI row
+                                        Row {
+                                            width: parent.width
+
+                                            Text {
+                                                text: "󰌷 uri: qemu:///system"
+                                                color: "#a89984"
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 8
+                                                renderType: Text.NativeRendering
+                                            }
+                                        }
+
+                                        // Action buttons
+                                        Item {
+                                            width: parent.width
+                                            height: 18
+
+                                            Row {
+                                                anchors.left: parent.left
+                                                anchors.top: parent.top
+                                                anchors.topMargin: 6
+                                                spacing: 12
+
+                                                Text {
+                                                    id: qemuActionLbl
+
+                                                    text: {
+                                                        if (qemuRow.isPending)
+                                                            return "...";
+
+                                                        if (modelData.running)
+                                                            return " stop";
+
+                                                        return " start";
+                                                    }
+                                                    color: modelData.running ? "#ea6962" : "#a9b665"
+                                                    font.family: "FiraCode Nerd Font"
+                                                    font.pixelSize: 8
+                                                    renderType: Text.NativeRendering
+                                                    opacity: qemuActionMa.containsMouse ? 1.0 : 0.7
+
+                                                    MouseArea {
+                                                        id: qemuActionMa
+
+                                                        anchors.fill: parent
+                                                        hoverEnabled: true
+                                                        enabled: !qemuRow.isPending
+                                                        cursorShape: Qt.PointingHandCursor
+                                                        onClicked: {
+                                                            if (modelData.running)
+                                                                root.stopQemuVm(modelData.name);
+                                                            else
+                                                                root.startQemuVm(modelData.name);
+                                                        }
+                                                    }
+                                                }
+
+                                                Text {
+                                                    id: qemuOpenLbl
+
+                                                    text: " open"
+                                                    color: "#d5c4a1"
+                                                    font.family: "FiraCode Nerd Font"
+                                                    font.pixelSize: 8
+                                                    renderType: Text.NativeRendering
+                                                    opacity: qemuOpenMa.containsMouse ? 1.0 : 0.7
+
+                                                    MouseArea {
+                                                        id: qemuOpenMa
+
+                                                        anchors.fill: parent
+                                                        hoverEnabled: true
+                                                        cursorShape: Qt.PointingHandCursor
+                                                        onClicked: root.openQemuVmGui(modelData.name)
+                                                    }
+                                                }
+
+                                                Text {
+                                                    id: qemuDeleteLbl
+
+                                                    text: " delete"
+                                                    color: "#ea6962"
+                                                    font.family: "FiraCode Nerd Font"
+                                                    font.pixelSize: 8
+                                                    renderType: Text.NativeRendering
+                                                    opacity: qemuDeleteMa.containsMouse ? 1.0 : 0.7
+
+                                                    MouseArea {
+                                                        id: qemuDeleteMa
+
+                                                        anchors.fill: parent
+                                                        hoverEnabled: true
+                                                        enabled: !qemuRow.isPending
+                                                        cursorShape: Qt.PointingHandCursor
+                                                        onClicked: root.deleteQemuVm(modelData.name)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

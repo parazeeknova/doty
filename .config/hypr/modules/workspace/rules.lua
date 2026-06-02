@@ -123,6 +123,28 @@ hl.window_rule({
     float = true
 })
 
+-- Dialogs & Authentication Floating
+hl.window_rule({
+    match = {
+        class = "^(xdg-desktop-portal-.*)$"
+    },
+    float = true,
+    center = true
+})
+hl.window_rule({
+    match = {
+        class = "^(polkit-.*-authentication-agent-.*)$"
+    },
+    float = true,
+    center = true
+})
+hl.window_rule({
+    match = {
+        title = "^(Confirm to replace files)$"
+    },
+    float = true
+})
+
 -- Picture-in-Picture
 hl.window_rule({
     match = {

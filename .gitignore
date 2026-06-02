@@ -14,3 +14,4 @@ __pycache__
 .config/gtk-3.0/bookmarks
 references/
 vm_password
+vm_guest_credentials

@@ -11,15 +11,17 @@ local osdctl = "~/doty/.config/quickshell/osd/bin/osdctl"
 ---------------------
 
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
+hl.bind(mainMod .. " + SHIFT + RETURN", hl.dsp.exec_cmd("ghostty --class=ghostty.floating"))
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("kitty"))
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd("warp-terminal"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
+hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd("env WAYLAND_DISPLAY=\"\" DBUS_SESSION_BUS_ADDRESS=\"\" thunar --class=thunar.floating"))
 
 -- Browsers
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("zen-browser"))
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd('hyprctl clients | grep -q "class: zen" && hyprctl dispatch \'hl.dsp.focus({ window = "class:zen" })\' || zen-browser'))
 
 -- Editors
-hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd("code-insiders"))
+hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd('hyprctl clients | grep -q "class: code-insiders" && hyprctl dispatch \'hl.dsp.focus({ window = "class:code-insiders" })\' || code-insiders'))
 
 ---------------------
 ---    Windows    ---
@@ -94,6 +96,10 @@ hl.bind(mainMod .. " + SHIFT + Z", hl.dsp.window.move({
     workspace = "special:terminal"
 }))
 
+-- Scratchpads (Toggle or Launch)
+hl.bind(mainMod .. " + G", hl.dsp.exec_cmd('pgrep -x gitkraken && hyprctl dispatch \'hl.dsp.workspace.toggle_special("gitkraken")\' || gitkraken'))
+hl.bind(mainMod .. " + ALT + H", hl.dsp.exec_cmd('pgrep -x helium && hyprctl dispatch \'hl.dsp.workspace.toggle_special("helium")\' || helium-browser'))
+
 ---------------------
 ---     Rofi      ---
 ---------------------
@@ -122,9 +128,11 @@ hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(
     "quickshell -c brightness_popup ipc call brightness_popup close || quickshell --config brightness_popup"))
 hl.bind(mainMod .. " + SHIFT + N",
     hl.dsp.exec_cmd("quickshell -c notif_popup ipc call notif_popup close || quickshell --config notif_popup"))
+hl.bind(mainMod .. " + SHIFT + O",
+    hl.dsp.exec_cmd("~/.config/rofi/scripts/toggle-glass.sh"))
 hl.bind(mainMod .. " + ALT + slash",
     hl.dsp.exec_cmd("quickshell -c podman_popup ipc call podman_popup close || quickshell --config podman_popup"))
-hl.bind(mainMod .. " + G",
+hl.bind(mainMod .. " + SHIFT + G",
     hl.dsp.exec_cmd("quickshell -c media_popup ipc call media_popup close || quickshell --config media_popup"))
 hl.bind("SUPER_L", hl.dsp
     .exec_cmd("quickshell -c workspace_popup ipc call workspace_popup close || quickshell --config workspace_popup"), {

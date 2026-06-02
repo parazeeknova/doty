@@ -82,8 +82,12 @@ Scope {
                 maxId = Math.max(maxId, wsId);
             }
         }
-        workspaceMap[maxId + 1] = true;
-        maxId = maxId + 1;
+        if (maxId < 10) {
+            workspaceMap[maxId + 1] = true;
+            maxId = maxId + 1;
+        } else {
+            workspaceMap[9] = true;
+        }
         var ids = [];
         for (var id = 1; id <= maxId; id++) {
             if (workspaceMap[id])
@@ -454,7 +458,7 @@ Scope {
 
                     anchors.fill: parent
                     opacity: win.animOpacity
-                    color: root.colorBgDark
+                    color: theme.popupBgColor
                     border.width: 1
                     border.color: root.colorTheme
                     radius: 0 // Sharp corners

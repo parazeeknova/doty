@@ -1380,11 +1380,7 @@ Scope {
                                     onEntered: btnGlass.opacity = 0.7
                                     onExited: btnGlass.opacity = 1
                                     onClicked: {
-                                        var targetEnabled = !root.glassEnabled;
-                                        var opacity = targetEnabled ? "0.85" : "1.0";
-                                        var blurVal = targetEnabled ? "true" : "false";
-                                        var evalStr = "hl.config({ decoration = { active_opacity = " + opacity + ", blur = { enabled = " + blurVal + " } } })";
-                                        Quickshell.execDetached(["sh", "-c", "hyprctl eval '" + evalStr + "' && echo '" + targetEnabled + "' > /tmp/quickshell_glass_state && /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show 'Glass: " + (targetEnabled ? "On" : "Off") + "' " + (targetEnabled ? "good" : "bad") + " 1200"]);
+                                        Quickshell.execDetached(["/home/parazeeknova/doty/.config/rofi/scripts/toggle-glass.sh"]);
                                     }
                                 }
 
