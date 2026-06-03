@@ -50,31 +50,31 @@ if [ "$#" -gt 0 ]; then
             clear_config
             restart_sunset -i
             echo -n "Off" > "$STATE_FILE"
-            /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "sunset off" info 1200
+            ~/.config/quickshell/osd/bin/osdctl show "sunset off" info 1200
             ;;
         sunset)
             clear_config
             restart_sunset -t 4500
             echo -n "Sunset" > "$STATE_FILE"
-            /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "sunset 4500k" info 1200
+            ~/.config/quickshell/osd/bin/osdctl show "sunset 4500k" info 1200
             ;;
         night)
             clear_config
             restart_sunset -t 3500
             echo -n "Night" > "$STATE_FILE"
-            /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "sunset 3500k" info 1200
+            ~/.config/quickshell/osd/bin/osdctl show "sunset 3500k" info 1200
             ;;
         midnight)
             clear_config
             restart_sunset -t 2500
             echo -n "Midnight" > "$STATE_FILE"
-            /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "sunset 2500k" info 1200
+            ~/.config/quickshell/osd/bin/osdctl show "sunset 2500k" info 1200
             ;;
         default)
             clear_config
             restart_sunset -t 6000
             echo -n "Default" > "$STATE_FILE"
-            /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "sunset 6000k" info 1200
+            ~/.config/quickshell/osd/bin/osdctl show "sunset 6000k" info 1200
             ;;
         auto)
             write_auto_config
@@ -83,20 +83,20 @@ if [ "$#" -gt 0 ]; then
             # Show what state auto is currently in
             current_hour=$(date +%H)
             if [ "$current_hour" -ge 22 ] || [ "$current_hour" -lt 6 ]; then
-                /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "sunset auto: 4000k" info 1200
+                ~/.config/quickshell/osd/bin/osdctl show "sunset auto: 4000k" info 1200
             elif [ "$current_hour" -ge 18 ] && [ "$current_hour" -lt 22 ]; then
-                /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "sunset auto: 5000k" info 1200
+                ~/.config/quickshell/osd/bin/osdctl show "sunset auto: 5000k" info 1200
             elif [ "$current_hour" -ge 6 ] && [ "$current_hour" -lt 8 ]; then
-                /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "sunset auto: 5000k" info 1200
+                ~/.config/quickshell/osd/bin/osdctl show "sunset auto: 5000k" info 1200
             else
-                /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "sunset auto: off" info 1200
+                ~/.config/quickshell/osd/bin/osdctl show "sunset auto: off" info 1200
             fi
             ;;
         [0-9]*)
             clear_config
             restart_sunset -t "$selection"
             echo -n "$selection" > "$STATE_FILE"
-            /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "sunset ${selection}k" info 1200
+            ~/.config/quickshell/osd/bin/osdctl show "sunset ${selection}k" info 1200
             ;;
     esac
     exit 0

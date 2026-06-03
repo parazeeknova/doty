@@ -4,4 +4,4 @@ After=basic.target
 
 [Service]
 Type=oneshot
-ExecStart=/home/parazeeknova/.config/quickshell/battery_popup/log_battery
+ExecStart=%h/.config/quickshell/battery_popup/log_battery

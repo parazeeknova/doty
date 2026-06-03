@@ -13,7 +13,7 @@ set -gx LC_ALL en_US.UTF-8
 set -gx GPG_TTY (tty)
 set -gx SSH_ASKPASS /usr/lib/seahorse/ssh-askpass
 set -gx SSH_AUTH_SOCK "$XDG_RUNTIME_DIR/ssh-agent.socket"
-
+set -gx PATH $HOME/.npm-global/bin $PATH
 
 # Man Page Formatting
 set -x MANROFFOPT -c
@@ -53,8 +53,3 @@ if status is-interactive
     end
 
 end
-set -gx PATH $HOME/.npm-global/bin $PATH
-
-# >>> grok installer >>>
-fish_add_path $HOME/.grok/bin
-# <<< grok installer <<<

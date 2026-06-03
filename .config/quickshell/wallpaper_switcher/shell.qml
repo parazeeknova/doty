@@ -124,8 +124,8 @@ Scope {
         onTriggered: {
             if (root.activeWallpaper !== "") {
                 Quickshell.execDetached(["awww", "img", root.activeWallpaper]);
-                Quickshell.execDetached(["mkdir", "-p", "/home/parazeeknova/.cache"]);
-                Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" > /home/parazeeknova/.cache/last_wallpaper", "sh", root.activeWallpaper]);
+                Quickshell.execDetached(["mkdir", "-p", root.homeDir + "/.cache"]);
+                Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" > " + root.homeDir + "/.cache/last_wallpaper", "sh", root.activeWallpaper]);
             }
         }
     }

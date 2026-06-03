@@ -21,7 +21,7 @@ caffeine_on() {
     fi
     systemd-inhibit --what=idle:sleep --who=caffeine --why="Caffeine mode" sleep infinity &
     echo $! > "$CAFFEINE_FLAG"
-    /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "caffeine on" good 1200
+    ~/.config/quickshell/osd/bin/osdctl show "caffeine on" good 1200
 }
 
 caffeine_off() {
@@ -31,7 +31,7 @@ caffeine_off() {
         hypridle &
     fi
     rm -f /tmp/caffeine-was-running
-    /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "caffeine off" info 1200
+    ~/.config/quickshell/osd/bin/osdctl show "caffeine off" info 1200
 }
 
 caffeine_toggle

@@ -8,7 +8,7 @@ if [ "${ROFI_RETV:-}" = "1" ]; then
     case "${ROFI_INFO:-}" in
         Quiet|Balanced|Performance)
             asusctl profile set "${ROFI_INFO:-}" >/dev/null 2>&1
-            /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show "profile: ${ROFI_INFO:-,,}" good 1500
+            ~/.config/quickshell/osd/bin/osdctl show "profile: ${ROFI_INFO:-,,}" good 1500
             ;;
     esac
     exit 0
