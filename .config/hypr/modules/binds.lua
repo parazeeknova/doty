@@ -2,8 +2,8 @@
 ---- Keybindings ----
 ---------------------
 local mainMod = "SUPER"
-local terminal = "ghostty"
-local fileManager = "thunar"
+local terminal = "uwsm app -- ghostty"
+local fileManager = "uwsm app -- thunar"
 local osdctl = "~/doty/.config/quickshell/osd/bin/osdctl"
 
 ---------------------
@@ -11,20 +11,20 @@ local osdctl = "~/doty/.config/quickshell/osd/bin/osdctl"
 ---------------------
 
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + SHIFT + RETURN", hl.dsp.exec_cmd("ghostty --class=ghostty.floating"))
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("kitty"))
-hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd("warp-terminal"))
+hl.bind(mainMod .. " + SHIFT + RETURN", hl.dsp.exec_cmd("uwsm app -- ghostty --class=ghostty.floating"))
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("uwsm app -- kitty"))
+hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd("uwsm app -- warp-terminal"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + SHIFT + E",
-    hl.dsp.exec_cmd("env WAYLAND_DISPLAY=\"\" DBUS_SESSION_BUS_ADDRESS=\"\" thunar --class=thunar.floating"))
+hl.bind(mainMod .. " + SHIFT + E", hl.dsp
+    .exec_cmd("env WAYLAND_DISPLAY=\"\" DBUS_SESSION_BUS_ADDRESS=\"\" uwsm app -- thunar --class=thunar.floating"))
 
 -- Browsers
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(
-    'hyprctl clients | grep -q "class: zen" && hyprctl dispatch \'hl.dsp.focus({ window = "class:zen" })\' || zen-browser'))
+    'hyprctl clients | grep -q "class: zen" && hyprctl dispatch \'hl.dsp.focus({ window = "class:zen" })\' || uwsm app -- zen-browser'))
 
 -- Editors
 hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd(
-    'hyprctl clients | grep -q "class: code-insiders" && hyprctl dispatch \'hl.dsp.focus({ window = "class:code-insiders" })\' || code-insiders'))
+    'hyprctl clients | grep -q "class: code-insiders" && hyprctl dispatch \'hl.dsp.focus({ window = "class:code-insiders" })\' || uwsm app -- code-insiders'))
 
 ---------------------
 ---    Windows    ---
@@ -193,7 +193,7 @@ hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprpicker -a -n"))
 
 -- Power menu / Logout
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("rofi -show power"))
-hl.bind(mainMod .. " + ALT + E", hl.dsp.exec_cmd("hyprctl dispatch exit"))
+hl.bind(mainMod .. " + ALT + E", hl.dsp.exec_cmd("sh -c 'if command -v uwsm >/dev/null 2>&1 && uwsm check; then uwsm stop; else hyprctl dispatch exit; fi'"))
 
 -- Caps lock OSD
 hl.bind("Caps_Lock", hl.dsp.exec_cmd(osdctl .. " caps toggle"), {

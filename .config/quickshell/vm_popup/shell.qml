@@ -98,7 +98,7 @@ Scope {
     }
 
     function openVmGui(vmx) {
-        Quickshell.execDetached(["vmware", vmx]);
+        Quickshell.execDetached(["uwsm", "app", "--", "vmware", vmx]);
         Quickshell.execDetached(["hyprctl", "dispatch", "workspace", "10"]);
     }
 
