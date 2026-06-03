@@ -6,6 +6,7 @@ import Quickshell.Io
 Scope {
     id: root
 
+    property string homeDir: Quickshell.env("HOME")
     // Network state properties
     property bool wifiEnabled: false
     property bool airplaneMode: false
@@ -52,7 +53,7 @@ Scope {
     Process {
         id: checkStatusProc
 
-        command: ["/home/parazeeknova/doty/.config/quickshell/network_popup/get_network_status"]
+        command: [root.homeDir + "/.config/quickshell/network_popup/get_network_status"]
         running: false
 
         stdout: StdioCollector {

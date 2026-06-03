@@ -16,12 +16,12 @@
     },
     "bash": "allow",
     "external_directory": {
-      "/home/paper/.bun/install/cache/*": "allow",
-      "/home/paper/Singulity/lumen/*": "allow",
-      "/home/parazeeknova/.cargo/registry/src/*": "allow",
-      "/home/parazeeknova/.config/*": "allow",
-      "/home/parazeeknova/.local/share/*": "allow",
-      "/home/parazeeknova/.cache/*": "allow"
+      "{env:HOME}/.bun/install/cache/*": "allow",
+      "{env:HOME}/Singulity/lumen/*": "allow",
+      "{env:HOME}/.cargo/registry/src/*": "allow",
+      "{env:HOME}/.config/*": "allow",
+      "{env:HOME}/.local/share/*": "allow",
+      "{env:HOME}/.cache/*": "allow"
     }
   }
 }

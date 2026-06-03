@@ -6,6 +6,7 @@ import Quickshell.Io
 Scope {
     id: root
 
+    property string homeDir: Quickshell.env("HOME")
     property var btEnabled: null
     property var devices: []
     property string expandedDeviceAddr: ""
@@ -27,6 +28,13 @@ Scope {
         id: theme
     }
 
+    QuickshellWindow {
+        id: window
+        width: 320
+        height: 500
+        target: "bluetooth_popup"
+    }
+
     IpcHandler {
         function close() {
             root.requestClose();
@@ -39,7 +47,7 @@ Scope {
         id: checkStatusProc
 
         command: {
-            var cmd = ["/home/parazeeknova/doty/.config/quickshell/bluetooth_popup/get_bluetooth_status"];
+            var cmd = [root.homeDir + "/.config/quickshell/bluetooth_popup/get_bluetooth_status"];
             if (root.pendingScan)
                 cmd.push("--scan");
 

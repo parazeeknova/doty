@@ -8,6 +8,7 @@ import Quickshell.Wayland
 Scope {
     id: root
 
+    property string homeDir: Quickshell.env("HOME")
     readonly property string statePath: Qt.resolvedUrl("./state.json")
     property string message: ""
     property string kind: "info"
@@ -420,7 +421,7 @@ Scope {
     Process {
         id: checkAudioStatusProc
 
-        command: ["/home/parazeeknova/doty/.config/quickshell/volume_popup/get_audio_status"]
+        command: [root.homeDir + "/.config/quickshell/volume_popup/get_audio_status"]
         running: false
 
         stdout: StdioCollector {
@@ -460,7 +461,7 @@ Scope {
     FileView {
         id: sunsetStateFile
 
-        path: "file:///home/parazeeknova/.config/hypr/sunset.state"
+        path: "file://" + root.homeDir + "/.config/hypr/sunset.state"
         watchChanges: true
         onLoaded: {
             var txt = sunsetStateFile.text().trim();

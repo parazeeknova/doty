@@ -7,6 +7,7 @@ Scope {
     id: root
 
     // Battery status properties
+    property string homeDir: Quickshell.env("HOME")
     property int capacity: 0
     property string status: "Unknown"
     property double health: 100
@@ -21,7 +22,7 @@ Scope {
     }
 
     function setProfile(profile) {
-        runCmd(["sh", "-c", "asusctl profile set " + profile + " && /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show 'profile: " + profile.toLowerCase() + "' good 1500"]);
+        runCmd(["sh", "-c", "asusctl profile set " + profile + " && " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show 'profile: " + profile.toLowerCase() + "' good 1500"]);
     }
 
     Component.onCompleted: {
@@ -36,7 +37,7 @@ Scope {
     Process {
         id: checkStatusProc
 
-        command: ["/home/parazeeknova/doty/.config/quickshell/battery_popup/get_battery_status"]
+        command: [root.homeDir + "/.config/quickshell/battery_popup/get_battery_status"]
         running: false
 
         stdout: StdioCollector {

@@ -6,6 +6,7 @@ import Quickshell.Io
 Scope {
     id: root
 
+    property string homeDir: Quickshell.env("HOME")
     property string cpuName: ""
     property int cpuUsage: 0
     property int cpuTemp: 0
@@ -67,7 +68,7 @@ Scope {
     Process {
         id: checkStatusProc
 
-        command: ["/home/parazeeknova/doty/.config/quickshell/sysmon_popup/get_sysmon_status"]
+        command: [root.homeDir + "/.config/quickshell/sysmon_popup/get_sysmon_status"]
         running: false
 
         stdout: StdioCollector {

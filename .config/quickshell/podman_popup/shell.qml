@@ -8,6 +8,7 @@ import Quickshell.Io
 Scope {
     id: root
 
+    property string homeDir: Quickshell.env("HOME")
     property var podmanData: ({
         "containers": [],
         "images": [],
@@ -54,7 +55,7 @@ Scope {
     Process {
         id: checkStatusProc
 
-        command: ["/home/parazeeknova/doty/.config/quickshell/podman_popup/get_podman_status"]
+        command: [root.homeDir + "/.config/quickshell/podman_popup/get_podman_status"]
         running: false
 
         stdout: StdioCollector {

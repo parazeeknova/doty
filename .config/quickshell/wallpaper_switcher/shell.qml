@@ -7,7 +7,8 @@ import Quickshell.Wayland
 Scope {
     id: root
 
-    property string animeDir: "/home/parazeeknova/Pictures/Anime"
+    property string homeDir: Quickshell.env("HOME")
+    property string animeDir: homeDir + "/Pictures/Anime"
     property var wallpapers: []
     property string activeWallpaper: ""
     property string lastWallpaperPath: ""
@@ -73,7 +74,7 @@ Scope {
     Process {
         id: loadLastWallpaperProc
 
-        command: ["sh", "-c", "test -r /home/parazeeknova/.cache/last_wallpaper && cat /home/parazeeknova/.cache/last_wallpaper || true"]
+        command: ["sh", "-c", "test -r " + root.homeDir + "/.cache/last_wallpaper && cat " + root.homeDir + "/.cache/last_wallpaper || true"]
         running: false
 
         stdout: StdioCollector {
@@ -88,7 +89,7 @@ Scope {
     Process {
         id: scanProc
 
-        command: ["/home/parazeeknova/.config/quickshell/wallpaper_switcher/wallpaper_thumb_watcher", "--print"]
+        command: [root.homeDir + "/.config/quickshell/wallpaper_switcher/wallpaper_thumb_watcher", "--print"]
         running: false
 
         stdout: StdioCollector {

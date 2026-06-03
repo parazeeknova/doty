@@ -22,7 +22,7 @@ struct Settings {
 
 impl Default for Settings {
     fn default() -> Self {
-        let home = env::var("HOME").unwrap_or_else(|_| "/home/parazeeknova".to_string());
+        let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
         Self {
             screenshot_dir: format!("{}/Pictures/Screenshots", home),
             recording_dir: format!("{}/Pictures/Recordings", home),
@@ -39,12 +39,12 @@ struct MediaStatus {
 }
 
 fn get_settings_path() -> PathBuf {
-    let home = env::var("HOME").unwrap_or_else(|_| "/home/parazeeknova".to_string());
+    let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
     PathBuf::from(home).join(".config/quickshell/media_popup/settings.json")
 }
 
 fn get_history_path() -> PathBuf {
-    let home = env::var("HOME").unwrap_or_else(|_| "/home/parazeeknova".to_string());
+    let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
     PathBuf::from(home).join(".cache/quickshell_media_history.json")
 }
 

@@ -7,6 +7,7 @@ import Quickshell.Wayland
 Scope {
     id: root
 
+    property string homeDir: Quickshell.env("HOME")
     property string username: "parazeeknova"
     property int totalContributions: 0
     property var contributionDays: []
@@ -26,7 +27,7 @@ Scope {
     Process {
         id: fetchGraphProc
 
-        command: ["/home/parazeeknova/doty/.config/quickshell/github_graph/get_github_graph"]
+        command: [root.homeDir + "/.config/quickshell/github_graph/get_github_graph"]
         running: false
 
         stdout: StdioCollector {

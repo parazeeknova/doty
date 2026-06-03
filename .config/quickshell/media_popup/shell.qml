@@ -8,7 +8,8 @@ import Quickshell.Wayland
 Scope {
     id: root
 
-    property string helperPath: "/home/parazeeknova/doty/.config/quickshell/media_popup/get_media_status"
+    property string homeDir: Quickshell.env("HOME")
+    property string helperPath: homeDir + "/.config/quickshell/media_popup/get_media_status"
     property bool isRecording: false
     property string screenshotDir: ""
     property string recordingDir: ""
@@ -129,7 +130,7 @@ Scope {
             onStreamFinished: {
                 var file = this.text.trim();
                 if (file !== "")
-                    Quickshell.execDetached(["sh", "-c", "TEXT=$(tesseract \"" + file + "\" stdout 2>/dev/null) && if [ ! -z \"$TEXT\" ]; then echo -n \"$TEXT\" | wl-copy && /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show \"Text Extracted\" \"good\" 1200 && \"" + root.helperPath + "\" add ocr \"$TEXT\"; else notify-send -t 1500 -a \"OCR\" \"No text found\"; fi"]);
+                    Quickshell.execDetached(["sh", "-c", "TEXT=$(tesseract \"" + file + "\" stdout 2>/dev/null) && if [ ! -z \"$TEXT\" ]; then echo -n \"$TEXT\" | wl-copy && " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Text Extracted\" \"good\" 1200 && \"" + root.helperPath + "\" add ocr \"$TEXT\"; else notify-send -t 1500 -a \"OCR\" \"No text found\"; fi"]);
 
             }
         }
@@ -529,7 +530,7 @@ Scope {
                                         }
                                         onClicked: {
                                             if (root.isRecording) {
-                                                Quickshell.execDetached(["sh", "-c", "pkill -SIGINT wf-recorder && /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show \"Recording Saved\" \"good\" 1200"]);
+                                                Quickshell.execDetached(["sh", "-c", "pkill -SIGINT wf-recorder && " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Recording Saved\" \"good\" 1200"]);
                                                 root.updateStatus();
                                             } else {
                                                 win.closePopup();
@@ -538,7 +539,7 @@ Scope {
                                                     audioArgs = "-a -a";
                                                 else if (root.recordAudio || root.recordMic)
                                                     audioArgs = "-a";
-                                                Quickshell.execDetached(["sh", "-c", "GEOM=$(slurp) && if [ ! -z \"$GEOM\" ]; then /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show \"Recording Started\" \"bad\" 1200 && mkdir -p \"" + root.recordingDir + "\" && FILE=\"" + root.recordingDir + "/Recording_$(date '+%Y-%m-%d_%H.%M.%S').mp4\" && (wf-recorder " + audioArgs + " -g \"$GEOM\" -f \"$FILE\" ; ffmpeg -y -i \"$FILE\" -ss 00:00:00.500 -vframes 1 \"${FILE%.mp4}.png\" 2>/dev/null ; \"" + root.helperPath + "\" add recording \"$FILE\") ; fi"]);
+                                                Quickshell.execDetached(["sh", "-c", "GEOM=$(slurp) && if [ ! -z \"$GEOM\" ]; then " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Recording Started\" \"bad\" 1200 && mkdir -p \"" + root.recordingDir + "\" && FILE=\"" + root.recordingDir + "/Recording_$(date '+%Y-%m-%d_%H.%M.%S').mp4\" && (wf-recorder " + audioArgs + " -g \"$GEOM\" -f \"$FILE\" ; ffmpeg -y -i \"$FILE\" -ss 00:00:00.500 -vframes 1 \"${FILE%.mp4}.png\" 2>/dev/null ; \"" + root.helperPath + "\" add recording \"$FILE\") ; fi"]);
                                             }
                                         }
                                     }
@@ -574,7 +575,7 @@ Scope {
                                                 audioArgs = "-a -a";
                                             else if (root.recordAudio || root.recordMic)
                                                 audioArgs = "-a";
-                                            Quickshell.execDetached(["sh", "-c", "/home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show \"Recording Started\" \"bad\" 1200 && mkdir -p \"" + root.recordingDir + "\" && FILE=\"" + root.recordingDir + "/Recording_$(date '+%Y-%m-%d_%H.%M.%S').mp4\" && (wf-recorder " + audioArgs + " -f \"$FILE\" ; ffmpeg -y -i \"$FILE\" -ss 00:00:00.500 -vframes 1 \"${FILE%.mp4}.png\" 2>/dev/null ; \"" + root.helperPath + "\" add recording \"$FILE\")"]);
+                                            Quickshell.execDetached(["sh", "-c", root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Recording Started\" \"bad\" 1200 && mkdir -p \"" + root.recordingDir + "\" && FILE=\"" + root.recordingDir + "/Recording_$(date '+%Y-%m-%d_%H.%M.%S').mp4\" && (wf-recorder " + audioArgs + " -f \"$FILE\" ; ffmpeg -y -i \"$FILE\" -ss 00:00:00.500 -vframes 1 \"${FILE%.mp4}.png\" 2>/dev/null ; \"" + root.helperPath + "\" add recording \"$FILE\")"]);
                                         }
                                     }
 
@@ -671,7 +672,7 @@ Scope {
                                         onClicked: {
                                             win.closePopup();
                                             var slurp = "slurp -b \\#1d2021b0 -c \\#d5c4a1ff -s \\#00000000";
-                                            Quickshell.execDetached(["sh", "-c", "grim -g \"$(" + slurp + ")\" /tmp/ocr_image.png && TEXT=$(tesseract /tmp/ocr_image.png stdout 2>/dev/null) && rm /tmp/ocr_image.png && if [ ! -z \"$TEXT\" ]; then echo -n \"$TEXT\" | wl-copy && /home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl show \"Text Extracted\" \"good\" 1200 && \"" + root.helperPath + "\" add ocr \"$TEXT\"; else notify-send -t 1500 -a \"OCR\" \"No text found\"; fi"]);
+                                            Quickshell.execDetached(["sh", "-c", "grim -g \"$(" + slurp + ")\" /tmp/ocr_image.png && TEXT=$(tesseract /tmp/ocr_image.png stdout 2>/dev/null) && rm /tmp/ocr_image.png && if [ ! -z \"$TEXT\" ]; then echo -n \"$TEXT\" | wl-copy && " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Text Extracted\" \"good\" 1200 && \"" + root.helperPath + "\" add ocr \"$TEXT\"; else notify-send -t 1500 -a \"OCR\" \"No text found\"; fi"]);
                                         }
                                     }
 

@@ -6,6 +6,7 @@ import Quickshell.Io
 Scope {
     id: root
 
+    property string homeDir: Quickshell.env("HOME")
     // Audio state properties
     property var defaultSink: null
     property var defaultSource: null
@@ -106,13 +107,13 @@ Scope {
             if (pendingOutVol !== -1 && root.defaultSink) {
                 Quickshell.execDetached(["pactl", "set-sink-volume", String(root.defaultSink.index), pendingOutVol + "%"]);
                 // Trigger OSD
-                Quickshell.execDetached(["/home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl", "show", "volume " + pendingOutVol + "%", "info", "1200"]);
+                Quickshell.execDetached([root.homeDir + "/.config/quickshell/osd/bin/osdctl", "show", "volume " + pendingOutVol + "%", "info", "1200"]);
                 pendingOutVol = -1;
             }
             if (pendingInVol !== -1 && root.defaultSource) {
                 Quickshell.execDetached(["pactl", "set-source-volume", String(root.defaultSource.index), pendingInVol + "%"]);
                 // Trigger OSD
-                Quickshell.execDetached(["/home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl", "show", "mic " + pendingInVol + "%", "info", "1200"]);
+                Quickshell.execDetached([root.homeDir + "/.config/quickshell/osd/bin/osdctl", "show", "mic " + pendingInVol + "%", "info", "1200"]);
                 pendingInVol = -1;
             }
             var appKeys = Object.keys(pendingAppVols);
@@ -132,7 +133,7 @@ Scope {
     Process {
         id: checkStatusProc
 
-        command: ["/home/parazeeknova/doty/.config/quickshell/volume_popup/get_audio_status"]
+        command: [root.homeDir + "/.config/quickshell/volume_popup/get_audio_status"]
         running: false
 
         stdout: StdioCollector {
@@ -794,7 +795,7 @@ Scope {
                                                 var muted = !root.defaultSink.muted;
                                                 var text = muted ? "vol muted" : "vol " + root.defaultSink.volume + "%";
                                                 var kind = muted ? "warn" : "info";
-                                                Quickshell.execDetached(["/home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl", "show", text, kind, "1200"]);
+                                                Quickshell.execDetached([root.homeDir + "/.config/quickshell/osd/bin/osdctl", "show", text, kind, "1200"]);
                                                 checkStatusProc.running = true;
                                             }
                                         }
@@ -909,7 +910,7 @@ Scope {
                                                 var muted = !root.defaultSource.muted;
                                                 var text = muted ? "mic muted" : "mic " + root.defaultSource.volume + "%";
                                                 var kind = muted ? "warn" : "info";
-                                                Quickshell.execDetached(["/home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl", "show", text, kind, "1200"]);
+                                                Quickshell.execDetached([root.homeDir + "/.config/quickshell/osd/bin/osdctl", "show", text, kind, "1200"]);
                                                 checkStatusProc.running = true;
                                             }
                                         }

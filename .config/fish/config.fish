@@ -24,16 +24,16 @@ set -U __done_min_cmd_duration 10000
 set -U __done_notification_urgency_level low
 
 # Global package PATH for node & bun
-export PATH="/home/parazeeknova/.bun/bin:$PATH"
+export PATH="$HOME/.bun/bin:$PATH"
 export DOCKER_COMPOSE_PROVIDER_WARNING=0
 
 # Path Configuration
 fish_add_path ~/.local/bin
 fish_add_path ~/.cargo/bin
 fish_add_path ~/Applications/depot_tools
-fish_add_path /home/paper/.spicetify
-fish_add_path /home/paper/.bun/bin
-fish_add_path /home/paper/.lmstudio/bin
+fish_add_path ~/.spicetify
+fish_add_path ~/.bun/bin
+fish_add_path ~/.lmstudio/bin
 
 # Source Profile (if exists)
 if test -f ~/.fish_profile
@@ -45,7 +45,6 @@ if status is-interactive
     # Initialize Tools
     starship init fish | source
     zoxide init --cmd cd fish | source
-    mise activate fish | source
     # colorscript -e zwaves
 
     # TMUX Auto-Start (unless already inside one)

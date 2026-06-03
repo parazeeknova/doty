@@ -9,6 +9,7 @@ import Quickshell.Wayland
 Scope {
     id: root
 
+    property string homeDir: Quickshell.env("HOME")
     // State properties
     property string searchQuery: ""
     property var emojisDb: []
@@ -60,7 +61,7 @@ Scope {
     Process {
         id: getEmojisProc
 
-        command: ["/home/parazeeknova/doty/.config/quickshell/emoji_popup/get_emojis"]
+        command: [root.homeDir + "/.config/quickshell/emoji_popup/get_emojis"]
         running: true
 
         stdout: StdioCollector {

@@ -6,7 +6,8 @@ import Quickshell.Io
 Scope {
     id: root
 
-    property string helperPath: "/home/parazeeknova/doty/.config/quickshell/vm_popup/get_vm_status"
+    property string homeDir: Quickshell.env("HOME")
+    property string helperPath: homeDir + "/.config/quickshell/vm_popup/get_vm_status"
     property string thumbDir: "/tmp/vm_thumbs"
     property var vms: []
     property var qemuVms: []

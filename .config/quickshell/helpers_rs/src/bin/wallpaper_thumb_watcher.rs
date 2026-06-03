@@ -19,7 +19,7 @@ struct Wallpaper {
 fn home_dir() -> PathBuf {
     env::var_os("HOME")
         .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("/home/parazeeknova"))
+        .unwrap_or_else(|| PathBuf::from("/tmp"))
 }
 
 fn cache_dir() -> PathBuf {
@@ -45,7 +45,7 @@ fn watch_dirs() -> Vec<PathBuf> {
 
     let home = home_dir();
     vec![
-        PathBuf::from("/home/parazeeknova/doty/Pictures/Anime"),
+        home.join("doty/Pictures/Anime"),
         home.join("Pictures").join("Anime"),
     ]
 }
@@ -195,7 +195,7 @@ fn cleanup_stale(cache_dir: &Path, live_thumbs: &BTreeSet<PathBuf>) {
 }
 
 fn link_anime_wallpapers() {
-    let doty_dir = PathBuf::from("/home/parazeeknova/doty/Pictures/Anime");
+    let doty_dir = home_dir().join("doty/Pictures/Anime");
     let home_dir_anime = home_dir().join("Pictures").join("Anime");
 
     if !doty_dir.is_dir() || !home_dir_anime.is_dir() {

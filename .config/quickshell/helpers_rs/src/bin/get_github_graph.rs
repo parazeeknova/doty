@@ -46,7 +46,7 @@ struct Repo {
 
 fn main() {
     let username = "parazeeknova";
-    let home = std::env::var("HOME").unwrap_or_else(|_| "/home/parazeeknova".to_string());
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
     let cache_path_str = format!("{home}/.cache/quickshell_github_graph.json");
     let cache_path = std::path::Path::new(&cache_path_str);
 
@@ -213,7 +213,7 @@ fn get_local_commit_count(repo_name: &str) -> Option<u32> {
         return None;
     }
     let repo_basename = parts[1];
-    let home = std::env::var("HOME").unwrap_or_else(|_| "/home/parazeeknova".to_string());
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
 
     let paths = vec![
         format!("{home}/{repo_basename}"),

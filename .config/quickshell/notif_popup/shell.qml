@@ -6,6 +6,7 @@ import Quickshell.Io
 Scope {
     id: root
 
+    property string homeDir: Quickshell.env("HOME")
     property var activeNotifs: []
     property var historyNotifs: []
     property bool historyExpanded: false
@@ -149,7 +150,7 @@ Scope {
     Process {
         id: checkNotifsProc
 
-        command: ["/home/parazeeknova/doty/.config/quickshell/notif_popup/get_notif_status"]
+        command: [root.homeDir + "/.config/quickshell/notif_popup/get_notif_status"]
         running: false
 
         stdout: StdioCollector {
@@ -1380,7 +1381,7 @@ Scope {
                                     onEntered: btnGlass.opacity = 0.7
                                     onExited: btnGlass.opacity = 1
                                     onClicked: {
-                                        Quickshell.execDetached(["/home/parazeeknova/doty/.config/rofi/scripts/toggle-glass.sh"]);
+                                        Quickshell.execDetached([root.homeDir + "/.config/rofi/scripts/toggle-glass.sh"]);
                                     }
                                 }
 

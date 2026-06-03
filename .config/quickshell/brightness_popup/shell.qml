@@ -6,6 +6,7 @@ import Quickshell.Io
 Scope {
     id: root
 
+    property string homeDir: Quickshell.env("HOME")
     // Brightness state properties
     property int screenBrightness: 80
     property int kbdBrightness: 100
@@ -50,7 +51,7 @@ Scope {
             if (pendingScreenVol !== -1) {
                 Quickshell.execDetached(["brightnessctl", "set", pendingScreenVol + "%"]);
                 // Trigger OSD
-                Quickshell.execDetached(["/home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl", "show", "brightness " + pendingScreenVol + "%", "info", "1200"]);
+                Quickshell.execDetached([root.homeDir + "/.config/quickshell/osd/bin/osdctl", "show", "brightness " + pendingScreenVol + "%", "info", "1200"]);
                 pendingScreenVol = -1;
             }
             if (pendingKbdVol !== -1) {
@@ -60,12 +61,12 @@ Scope {
                     Quickshell.execDetached(["brightnessctl", "-d", root.kbdDevice, "set", String(val)]);
                     // Trigger OSD
                     var pct = Math.round((val / 3) * 100);
-                    Quickshell.execDetached(["/home/parazeeknova/doty/.config/quickshell/osd/bin/osdctl", "show", "kbd brightness " + pct + "%", "info", "1200"]);
+                    Quickshell.execDetached([root.homeDir + "/.config/quickshell/osd/bin/osdctl", "show", "kbd brightness " + pct + "%", "info", "1200"]);
                 }
                 pendingKbdVol = -1;
             }
             if (pendingSunsetTemp !== -1) {
-                Quickshell.execDetached(["/home/parazeeknova/doty/.config/rofi/scripts/sunset.sh", String(pendingSunsetTemp)]);
+                Quickshell.execDetached([root.homeDir + "/.config/rofi/scripts/sunset.sh", String(pendingSunsetTemp)]);
                 pendingSunsetTemp = -1;
             }
         }
@@ -75,7 +76,7 @@ Scope {
     Process {
         id: checkStatusProc
 
-        command: ["/home/parazeeknova/doty/.config/quickshell/brightness_popup/get_brightness_status"]
+        command: [root.homeDir + "/.config/quickshell/brightness_popup/get_brightness_status"]
         running: false
 
         stdout: StdioCollector {
@@ -486,7 +487,7 @@ Scope {
                                         anchors.fill: parent
                                         onClicked: {
                                             root.sunsetState = "Auto";
-                                            Quickshell.execDetached(["/home/parazeeknova/doty/.config/rofi/scripts/sunset.sh", "auto"]);
+                                            Quickshell.execDetached([root.homeDir + "/.config/rofi/scripts/sunset.sh", "auto"]);
                                             root.triggerRefresh();
                                         }
                                     }
@@ -514,7 +515,7 @@ Scope {
                                         anchors.fill: parent
                                         onClicked: {
                                             root.sunsetState = "Off";
-                                            Quickshell.execDetached(["/home/parazeeknova/doty/.config/rofi/scripts/sunset.sh", "off"]);
+                                            Quickshell.execDetached([root.homeDir + "/.config/rofi/scripts/sunset.sh", "off"]);
                                             root.triggerRefresh();
                                         }
                                     }
@@ -647,7 +648,7 @@ Scope {
                                     onClicked: {
                                         var nextState = !root.caffeineActive;
                                         root.caffeineActive = nextState;
-                                        Quickshell.execDetached(["/home/parazeeknova/doty/.config/rofi/scripts/caffeine.sh"]);
+                                        Quickshell.execDetached([root.homeDir + "/.config/rofi/scripts/caffeine.sh"]);
                                         // Refresh in the background to sync state
                                         root.triggerRefresh();
                                     }

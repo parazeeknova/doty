@@ -9,6 +9,7 @@ import Quickshell.Wayland
 Scope {
     id: root
 
+    property string homeDir: Quickshell.env("HOME")
     // State properties
     property var rawEntries: []
     property var filteredEntries: []
@@ -103,7 +104,7 @@ Scope {
     Process {
         id: decodeScript
 
-        command: ["/home/parazeeknova/doty/.config/quickshell/clipboard_popup/decode_cliphist.sh"]
+        command: [root.homeDir + "/.config/quickshell/clipboard_popup/decode_cliphist.sh"]
         running: false
         onExited: {
             // Once decoding is done, query the cliphist list

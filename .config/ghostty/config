@@ -13,7 +13,7 @@ window-padding-y = 2
 window-padding-balance = true
 
 command = fish
-#command = /home/paper/scripts/ghostty-tmux.sh
+#command = ~/scripts/ghostty-tmux.sh
 #command = "tmux new-session -A -s main"
 custom-shader = shaders/cursor_warp.glsl
 custom-shader = shaders/ripple_cursor.glsl
