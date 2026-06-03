@@ -11,9 +11,11 @@ if [ "$CURRENT_STATE" = "true" ]; then
     BLUR="false"
     OSD_STATUS="Off"
     OSD_COLOR="bad"
-    # Make Waybar and Rofi opaque
+    # Make Waybar, Rofi and Mako opaque
     sed -i 's/background-color: alpha(@bg0, 0.75);/background-color: @bg0;/g' ~/.config/waybar/style.css
     sed -i 's/bg0:     #1d202180;/bg0:     #1d2021;/g' ~/.config/rofi/theme.rasi
+    sed -i 's/background-color=#1d202180/background-color=#1d2021/g' ~/.config/mako/config
+    makoctl reload
 else
     NEW_STATE="true"
     OPACITY="0.85"
@@ -21,9 +23,11 @@ else
     BLUR="true"
     OSD_STATUS="On"
     OSD_COLOR="good"
-    # Make Waybar and Rofi transparent
+    # Make Waybar, Rofi and Mako transparent
     sed -i 's/background-color: @bg0;/background-color: alpha(@bg0, 0.75);/g' ~/.config/waybar/style.css
     sed -i 's/bg0:     #1d2021;/bg0:     #1d202180;/g' ~/.config/rofi/theme.rasi
+    sed -i 's/background-color=#1d2021/background-color=#1d202180/g' ~/.config/mako/config
+    makoctl reload
 fi
 
 # Apply state via hyprctl eval

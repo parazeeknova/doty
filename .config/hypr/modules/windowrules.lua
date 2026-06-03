@@ -75,7 +75,10 @@ hl.layer_rule({
     match = {
         namespace = "quickshell"
     },
-    blur = true
+    animation = "slide left",
+    dim_around = true,
+    blur = true,
+    ignore_alpha = 0.01
 })
 
 hl.layer_rule({
@@ -83,7 +86,38 @@ hl.layer_rule({
     match = {
         namespace = "waybar"
     },
-    blur = true
+    animation = "slide left",
+    blur = true,
+    ignore_alpha = 0.01
+})
+
+hl.layer_rule({
+    name = "osd-blur",
+    match = {
+        namespace = "osd"
+    },
+    animation = "slide top",
+    blur = true,
+    ignore_alpha = 0.01
+})
+
+hl.layer_rule({
+    name = "mako-blur",
+    match = {
+        namespace = "notifications"
+    },
+    blur = true,
+    animation = "slide top",
+    ignore_alpha = 0.01
+})
+
+hl.layer_rule({
+    name = "wallpaper-switcher-effects",
+    match = {
+        namespace = "wallpaper_switcher"
+    },
+    animation = "slide left",
+    dim_around = true
 })
 
 -- Workspace assignments for specific applications using exact class names (anchored regex)

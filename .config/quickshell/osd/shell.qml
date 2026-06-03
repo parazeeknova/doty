@@ -3,6 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.SystemTray
+import Quickshell.Wayland
 
 Scope {
     id: root
@@ -90,6 +91,164 @@ Scope {
 
         }
         return -1;
+    }
+
+    function getIcon(msg) {
+        var lower = msg.toLowerCase();
+        // Volume
+        if (lower.includes("volume")) {
+            if (lower.includes("mute"))
+                return "󰝟";
+
+            return "󰕾";
+        }
+        // Mic
+        if (lower.includes("mic")) {
+            if (lower.includes("mute"))
+                return "󰍭";
+
+            return "󰍬";
+        }
+        // Brightness
+        if (lower.includes("kbd brightness") || lower.includes("kbdbrightness"))
+            return "󰌶";
+
+        if (lower.includes("brightness"))
+            return "󰃠";
+
+        // Profiles / Performance modes
+        if (lower.includes("profile:")) {
+            if (lower.includes("performance"))
+                return "󰓅";
+
+            if (lower.includes("balanced"))
+                return "󰾅";
+
+            if (lower.includes("quiet") || lower.includes("power-saver") || lower.includes("power saver"))
+                return "󰾆";
+
+            return "󰓅";
+        }
+        // Battery capacity & alerts
+        if (lower.includes("battery")) {
+            if (lower.includes("low") || lower.includes("critical") || lower.includes("dying"))
+                return "󰂃";
+
+            if (lower.includes("charging"))
+                return "󰂄";
+
+            if (lower.includes("full"))
+                return "󰁹";
+
+            return "󰁹";
+        }
+        if (lower.includes("charging"))
+            return "󰂄";
+
+        // Caffeine
+        if (lower.includes("caffeine")) {
+            if (lower.includes("on"))
+                return "󰛊";
+
+            return "󰾪";
+        }
+        // Sunset
+        if (lower.includes("sunset")) {
+            if (lower.includes("off"))
+                return "󰖔";
+
+            return "󰖚";
+        }
+        // Caps Lock
+        if (lower.includes("caps"))
+            return "󰪛";
+
+        // Recording & OCR
+        if (msg.includes("Recording Started"))
+            return "󰑋";
+
+        if (msg.includes("Recording Saved") || msg.includes("Recording Stopped"))
+            return "󰻃";
+
+        if (msg.includes("Extracted") || msg.includes("OCR"))
+            return "󰙎";
+
+        // Glass
+        if (msg.includes("Glass:"))
+            return "󰖆";
+
+        // Pomodoro
+        if (lower.includes("pomodoro"))
+            return "󰔛";
+
+        return "";
+    }
+
+    function getIconColor(msg) {
+        var lower = msg.toLowerCase();
+        if (msg.includes("Recording Started"))
+            return "#ea6962";
+
+        if (msg.includes("Recording Saved") || msg.includes("Recording Stopped"))
+            return "#a9b665";
+
+        if (msg.includes("Extracted") || msg.includes("OCR"))
+            return "#e78a4e";
+
+        if (msg.includes("Glass: On"))
+            return "#a9b665";
+
+        if (msg.includes("Glass: Off"))
+            return "#ea6962";
+
+        // Caffeine
+        if (lower.includes("caffeine on"))
+            return "#a9b665";
+
+        if (lower.includes("caffeine off"))
+            return "#7c6f64";
+
+        // Sunset
+        if (lower.includes("sunset auto") || lower.includes("sunset off"))
+            return "#7c6f64";
+
+        if (lower.includes("sunset"))
+            return "#e78a4e";
+
+        // Profile
+        if (lower.includes("profile:")) {
+            if (lower.includes("performance"))
+                return "#ea6962";
+
+            if (lower.includes("balanced"))
+                return "#a9b665";
+
+            if (lower.includes("quiet") || lower.includes("power-saver") || lower.includes("power saver"))
+                return "#7caea3";
+
+        }
+        // Caps
+        if (lower.includes("caps on"))
+            return "#ea6962";
+
+        if (lower.includes("caps off"))
+            return "#7c6f64";
+
+        // Mute states
+        if (lower.includes("mute"))
+            return "#ea6962";
+
+        // Battery
+        if (lower.includes("low battery") || lower.includes("critical battery") || lower.includes("battery dying"))
+            return "#ea6962";
+
+        if (lower.includes("charging") || lower.includes("battery full"))
+            return "#a9b665";
+
+        if (lower.includes("battery"))
+            return "#e78a4e";
+
+        return "#d4be98";
     }
 
     function defaultState() {
@@ -472,8 +631,9 @@ Scope {
                 screen: modelData
                 color: "transparent"
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
+                WlrLayershell.namespace: "osd"
                 visible: root.visibleNow || exitAnim.running
-                implicitWidth: (root.getPercentage(root.message) !== -1) ? 180 : (fallbackLabel.implicitWidth + 18)
+                implicitWidth: (root.getPercentage(root.message) !== -1) ? 200 : (fallbackLabel.implicitWidth + (fallbackIcon.visible ? fallbackIcon.implicitWidth + 6 : 0) + 18)
                 implicitHeight: mainLayout.implicitHeight + 12
                 Component.onCompleted: {
                     if (root.visibleNow) {
@@ -565,6 +725,16 @@ Scope {
                             visible: root.getPercentage(root.message) !== -1 && !root.message.includes("kbd")
 
                             Text {
+                                text: root.getIcon(root.message)
+                                color: root.getIconColor(root.message)
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 10
+                                renderType: Text.NativeRendering
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: text !== ""
+                            }
+
+                            Text {
                                 text: root.getPrefix(root.message)
                                 color: "#d4be98"
                                 font.family: "FiraCode Nerd Font"
@@ -616,13 +786,29 @@ Scope {
                             anchors.horizontalCenter: parent.horizontalCenter
                             visible: root.getPercentage(root.message) !== -1 && root.message.includes("kbd")
 
-                            Text {
-                                text: root.getPrefix(root.message)
-                                color: "#d4be98"
-                                font.family: "FiraCode Nerd Font"
-                                font.pixelSize: 9
-                                renderType: Text.NativeRendering
+                            Row {
+                                spacing: 4
                                 anchors.horizontalCenter: parent.horizontalCenter
+
+                                Text {
+                                    text: root.getIcon(root.message)
+                                    color: root.getIconColor(root.message)
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 10
+                                    renderType: Text.NativeRendering
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    visible: text !== ""
+                                }
+
+                                Text {
+                                    text: root.getPrefix(root.message)
+                                    color: "#d4be98"
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 9
+                                    renderType: Text.NativeRendering
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
                             }
 
                             Row {
@@ -665,46 +851,16 @@ Scope {
 
                         }
 
-                        // Fallback label for text-only messages
                         Row {
                             spacing: 6
                             anchors.horizontalCenter: parent.horizontalCenter
                             visible: root.getPercentage(root.message) === -1
 
                             Text {
-                                text: {
-                                    if (root.message.includes("Recording Started"))
-                                        return "󰑋";
+                                id: fallbackIcon
 
-                                    if (root.message.includes("Recording Saved") || root.message.includes("Recording Stopped"))
-                                        return "󰻃";
-
-                                    if (root.message.includes("Extracted") || root.message.includes("OCR"))
-                                        return "󰙎";
-
-                                    if (root.message.includes("Glass:"))
-                                        return "󰖆";
-
-                                    return "";
-                                }
-                                color: {
-                                    if (root.message.includes("Recording Started"))
-                                        return "#ea6962";
-
-                                    if (root.message.includes("Recording Saved") || root.message.includes("Recording Stopped"))
-                                        return "#a9b665";
-
-                                    if (root.message.includes("Extracted") || root.message.includes("OCR"))
-                                        return "#e78a4e";
-
-                                    if (root.message.includes("Glass: On"))
-                                        return "#a9b665";
-
-                                    if (root.message.includes("Glass: Off"))
-                                        return "#ea6962";
-
-                                    return "#d4be98";
-                                }
+                                text: root.getIcon(root.message)
+                                color: root.getIconColor(root.message)
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 10
                                 renderType: Text.NativeRendering
@@ -713,6 +869,8 @@ Scope {
                             }
 
                             Text {
+                                id: fallbackLabel
+
                                 text: root.message
                                 color: "#d4be98"
                                 font.family: "FiraCode Nerd Font"

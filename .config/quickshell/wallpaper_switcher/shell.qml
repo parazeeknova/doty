@@ -15,9 +15,7 @@ Scope {
     property bool isReady: false
     property bool lastWallpaperLoaded: false
 
-    onWallpapersChanged: {
-        root.selectLastWallpaper();
-    }
+    signal requestClose()
 
     function setLastWallpaper(path) {
         root.lastWallpaperLoaded = true;
@@ -27,7 +25,7 @@ Scope {
 
     function selectLastWallpaper() {
         if (!root.lastWallpaperLoaded || root.wallpapers.length === 0)
-            return;
+            return ;
 
         var indexToSelect = 0;
         if (root.lastWallpaperPath !== "") {
@@ -38,12 +36,9 @@ Scope {
                 }
             }
         }
-
         root.selectedIndex = indexToSelect;
         root.isReady = true;
     }
-
-    signal requestClose()
 
     function scanWallpapers() {
         scanProc.running = false;
@@ -55,6 +50,9 @@ Scope {
         applyTimer.restart();
     }
 
+    onWallpapersChanged: {
+        root.selectLastWallpaper();
+    }
     Component.onCompleted: {
         loadLastWallpaperProc.running = true;
         scanWallpapers();
@@ -83,6 +81,7 @@ Scope {
                 root.setLastWallpaper(this.text.trim());
             }
         }
+
     }
 
     // Scan wallpapers using the rust helper watcher in print mode for maximum speed.
@@ -101,12 +100,17 @@ Scope {
                     if (line.length > 0) {
                         var parts = line.split("\t");
                         if (parts.length >= 2)
-                            list.push({ "path": parts[0], "thumb": parts[1] });
+                            list.push({
+                            "path": parts[0],
+                            "thumb": parts[1]
+                        });
+
                     }
                 }
                 root.wallpapers = list;
             }
         }
+
     }
 
     // Debounce wallpaper application so process spawning does not fight scroll animation.
@@ -140,25 +144,15 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return;
+                        return ;
 
                     isClosing = true;
                     exitAnim.start();
                 }
 
-                screen: modelData
-                color: "transparent"
-                exclusionMode: PanelWindow.ExclusionMode.Ignore
-                focusable: true
-                WlrLayershell.namespace: "wallpaper_switcher"
-                WlrLayershell.layer: WlrLayer.Overlay
-                WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
-                implicitWidth: 280
-                implicitHeight: 650
-
                 function initializeAndStart() {
                     if (hasInitialized)
-                        return;
+                        return ;
 
                     hasInitialized = true;
                     restoreTimer.start();
@@ -167,7 +161,7 @@ Scope {
 
                 function restoreSelection() {
                     if (root.selectedIndex < 0 || root.selectedIndex >= root.wallpapers.length)
-                        return;
+                        return ;
 
                     listView.suppressApply = true;
                     listView.currentIndex = root.selectedIndex;
@@ -176,22 +170,33 @@ Scope {
                     listView.isInitialized = true;
                 }
 
+                screen: modelData
+                color: "transparent"
+                exclusionMode: PanelWindow.ExclusionMode.Ignore
+                focusable: true
+                WlrLayershell.namespace: "wallpaper_switcher"
+                WlrLayershell.layer: WlrLayer.Overlay
+                WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+                implicitWidth: 280
+                implicitHeight: 650
+                Component.onCompleted: {
+                    if (root.isReady)
+                        win.initializeAndStart();
+
+                }
+
                 Connections {
-                    target: root
                     function onRequestClose() {
                         win.closePopup();
                     }
-                    function onIsReadyChanged() {
-                        if (root.isReady) {
-                            win.initializeAndStart();
-                        }
-                    }
-                }
 
-                Component.onCompleted: {
-                    if (root.isReady) {
-                        win.initializeAndStart();
+                    function onIsReadyChanged() {
+                        if (root.isReady)
+                            win.initializeAndStart();
+
                     }
+
+                    target: root
                 }
 
                 Timer {
@@ -205,10 +210,9 @@ Scope {
 
                 anchors {
                     left: true
-                }
-
-                margins {
-                    left: win.animLeftMargin
+                    right: true
+                    top: true
+                    bottom: true
                 }
 
                 // Slide-in + fade-in from the left (matching notification popup)
@@ -232,6 +236,7 @@ Scope {
                         duration: 140
                         easing.type: Easing.OutCubic
                     }
+
                 }
 
                 // Slide-out + fade-out to the left
@@ -257,6 +262,7 @@ Scope {
                         duration: 110
                         easing.type: Easing.InCubic
                     }
+
                 }
 
                 HyprlandFocusGrab {
@@ -267,11 +273,18 @@ Scope {
                     }
                 }
 
-                Item {
+                MouseArea {
                     anchors.fill: parent
+                    onClicked: win.closePopup()
+                }
+
+                Item {
+                    width: 280
+                    height: 650
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: win.animLeftMargin
                     opacity: win.animOpacity
                     focus: true
-
                     Keys.onPressed: (event) => {
                         if (event.key === Qt.Key_Up) {
                             listView.decrementCurrentIndex();
@@ -284,13 +297,13 @@ Scope {
                             event.accepted = true;
                         }
                     }
-
                     Component.onCompleted: {
                         forceActiveFocus();
                     }
 
                     Column {
                         id: mainLayout
+
                         anchors.fill: parent
                         anchors.margins: 4
                         spacing: 0
@@ -298,15 +311,15 @@ Scope {
                         // Vertical curved coverflow stack
                         ListView {
                             id: listView
+
+                            property bool isInitialized: false
+                            property bool suppressApply: false
+
                             width: parent.width
                             height: parent.height - y - 10
                             clip: true
                             model: root.wallpapers
                             focus: false
-
-                            property bool isInitialized: false
-                            property bool suppressApply: false
-
                             // Keep the active selection centered
                             highlight: null
                             highlightRangeMode: ListView.StrictlyEnforceRange
@@ -317,46 +330,48 @@ Scope {
                             highlightResizeDuration: 220
                             snapMode: ListView.SnapToItem
                             keyNavigationEnabled: false
-                            header: Item {
-                                width: listView.width
-                                height: Math.max(0, listView.height / 2 - 68)
-                            }
-                            footer: Item {
-                                width: listView.width
-                                height: Math.max(0, listView.height / 2 - 68)
-                            }
-
                             onCurrentIndexChanged: {
-                                if (!isInitialized) return;
-                                if (suppressApply) return;
-                                if (root.selectedIndex === -2) return;
+                                if (!isInitialized)
+                                    return ;
+
+                                if (suppressApply)
+                                    return ;
+
+                                if (root.selectedIndex === -2)
+                                    return ;
+
                                 if (currentIndex >= 0 && currentIndex < root.wallpapers.length) {
                                     root.selectedIndex = currentIndex;
                                     root.applyWallpaper(root.wallpapers[currentIndex].path);
                                 }
                             }
 
+                            header: Item {
+                                width: listView.width
+                                height: Math.max(0, listView.height / 2 - 40)
+                            }
+
+                            footer: Item {
+                                width: listView.width
+                                height: Math.max(0, listView.height / 2 - 40)
+                            }
+
                             delegate: Item {
                                 id: delegateItem
-                                width: listView.width
-                                height: 136
 
                                 property string wallpaperPath: modelData.path
                                 property string thumbnailPath: modelData.thumb
                                 property real distance: Math.abs(index - listView.currentIndex)
-
                                 // Dynamic scale, opacity, and curved horizontal offset
-                                property real targetScale: Math.max(0.65, 1.0 - distance * 0.15)
-                                property real targetOpacity: Math.max(0.15, 1.0 - distance * 0.35)
+                                property real targetScale: Math.max(0.65, 1 - distance * 0.15)
+                                property real targetOpacity: Math.max(0.15, 1 - distance * 0.35)
                                 property real targetXOffset: -(distance * distance * 14)
 
+                                width: listView.width
+                                height: 136
                                 scale: targetScale
                                 opacity: targetOpacity
                                 x: targetXOffset
-
-                                Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
-                                Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
-                                Behavior on x { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
 
                                 Rectangle {
                                     width: 220
@@ -376,6 +391,32 @@ Scope {
                                         cache: true
                                         smooth: true
                                     }
+
+                                    // Wallpaper Name Overlay at the bottom
+                                    Rectangle {
+                                        width: parent.width
+                                        height: 18
+                                        anchors.bottom: parent.bottom
+                                        color: "#c01d2021" // dark overlay
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: {
+                                                var parts = delegateItem.wallpaperPath.split("/");
+                                                var filename = parts[parts.length - 1];
+                                                return filename.replace(/\.[^/.]+$/, "");
+                                            }
+                                            color: "#ebdbb2"
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                            elide: Text.ElideRight
+                                            width: parent.width - 12
+                                            horizontalAlignment: Text.AlignHCenter
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                    }
+
                                 }
 
                                 MouseArea {
@@ -385,11 +426,43 @@ Scope {
                                         listView.currentIndex = index;
                                     }
                                 }
+
+                                Behavior on scale {
+                                    NumberAnimation {
+                                        duration: 150
+                                        easing.type: Easing.OutCubic
+                                    }
+
+                                }
+
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: 150
+                                        easing.type: Easing.OutCubic
+                                    }
+
+                                }
+
+                                Behavior on x {
+                                    NumberAnimation {
+                                        duration: 150
+                                        easing.type: Easing.OutCubic
+                                    }
+
+                                }
+
                             }
+
                         }
+
                     }
+
                 }
+
             }
+
         }
+
     }
+
 }

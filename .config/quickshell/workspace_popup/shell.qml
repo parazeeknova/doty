@@ -35,11 +35,11 @@ Scope {
     // Concise, Single Color Theme (Gruvbox Material Dark / fg: #d5c4a1)
     readonly property color colorBgDark: "#801d2021"
     // 80% opacity dark bg
-    readonly property color colorBgCell: "#282828"
+    readonly property color colorBgCell: "#80282828"
     // Filled workspace cell bg
-    readonly property color colorBgCellActive: "#504945"
+    readonly property color colorBgCellActive: "#b0504945"
     // Filled active workspace cell bg
-    readonly property color colorBgCellHover: "#665c54"
+    readonly property color colorBgCellHover: "#d0665c54"
     // Filled hovered/drop cell bg
     readonly property color colorTheme: "#d5c4a1"
     // The single primary color (fg/borders)
@@ -55,6 +55,14 @@ Scope {
         getMonitors.running = true;
         getActiveWorkspace.running = true;
         getActiveWindow.running = true;
+    }
+
+    function toRoman(num) {
+        var lookup = {
+            1: "i", 2: "ii", 3: "iii", 4: "iv", 5: "v",
+            6: "vi", 7: "vii", 8: "viii", 9: "ix", 10: "x"
+        };
+        return lookup[num] || String(num);
     }
 
     function normalizeAddress(address) {
@@ -372,8 +380,8 @@ Scope {
                 focusable: true
                 color: "transparent"
                 // Dynamic dimensions based on layout contents
-                implicitWidth: 412
-                implicitHeight: Math.max(mainColumn.implicitHeight + 24, 0)
+                implicitWidth: 240
+                implicitHeight: Math.max(mainColumn.implicitHeight + 18, 0)
                 Component.onCompleted: introAnim.start()
 
                 Connections {
@@ -391,7 +399,7 @@ Scope {
                 }
 
                 margins {
-                    top: 4
+                    top: 0
                     left: win.animOffsetX
                 }
 
@@ -403,7 +411,7 @@ Scope {
                         target: win
                         property: "animOffsetX"
                         from: -550
-                        to: 32
+                        to: 19
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
@@ -428,7 +436,7 @@ Scope {
                     NumberAnimation {
                         target: win
                         property: "animOffsetX"
-                        from: 32
+                        from: 19
                         to: -550
                         duration: 120
                         easing.type: Easing.OutCubic
@@ -458,8 +466,8 @@ Scope {
 
                     anchors.fill: parent
                     opacity: win.animOpacity
-                    color: theme.popupBgColor
-                    border.width: 1
+                    color: "transparent"
+                    border.width: 0
                     border.color: root.colorTheme
                     radius: 0 // Sharp corners
                     // Listen to Escape key to close
@@ -475,7 +483,7 @@ Scope {
                         id: mainColumn
 
                         x: 12
-                        y: 12
+                        y: 6
                         width: parent.width - 24
                         spacing: 0
 
@@ -484,10 +492,10 @@ Scope {
                             id: wsGrid
 
                             width: parent.width
-                            columns: 2
-                            rows: Math.ceil(root.visibleWorkspaceIds.length / 2)
+                            columns: 1
+                            rows: root.visibleWorkspaceIds.length
                             rowSpacing: 8 // Concise spacing
-                            columnSpacing: 8
+                            columnSpacing: 0
 
                             Repeater {
                                 id: wsGridRepeater
@@ -499,22 +507,41 @@ Scope {
 
                                     readonly property int wsId: root.visibleWorkspaceIds[index]
 
-                                    implicitWidth: 190
-                                    implicitHeight: 107
+                                    implicitWidth: 216
+                                    implicitHeight: 122
                                     color: root.hoveredWorkspaceId === wsId ? root.colorBgCellHover : root.activeWorkspaceId === wsId ? root.colorBgCellActive : root.colorBgCell
                                     radius: 0 // Sharp corners
                                     border.width: 0
                                     scale: root.hoveredWorkspaceId === wsId ? 1.03 : 1
 
-                                    // Workspace index indicator centered in the middle
-                                    Text {
-                                        text: String(wsCell.wsId)
-                                        font.pixelSize: 16
-                                        font.bold: true
-                                        font.family: root.fontName
-                                        color: root.colorTheme
-                                        opacity: 0.7
-                                        anchors.centerIn: parent
+                                    // Top-right vertical badge outside the cell
+                                    Rectangle {
+                                        id: wsBadge
+                                        width: Math.max(16, badgeText.implicitWidth + 6)
+                                        height: 18
+                                        color: root.activeWorkspaceId === wsId ? root.colorTheme : "#282828"
+                                        border.width: 1
+                                        border.color: root.colorTheme
+                                        radius: 0
+                                        z: 10
+
+                                        anchors {
+                                            top: parent.top
+                                            right: parent.right
+                                            topMargin: -6
+                                            rightMargin: -6
+                                        }
+
+                                        Text {
+                                            id: badgeText
+                                            anchors.centerIn: parent
+                                            text: root.toRoman(wsCell.wsId)
+                                            font.pixelSize: 9
+                                            font.bold: true
+                                            font.family: root.fontName
+                                            color: root.activeWorkspaceId === wsId ? "#1d2021" : root.colorTheme
+                                            renderType: Text.NativeRendering
+                                        }
                                     }
 
                                     // Interactive Click to Switch Workspace

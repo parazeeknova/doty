@@ -329,7 +329,63 @@ Scope {
                                 renderType: Text.NativeRendering
                             }
 
+                            Row {
+                                anchors.right: refreshLbl.left
+                                anchors.rightMargin: 12
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 8
+
+                                Text {
+                                    text: " create vmw"
+                                    color: "#7caea3"
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                    renderType: Text.NativeRendering
+                                    opacity: vmwMa.containsMouse ? 1 : 0.7
+
+                                    MouseArea {
+                                        id: vmwMa
+
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            Quickshell.execDetached(["vmware"]);
+                                            Quickshell.execDetached(["hyprctl", "dispatch", "workspace", "10"]);
+                                            win.closePopup();
+                                        }
+                                    }
+
+                                }
+
+                                Text {
+                                    text: " create qemu"
+                                    color: "#e78a4e"
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                    renderType: Text.NativeRendering
+                                    opacity: qemuMa.containsMouse ? 1 : 0.7
+
+                                    MouseArea {
+                                        id: qemuMa
+
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            Quickshell.execDetached(["virt-manager"]);
+                                            Quickshell.execDetached(["hyprctl", "dispatch", "workspace", "9"]);
+                                            win.closePopup();
+                                        }
+                                    }
+
+                                }
+
+                            }
+
                             Text {
+                                id: refreshLbl
+
                                 anchors.right: parent.right
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: "refresh"
@@ -581,7 +637,7 @@ Scope {
                                             visible: modelData.shared_folders && modelData.shared_folders.length > 0
 
                                             Text {
-                                                text: "  shared: " + modelData.shared_folders.map(function(f) {
+                                                text: " : " + modelData.shared_folders.map(function(f) {
                                                     return f.guest_name + " ➜ " + f.host_path;
                                                 }).join(", ")
                                                 color: "#a89984"
@@ -619,7 +675,7 @@ Scope {
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
-                                                    opacity: actionMa.containsMouse ? 1.0 : 0.7
+                                                    opacity: actionMa.containsMouse ? 1 : 0.7
 
                                                     MouseArea {
                                                         id: actionMa
@@ -635,6 +691,7 @@ Scope {
                                                                 root.startVm(modelData.vmx);
                                                         }
                                                     }
+
                                                 }
 
                                                 Text {
@@ -645,7 +702,7 @@ Scope {
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
-                                                    opacity: openMa.containsMouse ? 1.0 : 0.7
+                                                    opacity: openMa.containsMouse ? 1 : 0.7
 
                                                     MouseArea {
                                                         id: openMa
@@ -655,6 +712,7 @@ Scope {
                                                         cursorShape: Qt.PointingHandCursor
                                                         onClicked: root.openVmGui(modelData.vmx)
                                                     }
+
                                                 }
 
                                                 Text {
@@ -665,7 +723,7 @@ Scope {
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
-                                                    opacity: deleteMa.containsMouse ? 1.0 : 0.7
+                                                    opacity: deleteMa.containsMouse ? 1 : 0.7
 
                                                     MouseArea {
                                                         id: deleteMa
@@ -676,7 +734,9 @@ Scope {
                                                         cursorShape: Qt.PointingHandCursor
                                                         onClicked: root.deleteVm(modelData.vmx)
                                                     }
+
                                                 }
+
                                             }
 
                                         }
@@ -726,6 +786,9 @@ Scope {
                                 property bool isPending: root.pendingActions[pendingKey] === true
                                 property int localTick: 0
 
+                                width: parent.width
+                                height: Math.max(qemuThumbBox.height, qemuInfoColumn.implicitHeight) + 4
+
                                 // Local capture timer: only runs when this specific VM is active
                                 Timer {
                                     interval: 10000
@@ -746,9 +809,6 @@ Scope {
                                     running: false
                                     onTriggered: qemuRow.localTick++
                                 }
-
-                                width: parent.width
-                                height: Math.max(qemuThumbBox.height, qemuInfoColumn.implicitHeight) + 4
 
                                 Row {
                                     anchors.fill: parent
@@ -781,6 +841,7 @@ Scope {
                                             onStatusChanged: {
                                                 if (status === Image.Ready)
                                                     hasLoaded = true;
+
                                             }
                                         }
 
@@ -812,6 +873,7 @@ Scope {
                                                 font.pixelSize: 12
                                                 renderType: Text.NativeRendering
                                             }
+
                                         }
 
                                         // Click opens VM GUI
@@ -820,11 +882,13 @@ Scope {
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: root.openQemuVmGui(modelData.name)
                                         }
+
                                     }
 
                                     // Right-side info
                                     Column {
                                         id: qemuInfoColumn
+
                                         width: parent.width - qemuThumbBox.width - 10
                                         anchors.verticalCenter: parent.verticalCenter
                                         spacing: 2
@@ -863,6 +927,7 @@ Scope {
                                                 font.pixelSize: 7
                                                 renderType: Text.NativeRendering
                                             }
+
                                         }
 
                                         // Resources row
@@ -879,6 +944,7 @@ Scope {
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
                                             }
+
                                         }
 
                                         // Connection URI row
@@ -892,6 +958,7 @@ Scope {
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
                                             }
+
                                         }
 
                                         // Action buttons
@@ -921,7 +988,7 @@ Scope {
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
-                                                    opacity: qemuActionMa.containsMouse ? 1.0 : 0.7
+                                                    opacity: qemuActionMa.containsMouse ? 1 : 0.7
 
                                                     MouseArea {
                                                         id: qemuActionMa
@@ -937,6 +1004,7 @@ Scope {
                                                                 root.startQemuVm(modelData.name);
                                                         }
                                                     }
+
                                                 }
 
                                                 Text {
@@ -947,7 +1015,7 @@ Scope {
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
-                                                    opacity: qemuOpenMa.containsMouse ? 1.0 : 0.7
+                                                    opacity: qemuOpenMa.containsMouse ? 1 : 0.7
 
                                                     MouseArea {
                                                         id: qemuOpenMa
@@ -957,6 +1025,7 @@ Scope {
                                                         cursorShape: Qt.PointingHandCursor
                                                         onClicked: root.openQemuVmGui(modelData.name)
                                                     }
+
                                                 }
 
                                                 Text {
@@ -967,7 +1036,7 @@ Scope {
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
-                                                    opacity: qemuDeleteMa.containsMouse ? 1.0 : 0.7
+                                                    opacity: qemuDeleteMa.containsMouse ? 1 : 0.7
 
                                                     MouseArea {
                                                         id: qemuDeleteMa
@@ -978,16 +1047,29 @@ Scope {
                                                         cursorShape: Qt.PointingHandCursor
                                                         onClicked: root.deleteQemuVm(modelData.name)
                                                     }
+
                                                 }
+
                                             }
+
                                         }
+
                                     }
+
                                 }
+
                             }
+
                         }
+
                     }
+
                 }
+
             }
+
         }
+
     }
+
 }

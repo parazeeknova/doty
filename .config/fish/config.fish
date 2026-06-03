@@ -11,7 +11,7 @@ end
 set -gx LANG en_US.UTF-8
 set -gx LC_ALL en_US.UTF-8
 set -gx GPG_TTY (tty)
-set -gx SSH_ASKPASS /usr/bin/ksshaskpass
+set -gx SSH_ASKPASS /usr/lib/seahorse/ssh-askpass
 set -gx SSH_AUTH_SOCK "$XDG_RUNTIME_DIR/ssh-agent.socket"
 
 
