@@ -11,6 +11,8 @@ hl.on("hyprland.start", function()
         "sh -lc 'if command -v quickshell >/dev/null 2>&1; then quickshell --config osd; elif command -v qs >/dev/null 2>&1; then qs --config osd; fi'")
     hl.exec_cmd(
         "sh -lc 'if command -v quickshell >/dev/null 2>&1; then quickshell --config github_graph; elif command -v qs >/dev/null 2>&1; then qs --config github_graph; fi'")
+    hl.exec_cmd(
+        "sh -lc 'if command -v quickshell >/dev/null 2>&1; then quickshell --config workspace_overview; elif command -v qs >/dev/null 2>&1; then qs --config workspace_overview; fi'")
     hl.exec_cmd("waybar")
     hl.exec_cmd("awww-daemon")
     hl.exec_cmd(
