@@ -60,6 +60,16 @@ hl.window_rule({
 })
 
 hl.window_rule({
+    name = "thunar-rename-floating",
+    match = {
+        class = "^thunar$",
+        title = "^Rename.*$"
+    },
+    float = true,
+    center = true
+})
+
+hl.window_rule({
     name = "ghostty-floating",
     match = {
         class = "ghostty.floating",
@@ -76,7 +86,6 @@ hl.layer_rule({
         namespace = "quickshell"
     },
     animation = "slide left",
-    dim_around = true,
     blur = true,
     ignore_alpha = 0.01
 })

@@ -280,9 +280,15 @@ fn parse_activity(json_str: &str) -> Vec<ActivityItem> {
         aggregated.push(item);
     }
 
-    // Format final aggregated times (join all times)
+    // Format final aggregated times (join all times, truncating at 8)
     for item in &mut aggregated {
-        item.time = item.times.join(", ");
+        if item.times.len() > 8 {
+            let truncated = &item.times[..8];
+            let remaining = item.times.len() - 8;
+            item.time = format!("{}, +{} more", truncated.join(", "), remaining);
+        } else {
+            item.time = item.times.join(", ");
+        }
     }
 
     aggregated

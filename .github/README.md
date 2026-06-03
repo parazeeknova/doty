@@ -1,39 +1,50 @@
 <div align="center">
 
-  <a href="https://github.com/parazeeknova/doty">
-    <img src="assets/doty.png" alt="doty-banner" width="80%">
-  </a>
+  <h3>stowed in ~ painted in gruvbox</h3>
   <br>
-  <h3>a place to "stow" my dotfiles hence "doty" ~ tada</h3>
+  <a href="https://github.com/parazeeknova/doty">
+    <img src="assets/1.png" alt="homescreen" width="99%">
+  </a>
+
 </div>
+
+### doty
+dotfiles, quickshell widgets, rust daemons, and configs for my daily setup.  
+stow-based. arch-first but mostly distro-agnostic.
+
+#### what's inside
+
+- **quickshell** - widgets (dashboard, popups, bla bla)
+- **rust daemons** - background services wired to the widgets  
+- **configs** - shell, editor, wm, and misc dotfiles
 
 <div align="center">
 
-###### *<div align="right"><sub>// KDE Gruvbox Rice</sub></div>*
+###### *<div align="center"><sub>Gruvbox Rice</sub></div>*
   <a href="https://github.com/parazeeknova/doty">
-    <img src="assets/KDE.png" alt="rice" width="90%">
+    <img src="assets/rice.png" alt="rice" width="99%">
   </a>
 
   <br>
 
-###### *<div align="right"><sub>// Windholes 10 VM</sub></div>*
+###### *<div align="center"><sub>Quickshell Utilities</sub></div>*
   <a href="https://github.com/parazeeknova/doty">
-    <img src="assets/windows-vm.png" alt="windows-vm" width="90%">
+    <img src="assets/quickshell.png" alt="quickshell" width="99%">
   </a>
 </div>
 
 ### What the hek is this ?
-Contains various dotfiles and configurations for setting up a development environment quickly for web + rust.
+personal dotfiles. quickshell widgets, rust daemons, and configs i use daily.
+nothing novel, just the way i like things..
 
 ### Would it work on my system ?
-I use Arch btw, but it should work on most Linux distributions with the necessary packages installed, i'll try to keep it as distro-agnostic as possible but few may not work like package managers and such.
+I use it daily on cachyos (i use arch btw). should work on any systemd-based distro with the right packages. package manager integrations are arch-only, everything else  
+is portable.
 
 ### How to use ?
-Just clone the repo in your home directory & use stow to symlink the files to their respective locations.
+Just clone the repo in your home directory & use stow to symlink the files to their respective locations, then pray.
 
-### Ahh, I'll leave this here then
-- [dotfiles](https://github.com/parazeeknova/dotfiles) - My old dotfiles for i3wm, minimal and lightweight
-- [hypr](https://github.com/parazeeknova/hypr) - Little module for modeset & powerprofile for waybar
-- [pistachio-v1](https://github.com/parazeeknova/pistachio-dotfiles) - Openbox dotfiles, uploaded on r/unixporn
-- [pistachio-v2](https://github.com/parazeeknova/pistachio-V2-dotfiles) - Better pista dotfiles, uploaded on r/unixporn
-- [bitwise-blur](https://github.com/parazeeknova/bitwise-blur-waves-dotfiles) - My first dotfiles, uses everforest colorscheme + green ocean
+## notes
+- some modules have hard dependencies, check the relevant config before enabling
+- no install script, no hand-holding, stow and sort it yourself
+- issues and PRs welcome if something's broken or you have suggestions

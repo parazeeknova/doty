@@ -74,7 +74,7 @@ Scope {
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
                 focusable: false
                 // Set window dimensions
-                implicitWidth: layout.implicitWidth + 24
+                implicitWidth: 731
                 implicitHeight: layout.implicitHeight + 20
                 // Layer settings for desktop widget
                 WlrLayershell.namespace: "github-graph"
@@ -91,7 +91,14 @@ Scope {
                     ColumnLayout {
                         id: layout
 
-                        anchors.centerIn: parent
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            top: parent.top
+                            leftMargin: 12
+                            rightMargin: 12
+                            topMargin: 10
+                        }
                         spacing: 10
 
                         // Header Row
@@ -393,6 +400,8 @@ Scope {
                                         font.pixelSize: 8
                                         renderType: Text.NativeRendering
                                         horizontalAlignment: Text.AlignRight
+                                        elide: Text.ElideRight
+                                        Layout.maximumWidth: 260
                                     }
 
                                 }
