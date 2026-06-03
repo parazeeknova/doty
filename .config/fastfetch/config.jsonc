@@ -11,7 +11,7 @@
   "modules": [
     {
       "type": "command",
-      "key": "  ",
+      "key": "  ",
       "keyColor": "blue",
       "text": "splash=$(hyprctl splash);echo $splash"
     },
@@ -54,7 +54,7 @@
     },
     {
       "type": "wm",
-      "key": "  󱗃 WM",
+      "key": "   WM",
       "format": "{2}",
       "keyColor": "yellow"
     },
@@ -92,7 +92,7 @@
     },
     {
       "type": "memory",
-      "key": "   Memory ",
+      "key": "   Memory ",
       "keyColor": "magenta"
     },
     {
