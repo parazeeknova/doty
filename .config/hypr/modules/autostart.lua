@@ -9,6 +9,8 @@ hl.on("hyprland.start", function()
     -- System Startups
     hl.exec_cmd(
         "sh -lc 'if command -v quickshell >/dev/null 2>&1; then quickshell --config osd; elif command -v qs >/dev/null 2>&1; then qs --config osd; fi'")
+    hl.exec_cmd(
+        "sh -lc 'if command -v quickshell >/dev/null 2>&1; then quickshell --config github_graph; elif command -v qs >/dev/null 2>&1; then qs --config github_graph; fi'")
     hl.exec_cmd("waybar")
     hl.exec_cmd("awww-daemon")
     hl.exec_cmd(
@@ -19,5 +21,6 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("wl-paste --type image --watch cliphist store")
     hl.exec_cmd("~/.config/quickshell/wallpaper_switcher/wallpaper_thumb_watcher")
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
-    hl.exec_cmd("systemctl --user start ssh-agent.service && sh -c 'sleep 3 && env SSH_ASKPASS=/usr/lib/seahorse/ssh-askpass ssh-add ~/.ssh/id_ed25519 < /dev/null'")
+    hl.exec_cmd(
+        "systemctl --user start ssh-agent.service && sh -c 'sleep 3 && env SSH_ASKPASS=/usr/lib/seahorse/ssh-askpass ssh-add ~/.ssh/id_ed25519 < /dev/null'")
 end)

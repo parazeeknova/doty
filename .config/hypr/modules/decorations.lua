@@ -155,6 +155,12 @@ hl.animation({
     bezier = "emphasizedDecel"
 })
 hl.animation({
+    leaf = "fade",
+    enabled = true,
+    speed = 3.5,
+    bezier = "emphasizedDecel"
+})
+hl.animation({
     leaf = "windowsMove",
     enabled = true,
     speed = 3,

@@ -82,6 +82,15 @@ hl.layer_rule({
 })
 
 hl.layer_rule({
+    name = "github-graph-blur",
+    match = {
+        namespace = "github-graph"
+    },
+    blur = true,
+    ignore_alpha = 0.01
+})
+
+hl.layer_rule({
     name = "waybar-blur",
     match = {
         namespace = "waybar"
