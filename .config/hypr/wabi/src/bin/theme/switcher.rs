@@ -101,6 +101,31 @@ fn get_everforest_palette() -> HashMap<String, String> {
     p
 }
 
+fn hex_to_rgb_tuple(hex: &str) -> Option<(u8, u8, u8)> {
+    let h = hex.trim_start_matches('#');
+    if h.len() == 6 {
+        let r = u8::from_str_radix(&h[0..2], 16).ok()?;
+        let g = u8::from_str_radix(&h[2..4], 16).ok()?;
+        let b = u8::from_str_radix(&h[4..6], 16).ok()?;
+        Some((r, g, b))
+    } else {
+        None
+    }
+}
+
+fn rgb_to_hex_string(r: u8, g: u8, b: u8) -> String {
+    format!("#{:02x}{:02x}{:02x}", r, g, b)
+}
+
+fn interpolate_color(c1: &str, c2: &str, factor: f64) -> String {
+    let rgb1 = hex_to_rgb_tuple(c1).unwrap_or((0, 0, 0));
+    let rgb2 = hex_to_rgb_tuple(c2).unwrap_or((255, 255, 255));
+    let r = ((rgb1.0 as f64) * (1.0 - factor) + (rgb2.0 as f64) * factor).round() as u8;
+    let g = ((rgb1.1 as f64) * (1.0 - factor) + (rgb2.1 as f64) * factor).round() as u8;
+    let b = ((rgb1.2 as f64) * (1.0 - factor) + (rgb2.2 as f64) * factor).round() as u8;
+    rgb_to_hex_string(r, g, b)
+}
+
 fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     let mut vars = HashMap::new();
 
@@ -173,15 +198,41 @@ fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
         }
     };
 
-    vars.insert("bg_rgb".to_string(), hex_to_rgb(&bg));
-    vars.insert("bg_dark_rgb".to_string(), hex_to_rgb(&bg_dark));
-    vars.insert("bg_light_rgb".to_string(), hex_to_rgb(&bg_light));
-    vars.insert("fg_rgb".to_string(), hex_to_rgb(&fg));
-    vars.insert("fg_light_rgb".to_string(), hex_to_rgb(&fg_light));
-    vars.insert("accent_rgb".to_string(), hex_to_rgb(&accent));
-    vars.insert("secondary_rgb".to_string(), hex_to_rgb(&secondary));
-    vars.insert("error_rgb".to_string(), hex_to_rgb(&error));
+    let bg_rgb = hex_to_rgb(&bg);
+    let bg_dark_rgb = hex_to_rgb(&bg_dark);
+    let bg_light_rgb = hex_to_rgb(&bg_light);
+    let fg_rgb = hex_to_rgb(&fg);
+    let fg_light_rgb = hex_to_rgb(&fg_light);
+    let accent_rgb = hex_to_rgb(&accent);
+    let secondary_rgb = hex_to_rgb(&secondary);
+    let error_rgb = hex_to_rgb(&error);
+
+    vars.insert("bg_rgb".to_string(), bg_rgb.clone());
+    vars.insert("bg_dark_rgb".to_string(), bg_dark_rgb.clone());
+    vars.insert("bg_light_rgb".to_string(), bg_light_rgb.clone());
+    vars.insert("fg_rgb".to_string(), fg_rgb.clone());
+    vars.insert("fg_light_rgb".to_string(), fg_light_rgb.clone());
+    vars.insert("accent_rgb".to_string(), accent_rgb.clone());
+    vars.insert("secondary_rgb".to_string(), secondary_rgb.clone());
+    vars.insert("error_rgb".to_string(), error_rgb.clone());
+
+    vars.insert("bg_rgb_semicolon".to_string(), bg_rgb.replace(",", ";"));
+    vars.insert("bg_dark_rgb_semicolon".to_string(), bg_dark_rgb.replace(",", ";"));
+    vars.insert("bg_light_rgb_semicolon".to_string(), bg_light_rgb.replace(",", ";"));
+    vars.insert("fg_rgb_semicolon".to_string(), fg_rgb.replace(",", ";"));
+    vars.insert("fg_light_rgb_semicolon".to_string(), fg_light_rgb.replace(",", ";"));
+    vars.insert("accent_rgb_semicolon".to_string(), accent_rgb.replace(",", ";"));
+    vars.insert("secondary_rgb_semicolon".to_string(), secondary_rgb.replace(",", ";"));
+    vars.insert("error_rgb_semicolon".to_string(), error_rgb.replace(",", ";"));
+
     vars.insert("home".to_string(), home_dir().to_string_lossy().to_string());
+
+    // Interpolate 8 colors from accent to tertiary for cava
+    for i in 0..8 {
+        let factor = i as f64 / 7.0;
+        let color = interpolate_color(&accent, &tertiary, factor);
+        vars.insert(format!("cava_color_{}", i + 1), color);
+    }
 
     vars
 }
@@ -443,6 +494,26 @@ fn main() {
             ".config/color-schemes/Kvantum.colors.template",
             ".local/share/color-schemes/Kvantum.colors",
         ),
+        (
+            ".config/starship.toml.template",
+            ".config/starship.toml",
+        ),
+        (
+            ".config/tmux/tmux.conf.template",
+            ".config/tmux/tmux.conf",
+        ),
+        (
+            ".config/fastfetch/config.jsonc.template",
+            ".config/fastfetch/config.jsonc",
+        ),
+        (
+            ".config/cava/config.template",
+            ".config/cava/config",
+        ),
+        (
+            ".config/satty/config.toml.template",
+            ".config/satty/config.toml",
+        ),
     ];
 
     for (tmpl, dest) in mappings {
@@ -499,6 +570,7 @@ fn main() {
     let _ = Command::new("killall").arg("-USR2").arg("waybar").status();
     let _ = Command::new("makoctl").arg("reload").status();
     let _ = Command::new("thunar").arg("-q").status();
+    let _ = Command::new("killall").arg("-USR2").arg("cava").status();
 
     // Write colors.json to cache folder for dynamic color switching in QuickShell
     let colors_json_dest = cache_colors_dir.join("colors.json");

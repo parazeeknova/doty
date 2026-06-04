@@ -1,1 +1,17 @@
 @import url("colors.css");
+
+paned.horizontal > separator,
+paned.vertical > separator,
+paned > separator {
+  min-width: 1px !important;
+  min-height: 1px !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background-image: none !important;
+  background-color: @border_color !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}

@@ -249,7 +249,7 @@ Scope {
                 Rectangle {
                     anchors.fill: parent
                     opacity: win.animOpacity
-                    color: "#f01d2021" // Solid/semi-transparent Gruvbox dark background
+                    color: theme.popupBgColor // Matching background color of other popups
                     border.width: 1
                     border.color: theme.accent
                     radius: 0

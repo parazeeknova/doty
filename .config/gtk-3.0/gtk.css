@@ -1,0 +1,14 @@
+paned.horizontal > separator,
+paned.vertical > separator,
+paned > separator,
+.sidebar + separator {
+  min-width: 1px;
+  min-height: 1px;
+  margin: 0;
+  padding: 0;
+  background: @border_color;
+  border-style: none;
+  outline-style: none;
+  box-shadow: none;
+  -gtk-icon-source: none;
+}

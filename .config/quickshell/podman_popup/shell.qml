@@ -185,7 +185,7 @@ Scope {
                 Rectangle {
                     anchors.fill: parent
                     opacity: win.animOpacity
-                    color: theme.podmanBgColor // Sleek dark semi-transparent bg matching clipboard
+                    color: theme.popupBgColor // Matching background color of other popups
                     border.width: 1
                     border.color: theme.accent
                     radius: 0

@@ -28,12 +28,6 @@ Scope {
         id: theme
     }
 
-    QuickshellWindow {
-        id: window
-        width: 320
-        height: 500
-        target: "bluetooth_popup"
-    }
 
     IpcHandler {
         function close() {
