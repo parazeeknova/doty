@@ -1,0 +1,494 @@
+" Name:         wabi
+" Description:  wabi colorscheme template
+" Author:       wabi
+" License:      Same as Vim
+" Last Change:  June 2026
+
+if exists('g:loaded_matugen') | finish | endif
+let g:loaded_matugen = 1
+
+
+" Detect background based on terminal colors
+if $BACKGROUND =~# 'light'
+  set background=light
+else
+  set background=dark
+endif
+
+" hi clear
+let g:colors_name = 'matugen'
+
+let s:t_Co = &t_Co
+
+" Terminal color setup
+if (has('termguicolors') && &termguicolors) || has('gui_running')
+  let s:is_dark = &background == 'dark'
+
+  " Define terminal colors based on the background
+  if s:is_dark
+    let g:terminal_ansi_colors = ['{{bg_hex}}', '{{error_hex}}', '{{accent_hex}}', '{{tertiary_hex}}',
+                                \ '{{secondary_hex}}', '{{tertiary_hex}}', '{{accent_hex}}', '{{fg_light_hex}}',
+                                \ '{{bg_dark_hex}}', '{{error_hex}}', '{{accent_hex}}', '{{tertiary_hex}}',
+                                \ '{{secondary_hex}}', '{{tertiary_hex}}', '{{accent_hex}}', '{{fg_hex}}']
+  else
+    " Lighter colors for light theme
+    let g:terminal_ansi_colors = ['{{fg_hex}}', '{{error_hex}}', '{{accent_hex}}', '{{tertiary_hex}}',
+                                \ '{{secondary_hex}}', '{{tertiary_hex}}', '{{accent_hex}}', '{{bg_light_hex}}',
+                                \ '{{fg_light_hex}}', '{{error_hex}}', '{{accent_hex}}', '{{tertiary_hex}}',
+                                \ '{{secondary_hex}}', '{{tertiary_hex}}', '{{accent_hex}}', '{{bg_hex}}']
+  endif
+
+  " Nvim uses g:terminal_color_{0-15} instead
+  for i in range(g:terminal_ansi_colors->len())
+    let g:terminal_color_{i} = g:terminal_ansi_colors[i]
+  endfor
+endif
+
+      " For Neovim compatibility
+      if has('nvim')
+        " Set Neovim specific terminal colors
+        let g:terminal_color_0 = '#' . g:terminal_ansi_colors[0]
+        let g:terminal_color_1 = '#' . g:terminal_ansi_colors[1]
+        let g:terminal_color_2 = '#' . g:terminal_ansi_colors[2]
+        let g:terminal_color_3 = '#' . g:terminal_ansi_colors[3]
+        let g:terminal_color_4 = '#' . g:terminal_ansi_colors[4]
+        let g:terminal_color_5 = '#' . g:terminal_ansi_colors[5]
+        let g:terminal_color_6 = '#' . g:terminal_ansi_colors[6]
+        let g:terminal_color_7 = '#' . g:terminal_ansi_colors[7]
+        let g:terminal_color_8 = '#' . g:terminal_ansi_colors[8]
+        let g:terminal_color_9 = '#' . g:terminal_ansi_colors[9]
+        let g:terminal_color_10 = '#' . g:terminal_ansi_colors[10]
+        let g:terminal_color_11 = '#' . g:terminal_ansi_colors[11]
+        let g:terminal_color_12 = '#' . g:terminal_ansi_colors[12]
+        let g:terminal_color_13 = '#' . g:terminal_ansi_colors[13]
+        let g:terminal_color_14 = '#' . g:terminal_ansi_colors[14]
+        let g:terminal_color_15 = '#' . g:terminal_ansi_colors[15]
+      endif
+
+" Function to dynamically invert colors for UI elements
+function! s:inverse_color(color)
+  " This function takes a hex color (without #) and returns its inverse
+  " Convert hex to decimal values
+  let r = str2nr(a:color[0:1], 16)
+  let g = str2nr(a:color[2:3], 16)
+  let b = str2nr(a:color[4:5], 16)
+
+  " Calculate inverse (255 - value)
+  let r_inv = 255 - r
+  let g_inv = 255 - g
+  let b_inv = 255 - b
+
+  " Convert back to hex
+  return printf('%02x%02x%02x', r_inv, g_inv, b_inv)
+endfunction
+
+" Function to be called for selection background
+function! InverseSelectionBg()
+  if &background == 'dark'
+    return '{{accent_hex}}'
+  else
+    return '{{secondary_hex}}'
+  endif
+endfunction
+
+" Add high-contrast dynamic selection highlighting using the inverse color function
+augroup MatugenDynamicHighlight
+  autocmd!
+  " Update selection highlight when matugen colors change
+  autocmd ColorScheme matugen call s:update_dynamic_highlights()
+augroup END
+
+function! s:update_dynamic_highlights()
+  let l:bg_color = synIDattr(synIDtrans(hlID('Normal')), 'bg#')
+  if l:bg_color != ''
+    let l:bg_color = l:bg_color[1:] " Remove # from hex color
+    let l:inverse = s:inverse_color(l:bg_color)
+
+    " Apply inverse color to selection highlights
+    execute 'highlight! CursorSelection guifg=' . l:bg_color . ' guibg=#' . l:inverse
+
+    " Link dynamic highlights to various selection groups
+    highlight! link NeoTreeCursorLine CursorSelection
+    highlight! link TelescopeSelection CursorSelection
+    highlight! link CmpItemSelected CursorSelection
+    highlight! link PmenuSel CursorSelection
+    highlight! link WinSeparator VertSplit
+  endif
+endfunction
+
+" Make selection visible right away for current colorscheme
+call s:update_dynamic_highlights()
+
+" Conditional highlighting based on background
+if &background == 'dark'
+  " Base UI elements with transparent backgrounds
+  hi Normal guibg=NONE guifg=#{{fg_hex}} gui=NONE cterm=NONE
+  hi Pmenu guibg=#{{bg_light_hex}} guifg=#{{fg_hex}} gui=NONE cterm=NONE
+  hi StatusLine guifg=#{{fg_hex}} guibg=#{{bg_light_hex}} gui=NONE cterm=NONE
+  hi StatusLineNC guifg=#{{fg_light_hex}} guibg=#{{bg_dark_hex}} gui=NONE cterm=NONE
+  hi VertSplit guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi LineNr guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi SignColumn guifg=NONE guibg=NONE gui=NONE cterm=NONE
+  hi FoldColumn guifg=#{{fg_light_hex}} guibg=NONE gui=NONE cterm=NONE
+
+  " NeoTree with transparent background including unfocused state
+  hi NeoTreeNormal guibg=NONE guifg=#{{fg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeEndOfBuffer guibg=NONE guifg=#{{fg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeFloatNormal guibg=NONE guifg=#{{fg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeFloatBorder guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeWinSeparator guifg=#{{bg_dark_hex}} guibg=NONE gui=NONE cterm=NONE
+
+  " NeoTree with transparent background
+  hi NeoTreeNormal guibg=NONE guifg=#{{fg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeEndOfBuffer guibg=NONE guifg=#{{fg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeRootName guifg=#{{accent_hex}} guibg=NONE gui=bold cterm=bold
+
+  " TabLine highlighting with complementary accents
+  hi TabLine guifg=#{{fg_light_hex}} guibg=#{{bg_light_hex}} gui=NONE cterm=NONE
+  hi TabLineFill guifg=NONE guibg=NONE gui=NONE cterm=NONE
+  hi TabLineSel guifg=#{{bg_hex}} guibg=#{{accent_hex}} gui=bold cterm=bold
+  hi TabLineSeparator guifg=#{{accent_hex}} guibg=#{{bg_light_hex}} gui=NONE cterm=NONE
+
+  " Interactive elements with dynamic contrast
+  hi Search guifg=#{{bg_dark_hex}} guibg=#{{accent_hex}} gui=NONE cterm=NONE
+  hi Visual guifg=#{{bg_dark_hex}} guibg=#{{accent_hex}} gui=NONE cterm=NONE
+  hi MatchParen guifg=#{{bg_dark_hex}} guibg=#{{accent_hex}} gui=bold cterm=bold
+
+  " Menu item hover highlight
+  hi CmpItemAbbrMatch guifg=#{{accent_hex}} guibg=NONE gui=bold cterm=bold
+  hi CmpItemAbbrMatchFuzzy guifg=#{{accent_hex}} guibg=NONE gui=bold cterm=bold
+  hi CmpItemMenu guifg=#{{fg_light_hex}} guibg=NONE gui=italic cterm=italic
+  hi CmpItemAbbr guifg=#{{fg_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi CmpItemAbbrDeprecated guifg=#{{fg_light_hex}} guibg=NONE gui=strikethrough cterm=strikethrough
+
+  " Specific menu highlight groups
+  hi WhichKey guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi WhichKeySeparator guifg=#{{fg_light_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi WhichKeyGroup guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi WhichKeyDesc guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi WhichKeyFloat guibg=#{{bg_dark_hex}} guifg=NONE gui=NONE cterm=NONE
+
+  " Selection and hover highlights with inverted colors
+  hi CursorColumn guifg=NONE guibg=#{{bg_light_hex}} gui=NONE cterm=NONE
+  hi Cursor guibg=#{{fg_hex}} guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi lCursor guibg=#{{fg_hex}} guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi CursorIM guibg=#{{fg_hex}} guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi TermCursor guibg=#{{fg_hex}} guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi TermCursorNC guibg=#{{fg_light_hex}} guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi CursorLine guibg=NONE ctermbg=NONE gui=underline cterm=underline
+  hi CursorLineNr guifg=#{{accent_hex}} guibg=NONE gui=bold cterm=bold
+
+  hi QuickFixLine guifg=#{{bg_dark_hex}} guibg=#{{accent_hex}} gui=NONE cterm=NONE
+  hi IncSearch guifg=#{{bg_dark_hex}} guibg=#{{accent_hex}} gui=NONE cterm=NONE
+  hi NormalNC guibg=#{{bg_dark_hex}} guifg=#{{fg_light_hex}} gui=NONE cterm=NONE
+  hi Directory guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi WildMenu guifg=#{{bg_dark_hex}} guibg=#{{accent_hex}} gui=bold cterm=bold
+
+  " Add highlight groups for focused items with inverted colors
+  hi CursorLineFold guifg=#{{accent_hex}} guibg=#{{bg_dark_hex}} gui=NONE cterm=NONE
+  hi FoldColumn guifg=#{{fg_light_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi Folded guifg=#{{fg_hex}} guibg=#{{bg_light_hex}} gui=italic cterm=italic
+
+  " File explorer specific highlights
+  hi NeoTreeNormal guibg=NONE guifg=#{{fg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeEndOfBuffer guibg=NONE guifg=#{{fg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeRootName guifg=#{{accent_hex}} guibg=NONE gui=bold cterm=bold
+  hi NeoTreeFileName guifg=#{{fg_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeFileIcon guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeDirectoryName guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeDirectoryIcon guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeGitModified guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeGitAdded guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeGitDeleted guifg=#{{error_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeGitUntracked guifg=#{{tertiary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeIndentMarker guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeSymbolicLinkTarget guifg=#{{accent_hex}} guibg=NONE gui=NONE cterm=NONE
+
+  " File explorer cursor highlights with strong contrast
+  " hi NeoTreeCursorLine guibg=#{{accent_hex}} guifg=#{{bg_hex}} gui=bold cterm=bold
+  " hi! link NeoTreeCursor NeoTreeCursorLine
+  " hi! link NeoTreeCursorLineSign NeoTreeCursorLine
+
+  " Use matugen colors for explorer snack in dark mode
+  hi WinBar guifg=#{{fg_hex}} guibg=#{{bg_light_hex}} gui=bold cterm=bold
+  hi WinBarNC guifg=#{{fg_light_hex}} guibg=#{{bg_dark_hex}} gui=NONE cterm=NONE
+  hi ExplorerSnack guibg=#{{accent_hex}} guifg=#{{bg_hex}} gui=bold cterm=bold
+  hi BufferTabpageFill guibg=#{{bg_hex}} guifg=#{{fg_light_hex}} gui=NONE cterm=NONE
+  hi BufferCurrent guifg=#{{fg_hex}} guibg=#{{accent_hex}} gui=bold cterm=bold
+  hi BufferCurrentMod guifg=#{{fg_hex}} guibg=#{{accent_hex}} gui=bold cterm=bold
+  hi BufferCurrentSign guifg=#{{accent_hex}} guibg=#{{bg_dark_hex}} gui=NONE cterm=NONE
+  hi BufferVisible guifg=#{{fg_hex}} guibg=#{{bg_light_hex}} gui=NONE cterm=NONE
+  hi BufferVisibleMod guifg=#{{fg_light_hex}} guibg=#{{bg_light_hex}} gui=NONE cterm=NONE
+  hi BufferVisibleSign guifg=#{{accent_hex}} guibg=#{{bg_dark_hex}} gui=NONE cterm=NONE
+  hi BufferInactive guifg=#{{fg_light_hex}} guibg=#{{bg_dark_hex}} gui=NONE cterm=NONE
+  hi BufferInactiveMod guifg=#{{accent_hex}} guibg=#{{bg_dark_hex}} gui=NONE cterm=NONE
+  hi BufferInactiveSign guifg=#{{accent_hex}} guibg=#{{bg_dark_hex}} gui=NONE cterm=NONE
+
+  " Fix link colors to make them more visible
+  hi link Hyperlink NONE
+  hi link markdownLinkText NONE
+  hi Underlined guifg=#FF00FF guibg=NONE gui=bold,underline cterm=bold,underline
+  hi Special guifg=#FF00FF guibg=NONE gui=bold cterm=bold
+  hi markdownUrl guifg=#FF00FF guibg=NONE gui=underline cterm=underline
+  hi markdownLinkText guifg=#FF00FF guibg=NONE gui=bold cterm=bold
+  hi htmlLink guifg=#FF00FF guibg=NONE gui=bold,underline cterm=bold,underline
+
+  " Add more direct highlights for badges in markdown
+  hi markdownH1 guifg=#FF00FF guibg=NONE gui=bold cterm=bold
+  hi markdownLinkDelimiter guifg=#FF00FF guibg=NONE gui=bold cterm=bold
+  hi markdownLinkTextDelimiter guifg=#FF00FF guibg=NONE gui=bold cterm=bold
+  hi markdownIdDeclaration guifg=#FF00FF guibg=NONE gui=bold cterm=bold
+else
+  " Light theme with transparent backgrounds
+  hi Normal guibg=NONE guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi Pmenu guibg=#{{fg_light_hex}} guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi StatusLine guifg=#{{fg_hex}} guibg=#{{tertiary_hex}} gui=NONE cterm=NONE
+  hi StatusLineNC guifg=#{{bg_hex}} guibg=#{{fg_light_hex}} gui=NONE cterm=NONE
+  hi VertSplit guifg=#{{tertiary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi LineNr guifg=#{{tertiary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi SignColumn guifg=NONE guibg=NONE gui=NONE cterm=NONE
+  hi FoldColumn guifg=#{{bg_dark_hex}} guibg=NONE gui=NONE cterm=NONE
+
+  " NeoTree with transparent background including unfocused state
+  hi NeoTreeNormal guibg=NONE guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeEndOfBuffer guibg=NONE guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeFloatNormal guibg=NONE guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeFloatBorder guifg=#{{secondary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeWinSeparator guifg=#{{fg_light_hex}} guibg=NONE gui=NONE cterm=NONE
+
+  " NeoTree with transparent background
+  hi NeoTreeNormal guibg=NONE guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeEndOfBuffer guibg=NONE guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeRootName guifg=#{{secondary_hex}} guibg=NONE gui=bold cterm=bold
+
+  " TabLine highlighting with complementary accents
+  hi TabLine guifg=#{{bg_hex}} guibg=#{{fg_light_hex}} gui=NONE cterm=NONE
+  hi TabLineFill guifg=NONE guibg=NONE gui=NONE cterm=NONE
+  hi TabLineSel guifg=#{{fg_hex}} guibg=#{{secondary_hex}} gui=bold cterm=bold
+  hi TabLineSeparator guifg=#{{tertiary_hex}} guibg=#{{fg_light_hex}} gui=NONE cterm=NONE
+
+  " Interactive elements with complementary contrast
+  hi Search guifg=#{{fg_hex}} guibg=#{{secondary_hex}} gui=NONE cterm=NONE
+  hi Visual guifg=#{{fg_hex}} guibg=#{{tertiary_hex}} gui=NONE cterm=NONE
+  hi MatchParen guifg=#{{fg_hex}} guibg=#{{secondary_hex}} gui=bold cterm=bold
+
+  " Menu item hover highlight
+  hi CmpItemAbbrMatch guifg=#{{secondary_hex}} guibg=NONE gui=bold cterm=bold
+  hi CmpItemAbbrMatchFuzzy guifg=#{{secondary_hex}} guibg=NONE gui=bold cterm=bold
+  hi CmpItemMenu guifg=#{{bg_dark_hex}} guibg=NONE gui=italic cterm=italic
+  hi CmpItemAbbr guifg=#{{bg_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi CmpItemAbbrDeprecated guifg=#{{bg_light_hex}} guibg=NONE gui=strikethrough cterm=strikethrough
+
+  " Specific menu highlight groups
+  hi WhichKey guifg=#{{secondary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi WhichKeySeparator guifg=#{{bg_light_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi WhichKeyGroup guifg=#{{secondary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi WhichKeyDesc guifg=#{{secondary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi WhichKeyFloat guibg=#{{fg_light_hex}} guifg=NONE gui=NONE cterm=NONE
+
+  " Selection and hover highlights with inverted colors
+  hi CursorColumn guifg=NONE guibg=#{{fg_light_hex}} gui=NONE cterm=NONE
+  hi Cursor guibg=#{{bg_hex}} guifg=#{{fg_hex}} gui=NONE cterm=NONE
+  hi lCursor guibg=#{{fg_hex}} guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi CursorIM guibg=#{{fg_hex}} guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi TermCursor guibg=#{{bg_hex}} guifg=#{{fg_hex}} gui=NONE cterm=NONE
+  hi TermCursorNC guibg=#{{fg_light_hex}} guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi CursorLine guibg=NONE ctermbg=NONE gui=underline cterm=underline
+  hi CursorLineNr guifg=#{{secondary_hex}} guibg=NONE gui=bold cterm=bold
+
+  hi QuickFixLine guifg=#{{fg_hex}} guibg=#{{secondary_hex}} gui=NONE cterm=NONE
+  hi IncSearch guifg=#{{fg_hex}} guibg=#{{secondary_hex}} gui=NONE cterm=NONE
+  hi NormalNC guibg=#{{fg_hex}} guifg=#{{bg_dark_hex}} gui=NONE cterm=NONE
+  hi Directory guifg=#{{secondary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi WildMenu guifg=#{{fg_hex}} guibg=#{{secondary_hex}} gui=bold cterm=bold
+
+  " Add highlight groups for focused items with inverted colors
+  hi CursorLineFold guifg=#{{secondary_hex}} guibg=#{{fg_hex}} gui=NONE cterm=NONE
+  hi FoldColumn guifg=#{{bg_dark_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi Folded guifg=#{{bg_hex}} guibg=#{{fg_light_hex}} gui=italic cterm=italic
+
+  " File explorer specific highlights
+  hi NeoTreeNormal guibg=NONE guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeEndOfBuffer guibg=NONE guifg=#{{bg_hex}} gui=NONE cterm=NONE
+  hi NeoTreeRootName guifg=#{{secondary_hex}} guibg=NONE gui=bold cterm=bold
+  hi NeoTreeFileName guifg=#{{bg_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeFileIcon guifg=#{{secondary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeDirectoryName guifg=#{{secondary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeDirectoryIcon guifg=#{{secondary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeGitModified guifg=#{{secondary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeGitAdded guifg=#{{tertiary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeGitDeleted guifg=#{{error_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeGitUntracked guifg=#{{tertiary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeIndentMarker guifg=#{{secondary_hex}} guibg=NONE gui=NONE cterm=NONE
+  hi NeoTreeSymbolicLinkTarget guifg=#{{secondary_hex}} guibg=NONE gui=NONE cterm=NONE
+
+  " File explorer cursor highlights with strong contrast
+  " hi NeoTreeCursorLine guibg=#{{secondary_hex}} guifg=#{{fg_hex}} gui=bold cterm=bold
+  " hi! link NeoTreeCursor NeoTreeCursorLine
+  " hi! link NeoTreeCursorLineSign NeoTreeCursorLine
+
+  " Use matugen colors for explorer snack in light mode
+  hi WinBar guifg=#{{bg_hex}} guibg=#{{fg_light_hex}} gui=bold cterm=bold
+  hi WinBarNC guifg=#{{bg_dark_hex}} guibg=#{{fg_light_hex}} gui=NONE cterm=NONE
+  hi ExplorerSnack guibg=#{{secondary_hex}} guifg=#{{fg_hex}} gui=bold cterm=bold
+  hi BufferTabpageFill guibg=#{{fg_hex}} guifg=#{{bg_light_hex}} gui=NONE cterm=NONE
+  hi BufferCurrent guifg=#{{fg_hex}} guibg=#{{secondary_hex}} gui=bold cterm=bold
+  hi BufferCurrentMod guifg=#{{fg_hex}} guibg=#{{secondary_hex}} gui=bold cterm=bold
+  hi BufferCurrentSign guifg=#{{secondary_hex}} guibg=#{{fg_light_hex}} gui=NONE cterm=NONE
+  hi BufferVisible guifg=#{{bg_hex}} guibg=#{{fg_light_hex}} gui=NONE cterm=NONE
+  hi BufferVisibleMod guifg=#{{bg_dark_hex}} guibg=#{{fg_light_hex}} gui=NONE cterm=NONE
+  hi BufferVisibleSign guifg=#{{secondary_hex}} guibg=#{{fg_light_hex}} gui=NONE cterm=NONE
+  hi BufferInactive guifg=#{{bg_light_hex}} guibg=#{{fg_light_hex}} gui=NONE cterm=NONE
+  hi BufferInactiveMod guifg=#{{secondary_hex}} guibg=#{{fg_light_hex}} gui=NONE cterm=NONE
+  hi BufferInactiveSign guifg=#{{secondary_hex}} guibg=#{{fg_light_hex}} gui=NONE cterm=NONE
+
+  " Fix link colors to make them more visible
+  hi link Hyperlink NONE
+  hi link markdownLinkText NONE
+  hi Underlined guifg=#FF00FF guibg=NONE gui=bold,underline cterm=bold,underline
+  hi Special guifg=#FF00FF guibg=NONE gui=bold cterm=bold
+  hi markdownUrl guifg=#FF00FF guibg=NONE gui=underline cterm=underline
+  hi markdownLinkText guifg=#FF00FF guibg=NONE gui=bold cterm=bold
+  hi htmlLink guifg=#FF00FF guibg=NONE gui=bold,underline cterm=bold,underline
+
+  " Add more direct highlights for badges in markdown
+  hi markdownH1 guifg=#FF00FF guibg=NONE gui=bold cterm=bold
+  hi markdownLinkDelimiter guifg=#FF00FF guibg=NONE gui=bold cterm=bold
+  hi markdownLinkTextDelimiter guifg=#FF00FF guibg=NONE gui=bold cterm=bold
+  hi markdownIdDeclaration guifg=#FF00FF guibg=NONE gui=bold cterm=bold
+endif
+
+" UI elements that are the same in both themes with transparent backgrounds
+hi NormalFloat guibg=NONE guifg=NONE gui=NONE cterm=NONE
+hi FloatBorder guifg=#{{tertiary_hex}} guibg=NONE gui=NONE cterm=NONE
+hi SignColumn guifg=NONE guibg=NONE gui=NONE cterm=NONE
+hi DiffAdd guifg=#{{fg_hex}} guibg=#{{accent_hex}} gui=NONE cterm=NONE
+hi DiffChange guifg=#{{fg_hex}} guibg=#{{tertiary_hex}} gui=NONE cterm=NONE
+hi DiffDelete guifg=#{{fg_hex}} guibg=#{{error_hex}} gui=NONE cterm=NONE
+hi TabLineFill guifg=NONE guibg=NONE gui=NONE cterm=NONE
+
+" Fix selection highlighting with proper color derivatives
+hi TelescopeSelection guibg=#{{tertiary_hex}} guifg=#{{bg_hex}} gui=bold cterm=bold
+hi TelescopeSelectionCaret guifg=#{{fg_hex}} guibg=#{{tertiary_hex}} gui=bold cterm=bold
+hi TelescopeMultiSelection guibg=#{{tertiary_hex}} guifg=#{{bg_hex}} gui=bold cterm=bold
+hi TelescopeMatching guifg=#{{error_hex}} guibg=NONE gui=bold cterm=bold
+
+" Minimal fix for explorer selection highlighting
+hi NeoTreeCursorLine guibg=#{{tertiary_hex}} guifg=#{{bg_hex}} gui=bold
+
+" Fix for LazyVim menu selection highlighting
+hi Visual guibg=#{{error_hex}} guifg=#{{bg_hex}} gui=bold
+hi CursorLine guibg=NONE ctermbg=NONE gui=underline cterm=underline
+hi PmenuSel guibg=#{{error_hex}} guifg=#{{bg_hex}} gui=bold
+hi WildMenu guibg=#{{error_hex}} guifg=#{{bg_hex}} gui=bold
+
+" Create improved autocommands to ensure highlighting persists with NeoTree focus fixes
+augroup MatugenSelectionFix
+  autocmd!
+  " Force these persistent highlights with transparent backgrounds where possible
+  autocmd ColorScheme * if &background == 'dark' |
+    \ hi Normal guibg=NONE |
+    \ hi NeoTreeNormal guibg=NONE |
+    \ hi SignColumn guibg=NONE |
+    \ hi NormalFloat guibg=NONE |
+    \ hi FloatBorder guibg=NONE |
+    \ hi TabLineFill guibg=NONE |
+    \ else |
+    \ hi Normal guibg=NONE |
+    \ hi NeoTreeNormal guibg=NONE |
+    \ hi SignColumn guibg=NONE |
+    \ hi NormalFloat guibg=NONE |
+    \ hi FloatBorder guibg=NONE |
+    \ hi TabLineFill guibg=NONE |
+    \ endif
+
+  " Force NeoTree background to be transparent even when unfocused
+  autocmd WinEnter,WinLeave,BufEnter,BufLeave * if &ft == 'neo-tree' || &ft == 'NvimTree' |
+    \ hi NeoTreeNormal guibg=NONE |
+    \ hi NeoTreeEndOfBuffer guibg=NONE |
+    \ endif
+
+  " Fix NeoTree unfocus issue specifically in LazyVim
+  autocmd VimEnter,ColorScheme * hi link NeoTreeNormalNC NeoTreeNormal
+
+  " Make CursorLine less obtrusive by using underline instead of background
+  autocmd ColorScheme * hi CursorLine guibg=NONE ctermbg=NONE gui=underline cterm=underline
+
+  " Make links visible across modes
+  autocmd ColorScheme * if &background == 'dark' |
+    \ hi Underlined guifg=#FF00FF guibg=NONE gui=bold,underline cterm=bold,underline |
+    \ hi Special guifg=#FF00FF guibg=NONE gui=bold cterm=bold |
+    \ else |
+    \ hi Underlined guifg=#FF00FF guibg=NONE gui=bold,underline cterm=bold,underline |
+    \ hi Special guifg=#FF00FF guibg=NONE gui=bold cterm=bold |
+    \ endif
+
+  " Fix markdown links specifically
+  autocmd FileType markdown hi markdownUrl guifg=#FF00FF guibg=NONE gui=underline,bold
+  autocmd FileType markdown hi markdownLinkText guifg=#FF00FF guibg=NONE gui=bold
+  autocmd FileType markdown hi markdownIdDeclaration guifg=#FF00FF guibg=NONE gui=bold
+  autocmd FileType markdown hi htmlLink guifg=#FF00FF guibg=NONE gui=bold,underline
+augroup END
+
+" Create a more aggressive fix for NeoTree background in LazyVim
+augroup FixNeoTreeBackground
+  autocmd!
+  " Force NONE background for NeoTree at various points to override tokyonight fallback
+  autocmd ColorScheme,VimEnter,WinEnter,BufEnter * hi NeoTreeNormal guibg=NONE guifg=#{{fg_hex}} ctermbg=NONE
+  autocmd ColorScheme,VimEnter,WinEnter,BufEnter * hi NeoTreeNormalNC guibg=NONE guifg=#{{fg_light_hex}} ctermbg=NONE
+  autocmd ColorScheme,VimEnter,WinEnter,BufEnter * hi NeoTreeEndOfBuffer guibg=NONE guifg=#{{fg_hex}} ctermbg=NONE
+
+  " Also fix NvimTree for NvChad
+  autocmd ColorScheme,VimEnter,WinEnter,BufEnter * hi NvimTreeNormal guibg=NONE guifg=#{{fg_hex}} ctermbg=NONE
+  autocmd ColorScheme,VimEnter,WinEnter,BufEnter * hi NvimTreeNormalNC guibg=NONE guifg=#{{fg_light_hex}} ctermbg=NONE
+  autocmd ColorScheme,VimEnter,WinEnter,BufEnter * hi NvimTreeEndOfBuffer guibg=NONE guifg=#{{fg_hex}} ctermbg=NONE
+
+  " Apply highlight based on current theme
+  autocmd ColorScheme,VimEnter * if &background == 'dark' |
+    \ hi NeoTreeCursorLine guibg=#{{tertiary_hex}} guifg=#{{bg_hex}} gui=bold cterm=bold |
+    \ hi NvimTreeCursorLine guibg=#{{tertiary_hex}} guifg=#{{bg_hex}} gui=bold cterm=bold |
+    \ else |
+    \ hi NeoTreeCursorLine guibg=#{{secondary_hex}} guifg=#{{fg_hex}} gui=bold cterm=bold |
+    \ hi NvimTreeCursorLine guibg=#{{secondary_hex}} guifg=#{{fg_hex}} gui=bold cterm=bold |
+    \ endif
+
+  " Force execution after other plugins have loaded
+  autocmd VimEnter * doautocmd ColorScheme
+augroup END
+
+" Add custom autocommand specifically for LazyVim markdown links
+augroup LazyVimMarkdownFix
+  autocmd!
+  " Force link visibility in LazyVim with stronger override
+  autocmd FileType markdown,markdown.mdx,markdown.gfm hi! def link markdownUrl MagentaLink
+  autocmd FileType markdown,markdown.mdx,markdown.gfm hi! def link markdownLinkText MagentaLink
+  autocmd FileType markdown,markdown.mdx,markdown.gfm hi! def link markdownLink MagentaLink
+  autocmd FileType markdown,markdown.mdx,markdown.gfm hi! def link markdownLinkDelimiter MagentaLink
+  autocmd FileType markdown,markdown.mdx,markdown.gfm hi! MagentaLink guifg=#FF00FF gui=bold,underline
+
+  " Apply when LazyVim is detected
+  autocmd User LazyVimStarted doautocmd FileType markdown
+  autocmd VimEnter * if exists('g:loaded_lazy') | doautocmd FileType markdown | endif
+augroup END
+
+" Add custom autocommand specifically for markdown files with links
+augroup MarkdownLinkFix
+  autocmd!
+  " Use bright hardcoded magenta that will definitely be visible
+  autocmd FileType markdown hi markdownUrl guifg=#FF00FF guibg=NONE gui=underline,bold
+  autocmd FileType markdown hi markdownLinkText guifg=#FF00FF guibg=NONE gui=bold
+  autocmd FileType markdown hi markdownIdDeclaration guifg=#FF00FF guibg=NONE gui=bold
+  autocmd FileType markdown hi htmlLink guifg=#FF00FF guibg=NONE gui=bold,underline
+
+  " Force these highlights right after vim loads
+  autocmd VimEnter * if &ft == 'markdown' | doautocmd FileType markdown | endif
+augroup END
+
+" Remove possibly conflicting previous autocommands
+augroup LazyVimFix
+  autocmd!
+augroup END
+
+augroup MinimalExplorerFix
+  autocmd!
+augroup END

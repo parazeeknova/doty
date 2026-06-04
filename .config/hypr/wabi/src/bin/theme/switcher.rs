@@ -514,6 +514,14 @@ fn main() {
             ".config/satty/config.toml.template",
             ".config/satty/config.toml",
         ),
+        (
+            ".config/nvim/init.lua.template",
+            ".config/nvim/init.lua",
+        ),
+        (
+            ".config/vim/colors/matugen.vim.template",
+            ".config/vim/colors/matugen.vim",
+        ),
     ];
 
     for (tmpl, dest) in mappings {
