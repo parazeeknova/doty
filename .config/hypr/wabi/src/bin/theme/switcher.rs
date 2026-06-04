@@ -435,6 +435,15 @@ fn main() {
     let vars = build_vars(&palette);
     let doty = home_dir().join("doty");
 
+    if mode == "wallpaper" {
+        let _ = Command::new("matugen")
+            .arg("image")
+            .arg(&value)
+            .arg("--source-color-index")
+            .arg("0")
+            .status();
+    }
+
     // Define all templates and their destinations
     let mappings = vec![
         (

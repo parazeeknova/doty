@@ -257,27 +257,27 @@ live-config = 1
 # background must also be defined in hex or remain commented out. 1 = on, 0 = off.
 # You can define as many as 8 different colors. They range from bottom to top of screen
 gradient = 1
-gradient_color_1 = '#fcb974'
-gradient_color_2 = '#f3bc7a'
-gradient_color_3 = '#ebbe7f'
-gradient_color_4 = '#e2c185'
-gradient_color_5 = '#d9c48a'
-gradient_color_6 = '#d0c790'
-gradient_color_7 = '#c8c995'
-gradient_color_8 = '#bfcc9b'
+gradient_color_1 = '#b3d089'
+gradient_color_2 = '#b0d092'
+gradient_color_3 = '#aed09c'
+gradient_color_4 = '#abd0a5'
+gradient_color_5 = '#a8d0af'
+gradient_color_6 = '#a5d0b8'
+gradient_color_7 = '#a3d0c2'
+gradient_color_8 = '#a0d0cb'
 
 
 # Horizontal is only supported on noncurses output.
 # Only one color will be calculated per bar.
 horizontal_gradient = 1
-horizontal_gradient_color_1 = '#fcb974'
-horizontal_gradient_color_2 = '#f3bc7a'
-horizontal_gradient_color_3 = '#ebbe7f'
-horizontal_gradient_color_4 = '#e2c185'
-horizontal_gradient_color_5 = '#d9c48a'
-horizontal_gradient_color_6 = '#d0c790'
-horizontal_gradient_color_7 = '#c8c995'
-horizontal_gradient_color_8 = '#bfcc9b'
+horizontal_gradient_color_1 = '#b3d089'
+horizontal_gradient_color_2 = '#b0d092'
+horizontal_gradient_color_3 = '#aed09c'
+horizontal_gradient_color_4 = '#abd0a5'
+horizontal_gradient_color_5 = '#a8d0af'
+horizontal_gradient_color_6 = '#a5d0b8'
+horizontal_gradient_color_7 = '#a3d0c2'
+horizontal_gradient_color_8 = '#a0d0cb'
 
 
 # If both vertical and horizontal gradient is enabled, vertical will be blended in this direction.
