@@ -46,13 +46,6 @@
 [diff-so-fancy]
   markEmptyLines = false
 
-[color "diff"]
-  meta = black bold
-  frag = magenta
-  context = white
-  whitespace = yellow reverse
-  old = red
-
 [interactive]
   diffFilter = diff-so-fancy --patch
   singleKey = true
@@ -73,19 +66,6 @@
 [log]
   abbrevCommit = true
   graphColors = blue,yellow,cyan,magenta,green,red
-
-[color "decorate"]
-  HEAD = red
-  branch = blue
-  tag = yellow
-  remoteBranch = magenta
-
-[color "branch"]
-  current = magenta
-  local = default
-  remote = yellow
-  upstream = green
-  plain = blue
 
 [branch]
   sort = -committerdate
@@ -117,3 +97,6 @@
 	cmd = git-nbmergetool merge \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\"
 [mergetool]
 	prompt = false
+
+[include]
+	path = colors

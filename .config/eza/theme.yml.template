@@ -1,0 +1,203 @@
+filekinds:
+  normal:
+    foreground: "{{fg}}"
+  directory:
+    foreground: "{{accent}}"
+    is_bold: true
+  symlink:
+    foreground: "{{secondary}}"
+    is_italic: true
+  pipe:
+    foreground: "{{fg_light}}"
+  block_device:
+    foreground: "{{tertiary}}"
+  char_device:
+    foreground: "{{tertiary}}"
+  socket:
+    foreground: "{{tertiary}}"
+  special:
+    foreground: "{{tertiary}}"
+  executable:
+    foreground: "{{accent}}"
+    is_bold: true
+  mount_point:
+    foreground: "{{error}}"
+    is_bold: true
+
+perms:
+  user_read:
+    foreground: "{{accent}}"
+  user_write:
+    foreground: "{{tertiary}}"
+  user_execute_file:
+    foreground: "{{accent}}"
+  user_execute_other:
+    foreground: "{{accent}}"
+  group_read:
+    foreground: "{{tertiary}}"
+  group_write:
+    foreground: "{{tertiary}}"
+  group_execute:
+    foreground: "{{tertiary}}"
+  other_read:
+    foreground: "{{fg_light}}"
+  other_write:
+    foreground: "{{fg_light}}"
+  other_execute:
+    foreground: "{{fg_light}}"
+  special_user_file:
+    foreground: "{{accent}}"
+    is_bold: true
+  special_other:
+    foreground: "{{accent}}"
+    is_bold: true
+  attribute:
+    foreground: "{{secondary}}"
+
+size:
+  major:
+    foreground: "{{accent}}"
+    is_bold: true
+  minor:
+    foreground: "{{fg_light}}"
+  number_byte:
+    foreground: "{{tertiary}}"
+  number_kilo:
+    foreground: "{{tertiary}}"
+  number_mega:
+    foreground: "{{accent}}"
+  number_giga:
+    foreground: "{{accent}}"
+  number_huge:
+    foreground: "{{accent}}"
+    is_bold: true
+  unit_byte:
+    foreground: "{{fg_light}}"
+  unit_kilo:
+    foreground: "{{fg_light}}"
+  unit_mega:
+    foreground: "{{fg_light}}"
+  unit_giga:
+    foreground: "{{fg_light}}"
+  unit_huge:
+    foreground: "{{fg_light}}"
+
+users:
+  user_you:
+    foreground: "{{accent}}"
+    is_bold: true
+  user_root:
+    foreground: "{{error}}"
+    is_bold: true
+  user_other:
+    foreground: "{{fg}}"
+  group_yours:
+    foreground: "{{accent}}"
+  group_other:
+    foreground: "{{fg_light}}"
+  group_root:
+    foreground: "{{error}}"
+
+links:
+  normal:
+    foreground: "{{secondary}}"
+  multi_link_file:
+    foreground: "{{secondary}}"
+    is_bold: true
+
+git:
+  new:
+    foreground: "{{accent}}"
+  modified:
+    foreground: "{{tertiary}}"
+  deleted:
+    foreground: "{{error}}"
+  renamed:
+    foreground: "{{secondary}}"
+  ignored:
+    foreground: "{{fg_light}}"
+  conflicted:
+    foreground: "{{error}}"
+    is_bold: true
+
+git_repo:
+  branch_main:
+    foreground: "{{accent}}"
+  branch_other:
+    foreground: "{{tertiary}}"
+  git_clean:
+    foreground: "{{accent}}"
+  git_dirty:
+    foreground: "{{tertiary}}"
+
+security_context:
+  none:
+    foreground: "{{fg_light}}"
+  selinux:
+    colon:
+      foreground: "{{fg_light}}"
+    user:
+      foreground: "{{secondary}}"
+    role:
+      foreground: "{{tertiary}}"
+    typ:
+      foreground: "{{accent}}"
+    range:
+      foreground: "{{secondary}}"
+
+file_type:
+  image:
+    foreground: "{{secondary}}"
+    is_italic: true
+  video:
+    foreground: "{{secondary}}"
+  music:
+    foreground: "{{tertiary}}"
+  crypto:
+    foreground: "{{accent}}"
+  document:
+    foreground: "{{fg}}"
+  compressed:
+    foreground: "{{error}}"
+  temp:
+    foreground: "{{fg_light}}"
+  compiled:
+    foreground: "{{tertiary}}"
+  build:
+    foreground: "{{accent}}"
+    is_underline: true
+  source:
+    foreground: "{{accent}}"
+
+punctuation:
+  foreground: "{{fg_light}}"
+
+date:
+  foreground: "{{fg_light}}"
+
+inode:
+  foreground: "{{bg_light}}"
+
+blocks:
+  foreground: "{{accent}}"
+
+header:
+  foreground: "{{accent}}"
+  is_bold: true
+
+octal:
+  foreground: "{{tertiary}}"
+
+flags:
+  foreground: "{{fg_light}}"
+
+control_char:
+  foreground: "{{error}}"
+
+broken_symlink:
+  foreground: "{{error}}"
+  is_strikethrough: true
+
+broken_path_overlay:
+  foreground: "{{error}}"
+  is_strikethrough: true

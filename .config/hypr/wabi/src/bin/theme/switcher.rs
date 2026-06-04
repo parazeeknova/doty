@@ -467,6 +467,42 @@ fn main() {
             ".config/ghostty/themes/theme",
         ),
         (
+            ".config/yazi/theme.toml.template",
+            ".config/yazi/theme.toml",
+        ),
+        (
+            ".config/git/colors.template",
+            ".config/git/colors",
+        ),
+        (
+            ".config/lazygit/config.yml.template",
+            ".config/lazygit/config.yml",
+        ),
+        (
+            ".config/btop/themes/matugen.theme.template",
+            ".config/btop/themes/matugen.theme",
+        ),
+        (
+            ".config/bat/themes/matugen.tmTheme.template",
+            ".config/bat/themes/matugen.tmTheme",
+        ),
+        (
+            ".config/fish/conf.d/matugen-colors.fish.template",
+            ".config/fish/conf.d/matugen-colors.fish",
+        ),
+        (
+            ".config/fish/conf.d/fzf-colors.fish.template",
+            ".config/fish/conf.d/fzf-colors.fish",
+        ),
+        (
+            ".config/eza/theme.yml.template",
+            ".config/eza/theme.yml",
+        ),
+        (
+            ".config/opencode/themes/matugen.json.template",
+            ".config/opencode/themes/matugen.json",
+        ),
+        (
             ".config/quickshell/Theme.qml.template",
             ".config/quickshell/Theme.qml",
         ),
@@ -649,6 +685,9 @@ fn main() {
     let _ = Command::new("thunar").arg("-q").status();
     let _ = Command::new("killall").arg("-USR2").arg("cava").status();
     let _ = Command::new("killall").arg("-USR1").arg("kitty").status();
+
+    // Rebuild bat's theme cache so the rendered tmTheme is picked up
+    let _ = Command::new("bat").arg("cache").arg("--build").status();
 
     // Write colors.json to cache folder for dynamic color switching in QuickShell
     let colors_json_dest = cache_colors_dir.join("colors.json");

@@ -1359,33 +1359,34 @@ Scope {
 
                             }
 
-                            // Glass/Blur Button
-                            Item {
-                                width: parent.width / 6
-                                height: 14
+                            // Colorscheme Button
+                             Item {
+                                 width: parent.width / 6
+                                 height: 14
 
-                                Text {
-                                    id: btnGlass
+                                 Text {
+                                     id: btnColorscheme
 
-                                    anchors.centerIn: parent
-                                    text: root.glassEnabled ? "" : ""
-                                    color: theme.accent
-                                    font.family: "FiraCode Nerd Font"
-                                    font.pixelSize: 12
-                                    renderType: Text.NativeRendering
-                                }
+                                     anchors.centerIn: parent
+                                     text: ""
+                                     color: theme.accent
+                                     font.family: "FiraCode Nerd Font"
+                                     font.pixelSize: 12
+                                     renderType: Text.NativeRendering
+                                 }
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    onEntered: btnGlass.opacity = 0.7
-                                    onExited: btnGlass.opacity = 1
-                                    onClicked: {
-                                        Quickshell.execDetached([root.homeDir + "/.config/rofi/scripts/toggle-glass.sh"]);
-                                    }
-                                }
+                                 MouseArea {
+                                     anchors.fill: parent
+                                     hoverEnabled: true
+                                     onEntered: btnColorscheme.opacity = 0.7
+                                     onExited: btnColorscheme.opacity = 1
+                                     onClicked: {
+                                         Quickshell.execDetached(["quickshell", "--config", "colorscheme_popup"]);
+                                         win.closePopup();
+                                     }
+                                 }
 
-                            }
+                             }
 
                             // Wallpaper Switcher Button
                             Item {

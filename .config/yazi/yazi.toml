@@ -1,0 +1,9 @@
+#:schema https://yazi-rs.github.io/schemas/yazi.json
+
+[mgr]
+show_hidden    = true
+show_symlink   = true
+sort_by        = "alphabetical"
+sort_sensitive = false
+sort_dir_first = true
+scrolloff      = 5

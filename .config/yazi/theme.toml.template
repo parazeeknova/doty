@@ -1,0 +1,148 @@
+#:schema https://yazi-rs.github.io/schemas/theme.json
+# Rendered by wabi theme_switcher from matugen colors.
+# Do not edit theme.toml directly — edit theme.toml.template instead.
+
+[flavor]
+dark  = ""
+light = ""
+
+[mgr]
+cwd = { fg = "{{accent}}" }
+
+find_keyword  = { fg = "{{tertiary}}", bold = true, italic = true, underline = true }
+find_position = { fg = "{{secondary}}", bg = "reset", bold = true, italic = true }
+
+symlink_target = { fg = "{{fg_light}}", italic = true }
+
+marker_copied   = { fg = "{{accent}}",    bg = "{{accent}}" }
+marker_cut      = { fg = "{{error}}",     bg = "{{error}}" }
+marker_marked   = { fg = "{{secondary}}", bg = "{{secondary}}" }
+marker_selected = { fg = "{{tertiary}}",  bg = "{{tertiary}}" }
+marker_symbol   = "│"
+
+count_copied   = { fg = "{{bg}}", bg = "{{accent}}" }
+count_cut      = { fg = "{{bg}}", bg = "{{error}}" }
+count_selected = { fg = "{{bg}}", bg = "{{tertiary}}" }
+
+border_symbol = "│"
+border_style  = { fg = "{{bg_light}}" }
+
+syntect_theme = ""
+
+[tabs]
+active   = { fg = "{{bg}}",       bg = "{{accent}}",  bold = true }
+inactive = { fg = "{{fg_light}}", bg = "{{bg_dark}}" }
+
+sep_inner = { open = "", close = "" }
+sep_outer = { open = "", close = "" }
+
+[mode]
+normal_main = { fg = "{{bg}}",       bg = "{{accent}}",  bold = true }
+normal_alt  = { fg = "{{accent}}",   bg = "{{bg_dark}}" }
+
+select_main = { fg = "{{bg}}",       bg = "{{tertiary}}", bold = true }
+select_alt  = { fg = "{{tertiary}}", bg = "{{bg_dark}}" }
+
+unset_main  = { fg = "{{bg}}",       bg = "{{error}}",    bold = true }
+unset_alt   = { fg = "{{error}}",    bg = "{{bg_dark}}" }
+
+[indicator]
+parent  = { fg = "{{accent}}",    reversed = true }
+current = { fg = "{{accent}}",    reversed = true }
+preview = { fg = "{{secondary}}", underline = true }
+padding = { open = "", close = "" }
+
+[status]
+overall   = { bg = "{{bg_dark}}" }
+sep_left  = { open = "", close = "" }
+sep_right = { open = "", close = "" }
+
+perm_sep   = { fg = "{{bg_light}}" }
+perm_type  = { fg = "{{accent}}" }
+perm_read  = { fg = "{{tertiary}}" }
+perm_write = { fg = "{{error}}" }
+perm_exec  = { fg = "{{secondary}}" }
+
+progress_label  = { fg = "{{fg}}",     bold = true }
+progress_normal = { fg = "{{accent}}", bg = "{{bg_light}}" }
+progress_error  = { fg = "{{error}}",  bg = "{{bg_light}}" }
+
+[which]
+cols            = 3
+mask            = { bg = "{{bg_dark}}" }
+cand            = { fg = "{{accent}}" }
+rest            = { fg = "{{fg_light}}" }
+desc            = { fg = "{{secondary}}" }
+separator       = "  "
+separator_style = { fg = "{{bg_light}}" }
+
+[confirm]
+border     = { fg = "{{accent}}" }
+title      = { fg = "{{accent}}" }
+body       = { fg = "{{fg}}" }
+list       = {}
+btn_yes    = { fg = "{{bg}}", bg = "{{accent}}", bold = true }
+btn_no     = { fg = "{{fg_light}}" }
+btn_labels = [ "  [Y]es  ", "  (N)o  " ]
+
+[spot]
+border = { fg = "{{accent}}" }
+title  = { fg = "{{accent}}" }
+
+tbl_col  = { fg = "{{accent}}" }
+tbl_cell = { fg = "{{tertiary}}", reversed = true }
+
+[notify]
+title_info  = { fg = "{{accent}}" }
+title_warn  = { fg = "{{tertiary}}" }
+title_error = { fg = "{{error}}" }
+
+icon_info  = ""
+icon_warn  = ""
+icon_error = ""
+
+[pick]
+border   = { fg = "{{accent}}" }
+active   = { fg = "{{secondary}}", bold = true }
+inactive = { fg = "{{fg_light}}" }
+
+[input]
+border   = { fg = "{{accent}}" }
+title    = { fg = "{{fg}}" }
+value    = { fg = "{{fg}}" }
+selected = { fg = "{{bg}}", bg = "{{accent}}" }
+
+[cmp]
+border   = { fg = "{{accent}}" }
+active   = { fg = "{{bg}}", bg = "{{accent}}" }
+inactive = { fg = "{{fg_light}}" }
+
+icon_file    = ""
+icon_folder  = ""
+icon_command = ""
+
+[tasks]
+border  = { fg = "{{accent}}" }
+title   = { fg = "{{fg}}" }
+hovered = { fg = "{{secondary}}", bold = true }
+
+[help]
+on      = { fg = "{{secondary}}" }
+run     = { fg = "{{accent}}" }
+desc    = { fg = "{{fg}}" }
+hovered = { fg = "{{bg}}", bg = "{{accent}}", bold = true }
+footer  = { fg = "{{bg}}", bg = "{{accent}}" }
+
+[filetype]
+rules = [
+	{ mime = "image/*",                                                                                                                fg = "{{tertiary}}" },
+	{ mime = "{audio,video}/*",                                                                                                        fg = "{{secondary}}" },
+	{ mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}",                            fg = "{{error}}" },
+	{ mime = "application/{pdf,doc,rtf}",                                                                                              fg = "{{secondary}}" },
+	{ mime = "vfs/{absent,stale}",                                                                                                     fg = "{{bg_light}}" },
+	{ url = "*", is = "orphan",                                                                                                        bg = "{{error}}" },
+	{ url = "*", is = "exec",                                                                                                          fg = "{{accent}}" },
+	{ url = "*", is = "dummy",                                                                                                         bg = "{{error}}" },
+	{ url = "*/", is = "dummy",                                                                                                        bg = "{{error}}" },
+	{ url = "*/",                                                                                                                      fg = "{{accent}}" },
+]
