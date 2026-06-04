@@ -192,6 +192,17 @@ hl.window_rule({
     center = true
 })
 
+-- Pyprland Scratchpads
+hl.window_rule({
+    name = "pypr-term-scratchpad",
+    match = {
+        class = "^ghostty\\.pypr$"
+    },
+    float = true,
+    animation = "slide",
+    border_color = "rgb(a9b665)"
+})
+
 -- Force full opacity for VMware Workstation
 hl.window_rule({
     name = "vmware-opacity",

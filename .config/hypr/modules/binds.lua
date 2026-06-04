@@ -32,7 +32,7 @@ hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd(
 
 local closeWindowBind = hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
-hl.bind(mainMod .. " + F", hl.dsp.window.float({
+hl.bind(mainMod .. " + C", hl.dsp.window.float({
     action = "toggle"
 }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
@@ -116,6 +116,13 @@ hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("rofi -show sunset"))
 hl.bind(mainMod .. " + slash", hl.dsp.exec_cmd("rofi -show ports -mesg 'occupied ports'"))
 hl.bind("XF86Launch3", hl.dsp.exec_cmd("rofi -show profile"))
 
+---------------------
+---   Pyprland    ---
+---------------------
+hl.bind("ALT + TAB", hl.dsp.exec_cmd("pypr expose"))
+hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("pypr layout_center toggle"))
+hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("pypr toggle term"))
+
 -- Quickshell popups
 hl.bind(mainMod .. " + V", hl.dsp
     .exec_cmd("quickshell -c clipboard_popup ipc call clipboard_popup close || quickshell --config clipboard_popup"))
@@ -193,7 +200,8 @@ hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprpicker -a -n"))
 
 -- Power menu / Logout
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("rofi -show power"))
-hl.bind(mainMod .. " + ALT + E", hl.dsp.exec_cmd("sh -c 'if command -v uwsm >/dev/null 2>&1 && uwsm check; then uwsm stop; else hyprctl dispatch exit; fi'"))
+hl.bind(mainMod .. " + ALT + E", hl.dsp.exec_cmd(
+    "sh -c 'if command -v uwsm >/dev/null 2>&1 && uwsm check; then uwsm stop; else hyprctl dispatch exit; fi'"))
 
 -- Caps lock OSD
 hl.bind("Caps_Lock", hl.dsp.exec_cmd(osdctl .. " caps toggle"), {

@@ -1,0 +1,11 @@
+[pyprland]
+plugins = ["scratchpads", "layout_center", "expose"]
+
+[scratchpads.term]
+command = "ghostty --class=ghostty.pypr"
+class = "ghostty.pypr"
+size = "75% 60%"
+lazy = true
+
+[layout_center]
+margin = 60
