@@ -1,0 +1,11 @@
+// Zen profile prefs - managed by wabi theme switcher
+
+// Enables chrome/userChrome.js auto-loading (needed for live-reload watcher)
+user_pref("general.config.sandbox_enabled", false);
+
+// Enables Browser Toolbox (Ctrl+Shift+Alt+I) for debugging
+user_pref("devtools.chrome.enabled", true);
+user_pref("devtools.debugger.remote-enabled", true);
+
+// Ensures userChrome.css is loaded (Zen 1.14+ defaults this to false)
+user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);

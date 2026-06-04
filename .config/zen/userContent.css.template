@@ -1,0 +1,151 @@
+/* Zen Browser userContent.css - matugen-driven Catppuccin theme template */
+
+/* Common variables affecting all pages */
+@-moz-document url-prefix("about:") {
+  :root {
+    --in-content-page-color: {{fg}} !important;
+    --color-accent-primary: {{accent}} !important;
+    --color-accent-primary-hover: color-mix(in srgb, {{accent}} 85%, {{fg}} 15%) !important;
+    --color-accent-primary-active: color-mix(in srgb, {{accent}} 75%, {{fg}} 25%) !important;
+    background-color: {{bg}} !important;
+    --in-content-page-background: {{bg}} !important;
+  }
+}
+
+/* Variables and styles specific to about:newtab and about:home */
+@-moz-document url("about:newtab"), url("about:home") {
+  :root {
+    --newtab-background-color: {{bg}} !important;
+    --newtab-background-color-secondary: {{bg_light}} !important;
+    --newtab-element-hover-color: {{bg_light}} !important;
+    --newtab-text-primary-color: {{fg}} !important;
+    --newtab-wordmark-color: {{fg}} !important;
+    --newtab-primary-action-background: {{accent}} !important;
+  }
+
+  .icon {
+    color: {{accent}} !important;
+  }
+
+  .search-wrapper .logo-and-wordmark .logo {
+    background: url("zen-logo-mocha.svg") no-repeat center !important;
+    display: inline-block !important;
+    height: 82px !important;
+    width: 82px !important;
+    background-size: 82px !important;
+  }
+
+  @media (max-width: 609px) {
+    .search-wrapper .logo-and-wordmark .logo {
+      background-size: 64px !important;
+      height: 64px !important;
+      width: 64px !important;
+    }
+  }
+
+  .card-outer:is(:hover, :focus, .active):not(.placeholder) .card-title {
+    color: {{accent}} !important;
+  }
+
+  .top-site-outer .search-topsite {
+    background-color: {{accent}} !important;
+  }
+
+  .compact-cards .card-outer .card-context .card-context-icon.icon-download {
+    fill: {{accent}} !important;
+  }
+}
+
+/* Variables and styles specific to about:preferences */
+@-moz-document url-prefix("about:preferences") {
+  :root {
+    --zen-colors-tertiary: {{bg_dark}} !important;
+    --in-content-text-color: {{fg}} !important;
+    --link-color: {{accent}} !important;
+    --link-color-hover: color-mix(in srgb, {{accent}} 85%, {{fg}} 15%) !important;
+    --zen-colors-primary: {{bg_light}} !important;
+    --in-content-box-background: {{bg_light}} !important;
+    --zen-primary-color: {{accent}} !important;
+  }
+
+  groupbox, moz-card {
+    background: {{bg}} !important;
+  }
+
+  button, groupbox menulist {
+    background: {{bg_light}} !important;
+    color: {{fg}} !important;
+  }
+
+  .main-content {
+    background-color: {{bg_dark}} !important;
+  }
+
+  .identity-color-blue {
+    --identity-tab-color: #8aadf4 !important;
+    --identity-icon-color: #8aadf4 !important;
+  }
+
+  .identity-color-turquoise {
+    --identity-tab-color: #8bd5ca !important;
+    --identity-icon-color: #8bd5ca !important;
+  }
+
+  .identity-color-green {
+    --identity-tab-color: #a6da95 !important;
+    --identity-icon-color: #a6da95 !important;
+  }
+
+  .identity-color-yellow {
+    --identity-tab-color: #eed49f !important;
+    --identity-icon-color: #eed49f !important;
+  }
+
+  .identity-color-orange {
+    --identity-tab-color: #f5a97f !important;
+    --identity-icon-color: #f5a97f !important;
+  }
+
+  .identity-color-red {
+    --identity-tab-color: #ed8796 !important;
+    --identity-icon-color: #ed8796 !important;
+  }
+
+  .identity-color-pink {
+    --identity-tab-color: #f5bde6 !important;
+    --identity-icon-color: #f5bde6 !important;
+  }
+
+  .identity-color-purple {
+    --identity-tab-color: {{accent}} !important;
+    --identity-icon-color: {{accent}} !important;
+  }
+}
+
+/* Variables and styles specific to about:addons */
+@-moz-document url-prefix("about:addons") {
+  :root {
+    --zen-dark-color-mix-base: {{bg_dark}} !important;
+    --background-color-box: {{bg}} !important;
+  }
+}
+
+/* Variables and styles specific to about:protections */
+@-moz-document url-prefix("about:protections") {
+  :root {
+    --zen-primary-color: {{bg}} !important;
+    --social-color: {{accent}} !important;
+    --cookie-color: {{accent}} !important;
+    --fingerprinter-color: {{accent}} !important;
+    --cryptominer-color: {{accent}} !important;
+    --tracker-color: {{accent}} !important;
+    --in-content-primary-button-background-hover: color-mix(in srgb, {{accent}} 85%, {{fg}} 15%) !important;
+    --in-content-primary-button-text-color-hover: {{fg}} !important;
+    --in-content-primary-button-background: {{bg_light}} !important;
+    --in-content-primary-button-text-color: {{fg}} !important;
+  }
+
+  .card {
+    background-color: {{bg_light}} !important;
+  }
+}

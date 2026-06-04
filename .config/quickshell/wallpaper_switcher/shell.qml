@@ -66,6 +66,7 @@ Scope {
         scanWallpapers();
     }
 
+
     Theme {
         id: theme
     }
@@ -380,6 +381,33 @@ Scope {
                                 property real targetOpacity: Math.max(0.15, 1 - distance * 0.35)
                                 property real targetXOffset: -(distance * distance * 14)
 
+                                property var colorsList: ["#a9b665", "#7daea3", "#d8a657", "#cc241d", "#1d2021", "#ebdbb2"]
+
+                                FileView {
+                                    id: colorReader
+                                    path: "file://" + thumbnailPath.replace(/\.jpg$/, ".json")
+                                    onLoaded: {
+                                        try {
+                                            var textVal = colorReader.text().trim();
+                                            if (textVal.length === 0) return;
+                                            var data = JSON.parse(textVal);
+                                            if (data && data.colors) {
+                                                var c = data.colors;
+                                                delegateItem.colorsList = [
+                                                    c.primary ? c.primary.default.color : "#a9b665",
+                                                    c.secondary ? c.secondary.default.color : "#7daea3",
+                                                    c.tertiary ? c.tertiary.default.color : "#d8a657",
+                                                    c.error ? c.error.default.color : "#cc241d",
+                                                    c.surface ? c.surface.default.color : "#1d2021",
+                                                    c.on_surface ? c.on_surface.default.color : "#ebdbb2"
+                                                ];
+                                            }
+                                        } catch (e) {
+                                            // ignore
+                                        }
+                                    }
+                                }
+
                                 width: listView.width
                                 height: 136
                                 scale: targetScale
@@ -387,12 +415,23 @@ Scope {
                                 x: targetXOffset
 
                                 Rectangle {
-                                    width: 220
+                                    id: previewRect
+                                    width: 212
                                     height: 124
-                                    anchors.centerIn: parent
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: 12
+                                    anchors.verticalCenter: parent.verticalCenter
                                     color: theme.bg
-                                    radius: 8
                                     clip: true
+
+                                    // Border overlay for the currently selected/applied wallpaper
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: "transparent"
+                                        border.width: index === listView.currentIndex ? 3 : 0
+                                        border.color: theme.accent
+                                        z: 2
+                                    }
 
                                     Image {
                                         id: wallpaperPreview
@@ -410,7 +449,8 @@ Scope {
                                         width: parent.width
                                         height: 18
                                         anchors.bottom: parent.bottom
-                                        color: "#c01d2021" // dark overlay
+                                        color: delegateItem.colorsList[4]
+                                        opacity: 0.85
 
                                         Text {
                                             anchors.centerIn: parent
@@ -419,7 +459,7 @@ Scope {
                                                 var filename = parts[parts.length - 1];
                                                 return filename.replace(/\.[^/.]+$/, "");
                                             }
-                                            color: theme.fg
+                                            color: delegateItem.colorsList[5]
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             elide: Text.ElideRight
@@ -430,6 +470,25 @@ Scope {
 
                                     }
 
+                                }
+
+                                Column {
+                                    id: colorColumn
+                                    anchors.left: previewRect.right
+                                    anchors.leftMargin: 8
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 5
+
+                                    Repeater {
+                                        model: delegateItem.colorsList.slice(0, 5)
+                                        delegate: Rectangle {
+                                            width: 16
+                                            height: 16
+                                            color: modelData
+                                            border.width: 1
+                                            border.color: "#30ffffff"
+                                        }
+                                    }
                                 }
 
                                 MouseArea {

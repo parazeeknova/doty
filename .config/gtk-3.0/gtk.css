@@ -12,3 +12,15 @@ paned > separator,
   box-shadow: none;
   -gtk-icon-source: none;
 }
+
+/* Remove rounded corners and shadows from menus and popups */
+menu, .menu, .context-menu, popover, popover contents, popover.menu, .popup, tooltip {
+  border-radius: 0px;
+  box-shadow: none;
+  -gtk-outline-radius: 0px;
+}
+
+decoration, decoration:backdrop, window.csd decoration {
+  border-radius: 0px;
+  box-shadow: none;
+}

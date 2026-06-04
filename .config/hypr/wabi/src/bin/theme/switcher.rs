@@ -567,6 +567,66 @@ fn main() {
         apply_papirus_folders(accent);
     }
 
+    // Render Zen Browser colors
+    for zen_profile in find_zen_profiles() {
+        let chrome_dir = zen_profile.join("chrome");
+        let _ = fs::create_dir_all(&chrome_dir);
+
+        let css_tmpl = doty.join(".config/zen/userChrome.css.template");
+        let css_dest = chrome_dir.join("userChrome.css");
+        if css_tmpl.exists() {
+            if render_template(&css_tmpl, &css_dest, &vars) {
+                println!("Rendered Zen Browser userChrome.css for {:?}", zen_profile.file_name().unwrap_or_default());
+            }
+        }
+
+        let content_css_tmpl = doty.join(".config/zen/userContent.css.template");
+        let content_css_dest = chrome_dir.join("userContent.css");
+        if content_css_tmpl.exists() {
+            if render_template(&content_css_tmpl, &content_css_dest, &vars) {
+                println!("Rendered Zen Browser userContent.css for {:?}", zen_profile.file_name().unwrap_or_default());
+            }
+        }
+
+        let js_src = doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/zen-reload.uc.js");
+        let js_dest = chrome_dir.join("JS").join("zen-reload.uc.js");
+        if js_src.exists() {
+            let _ = fs::create_dir_all(chrome_dir.join("JS"));
+            if fs::copy(&js_src, &js_dest).is_ok() {
+                println!("Synced Zen Browser zen-reload.uc.js for {:?}", zen_profile.file_name().unwrap_or_default());
+            }
+        }
+
+        // Sync fx-autoconfig utils (chrome.manifest, boot.sys.mjs, etc.)
+        // Remove stale files first so renames in source (e.g. fs.jsm -> fs.sys.mjs) don't linger.
+        let utils_src = doty.join(".config/zen/fx-autoconfig/profile/chrome/utils");
+        let utils_dst = chrome_dir.join("utils");
+        if utils_src.exists() {
+            let _ = fs::create_dir_all(&utils_dst);
+            let src_names: std::collections::HashSet<String> = fs::read_dir(&utils_src)
+                .map(|d| d.flatten().map(|e| e.file_name().to_string_lossy().into_owned()).collect())
+                .unwrap_or_default();
+            if let Ok(existing) = fs::read_dir(&utils_dst) {
+                for e in existing.flatten() {
+                    if !src_names.contains(&e.file_name().to_string_lossy().into_owned()) {
+                        let _ = fs::remove_file(e.path());
+                    }
+                }
+            }
+            for name in &src_names {
+                let _ = fs::copy(utils_src.join(name), utils_dst.join(name));
+            }
+        }
+
+        let userjs_tmpl = doty.join(".config/zen/user.js.template");
+        let userjs_dest = zen_profile.join("user.js");
+        if userjs_tmpl.exists() {
+            if render_template(&userjs_tmpl, &userjs_dest, &vars) {
+                println!("Rendered Zen Browser user.js for {:?}", zen_profile.file_name().unwrap_or_default());
+            }
+        }
+    }
+
     // Sync files
     let _ = Command::new("make").arg("sync").current_dir(&doty).status();
 
@@ -588,6 +648,7 @@ fn main() {
     let _ = Command::new("makoctl").arg("reload").status();
     let _ = Command::new("thunar").arg("-q").status();
     let _ = Command::new("killall").arg("-USR2").arg("cava").status();
+    let _ = Command::new("killall").arg("-USR1").arg("kitty").status();
 
     // Write colors.json to cache folder for dynamic color switching in QuickShell
     let colors_json_dest = cache_colors_dir.join("colors.json");
@@ -710,4 +771,25 @@ fn apply_papirus_folders(accent_hex: &str) {
         .arg("-C")
         .arg(best_color)
         .status();
+}
+
+fn find_zen_profiles() -> Vec<PathBuf> {
+    let mut profiles = Vec::new();
+    let zen_dir = home_dir().join(".config").join("zen");
+    if !zen_dir.exists() {
+        return profiles;
+    }
+    if let Ok(entries) = fs::read_dir(&zen_dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                if let Some(name) = path.file_name().map(|n| n.to_string_lossy()) {
+                    if name.contains("Default") || name.contains("default") {
+                        profiles.push(path);
+                    }
+                }
+            }
+        }
+    }
+    profiles
 }

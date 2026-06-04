@@ -1,0 +1,594 @@
+/* Zen Browser userChrome.css - matugen-driven theme template
+ * Palette: {{accent}} {{bg}} {{bg_dark}} {{bg_light}} {{fg}} {{fg_light}}
+ * Style: sharp corners, no panel shadows, accent on sidebar, subtle selected tab.
+ */
+
+/* ============================================================
+ * 1. ROOT VARIABLES (caelestia-aligned Zen token mapping)
+ * ============================================================ */
+:root {
+  --zen-primary-color: {{bg_light}};
+  --zen-colors-primary: {{accent}};
+  --zen-colors-secondary: {{bg_light}};
+  --zen-colors-tertiary: {{bg_dark}};
+  --zen-colors-border: {{fg_light}};
+
+  --zen-main-browser-background: {{bg_dark}};
+  --zen-themed-toolbar-bg: {{bg_dark}};
+  --zen-themed-toolbar-bg-transparent: {{bg_dark}};
+
+  --toolbar-bgcolor: {{bg_dark}};
+  --toolbox-bgcolor-inactive: {{bg_dark}};
+  --newtab-background-color: {{bg}};
+
+  --lwt-text-color: {{fg}};
+  --lwt-sidebar-text-color: {{fg}};
+  --lwt-sidebar-background-color: {{bg_dark}};
+
+  --toolbar-color: {{fg}};
+  --toolbar-field-color: {{fg}};
+  --toolbar-field-focus-color: {{fg}};
+  --tab-selected-textcolor: {{accent}};
+  --newtab-text-primary-color: {{fg}};
+
+  --arrowpanel-color: {{accent}};
+  --arrowpanel-background: {{bg}};
+  --sidebar-text-color: {{fg}};
+  --toolbarbutton-icon-fill: {{accent}};
+}
+
+/* ============================================================
+ * 2. SHARP CORNERS (chrome UI only - no `*` selector to avoid
+ *    leaking into content overlays like the find bar, password
+ *    manager, or extension popups that render inside <tab>.
+ * ============================================================ */
+#navigator-toolbox,
+#titlebar,
+#TabsToolbar,
+#tabbrowser-tabs,
+#tabbrowser-tabs[orient="vertical"],
+#tabbrowser-tabs[orient="horizontal"],
+.tabbrowser-tab,
+.tab-background,
+.tab-stack,
+.tab-content,
+#zen-sidebar-splitter,
+#zen-workspaces-button,
+.zen-workspace-tabs-section,
+.zen-current-workspace-indicator,
+.zen-current-workspace-indicator-stack,
+.zen-current-workspace-indicator-icon,
+.zen-current-workspace-indicator::before,
+.zen-current-workspace-indicator::after,
+.zen-current-workspace-indicator:hover,
+.zen-current-workspace-indicator:hover::before,
+.zen-current-workspace-indicator:hover::after,
+zen-folder,
+zen-folder .tab-group-label-container,
+zen-folder .tab-group-label-container::before,
+zen-folder .tab-group-label-container::after,
+zen-folder:hover .tab-group-label-container,
+zen-folder:hover .tab-group-label-container::before,
+zen-folder:hover .tab-group-label-container::after,
+.tab-group-label,
+#zen-appcontent-navbar-container,
+#urlbar,
+.urlbar-background,
+#searchbar,
+#searchbar .searchbar-textbox,
+.content-shortcuts,
+toolbarbutton,
+.toolbarbutton-1,
+.toolbarbutton-icon,
+menupopup,
+panel,
+menu,
+menuitem,
+menucaption,
+input[type="checkbox"],
+input[type="radio"] {
+  border-radius: 0 !important;
+}
+
+/* Zen folder label hover: kill Zen's rounded overlay, add a
+ * single square accent tint. */
+zen-folder .tab-group-label-container::before,
+zen-folder .tab-group-label-container::after,
+zen-folder:hover .tab-group-label-container::before,
+zen-folder:hover .tab-group-label-container::after {
+  background: none !important;
+  background-color: transparent !important;
+}
+
+zen-folder:hover .tab-group-label-container {
+  background-color: color-mix(in srgb, {{accent}} 15%, {{bg_dark}} 85%) !important;
+}
+zen-folder[open] .tab-group-label-container,
+zen-folder[expanded] .tab-group-label-container {
+  background-color: color-mix(in srgb, {{accent}} 20%, {{bg_dark}} 80%) !important;
+}
+
+/* Workspace tab hover/active background: kill Zen's
+ * pseudo-element bg (the rounded overlay) and replace with
+ * a single square accent tint. */
+.zen-current-workspace-indicator::before,
+.zen-current-workspace-indicator::after,
+.zen-current-workspace-indicator:hover::before,
+.zen-current-workspace-indicator:hover::after,
+.zen-current-workspace-indicator[open]::before,
+.zen-current-workspace-indicator[active]::before {
+  background: none !important;
+  background-color: transparent !important;
+}
+
+.zen-current-workspace-indicator:hover {
+  background-color: color-mix(in srgb, {{accent}} 15%, {{bg_dark}} 85%) !important;
+}
+.zen-current-workspace-indicator[open],
+.zen-current-workspace-indicator[active] {
+  background-color: color-mix(in srgb, {{accent}} 20%, {{bg_dark}} 80%) !important;
+}
+
+/* ============================================================
+ * 3. SIDEBAR (vertical tabs, workspaces, splitter)
+ * ============================================================ */
+#zen-main-app-wrapper,
+#zen-browser-background,
+#zen-browser-background::after,
+#navigator-toolbox,
+#titlebar,
+#tabbrowser-tabs[orient="vertical"],
+#zen-sidebar-splitter {
+  background-color: {{bg_dark}} !important;
+}
+
+#tabbrowser-tabs[orient="vertical"] .tabbrowser-tab .tab-label,
+#tabbrowser-tabs[orient="vertical"] .tabbrowser-tab[selected] .tab-label,
+#zen-sidebar-splitter,
+#zen-workspaces-button,
+#zen-current-workspace-indicator,
+.zen-workspace-tabs-section,
+#sidebar,
+#sidebar-header,
+.bookmark-item,
+toolbarbutton.bookmark-item,
+.sidebar-placesTree {
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+#zen-sidebar-foot-buttons > toolbarbutton {
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+#zen-sidebar-foot-buttons > toolbarbutton:hover {
+  background-color: color-mix(in srgb, {{accent}} 15%, {{bg_dark}} 85%) !important;
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+.sidebar-placesTree {
+  background-color: {{bg_dark}} !important;
+}
+
+/* ============================================================
+ * 4. TABS (selected = subtle bg_light, not bright accent)
+ * ============================================================ */
+.tabbrowser-tab[selected] .tab-background,
+.tabbrowser-tab[selected] .tab-stack,
+.tabbrowser-tab:hover .tab-background {
+  background-color: {{bg_light}} !important;
+  color: {{accent}} !important;
+}
+
+.tabbrowser-tab:not([selected]):not(:hover) .tab-background {
+  background-color: {{bg_dark}} !important;
+}
+
+.tabbrowser-tab .tab-label,
+.tabbrowser-tab[selected] .tab-label {
+  color: {{accent}} !important;
+}
+
+/* Zen "essential" pinned tabs: border only on the active one.
+ * Match Zen's selector specificity to override its !important
+ * border-radius: var(--border-radius-medium). */
+#tabbrowser-tabs .tabbrowser-tab[zen-essential="true"] .tab-background,
+#zen-welcome-initial-essentials-browser-sidebar-essentials .tabbrowser-tab .tab-background {
+  background-color: color-mix(in srgb, {{bg_light}} 30%, {{bg_dark}} 70%) !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+#tabbrowser-tabs .tabbrowser-tab[zen-essential="true"]:not([visuallyselected]):not([multiselected="true"]):hover .tab-background {
+  background-color: color-mix(in srgb, {{bg_light}} 50%, {{bg_dark}} 50%) !important;
+}
+
+#tabbrowser-tabs .tabbrowser-tab[zen-essential="true"][visuallyselected] .tab-background,
+#tabbrowser-tabs .tabbrowser-tab[zen-essential="true"][selected] .tab-background {
+  background-color: color-mix(in srgb, {{bg_light}} 70%, {{bg_dark}} 30%) !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: inset 0 0 0 1px {{accent}} !important;
+}
+
+/* Kill border-radius on every level of an essential so the
+ * inner "rounded thingy" Zen draws by default disappears. */
+#tabbrowser-tabs .tabbrowser-tab[zen-essential="true"],
+#tabbrowser-tabs .tabbrowser-tab[zen-essential="true"] .tab-background,
+#tabbrowser-tabs .tabbrowser-tab[zen-essential="true"] .tab-stack,
+#tabbrowser-tabs .tabbrowser-tab[zen-essential="true"] .tab-content,
+#tabbrowser-tabs .tabbrowser-tab[zen-essential="true"]::before,
+#tabbrowser-tabs .tabbrowser-tab[zen-essential="true"]::after,
+#tabbrowser-tabs .tabbrowser-tab[zen-essential="true"] .tab-background::before,
+#tabbrowser-tabs .tabbrowser-tab[zen-essential="true"] .tab-background::after,
+#zen-welcome-initial-essentials-browser-sidebar-essentials .tabbrowser-tab,
+#zen-welcome-initial-essentials-browser-sidebar-essentials .tabbrowser-tab .tab-background {
+  border-radius: 0 !important;
+}
+
+/* ============================================================
+ * 5. TOP TOOLBAR (URL bar, search, content shortcuts)
+ * ============================================================ */
+#TabsToolbar,
+#zen-appcontent-navbar-container,
+hbox#titlebar {
+  background-color: {{bg_dark}} !important;
+}
+
+.urlbar-background,
+.content-shortcuts {
+  background-color: {{bg}} !important;
+  color: {{fg}} !important;
+}
+
+.content-shortcuts {
+  border: 1px solid color-mix(in srgb, {{accent}} 30%, transparent) !important;
+}
+
+.urlbarView-url,
+#urlbar-results .urlbarView-url,
+.ac-url-text,
+.ac-action-text {
+  color: {{accent}} !important;
+}
+
+#zenEditBookmarkPanelFaviconContainer {
+  background: {{bg_dark}} !important;
+}
+
+/* URL bar text selection + suggestion row highlight. */
+#urlbar-input::selection,
+#urlbar-input::-moz-selection,
+.urlbar-input::selection,
+.searchbar-textbox::selection,
+#urlbar-go-button,
+.search-go-button {
+  background-color: color-mix(in srgb, {{accent}} 40%, transparent) !important;
+  color: {{fg}} !important;
+}
+
+#urlbar-results .urlbarView-row[selected],
+.urlbarView-row[selected],
+.urlbarView-row:hover {
+  background-color: color-mix(in srgb, {{accent}} 25%, {{bg}} 75%) !important;
+}
+
+#urlbar-results .urlbarView-row[selected] .urlbarView-url,
+#urlbar-results .urlbarView-row[selected] .ac-url-text,
+#urlbar-results .urlbarView-row[selected] .ac-title,
+#urlbar-results .urlbarView-row[selected] .ac-action-text {
+  color: {{accent}} !important;
+}
+
+#urlbar[breakout-extend="true"] > .urlbar-input-container,
+.urlbar[focused="true"] > .urlbar-input-container {
+  background-color: {{bg}} !important;
+  outline: 1px solid color-mix(in srgb, {{accent}} 40%, transparent) !important;
+  outline-offset: -1px;
+  border-radius: 0 !important;
+}
+
+/* URL bar on click (Zen floating mode): kill the rounded container
+ * Zen adds when the URL bar opens via [zen-floating-urlbar="true"]. */
+#urlbar[open][zen-floating-urlbar="true"] #urlbar-container,
+#urlbar[open][zen-floating-urlbar="true"] .urlbar-input-container,
+#urlbar-container:has(#urlbar[zen-floating-urlbar="true"][open]),
+#urlbar-container:has(#urlbar[zen-floating-urlbar="true"][breakout="true"]),
+#urlbar-container,
+#urlbar-results,
+.urlbar-background,
+.urlbarView {
+  border-radius: 0 !important;
+}
+
+/* All toolbar buttons: accent color/fill + square hover bg. */
+.toolbarbutton-1:not(#tabs-newtab-button),
+.urlbar-page-action,
+.identity-box-button,
+#PanelUI-menu-button,
+#appMenu-more-button2,
+.zen-workspaces-actions,
+#zen-workspace-actions-menu-icon,
+#back-button,
+#forward-button,
+#reload-button,
+#stop-button,
+#home-button,
+#downloads-button,
+#bookmarks-menu-button,
+#history-button,
+#addons-button {
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+.toolbarbutton-1:not(#tabs-newtab-button):hover,
+.urlbar-page-action:hover,
+.identity-box-button:hover,
+#PanelUI-menu-button:hover,
+#back-button:hover,
+#forward-button:hover,
+#reload-button:hover,
+#downloads-button:hover,
+#bookmarks-menu-button:hover,
+#history-button:hover,
+#addons-button:hover {
+  background-color: color-mix(in srgb, {{accent}} 15%, {{bg_dark}} 85%) !important;
+}
+
+/* ============================================================
+ * 6. PANEL POPUPS (context menus, dropdowns)
+ *    No rounded corners, no shadow, subtle accent border.
+ * ============================================================ */
+menupopup, panel,
+#contentAreaContextMenu,
+#PlacesToolbar menu,
+#PlacesToolbar menupopup,
+.tab-context-menu {
+  --panel-border-radius: 0 !important;
+  --panel-shadow: none !important;
+  --panel-shadow-margin: 0 !important;
+  --panel-border-color: color-mix(in srgb, {{accent}} 30%, transparent) !important;
+  --panel-border-width: 1px !important;
+  --panel-border-style: solid !important;
+  -moz-window-shadow: none !important;
+  background-color: {{bg}} !important;
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+menu, menuitem, menucaption,
+.menu-text, .menu-accel, .menu-iconic-text, .menu-iconic-accel,
+.menu-highlightable-text,
+.accesskey,
+menuitem > .menu-highlightable-text {
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+.menu-icon,
+menuitem > .menu-iconic-left > .menu-iconic-icon,
+menuitem > .menu-iconic-left,
+menuitem image,
+menupopup image,
+menuitem > html:img.menu-icon,
+.menu-highlightable-text + .menu-accel {
+  fill: {{accent}} !important;
+  color: {{accent}} !important;
+}
+
+/* Hover/active state: 20% accent over the panel bg, accent text */
+menupopup menuitem[_moz-menuactive="true"],
+menupopup menuitem:hover:not([disabled="true"]),
+menupopup menu[_moz-menuactive="true"],
+menupopup menu:hover:not([disabled="true"]) {
+  background-color: color-mix(in srgb, {{accent}} 20%, {{bg}} 80%) !important;
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+menupopup menuitem[_moz-menuactive="true"] .menu-highlightable-text,
+menupopup menuitem:hover:not([disabled="true"]) .menu-highlightable-text,
+menupopup menuitem[_moz-menuactive="true"] .menu-text,
+menupopup menuitem:hover:not([disabled="true"]) .menu-text,
+menupopup menuitem[_moz-menuactive="true"] .menu-icon,
+menupopup menuitem:hover:not([disabled="true"]) .menu-icon {
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+menupopup menuitem[disabled="true"],
+menupopup menuitem[disabled="true"] .menu-text,
+menupopup menuitem[disabled="true"] .menu-highlightable-text,
+menupopup menuitem[disabled="true"] .menu-icon {
+  color: color-mix(in srgb, {{accent}} 40%, transparent) !important;
+  fill: color-mix(in srgb, {{accent}} 40%, transparent) !important;
+}
+
+menuseparator {
+  border: none !important;
+  background: transparent !important;
+  min-height: 4px !important;
+  opacity: 0 !important;
+}
+
+.menu-icon,
+menuitem > .menu-iconic-left > .menu-iconic-icon,
+menuitem > .menu-iconic-left,
+menuitem image,
+menupopup image {
+  fill: {{accent}} !important;
+  color: {{accent}} !important;
+}
+
+menupopup menuitem[_moz-menuactive="true"],
+menupopup menuitem:hover:not([disabled="true"]) {
+  background-color: color-mix(in srgb, {{accent}} 20%, transparent) !important;
+  color: {{accent}} !important;
+}
+
+menupopup menuitem[disabled="true"] {
+  color: color-mix(in srgb, {{accent}} 40%, transparent) !important;
+  fill: color-mix(in srgb, {{accent}} 40%, transparent) !important;
+}
+
+/* ============================================================
+ * 6b. APP MENU (hamburger PanelUI) - accent text/icons + hover bg
+ * ============================================================ */
+#appMenu-mainView,
+.panel-viewstack,
+.panel-subview-body {
+  background-color: {{bg}} !important;
+}
+
+.subviewbutton,
+.subviewbutton-nav,
+.subviewbutton-iconic {
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+.subviewbutton .toolbarbutton-icon,
+.subviewbutton image,
+.subviewbutton-nav .toolbarbutton-icon,
+.subviewbutton-iconic .toolbarbutton-icon {
+  fill: {{accent}} !important;
+  color: {{accent}} !important;
+}
+
+.subviewbutton .toolbarbutton-text,
+.subviewbutton .toolbarbutton-textcrop-end {
+  color: {{accent}} !important;
+}
+
+.subviewbutton:hover:not([disabled="true"]),
+.subviewbutton[selected],
+.subviewbutton-nav:hover:not([disabled="true"]),
+.subviewbutton-iconic:hover:not([disabled="true"]) {
+  background-color: color-mix(in srgb, {{accent}} 20%, {{bg}} 80%) !important;
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+.subviewbutton[disabled="true"] {
+  color: color-mix(in srgb, {{accent}} 40%, transparent) !important;
+  fill: color-mix(in srgb, {{accent}} 40%, transparent) !important;
+}
+
+#appMenu-fxa-text,
+#appMenu-header-title,
+#appMenu-header-description,
+#PanelUI-fxa-label,
+#PanelUI-fxa-icon,
+#fxa-menu-avatar,
+#PanelUI-fxa-menu {
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+.panel-banner-item {
+  background-color: color-mix(in srgb, {{accent}} 15%, {{bg}} 85%) !important;
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+/* ============================================================
+ * 6c. DOWNLOADS POPUP
+ * ============================================================ */
+#downloadsPanel,
+#downloadsPanel .panel-view-body-unscrollable,
+#downloadsListBox,
+#downloadsFooter {
+  background-color: {{bg}} !important;
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+#downloadsSummaryDescription,
+#downloadsSummaryDetails,
+#emptyDownloads,
+richlistitem[is="download"] .downloadMainArea .downloadTarget,
+richlistitem[is="download"] .downloadMainArea .downloadDisplayName,
+richlistitem[is="download"] .downloadStatus,
+.downloadTarget,
+.downloadDisplayName {
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+.downloadTypeIcon {
+  fill: {{accent}} !important;
+  color: {{accent}} !important;
+}
+
+.downloadProgress {
+  background-color: {{bg_dark}} !important;
+  border: 1px solid color-mix(in srgb, {{accent}} 50%, transparent) !important;
+  border-radius: 0 !important;
+}
+.downloadProgress::-moz-progress-bar,
+.downloadProgress[mode="normal"]::-moz-progress-bar {
+  background-color: {{accent}} !important;
+  border-radius: 0 !important;
+}
+
+#downloadsHistory,
+.downloadsPanelFooterButton {
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+  background-color: transparent !important;
+}
+#downloadsHistory:hover,
+.downloadsPanelFooterButton:hover {
+  background-color: color-mix(in srgb, {{accent}} 20%, {{bg}} 80%) !important;
+  color: {{accent}} !important;
+  fill: {{accent}} !important;
+}
+
+/* ============================================================
+ * 7. IDENTITY-COLORED TABS (per-container color)
+ * ============================================================ */
+.identity-color-blue     { --identity-tab-color: #89b4fa !important; --identity-icon-color: #89b4fa !important; }
+.identity-color-turquoise{ --identity-tab-color: #94e2d5 !important; --identity-icon-color: #94e2d5 !important; }
+.identity-color-green    { --identity-tab-color: #a6e3a1 !important; --identity-icon-color: #a6e3a1 !important; }
+.identity-color-yellow   { --identity-tab-color: #f9e2af !important; --identity-icon-color: #f9e2af !important; }
+.identity-color-orange   { --identity-tab-color: #fab387 !important; --identity-icon-color: #fab387 !important; }
+.identity-color-red      { --identity-tab-color: #f38ba8 !important; --identity-icon-color: #f38ba8 !important; }
+.identity-color-pink     { --identity-tab-color: #f5c2e7 !important; --identity-icon-color: #f5c2e7 !important; }
+.identity-color-purple   { --identity-tab-color: {{accent}} !important; --identity-icon-color: {{accent}} !important; }
+
+/* ============================================================
+ * 8. MISC
+ * ============================================================ */
+#permissions-granted-icon {
+  color: {{bg_dark}} !important;
+}
+
+#zen-media-controls-toolbar #zen-media-progress-bar::-moz-range-track {
+  background: {{bg_light}} !important;
+}
+
+/* Form controls: checkboxes/radios in HTML pages rendered by Zen */
+input[type="checkbox"], input[type="radio"] {
+  appearance: none !important;
+  border-radius: 0 !important;
+  border: 1px solid {{fg_light}} !important;
+  background: transparent !important;
+  width: 14px;
+  height: 14px;
+}
+input[type="checkbox"]:checked { background: {{accent}} !important; }
+input[type="radio"]:checked::after {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: 2px;
+  background: {{accent}};
+}
+input[type="checkbox"]:disabled, input[type="radio"]:disabled {
+  border-color: color-mix(in srgb, {{fg_light}} 40%, transparent) !important;
+  background: color-mix(in srgb, {{accent}} 20%, transparent) !important;
+}
