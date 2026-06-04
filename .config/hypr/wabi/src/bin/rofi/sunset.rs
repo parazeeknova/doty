@@ -115,11 +115,9 @@ fn main() {
                     })
                     .unwrap_or(12);
 
-                let temp = if current_hour >= 22 || current_hour < 6 {
+                let temp = if !(6..22).contains(&current_hour) {
                     "auto: 4000k"
-                } else if current_hour >= 18 && current_hour < 22 {
-                    "auto: 5000k"
-                } else if current_hour >= 6 && current_hour < 8 {
+                } else if (18..22).contains(&current_hour) || (6..8).contains(&current_hour) {
                     "auto: 5000k"
                 } else {
                     "auto: off"
@@ -153,12 +151,12 @@ fn main() {
     for (name, key) in &options {
         let clean_name = name.split(" (").next().unwrap_or(name);
         if clean_name == current_state || *name == current_state {
-            print!("* {}\0info\x1f{}\n", name, key);
+            println!("* {}\0info\x1f{}", name, key);
         } else {
-            print!("  {}\0info\x1f{}\n", name, key);
+            println!("  {}\0info\x1f{}", name, key);
         }
     }
 
-    print!("\0message\x1fsunset\n");
+    println!("\0message\x1fsunset");
     let _ = io::stdout().flush();
 }

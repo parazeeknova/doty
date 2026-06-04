@@ -52,6 +52,14 @@ Scope {
     }
 
     function confirmWallpaper(path) {
+        // Cancel any pending preview awww call so it can't overwrite our confirmed path.
+        applyTimer.stop();
+        root.activeWallpaper = path;
+
+        // Set the actual wallpaper (awww) AND the color scheme (theme_switcher) atomically.
+        // If we only run one, the screen and the colors drift apart — the preview path
+        // calls awww on a 260ms debounce, which is skipped when the user confirms fast.
+        Quickshell.execDetached(["awww", "img", path]);
         Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "wallpaper", path]);
         Quickshell.execDetached(["mkdir", "-p", root.homeDir + "/.cache"]);
         Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" > " + root.homeDir + "/.cache/last_wallpaper", "sh", path]);

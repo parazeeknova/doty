@@ -52,7 +52,7 @@ fn main() {
 
         let proto = parts[0].to_uppercase();
         let local_addr = parts[4];
-        let port = local_addr.split(':').last().unwrap_or("");
+        let port = local_addr.split(':').next_back().unwrap_or("");
 
         if let Some(users_idx) = line.find("users:(") {
             let users_part = &line[users_idx..];

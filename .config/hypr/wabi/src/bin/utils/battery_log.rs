@@ -1,5 +1,5 @@
-use wabi::{battery_snapshot, quickshell_dir, round_to};
 use std::fs;
+use wabi::{battery_snapshot, quickshell_dir, round_to};
 
 fn main() {
     let config_dir = quickshell_dir().join("battery_popup");

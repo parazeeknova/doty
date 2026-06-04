@@ -50,8 +50,8 @@ fn shorten(text: &str) -> String {
 }
 
 fn emit_items(source: &str, tag: &str, json_str: &str) {
-    if let Ok(v) = serde_json::from_str::<Value>(json_str) {
-        if let Some(arr) = v.as_array() {
+    if let Ok(v) = serde_json::from_str::<Value>(json_str)
+        && let Some(arr) = v.as_array() {
             for item in arr {
                 let id = get_field(item, "id");
                 let mut app = get_field(item, "app-name");
@@ -67,26 +67,25 @@ fn emit_items(source: &str, tag: &str, json_str: &str) {
                 }
                 let summary_short = shorten(&summary);
                 if source == "active" {
-                    print!(
-                        "[{}] {} — {}\0info\x1fdismiss:{}\n",
+                    println!(
+                        "[{}] {} — {}\0info\x1fdismiss:{}",
                         tag, app, summary_short, id
                     );
                 } else {
-                    print!(
-                        "[{}] {} — {}\0info\x1frestore:{}\n",
+                    println!(
+                        "[{}] {} — {}\0info\x1frestore:{}",
                         tag, app, summary_short, id
                     );
                 }
             }
         }
-    }
 }
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 {
-        if let Ok(rofi_info) = env::var("ROFI_INFO") {
-            if !rofi_info.is_empty() {
+        if let Ok(rofi_info) = env::var("ROFI_INFO")
+            && !rofi_info.is_empty() {
                 if rofi_info.starts_with("dismiss:") {
                     let id = rofi_info.trim_start_matches("dismiss:");
                     let _ = Command::new("makoctl").args(["dismiss", "-n", id]).status();
@@ -96,29 +95,26 @@ fn main() {
                     let _ = Command::new("makoctl").args(["dismiss", "-a"]).status();
                 }
             }
-        }
         std::process::exit(0);
     }
 
     // Active
     let active_out = Command::new("makoctl").args(["list", "-j"]).output();
-    if let Ok(out) = active_out {
-        if out.status.success() {
+    if let Ok(out) = active_out
+        && out.status.success() {
             let json_str = String::from_utf8_lossy(&out.stdout);
             emit_items("active", "live", &json_str);
         }
-    }
 
     // History
     let history_out = Command::new("makoctl").args(["history", "-j"]).output();
-    if let Ok(out) = history_out {
-        if out.status.success() {
+    if let Ok(out) = history_out
+        && out.status.success() {
             let json_str = String::from_utf8_lossy(&out.stdout);
             emit_items("history", "hist", &json_str);
         }
-    }
 
-    print!("clear all\0info\x1fclear-all\n");
-    print!("\0message\x1fnotifications\n");
+    println!("clear all\0info\x1fclear-all");
+    println!("\0message\x1fnotifications");
     let _ = io::stdout().flush();
 }

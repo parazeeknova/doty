@@ -1,0 +1,14 @@
+# Dracula — dark variant
+# Source: https://draculatheme.com
+
+[colors]
+surface = "#282a36"
+surface_container = "#21222c"
+surface_variant = "#44475a"
+on_surface = "#f8f8f2"
+on_surface_variant = "#6272a4"
+primary = "#bd93f9"
+primary_container = "#ff79c6"
+secondary = "#8be9fd"
+tertiary = "#f1fa8c"
+error = "#ff5555"

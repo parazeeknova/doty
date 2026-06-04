@@ -1,8 +1,8 @@
-use wabi::{find_kbd_backlight_device, quickshell_dir, run_cmd};
 use serde::Serialize;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
+use wabi::{find_kbd_backlight_device, quickshell_dir, run_cmd};
 
 #[derive(Serialize)]
 struct State {

@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
+toml = "0.8"
 
 [lib]
 name = "wabi"
@@ -78,6 +79,10 @@ path = "src/bin/theme/switcher.rs"
 [[bin]]
 name = "wallpaper_thumb_watcher"
 path = "src/bin/theme/watcher.rs"
+
+[[bin]]
+name = "presets_lister"
+path = "src/bin/theme/presets_lister.rs"
 
 [[bin]]
 name = "ports_menu"

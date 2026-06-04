@@ -47,7 +47,11 @@ require("gruvbox").setup({
         neutral_aqua = "{{secondary}}",
         neutral_orange = "{{tertiary}}",
     },
-    overrides = {},
+    overrides = {
+        NormalFloat = { bg = "NONE" },
+        FloatBorder = { bg = "NONE" },
+        FloatTitle = { bg = "NONE" },
+    },
     dim_inactive = true,
     transparent_mode = true
 })

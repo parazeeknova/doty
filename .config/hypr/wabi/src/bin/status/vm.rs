@@ -1,9 +1,9 @@
-use wabi::{print_json, quickshell_dir};
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use wabi::{print_json, quickshell_dir};
 
 const VM_SCAN_ROOT: &str = "/run/media/parazeeknova/clips/VM";
 
@@ -158,9 +158,7 @@ fn resolve_disk_paths(vmx: &Path) -> Vec<PathBuf> {
                 continue;
             }
             // Skip CD-ROM images
-            if value.to_lowercase().ends_with(".iso")
-                || value.to_lowercase().ends_with(".cdr")
-            {
+            if value.to_lowercase().ends_with(".iso") || value.to_lowercase().ends_with(".cdr") {
                 continue;
             }
             let path = PathBuf::from(value);
@@ -189,7 +187,10 @@ fn get_process_cpu_usage(search_pattern: &str) -> f32 {
     if first_pid.is_empty() {
         return 0.0;
     }
-    let Ok(ps_out) = Command::new("ps").args(["-p", first_pid, "-o", "%cpu"]).output() else {
+    let Ok(ps_out) = Command::new("ps")
+        .args(["-p", first_pid, "-o", "%cpu"])
+        .output()
+    else {
         return 0.0;
     };
     if !ps_out.status.success() {
@@ -228,7 +229,10 @@ fn scan_vms() -> Vec<VmInfo> {
 
 fn get_shared_folders(vmx: &Path) -> Vec<VmSharedFolder> {
     let mut folders = Vec::new();
-    let log_path = vmx.parent().unwrap_or_else(|| Path::new(".")).join("vmware.log");
+    let log_path = vmx
+        .parent()
+        .unwrap_or_else(|| Path::new("."))
+        .join("vmware.log");
     if !log_path.exists() {
         return folders;
     }
@@ -249,7 +253,12 @@ fn get_shared_folders(vmx: &Path) -> Vec<VmSharedFolder> {
             }
             let rest = parts[1];
             let index_and_prop = rest.split('=').next().unwrap_or("").trim();
-            let value = rest.split('=').nth(1).unwrap_or("").trim().trim_matches('"');
+            let value = rest
+                .split('=')
+                .nth(1)
+                .unwrap_or("")
+                .trim()
+                .trim_matches('"');
             if index_and_prop.is_empty() || value.is_empty() {
                 continue;
             }
@@ -289,8 +298,8 @@ fn get_snapshots(vmx: &Path) -> VmSnapshotInfo {
             let path = entry.path();
             if path.is_file() && path.extension().and_then(|e| e.to_str()) == Some("vmsn") {
                 count += 1;
-                if let Ok(meta) = fs::metadata(&path) {
-                    if let Ok(mod_time) = meta.modified() {
+                if let Ok(meta) = fs::metadata(&path)
+                    && let Ok(mod_time) = meta.modified() {
                         if let Some(latest) = latest_modified {
                             if mod_time > latest {
                                 latest_modified = Some(mod_time);
@@ -299,7 +308,6 @@ fn get_snapshots(vmx: &Path) -> VmSnapshotInfo {
                             latest_modified = Some(mod_time);
                         }
                     }
-                }
             }
         }
     }
@@ -346,23 +354,23 @@ fn collect_vmx_recursive(dir: &Path, running: &[String], out: &mut Vec<VmInfo>) 
 }
 
 fn build_vm_info(vmx: &Path, running: &[String]) -> Option<VmInfo> {
-    let display_name =
-        read_vmx_field(vmx, "displayName").unwrap_or_else(|| {
-            vmx.file_stem()
-                .and_then(|s| s.to_str())
-                .unwrap_or("unknown")
-                .to_string()
-        });
+    let display_name = read_vmx_field(vmx, "displayName").unwrap_or_else(|| {
+        vmx.file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("unknown")
+            .to_string()
+    });
     let mut guest_os = read_vmx_field(vmx, "guestOS").unwrap_or_default();
-    if guest_os.is_empty() {
-        if let Some(detailed_data) = read_vmx_field(vmx, "guestInfo.detailed.data") {
-            if detailed_data.contains("prettyName='") {
-                if let Some(pretty) = detailed_data.split("prettyName='").nth(1).and_then(|s| s.split('\'').next()) {
+    if guest_os.is_empty()
+        && let Some(detailed_data) = read_vmx_field(vmx, "guestInfo.detailed.data")
+            && detailed_data.contains("prettyName='")
+                && let Some(pretty) = detailed_data
+                    .split("prettyName='")
+                    .nth(1)
+                    .and_then(|s| s.split('\'').next())
+                {
                     guest_os = pretty.to_string();
                 }
-            }
-        }
-    }
 
     let mut cpus = read_vmx_field(vmx, "numvcpus")
         .map(|s| parse_vmx_size(&s))
@@ -371,23 +379,30 @@ fn build_vm_info(vmx: &Path, running: &[String]) -> Option<VmInfo> {
         .map(|s| parse_vmx_size(&s))
         .unwrap_or(0);
 
-    let log_path = vmx.parent().unwrap_or_else(|| Path::new(".")).join("vmware.log");
-    if (cpus == 0 || ram_mb == 0) && log_path.exists() {
-        if let Ok(log_text) = fs::read_to_string(&log_path) {
+    let log_path = vmx
+        .parent()
+        .unwrap_or_else(|| Path::new("."))
+        .join("vmware.log");
+    if (cpus == 0 || ram_mb == 0) && log_path.exists()
+        && let Ok(log_text) = fs::read_to_string(&log_path) {
             let mut total_ram = 0;
             for line in log_text.lines() {
-                if cpus == 0 && line.contains("NumVCPUs ") {
-                    if let Some(n) = line.split("NumVCPUs ").nth(1).and_then(|s| s.trim().split_whitespace().next()) {
+                if cpus == 0 && line.contains("NumVCPUs ")
+                    && let Some(n) = line
+                        .split("NumVCPUs ")
+                        .nth(1)
+                        .and_then(|s| s.split_whitespace().next())
+                    {
                         cpus = n.parse().unwrap_or(0);
                     }
-                }
-                if line.contains("memoryHotplug: Node ") && line.contains("Present: ") {
-                    if let Some(n) = line.split("Present: ").nth(1).and_then(|s| s.trim().split_whitespace().next()) {
-                        if let Ok(val) = n.parse::<i64>() {
+                if line.contains("memoryHotplug: Node ") && line.contains("Present: ")
+                    && let Some(n) = line
+                        .split("Present: ")
+                        .nth(1)
+                        .and_then(|s| s.split_whitespace().next())
+                        && let Ok(val) = n.parse::<i64>() {
                             total_ram += val;
                         }
-                    }
-                }
             }
             if ram_mb == 0 && total_ram > 0 {
                 if (total_ram + 1) % 1024 == 0 {
@@ -397,7 +412,6 @@ fn build_vm_info(vmx: &Path, running: &[String]) -> Option<VmInfo> {
                 }
             }
         }
-    }
 
     let encrypted = read_vmx_field(vmx, "vmx.encryptionType").is_some()
         || read_vmx_field(vmx, "encryption.keySafe").is_some();
@@ -481,7 +495,10 @@ fn running_vms() -> Vec<String> {
 
 fn scan_qemu_vms() -> Vec<QemuVmInfo> {
     let mut out = Vec::new();
-    let Ok(list_out) = Command::new("virsh").args(["-c", "qemu:///system", "list", "--all"]).output() else {
+    let Ok(list_out) = Command::new("virsh")
+        .args(["-c", "qemu:///system", "list", "--all"])
+        .output()
+    else {
         return out;
     };
     if !list_out.status.success() {
@@ -527,9 +544,10 @@ fn scan_qemu_vms() -> Vec<QemuVmInfo> {
 fn qemu_domain_storage(name: &str) -> u64 {
     let Ok(out) = Command::new("virsh")
         .args(["-c", "qemu:///system", "domblkinfo", name, "--all"])
-        .output() else {
-            return 0;
-        };
+        .output()
+    else {
+        return 0;
+    };
     if !out.status.success() {
         return 0;
     }
@@ -541,17 +559,19 @@ fn qemu_domain_storage(name: &str) -> u64 {
             continue;
         }
         let parts: Vec<&str> = trimmed.split_whitespace().collect();
-        if parts.len() >= 2 {
-            if let Ok(bytes) = parts[1].parse::<u64>() {
+        if parts.len() >= 2
+            && let Ok(bytes) = parts[1].parse::<u64>() {
                 total_bytes += bytes;
             }
-        }
     }
     total_bytes
 }
 
 fn qemu_domain_resources(name: &str) -> (i64, i64) {
-    let Ok(out) = Command::new("virsh").args(["-c", "qemu:///system", "dominfo", name]).output() else {
+    let Ok(out) = Command::new("virsh")
+        .args(["-c", "qemu:///system", "dominfo", name])
+        .output()
+    else {
         return (0, 0);
     };
     if !out.status.success() {
@@ -566,7 +586,7 @@ fn qemu_domain_resources(name: &str) -> (i64, i64) {
             cpus = rest.trim().parse().unwrap_or(0);
         } else if let Some(rest) = trimmed.strip_prefix("Max memory:") {
             // "25165824 KiB"
-            let mut parts = rest.trim().split_whitespace();
+            let mut parts = rest.split_whitespace();
             if let Some(n) = parts.next() {
                 ram_kib = n.parse().unwrap_or(0);
             }
@@ -577,9 +597,7 @@ fn qemu_domain_resources(name: &str) -> (i64, i64) {
 
 fn vmrun_base_args(encrypted: bool) -> Vec<String> {
     let mut args = vec!["-T".to_string(), "ws".to_string()];
-    if encrypted
-        && let Ok(pw) = fs::read_to_string(password_path())
-    {
+    if encrypted && let Ok(pw) = fs::read_to_string(password_path()) {
         let trimmed = pw.trim();
         if !trimmed.is_empty() {
             args.push("-vp".to_string());
@@ -606,7 +624,11 @@ fn run_vmrun(args: &[&str]) -> Result<String, String> {
         return Err(format!(
             "vmrun exited with code {}: {}",
             output.status.code().unwrap_or(-1),
-            if stderr.trim().is_empty() { stdout } else { stderr }
+            if stderr.trim().is_empty() {
+                stdout
+            } else {
+                stderr
+            }
         ));
     }
     Ok(stdout)
@@ -664,14 +686,16 @@ fn handle_qemu_power(args: &[String], op: &str) {
         Ok(out) => {
             if !out.status.success() {
                 let stderr = String::from_utf8_lossy(&out.stderr);
-                eprintln!("virsh {} exited with code {}: {}",
+                eprintln!(
+                    "virsh {} exited with code {}: {}",
                     op,
                     out.status.code().unwrap_or(-1),
                     if stderr.trim().is_empty() {
                         String::from_utf8_lossy(&out.stdout).into_owned()
                     } else {
                         stderr.into_owned()
-                    });
+                    }
+                );
             }
         }
         Err(e) => eprintln!("{}", e),
@@ -722,12 +746,16 @@ fn handle_screenshot(args: &[String]) {
     if is_qemu {
         let Ok(out_res) = Command::new("virsh")
             .args(["-c", "qemu:///system", "screenshot", vmx, "--file", output])
-            .output() else {
-                eprintln!("Failed to run virsh screenshot");
-                return;
-            };
+            .output()
+        else {
+            eprintln!("Failed to run virsh screenshot");
+            return;
+        };
         if !out_res.status.success() {
-            eprintln!("virsh screenshot failed: {}", String::from_utf8_lossy(&out_res.stderr));
+            eprintln!(
+                "virsh screenshot failed: {}",
+                String::from_utf8_lossy(&out_res.stderr)
+            );
         }
         return;
     }
@@ -788,8 +816,12 @@ fn handle_delete(args: &[String]) {
 
     // 2. Nuke the folder (parent directory of the vmx)
     if let Some(parent) = vmx_path.parent() {
-        let parent_canonical = parent.canonicalize().unwrap_or_else(|_| parent.to_path_buf());
-        let root_canonical = Path::new(VM_SCAN_ROOT).canonicalize().unwrap_or_else(|_| PathBuf::from(VM_SCAN_ROOT));
+        let parent_canonical = parent
+            .canonicalize()
+            .unwrap_or_else(|_| parent.to_path_buf());
+        let root_canonical = Path::new(VM_SCAN_ROOT)
+            .canonicalize()
+            .unwrap_or_else(|_| PathBuf::from(VM_SCAN_ROOT));
         if parent_canonical.starts_with(&root_canonical) && parent_canonical != root_canonical {
             if let Err(e) = fs::remove_dir_all(&parent_canonical) {
                 eprintln!("Failed to delete VM directory: {}", e);
@@ -815,14 +847,19 @@ fn handle_qemu_delete(args: &[String]) {
 
     // 2. Undefine VM and clean up all associated storage volumes
     let output = Command::new("virsh")
-        .args(["-c", "qemu:///system", "undefine", name, "--remove-all-storage"])
+        .args([
+            "-c",
+            "qemu:///system",
+            "undefine",
+            name,
+            "--remove-all-storage",
+        ])
         .output();
 
-    if let Ok(out) = output {
-        if !out.status.success() {
+    if let Ok(out) = output
+        && !out.status.success() {
             let stderr = String::from_utf8_lossy(&out.stderr);
             eprintln!("Failed to delete QEMU VM: {}", stderr.trim());
             std::process::exit(1);
         }
-    }
 }

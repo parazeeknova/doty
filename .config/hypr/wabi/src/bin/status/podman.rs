@@ -12,13 +12,11 @@ struct PodmanResult {
 fn run_podman_json(args: &[&str]) -> Value {
     let output = Command::new("podman").args(args).output();
 
-    if let Ok(out) = output {
-        if out.status.success() {
-            if let Ok(val) = serde_json::from_slice(&out.stdout) {
+    if let Ok(out) = output
+        && out.status.success()
+            && let Ok(val) = serde_json::from_slice(&out.stdout) {
                 return val;
             }
-        }
-    }
     Value::Array(vec![])
 }
 

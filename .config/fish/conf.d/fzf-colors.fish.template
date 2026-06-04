@@ -15,7 +15,7 @@ if status is-interactive
     "--color=fg:#{{fg_hex}},header:#{{fg_light_hex}},info:#{{secondary_hex}},pointer:#{{accent_hex}} " \
     "--color=marker:#{{tertiary_hex}},fg+:#{{fg_hex}},prompt:#{{accent_hex}},hl+:#{{accent_hex}} " \
     "--color=border:#{{bg_light_hex}},query:#{{fg_hex}},label:#{{fg_light_hex}},preview-bg:#{{bg_dark_hex}} " \
-    "--color=preview-fg:#{{fg_hex}},preview-label:#{{accent_hex}},preview-header:#{{fg_light_hex}} " \
+    "--color=preview-fg:#{{fg_hex}},preview-label:#{{accent_hex}} " \
     "--color=preview-border:#{{bg_light_hex}},preview-scrollbar:#{{bg_light_hex}} " \
     "--color=gutter:#{{bg_dark_hex}},scrollbar:#{{bg_light_hex}}"
 end

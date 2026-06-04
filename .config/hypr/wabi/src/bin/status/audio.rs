@@ -1,8 +1,8 @@
-use wabi::{parse_percent, print_json};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
+use wabi::{parse_percent, print_json};
 
 const CURRENT_PLAYER_FILE: &str = "/tmp/quickshell_current_media_player";
 

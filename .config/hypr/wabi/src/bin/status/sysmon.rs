@@ -67,9 +67,9 @@ fn read_cpu_times() -> Option<(u64, u64)> {
 fn get_cpu_name() -> String {
     if let Ok(file) = File::open("/proc/cpuinfo") {
         let reader = BufReader::new(file);
-        for line in reader.lines().flatten() {
-            if line.starts_with("model name") {
-                if let Some(pos) = line.find(':') {
+        for line in reader.lines().map_while(Result::ok) {
+            if line.starts_with("model name")
+                && let Some(pos) = line.find(':') {
                     let model = line[pos + 1..].trim();
                     if model.contains("i7-12700H") {
                         return "i7-12700H".to_string();
@@ -83,7 +83,6 @@ fn get_cpu_name() -> String {
                         .trim()
                         .to_string();
                 }
-            }
         }
     }
     "CPU".to_string()
@@ -108,35 +107,30 @@ fn get_cpu_temp() -> i32 {
     for entry in std::fs::read_dir("/sys/class/thermal")
         .ok()
         .into_iter()
-        .flatten()
+        .flatten().flatten()
     {
-        if let Ok(entry) = entry {
-            let path = entry.path();
-            if path
-                .file_name()
-                .and_then(|n| n.to_str())
-                .map_or(false, |n| n.starts_with("thermal_zone"))
-            {
-                let type_path = path.join("type");
-                let temp_path = path.join("temp");
-                if let Ok(type_str) = std::fs::read_to_string(type_path) {
-                    let type_str = type_str.trim();
-                    if type_str == "x86_pkg_temp" || type_str == "TCPU" {
-                        if let Ok(temp_str) = std::fs::read_to_string(temp_path) {
-                            if let Ok(temp_raw) = temp_str.trim().parse::<i32>() {
-                                return temp_raw / 1000;
-                            }
+        let path = entry.path();
+        if path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .is_some_and(|n| n.starts_with("thermal_zone"))
+        {
+            let type_path = path.join("type");
+            let temp_path = path.join("temp");
+            if let Ok(type_str) = std::fs::read_to_string(type_path) {
+                let type_str = type_str.trim();
+                if (type_str == "x86_pkg_temp" || type_str == "TCPU")
+                    && let Ok(temp_str) = std::fs::read_to_string(temp_path)
+                        && let Ok(temp_raw) = temp_str.trim().parse::<i32>() {
+                            return temp_raw / 1000;
                         }
-                    }
-                }
             }
         }
     }
-    if let Ok(temp_str) = std::fs::read_to_string("/sys/class/thermal/thermal_zone0/temp") {
-        if let Ok(temp_raw) = temp_str.trim().parse::<i32>() {
+    if let Ok(temp_str) = std::fs::read_to_string("/sys/class/thermal/thermal_zone0/temp")
+        && let Ok(temp_raw) = temp_str.trim().parse::<i32>() {
             return temp_raw / 1000;
         }
-    }
     0
 }
 
@@ -145,15 +139,13 @@ fn get_cpu_freq() -> f64 {
     let mut count = 0;
     if let Ok(file) = File::open("/proc/cpuinfo") {
         let reader = BufReader::new(file);
-        for line in reader.lines().flatten() {
-            if line.starts_with("cpu MHz") {
-                if let Some(pos) = line.find(':') {
-                    if let Ok(mhz) = line[pos + 1..].trim().parse::<f64>() {
+        for line in reader.lines().map_while(Result::ok) {
+            if line.starts_with("cpu MHz")
+                && let Some(pos) = line.find(':')
+                    && let Ok(mhz) = line[pos + 1..].trim().parse::<f64>() {
                         sum += mhz;
                         count += 1;
                     }
-                }
-            }
         }
     }
     if count > 0 {
@@ -246,7 +238,7 @@ fn get_ram_usage_info() -> (f64, f64) {
     let mut available = 0.0;
     if let Ok(file) = File::open("/proc/meminfo") {
         let reader = BufReader::new(file);
-        for line in reader.lines().flatten() {
+        for line in reader.lines().map_while(Result::ok) {
             if line.starts_with("MemTotal:") {
                 total = parse_mem_line(&line);
             } else if line.starts_with("MemAvailable:") {
@@ -263,8 +255,8 @@ fn get_static_ram_info() -> (String, String) {
     let mut ram_type = "DDR".to_string();
     let mut speed = "N/A".to_string();
     for line in out.lines() {
-        if line.contains("type:") {
-            if let Some(pos) = line.find("type:") {
+        if line.contains("type:")
+            && let Some(pos) = line.find("type:") {
                 let rest = &line[pos + 5..];
                 if let Some(space_pos) = rest.trim().find(' ') {
                     ram_type = rest.trim()[..space_pos].trim().to_string();
@@ -272,12 +264,10 @@ fn get_static_ram_info() -> (String, String) {
                     ram_type = rest.trim().to_string();
                 }
             }
-        }
-        if line.contains("speed:") {
-            if let Some(pos) = line.find("speed:") {
+        if line.contains("speed:")
+            && let Some(pos) = line.find("speed:") {
                 speed = line[pos + 6..].trim().to_string();
             }
-        }
     }
     (ram_type, speed)
 }

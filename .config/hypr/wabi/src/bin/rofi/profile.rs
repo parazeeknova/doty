@@ -4,8 +4,8 @@ use std::process::Command;
 
 fn get_current_profile() -> String {
     let out = Command::new("asusctl").args(["profile", "get"]).output();
-    if let Ok(o) = out {
-        if o.status.success() {
+    if let Ok(o) = out
+        && o.status.success() {
             let stdout_str = String::from_utf8_lossy(&o.stdout);
             for line in stdout_str.lines() {
                 if line.contains("Active profile") {
@@ -16,15 +16,14 @@ fn get_current_profile() -> String {
                 }
             }
         }
-    }
     String::new()
 }
 
 fn main() {
     let current_profile = get_current_profile();
 
-    if let Ok(rofi_retv) = env::var("ROFI_RETV") {
-        if rofi_retv == "1" {
+    if let Ok(rofi_retv) = env::var("ROFI_RETV")
+        && rofi_retv == "1" {
             if let Ok(rofi_info) = env::var("ROFI_INFO") {
                 match rofi_info.as_str() {
                     "Quiet" | "Balanced" | "Performance" => {
@@ -47,16 +46,15 @@ fn main() {
             }
             std::process::exit(0);
         }
-    }
 
     for p in &["Quiet", "Balanced", "Performance"] {
         if *p == current_profile {
-            print!("* {}\0info\x1f{}\n", p, p);
+            println!("* {}\0info\x1f{}", p, p);
         } else {
-            print!("  {}\0info\x1f{}\n", p, p);
+            println!("  {}\0info\x1f{}", p, p);
         }
     }
 
-    print!("\0message\x1f{}\n", current_profile);
+    println!("\0message\x1f{}", current_profile);
     let _ = io::stdout().flush();
 }

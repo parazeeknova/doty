@@ -3,8 +3,8 @@ use std::io::{self, Write};
 use std::process::Command;
 
 fn main() {
-    if let Ok(rofi_retv) = env::var("ROFI_RETV") {
-        if rofi_retv == "1" {
+    if let Ok(rofi_retv) = env::var("ROFI_RETV")
+        && rofi_retv == "1" {
             if let Ok(rofi_info) = env::var("ROFI_INFO") {
                 match rofi_info.as_str() {
                     "poweroff" => {
@@ -44,13 +44,12 @@ fn main() {
             }
             std::process::exit(0);
         }
-    }
 
-    print!(" lock\0info\x1flock\n");
-    print!(" sleep\0info\x1fsleep\n");
-    print!(" reboot\0info\x1freboot\n");
-    print!(" poweroff\0info\x1fpoweroff\n");
-    print!("󰍃 logout\0info\x1flogout\n");
-    print!("\0message\x1fpower\n");
+    println!(" lock\0info\x1flock");
+    println!(" sleep\0info\x1fsleep");
+    println!(" reboot\0info\x1freboot");
+    println!(" poweroff\0info\x1fpoweroff");
+    println!("󰍃 logout\0info\x1flogout");
+    println!("\0message\x1fpower");
     let _ = io::stdout().flush();
 }

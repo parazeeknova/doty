@@ -135,15 +135,14 @@ fn generate_thumb(wallpaper: &Wallpaper, thumb: &Path) -> bool {
         return false;
     }
 
-    if let Some(parent) = thumb.parent() {
-        if let Err(err) = fs::create_dir_all(parent) {
+    if let Some(parent) = thumb.parent()
+        && let Err(err) = fs::create_dir_all(parent) {
             eprintln!(
                 "failed to create thumbnail cache {}: {err}",
                 parent.display()
             );
             return false;
         }
-    }
 
     let tmp = thumb.with_extension("jpg.tmp");
     let status = Command::new("magick")

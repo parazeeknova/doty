@@ -1,0 +1,14 @@
+# Ayu Dark — Mirage variant
+# Source: https://github.com/ayu-theme/ayu-colors
+
+[colors]
+surface = "#1f2430"
+surface_container = "#232834"
+surface_variant = "#444a58"
+on_surface = "#cbccc6"
+on_surface_variant = "#707a8c"
+primary = "#ffcc66"
+primary_container = "#73d0ff"
+secondary = "#95e6cb"
+tertiary = "#bae67e"
+error = "#f28779"

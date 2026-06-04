@@ -13,15 +13,14 @@ fn main() {
         .output();
 
     let mut count = 0;
-    if let Ok(o) = out {
-        if o.status.success() {
+    if let Ok(o) = out
+        && o.status.success() {
             let stdout_str = String::from_utf8_lossy(&o.stdout);
             let parts: Vec<&str> = stdout_str.split_whitespace().collect();
             if parts.len() >= 2 {
                 count = parts[1].parse::<i32>().unwrap_or(0);
             }
         }
-    }
 
     if count <= 0 {
         println!(r#"{{"text": "", "class": "empty"}}"#);

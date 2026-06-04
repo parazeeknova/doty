@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
@@ -42,10 +42,23 @@ fn get_matugen_palette(wallpaper_path: &Path) -> Option<HashMap<String, String>>
         .join("thumbs");
     let cache_path = cache_dir.join(format!("{}.json", hash));
 
-    let json_content = if cache_path.exists() {
+    // Treat the cache as stale when it's older than the wallpaper itself — a user may
+    // have overwritten the file in place, leaving the path unchanged but the content new.
+    let cache_is_fresh = match (fs::metadata(&cache_path), fs::metadata(wallpaper_path)) {
+        (Ok(cache_meta), Ok(wall_meta)) => match (
+            cache_meta.modified(),
+            wall_meta.modified(),
+        ) {
+            (Ok(c), Ok(w)) => c >= w,
+            _ => false,
+        },
+        _ => false,
+    };
+
+    let json_content = if cache_path.exists() && cache_is_fresh {
         fs::read_to_string(cache_path).ok()?
     } else {
-        // Run matugen dynamically if cache missed
+        // Run matugen dynamically — either no cache or stale cache.
         let out = Command::new("matugen")
             .arg("image")
             .arg(wallpaper_path)
@@ -58,6 +71,11 @@ fn get_matugen_palette(wallpaper_path: &Path) -> Option<HashMap<String, String>>
         if !out.status.success() {
             return None;
         }
+        // Refresh the cache so future invocations stay consistent with the wallpaper.
+        if let Some(parent) = cache_path.parent() {
+            let _ = fs::create_dir_all(parent);
+        }
+        let _ = fs::write(&cache_path, &out.stdout);
         String::from_utf8_lossy(&out.stdout).to_string()
     };
 
@@ -72,6 +90,10 @@ fn get_matugen_palette(wallpaper_path: &Path) -> Option<HashMap<String, String>>
 }
 
 fn get_gruvbox_palette() -> HashMap<String, String> {
+    load_preset_palette("gruvbox").unwrap_or_else(default_palette)
+}
+
+fn default_palette() -> HashMap<String, String> {
     let mut p = HashMap::new();
     p.insert("surface".to_string(), "#1d2021".to_string());
     p.insert("surface_container".to_string(), "#282828".to_string());
@@ -86,19 +108,21 @@ fn get_gruvbox_palette() -> HashMap<String, String> {
     p
 }
 
-fn get_everforest_palette() -> HashMap<String, String> {
-    let mut p = HashMap::new();
-    p.insert("surface".to_string(), "#2d353b".to_string());
-    p.insert("surface_container".to_string(), "#333c43".to_string());
-    p.insert("surface_variant".to_string(), "#3d484d".to_string());
-    p.insert("on_surface".to_string(), "#d3c6aa".to_string());
-    p.insert("on_surface_variant".to_string(), "#e6e2cc".to_string());
-    p.insert("primary".to_string(), "#a7c080".to_string());
-    p.insert("primary_container".to_string(), "#83c092".to_string());
-    p.insert("error".to_string(), "#e67e80".to_string());
-    p.insert("secondary".to_string(), "#7fbbb3".to_string());
-    p.insert("tertiary".to_string(), "#dbbc7f".to_string());
-    p
+fn load_preset_palette(name: &str) -> Option<HashMap<String, String>> {
+    let path = home_dir()
+        .join("doty/.config/hypr/wabi/presets")
+        .join(format!("{}.toml", name));
+
+    let content = fs::read_to_string(&path).ok()?;
+    let value: toml::Value = content.parse().ok()?;
+    let colors_table = value.get("colors")?.as_table()?;
+    let mut palette = HashMap::new();
+    for (key, val) in colors_table {
+        if let Some(s) = val.as_str() {
+            palette.insert(key.clone(), s.to_string());
+        }
+    }
+    Some(palette)
 }
 
 fn hex_to_rgb_tuple(hex: &str) -> Option<(u8, u8, u8)> {
@@ -217,13 +241,31 @@ fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     vars.insert("error_rgb".to_string(), error_rgb.clone());
 
     vars.insert("bg_rgb_semicolon".to_string(), bg_rgb.replace(",", ";"));
-    vars.insert("bg_dark_rgb_semicolon".to_string(), bg_dark_rgb.replace(",", ";"));
-    vars.insert("bg_light_rgb_semicolon".to_string(), bg_light_rgb.replace(",", ";"));
+    vars.insert(
+        "bg_dark_rgb_semicolon".to_string(),
+        bg_dark_rgb.replace(",", ";"),
+    );
+    vars.insert(
+        "bg_light_rgb_semicolon".to_string(),
+        bg_light_rgb.replace(",", ";"),
+    );
     vars.insert("fg_rgb_semicolon".to_string(), fg_rgb.replace(",", ";"));
-    vars.insert("fg_light_rgb_semicolon".to_string(), fg_light_rgb.replace(",", ";"));
-    vars.insert("accent_rgb_semicolon".to_string(), accent_rgb.replace(",", ";"));
-    vars.insert("secondary_rgb_semicolon".to_string(), secondary_rgb.replace(",", ";"));
-    vars.insert("error_rgb_semicolon".to_string(), error_rgb.replace(",", ";"));
+    vars.insert(
+        "fg_light_rgb_semicolon".to_string(),
+        fg_light_rgb.replace(",", ";"),
+    );
+    vars.insert(
+        "accent_rgb_semicolon".to_string(),
+        accent_rgb.replace(",", ";"),
+    );
+    vars.insert(
+        "secondary_rgb_semicolon".to_string(),
+        secondary_rgb.replace(",", ";"),
+    );
+    vars.insert(
+        "error_rgb_semicolon".to_string(),
+        error_rgb.replace(",", ";"),
+    );
 
     vars.insert("home".to_string(), home_dir().to_string_lossy().to_string());
 
@@ -271,7 +313,7 @@ fn patch_kvantum_svg(svg_template: &Path, svg_output: &Path, vars: &HashMap<Stri
     let fg_light = &vars["fg_light"];
     let accent = &vars["accent"];
     let secondary = &vars["secondary"];
-    let tertiary = &vars["tertiary"];
+    let _tertiary = &vars["tertiary"];
     let error = &vars["error"];
 
     // Build replacement list: order matters — replace more specific colors first
@@ -281,12 +323,11 @@ fn patch_kvantum_svg(svg_template: &Path, svg_output: &Path, vars: &HashMap<Stri
         // Gruvbox green — checkboxes, radio buttons, itemview selection, progress bars
         ("#b8bb26", accent),
         ("#a9b665", accent),
-        ("#98971a", accent),       // Darker Gruvbox green variant
+        ("#98971a", accent), // Darker Gruvbox green variant
         // Gruvbox aqua dark — checked state backgrounds
         ("#427b58", bg_light),
         // Gruvbox aqua — secondary accent elements
         ("#83a598", secondary),
-
         // === Focused / hover accent ===
         // Gruvbox yellow — focused close buttons, focused tab indicator, focused accent
         ("#fabd2f", accent),
@@ -296,10 +337,8 @@ fn patch_kvantum_svg(svg_template: &Path, svg_output: &Path, vars: &HashMap<Stri
         ("#fe8018", accent),
         ("#d65d0e", accent),
         ("#d08770", secondary),
-
         // === Error / close button pressed ===
         ("#fb4934", error),
-
         // === Foreground / text / icons ===
         // Gruvbox fg (cream/light) — main text, mdi icons, close/min/max icons
         ("#fbf1c7", fg),
@@ -307,7 +346,6 @@ fn patch_kvantum_svg(svg_template: &Path, svg_output: &Path, vars: &HashMap<Stri
         ("#f0e3c4", fg_light),
         // Gruvbox grey — muted text, scrollbar handles, borders
         ("#a89984", fg_light),
-
         // === Backgrounds (replace most-specific first) ===
         // Gruvbox bg3/bg2 — mid-tone surfaces
         ("#504945", bg_light),
@@ -315,12 +353,10 @@ fn patch_kvantum_svg(svg_template: &Path, svg_output: &Path, vars: &HashMap<Stri
         ("#32302f", bg_light),
         // Gruvbox bg1 — slightly lighter bg
         ("#5c5040", bg_light),
-
         // Nord polar night — used for focus/hover highlight fills
         ("#4c566a", bg_light),
         ("#555761", bg_light),
         ("#555564", bg_light),
-
         // Generic dark greys used in gradient stops and generic fills
         ("#6e6e70", bg_light),
         ("#414143", bg_light),
@@ -333,12 +369,10 @@ fn patch_kvantum_svg(svg_template: &Path, svg_output: &Path, vars: &HashMap<Stri
         ("#1c1c1c", bg_dark),
         ("#191919", bg_dark),
         ("#131621", bg_dark),
-
         // Gruvbox bg0 — main dark background
         ("#282828", bg_dark),
         // Gruvbox bg0_h — darkest background
         ("#1d2021", bg),
-
         // === Button gradient stops ===
         ("#7a7a7c", bg_light),
         ("#646466", bg_light),
@@ -348,15 +382,14 @@ fn patch_kvantum_svg(svg_template: &Path, svg_output: &Path, vars: &HashMap<Stri
         ("#48484a", bg_light),
         ("#606062", bg_light),
         ("#565658", bg_light),
-
         // === Misc themed accents ===
-        ("#c3c370", accent),       // Tooltip shadow hint (yellowish-green)
-        ("#717e98", secondary),    // Muted blue-grey element
-        ("#3c4366", bg_light),     // Dark blue-grey
-        ("#5c616c", bg_light),     // Adwaita-style grey (used in close icon class)
-        ("#31363b", bg_light),     // Breeze-style dark grey (used in border class)
-        ("#222", bg),              // Shorthand dark grey (main window background!)
-        ("#333", bg_light),        // Shorthand lighter grey
+        ("#c3c370", accent),    // Tooltip shadow hint (yellowish-green)
+        ("#717e98", secondary), // Muted blue-grey element
+        ("#3c4366", bg_light),  // Dark blue-grey
+        ("#5c616c", bg_light),  // Adwaita-style grey (used in close icon class)
+        ("#31363b", bg_light),  // Breeze-style dark grey (used in border class)
+        ("#222", bg),           // Shorthand dark grey (main window background!)
+        ("#333", bg_light),     // Shorthand lighter grey
     ];
 
     let mut rendered = content;
@@ -385,15 +418,14 @@ fn main() {
         .join("last_theme");
 
     if args.len() < 2 || args[1] == "restore" {
-        if cache_theme_path.exists() {
-            if let Ok(content) = fs::read_to_string(&cache_theme_path) {
+        if cache_theme_path.exists()
+            && let Ok(content) = fs::read_to_string(&cache_theme_path) {
                 let parts: Vec<&str> = content.trim().splitn(2, ' ').collect();
                 if parts.len() == 2 {
                     mode = parts[0].to_string();
                     value = parts[1].to_string();
                 }
             }
-        }
         if mode.is_empty() {
             mode = "preset".to_string();
             value = "gruvbox".to_string();
@@ -412,10 +444,13 @@ fn main() {
     let _ = fs::write(&cache_theme_path, format!("{} {}", mode, value));
 
     let palette = match mode.as_str() {
-        "preset" => match value.as_str() {
-            "everforest" => get_everforest_palette(),
-            _ => get_gruvbox_palette(),
-        },
+        "preset" => load_preset_palette(&value).unwrap_or_else(|| {
+            eprintln!(
+                "Unknown preset '{}': no file at ~/doty/.config/hypr/wabi/presets/{}.toml",
+                value, value
+            );
+            std::process::exit(1);
+        }),
         "wallpaper" => {
             let wall = Path::new(&value);
             match get_matugen_palette(wall) {
@@ -470,10 +505,7 @@ fn main() {
             ".config/yazi/theme.toml.template",
             ".config/yazi/theme.toml",
         ),
-        (
-            ".config/git/colors.template",
-            ".config/git/colors",
-        ),
+        (".config/git/colors.template", ".config/git/colors"),
         (
             ".config/lazygit/config.yml.template",
             ".config/lazygit/config.yml",
@@ -494,10 +526,7 @@ fn main() {
             ".config/fish/conf.d/fzf-colors.fish.template",
             ".config/fish/conf.d/fzf-colors.fish",
         ),
-        (
-            ".config/eza/theme.yml.template",
-            ".config/eza/theme.yml",
-        ),
+        (".config/eza/theme.yml.template", ".config/eza/theme.yml"),
         (
             ".config/opencode/themes/matugen.json.template",
             ".config/opencode/themes/matugen.json",
@@ -539,30 +568,18 @@ fn main() {
             ".config/color-schemes/Kvantum.colors.template",
             ".local/share/color-schemes/Kvantum.colors",
         ),
-        (
-            ".config/starship.toml.template",
-            ".config/starship.toml",
-        ),
-        (
-            ".config/tmux/tmux.conf.template",
-            ".config/tmux/tmux.conf",
-        ),
+        (".config/starship.toml.template", ".config/starship.toml"),
+        (".config/tmux/tmux.conf.template", ".config/tmux/tmux.conf"),
         (
             ".config/fastfetch/config.jsonc.template",
             ".config/fastfetch/config.jsonc",
         ),
-        (
-            ".config/cava/config.template",
-            ".config/cava/config",
-        ),
+        (".config/cava/config.template", ".config/cava/config"),
         (
             ".config/satty/config.toml.template",
             ".config/satty/config.toml",
         ),
-        (
-            ".config/nvim/init.lua.template",
-            ".config/nvim/init.lua",
-        ),
+        (".config/nvim/init.lua.template", ".config/nvim/init.lua"),
         (
             ".config/vim/colors/matugen.vim.template",
             ".config/vim/colors/matugen.vim",
@@ -572,11 +589,10 @@ fn main() {
     for (tmpl, dest) in mappings {
         let t_path = doty.join(tmpl);
         let d_path = doty.join(dest);
-        if t_path.exists() {
-            if render_template(&t_path, &d_path, &vars) {
+        if t_path.exists()
+            && render_template(&t_path, &d_path, &vars) {
                 println!("Rendered: {}", dest);
             }
-        }
     }
 
     // Render Colors.qml to cache folder to prevent QuickShell file watcher reload
@@ -584,11 +600,10 @@ fn main() {
     let _ = fs::create_dir_all(&cache_colors_dir);
     let colors_tmpl = doty.join(".config/quickshell/colors.qml.template");
     let colors_dest = cache_colors_dir.join("Colors.qml");
-    if colors_tmpl.exists() {
-        if render_template(&colors_tmpl, &colors_dest, &vars) {
+    if colors_tmpl.exists()
+        && render_template(&colors_tmpl, &colors_dest, &vars) {
             println!("Rendered cache Colors.qml");
         }
-    }
 
     // Patch Kvantum SVG
     let svg_tmpl = doty.join(".config/Kvantum/wabi/wabi.svg.template");
@@ -610,26 +625,33 @@ fn main() {
 
         let css_tmpl = doty.join(".config/zen/userChrome.css.template");
         let css_dest = chrome_dir.join("userChrome.css");
-        if css_tmpl.exists() {
-            if render_template(&css_tmpl, &css_dest, &vars) {
-                println!("Rendered Zen Browser userChrome.css for {:?}", zen_profile.file_name().unwrap_or_default());
+        if css_tmpl.exists()
+            && render_template(&css_tmpl, &css_dest, &vars) {
+                println!(
+                    "Rendered Zen Browser userChrome.css for {:?}",
+                    zen_profile.file_name().unwrap_or_default()
+                );
             }
-        }
 
         let content_css_tmpl = doty.join(".config/zen/userContent.css.template");
         let content_css_dest = chrome_dir.join("userContent.css");
-        if content_css_tmpl.exists() {
-            if render_template(&content_css_tmpl, &content_css_dest, &vars) {
-                println!("Rendered Zen Browser userContent.css for {:?}", zen_profile.file_name().unwrap_or_default());
+        if content_css_tmpl.exists()
+            && render_template(&content_css_tmpl, &content_css_dest, &vars) {
+                println!(
+                    "Rendered Zen Browser userContent.css for {:?}",
+                    zen_profile.file_name().unwrap_or_default()
+                );
             }
-        }
 
         let js_src = doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/zen-reload.uc.js");
         let js_dest = chrome_dir.join("JS").join("zen-reload.uc.js");
         if js_src.exists() {
             let _ = fs::create_dir_all(chrome_dir.join("JS"));
             if fs::copy(&js_src, &js_dest).is_ok() {
-                println!("Synced Zen Browser zen-reload.uc.js for {:?}", zen_profile.file_name().unwrap_or_default());
+                println!(
+                    "Synced Zen Browser zen-reload.uc.js for {:?}",
+                    zen_profile.file_name().unwrap_or_default()
+                );
             }
         }
 
@@ -640,7 +662,11 @@ fn main() {
         if utils_src.exists() {
             let _ = fs::create_dir_all(&utils_dst);
             let src_names: std::collections::HashSet<String> = fs::read_dir(&utils_src)
-                .map(|d| d.flatten().map(|e| e.file_name().to_string_lossy().into_owned()).collect())
+                .map(|d| {
+                    d.flatten()
+                        .map(|e| e.file_name().to_string_lossy().into_owned())
+                        .collect()
+                })
                 .unwrap_or_default();
             if let Ok(existing) = fs::read_dir(&utils_dst) {
                 for e in existing.flatten() {
@@ -656,11 +682,13 @@ fn main() {
 
         let userjs_tmpl = doty.join(".config/zen/user.js.template");
         let userjs_dest = zen_profile.join("user.js");
-        if userjs_tmpl.exists() {
-            if render_template(&userjs_tmpl, &userjs_dest, &vars) {
-                println!("Rendered Zen Browser user.js for {:?}", zen_profile.file_name().unwrap_or_default());
+        if userjs_tmpl.exists()
+            && render_template(&userjs_tmpl, &userjs_dest, &vars) {
+                println!(
+                    "Rendered Zen Browser user.js for {:?}",
+                    zen_profile.file_name().unwrap_or_default()
+                );
             }
-        }
     }
 
     // Sync files
@@ -686,6 +714,40 @@ fn main() {
     let _ = Command::new("killall").arg("-USR2").arg("cava").status();
     let _ = Command::new("killall").arg("-USR1").arg("kitty").status();
 
+    // Apply keyboard backlight using asusctl aura static colour
+    // Convert to HSL and force high saturation (90%) and darker lightness (40%)
+    // to match the rich spectrum of F56C31 so it doesn't look whitish or washed out on LEDs.
+    if let Some(accent_hex) = vars.get("accent_hex") {
+        let mut final_hex = accent_hex.to_uppercase();
+        if let Some((r, g, b)) = hex_to_rgb_tuple(&final_hex) {
+            let (h, _, _) = rgb_to_hsl(r as f64, g as f64, b as f64);
+            let (dr, dg, db) = hsl_to_rgb(h, 0.90, 0.40);
+            final_hex = format!("{:02X}{:02X}{:02X}", dr, dg, db);
+        }
+        let status = Command::new("asusctl")
+            .arg("aura")
+            .arg("effect")
+            .arg("static")
+            .arg("--colour")
+            .arg(&final_hex)
+            .status();
+
+        if status.is_ok() {
+            let _ = Command::new("notify-send")
+                .arg("-t")
+                .arg("2000")
+                .arg("-h")
+                .arg("string:x-canonical-private-synchronous:keyboard-backlight-notify")
+                .arg("-a")
+                .arg("Keyboard Backlight")
+                .arg("-i")
+                .arg("keyboard")
+                .arg("Backlight Color Updated")
+                .arg(format!("Set to #{}", final_hex))
+                .status();
+        }
+    }
+
     // Rebuild bat's theme cache so the rendered tmTheme is picked up
     let _ = Command::new("bat").arg("cache").arg("--build").status();
 
@@ -694,6 +756,19 @@ fn main() {
     if let Ok(json_str) = serde_json::to_string(&vars) {
         let _ = fs::write(colors_json_dest, json_str);
     }
+
+    // Generate and write custom vtrgb file to ~/.config/vtrgb
+    if let Some(accent_hex) = vars.get("accent_hex")
+        && let Some((r, g, b)) = hex_to_rgb_tuple(accent_hex) {
+            let vtrgb_content = format!(
+                "0,170,0,170,0,170,0,{},85,255,85,255,85,255,85,{}\n\
+                 0,0,170,85,0,0,170,{},85,85,255,255,85,85,255,{}\n\
+                 0,0,0,0,170,170,170,{},85,85,85,85,255,255,255,{}\n",
+                r, r, g, g, b, b
+            );
+            let vtrgb_path = home_dir().join(".config").join("vtrgb");
+            let _ = fs::write(vtrgb_path, vtrgb_content);
+        }
 
     println!("Theme applied successfully!");
 }
@@ -821,14 +896,55 @@ fn find_zen_profiles() -> Vec<PathBuf> {
     if let Ok(entries) = fs::read_dir(&zen_dir) {
         for entry in entries.flatten() {
             let path = entry.path();
-            if path.is_dir() {
-                if let Some(name) = path.file_name().map(|n| n.to_string_lossy()) {
-                    if name.contains("Default") || name.contains("default") {
+            if path.is_dir()
+                && let Some(name) = path.file_name().map(|n| n.to_string_lossy())
+                    && (name.contains("Default") || name.contains("default")) {
                         profiles.push(path);
                     }
-                }
-            }
         }
     }
     profiles
+}
+
+fn hue_to_rgb(p: f64, q: f64, mut t: f64) -> f64 {
+    if t < 0.0 {
+        t += 1.0;
+    }
+    if t > 1.0 {
+        t -= 1.0;
+    }
+    if t < 1.0 / 6.0 {
+        return p + (q - p) * 6.0 * t;
+    }
+    if t < 1.0 / 2.0 {
+        return q;
+    }
+    if t < 2.0 / 3.0 {
+        return p + (q - p) * (2.0 / 3.0 - t) * 6.0;
+    }
+    p
+}
+
+fn hsl_to_rgb(h: f64, s: f64, l: f64) -> (u8, u8, u8) {
+    let h = h / 360.0;
+    let (r, g, b) = if s == 0.0 {
+        (l, l, l)
+    } else {
+        let q = if l < 0.5 {
+            l * (1.0 + s)
+        } else {
+            l + s - l * s
+        };
+        let p = 2.0 * l - q;
+        (
+            hue_to_rgb(p, q, h + 1.0 / 3.0),
+            hue_to_rgb(p, q, h),
+            hue_to_rgb(p, q, h - 1.0 / 3.0),
+        )
+    };
+    (
+        (r * 255.0).round() as u8,
+        (g * 255.0).round() as u8,
+        (b * 255.0).round() as u8,
+    )
 }

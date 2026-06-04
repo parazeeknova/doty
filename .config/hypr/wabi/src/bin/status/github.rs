@@ -78,12 +78,11 @@ fn main() {
 
     // Fallback to cache if network fetch failed
     if !fetch_success {
-        if cache_path.exists() {
-            if let Ok(cached_data) = std::fs::read_to_string(cache_path) {
+        if cache_path.exists()
+            && let Ok(cached_data) = std::fs::read_to_string(cache_path) {
                 println!("{cached_data}");
                 return;
             }
-        }
         eprintln!("Failed to fetch contributions and no local cache is available.");
         std::process::exit(1);
     }
@@ -165,11 +164,10 @@ fn parse_contributions(html: &str) -> Vec<ContributionDay> {
 
                 if let Some(level_idx) = td_tag.find("data-level=\"") {
                     let s = level_idx + 12;
-                    if let Some(e) = td_tag[s..].find("\"") {
-                        if let Ok(l) = td_tag[s..s + e].parse::<u32>() {
+                    if let Some(e) = td_tag[s..].find("\"")
+                        && let Ok(l) = td_tag[s..s + e].parse::<u32>() {
                             level = l;
                         }
-                    }
                 }
 
                 if let Some(id_idx) = td_tag.find("id=\"") {
@@ -222,15 +220,12 @@ fn get_local_commit_count(repo_name: &str) -> Option<u32> {
 
     for path_str in paths {
         let path = std::path::Path::new(&path_str);
-        if path.join(".git").exists() {
-            if let Some(output) =
+        if path.join(".git").exists()
+            && let Some(output) =
                 wabi::run_cmd("git", &["-C", &path_str, "rev-list", "--count", "HEAD"])
-            {
-                if let Ok(count) = output.trim().parse::<u32>() {
+                && let Ok(count) = output.trim().parse::<u32>() {
                     return Some(count);
                 }
-            }
-        }
     }
     None
 }
@@ -264,8 +259,8 @@ fn parse_activity(json_str: &str) -> Vec<ActivityItem> {
     // Aggregate consecutive duplicates
     let mut aggregated: Vec<ActivityItem> = Vec::new();
     for item in raw_items {
-        if let Some(last) = aggregated.last_mut() {
-            if last.event_type == item.event_type
+        if let Some(last) = aggregated.last_mut()
+            && last.event_type == item.event_type
                 && last.repo == item.repo
                 && last.description == item.description
             {
@@ -276,7 +271,6 @@ fn parse_activity(json_str: &str) -> Vec<ActivityItem> {
                 }
                 continue;
             }
-        }
         aggregated.push(item);
     }
 

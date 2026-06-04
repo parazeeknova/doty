@@ -13,8 +13,36 @@ Scope {
     property string currentThemeValue: ""
     property bool glassEnabled: true
     property var wallpapers: []
+    property var presets: []
+    property string lastPresetsJson: ""
+
+    // Keyboard navigation state
+    property int wallpaperFocusIndex: 0
+    property int presetFocusIndex: 0
+    property string lastFocus: "preset"
+
+    // Clamp focus indices when the underlying lists change underneath us
+    onWallpapersChanged: {
+        if (root.wallpaperFocusIndex >= root.wallpapers.length && root.wallpapers.length > 0)
+            root.wallpaperFocusIndex = root.wallpapers.length - 1;
+    }
+    onPresetsChanged: {
+        var maxPreset = root.presets.length;
+        if (root.presetFocusIndex > maxPreset)
+            root.presetFocusIndex = maxPreset;
+    }
 
     signal requestClose()
+
+    // Apply both the actual wallpaper (awww) and the color scheme (theme_switcher).
+    // These MUST be in sync — if only one runs, the screen and the colors drift apart.
+    function applyWallpaper(path) {
+        if (path === "")
+            return ;
+        // awww first (sets the visible wallpaper), then theme_switcher (matugen from the same file).
+        Quickshell.execDetached(["awww", "img", path]);
+        Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "wallpaper", path]);
+    }
 
     Theme {
         id: theme
@@ -28,6 +56,7 @@ Scope {
         target: "colorscheme_popup"
     }
 
+    // File watchers
     FileView {
         id: lastWallpaperWatcher
 
@@ -66,7 +95,20 @@ Scope {
         onFileChanged: reload()
     }
 
-    // Process to scan wallpapers horizontally
+    // Watch presets dir for add/remove (directory mtime changes when entries change)
+    FileView {
+        id: presetsDirWatcher
+
+        path: "file://" + root.homeDir + "/doty/.config/hypr/wabi/presets"
+        watchChanges: true
+        onFileChanged: presetsLister.running = true
+        onLoaded: presetsLister.running = true
+    }
+
+    // Run lister immediately when popup finishes loading (no delay on open).
+    Component.onCompleted: presetsLister.running = true
+
+    // Wallpaper thumb process (existing)
     Process {
         id: scanProc
 
@@ -83,13 +125,39 @@ Scope {
                         var parts = line.split("\t");
                         if (parts.length >= 2)
                             list.push({
-                            "path": parts[0],
-                            "thumb": parts[1]
-                        });
+                                "path": parts[0],
+                                "thumb": parts[1]
+                            });
 
                     }
                 }
                 root.wallpapers = list;
+            }
+        }
+
+    }
+
+    // Presets list process
+    Process {
+        id: presetsLister
+
+        command: [root.homeDir + "/doty/scripts/presets_lister"]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                // Skip reassignment if the data hasn't changed — avoids Repeater rebuilds.
+                if (this.text === root.lastPresetsJson)
+                    return ;
+                root.lastPresetsJson = this.text;
+                try {
+                    var parsed = JSON.parse(this.text);
+                    if (Array.isArray(parsed)) {
+                        root.presets = parsed;
+                    }
+                } catch (e) {
+                    console.warn("presets_lister parse error:", e);
+                }
             }
         }
 
@@ -209,9 +277,59 @@ Scope {
                     antialiasing: false
                     focus: true
                     Keys.onPressed: (event) => {
-                        if (event.key === Qt.Key_Escape)
+                        if (event.key === Qt.Key_Escape) {
                             win.closePopup();
-
+                            event.accepted = true;
+                            return ;
+                        }
+                        if (event.key === Qt.Key_Right || event.key === Qt.Key_L) {
+                            if (root.wallpapers.length > 0) {
+                                root.wallpaperFocusIndex = Math.min(root.wallpaperFocusIndex + 1, root.wallpapers.length - 1);
+                                root.lastFocus = "wallpaper";
+                            }
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Left || event.key === Qt.Key_H) {
+                            if (root.wallpapers.length > 0) {
+                                root.wallpaperFocusIndex = Math.max(root.wallpaperFocusIndex - 1, 0);
+                                root.lastFocus = "wallpaper";
+                            }
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Down || event.key === Qt.Key_J) {
+                            var maxPreset = root.presets.length;
+                            if (maxPreset >= 0) {
+                                root.presetFocusIndex = Math.min(root.presetFocusIndex + 1, maxPreset);
+                                root.lastFocus = "preset";
+                            }
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Up || event.key === Qt.Key_K) {
+                            if (root.presets.length >= 0) {
+                                root.presetFocusIndex = Math.max(root.presetFocusIndex - 1, 0);
+                                root.lastFocus = "preset";
+                            }
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                            if (root.lastFocus === "wallpaper" && root.wallpapers.length > 0) {
+                                var wp = root.wallpapers[root.wallpaperFocusIndex];
+                                if (wp) {
+                                    root.applyWallpaper(wp.path);
+                                    win.closePopup();
+                                }
+                            } else if (root.lastFocus === "preset") {
+                                if (root.presetFocusIndex === 0) {
+                                    if (root.currentWallpaperPath !== "") {
+                                        root.applyWallpaper(root.currentWallpaperPath);
+                                        win.closePopup();
+                                    }
+                                } else {
+                                    var p = root.presets[root.presetFocusIndex - 1];
+                                    if (p) {
+                                        Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "preset", p.name]);
+                                        win.closePopup();
+                                    }
+                                }
+                            }
+                            event.accepted = true;
+                        }
                     }
                     Component.onCompleted: {
                         forceActiveFocus();
@@ -226,7 +344,7 @@ Scope {
                         anchors.margins: 10
                         spacing: 12
 
-                        // --- SECTION 1: CENTERED ACTIVE WALLPAPER WITH OVERLAY ---
+                        // --- SECTION 1: ACTIVE WALLPAPER + COLOR PREVIEW ---
                         Rectangle {
                             width: parent.width
                             height: 60
@@ -242,7 +360,6 @@ Scope {
                                 asynchronous: true
                             }
 
-                            // Bottom overlay displaying name and colors in a single row (gradient bg)
                             Rectangle {
                                 anchors.bottom: parent.bottom
                                 width: parent.width
@@ -261,8 +378,7 @@ Scope {
                                                 return "No Wallpaper";
 
                                             var parts = root.currentWallpaperPath.split("/");
-                                            var filename = parts[parts.length - 1];
-                                            return filename.replace(/\.[^/.]+$/, "");
+                                            return parts[parts.length - 1].replace(/\.[^/.]+$/, "");
                                         }
                                         color: theme.accent
                                         font.family: "FiraCode Nerd Font"
@@ -274,7 +390,6 @@ Scope {
                                         renderType: Text.NativeRendering
                                     }
 
-                                    // Color preview squares of current theme colors (increased to 8x8)
                                     Row {
                                         spacing: 3
                                         anchors.verticalCenter: parent.verticalCenter
@@ -314,15 +429,16 @@ Scope {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    if (root.currentWallpaperPath !== "")
-                                        Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "wallpaper", root.currentWallpaperPath]);
-
+                                    if (root.currentWallpaperPath !== "") {
+                                        root.applyWallpaper(root.currentWallpaperPath);
+                                        win.closePopup();
+                                    }
                                 }
                             }
 
                         }
 
-                        // --- SECTION 2: HORIZONTAL TIMELINE OF WALLPAPERS ---
+                        // --- SECTION 2: WALLPAPER TIMELINE ---
                         Column {
                             width: parent.width
                             spacing: 4
@@ -348,11 +464,13 @@ Scope {
                                 model: root.wallpapers
 
                                 delegate: Rectangle {
+                                    required property int index
+                                    required property var modelData
                                     width: 32
                                     height: 32
                                     color: theme.bg_dark
-                                    border.width: 1
-                                    border.color: (root.currentWallpaperPath === modelData.path) ? theme.accent : theme.bg_light
+                                    border.width: (root.wallpaperFocusIndex === index) ? 2 : 1
+                                    border.color: (root.wallpaperFocusIndex === index || root.currentWallpaperPath === modelData.path) ? theme.accent : theme.bg_light
                                     clip: true
 
                                     Image {
@@ -362,7 +480,6 @@ Scope {
                                         asynchronous: true
                                     }
 
-                                    // Hover apply overlay
                                     Rectangle {
                                         id: hoverOverlay
 
@@ -387,7 +504,10 @@ Scope {
                                         anchors.fill: parent
                                         hoverEnabled: true
                                         onClicked: {
-                                            Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "wallpaper", modelData.path]);
+                                            root.wallpaperFocusIndex = index;
+                                            root.lastFocus = "wallpaper";
+                                            root.applyWallpaper(modelData.path);
+                                            win.closePopup();
                                         }
                                     }
 
@@ -397,7 +517,7 @@ Scope {
 
                         }
 
-                        // --- SECTION 3: PRESETS (TEXT ONLY WITH COLOR DOTS) ---
+                        // --- SECTION 3: PRESETS ---
                         Column {
                             width: parent.width
                             spacing: 6
@@ -416,228 +536,115 @@ Scope {
                                 width: parent.width
                                 spacing: 0
 
-                                // Auto (Wallpaper) Preset Row
-                                Rectangle {
+                                // Auto (Wallpaper) row — first in list
+                                PresetRow {
                                     width: parent.width
-                                    height: 14
-                                    color: autoMouse.containsMouse ? theme.bg_light : "transparent"
-
-                                    MouseArea {
-                                        id: autoMouse
-
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        onClicked: {
-                                            if (root.currentWallpaperPath !== "")
-                                                Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "wallpaper", root.currentWallpaperPath]);
-
+                                    rowName: "Auto"
+                                    rowActive: (root.currentThemeMode === "wallpaper")
+                                    rowFocused: (root.presetFocusIndex === 0)
+                                    dotColors: [theme.bg, theme.bg_light, theme.fg, theme.accent, theme.secondary, theme.tertiary]
+                                    onTriggered: {
+                                        root.presetFocusIndex = 0;
+                                        root.lastFocus = "preset";
+                                        if (root.currentWallpaperPath !== "") {
+                                            root.applyWallpaper(root.currentWallpaperPath);
+                                            win.closePopup();
                                         }
                                     }
+                                }
 
-                                    Item {
-                                        anchors.fill: parent
-                                        anchors.leftMargin: 6
-                                        anchors.rightMargin: 6
+                                // Dynamic preset rows from .toml files
+                                Repeater {
+                                    model: root.presets
 
-                                        Text {
-                                            text: (root.currentThemeMode === "wallpaper") ? "Auto - active" : "Auto"
-                                            color: (root.currentThemeMode === "wallpaper") ? theme.accent : theme.fg_light
-                                            font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 8
-                                            font.bold: (root.currentThemeMode === "wallpaper")
-                                            renderType: Text.NativeRendering
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.left: parent.left
+                                    delegate: PresetRow {
+                                        required property var modelData
+                                        required property int index
+                                        width: parent.width
+                                        rowName: modelData.name
+                                        rowActive: (root.currentThemeMode === "preset" && root.currentThemeValue === modelData.name)
+                                        rowFocused: (root.presetFocusIndex === index + 1)
+                                        dotColors: [modelData.colors.surface, modelData.colors.surface_variant, modelData.colors.on_surface, modelData.colors.primary, modelData.colors.secondary, modelData.colors.tertiary]
+                                        onTriggered: {
+                                            root.presetFocusIndex = index + 1;
+                                            root.lastFocus = "preset";
+                                            Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "preset", modelData.name]);
+                                            win.closePopup();
                                         }
-
-                                        Row {
-                                            spacing: 4
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.right: parent.right
-
-                                            Repeater {
-                                                model: [theme.bg, theme.bg_light, theme.fg, theme.accent, theme.secondary, theme.tertiary]
-
-                                                delegate: Rectangle {
-                                                    width: 8
-                                                    height: 8
-                                                    color: modelData
-                                                }
-
-                                            }
-
-                                        }
-
                                     }
 
                                 }
 
-                                // Everforest Preset Row
-                                Rectangle {
-                                    width: parent.width
-                                    height: 14
-                                    color: everforestMouse.containsMouse ? theme.bg_light : "transparent"
-
-                                    MouseArea {
-                                        id: everforestMouse
-
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        onClicked: {
-                                            Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "preset", "everforest"]);
-                                        }
-                                    }
-
-                                    Item {
-                                        anchors.fill: parent
-                                        anchors.leftMargin: 6
-                                        anchors.rightMargin: 6
-
-                                        Text {
-                                            text: (root.currentThemeMode === "preset" && root.currentThemeValue === "everforest") ? "Everforest - active" : "Everforest"
-                                            color: (root.currentThemeMode === "preset" && root.currentThemeValue === "everforest") ? theme.accent : theme.fg_light
-                                            font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 8
-                                            font.bold: (root.currentThemeMode === "preset" && root.currentThemeValue === "everforest")
-                                            renderType: Text.NativeRendering
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.left: parent.left
-                                        }
-
-                                        Row {
-                                            spacing: 4
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.right: parent.right
-
-                                            Repeater {
-                                                model: ["#2d353b", "#d3c6aa", "#a7c080", "#7fbbb3", "#dbbc7f", "#e67e80"]
-
-                                                delegate: Rectangle {
-                                                    width: 8
-                                                    height: 8
-                                                    color: modelData
-                                                }
-
-                                            }
-
-                                        }
-
-                                    }
-
-                                }
-
-                                // Gruvbox Preset Row
-                                Rectangle {
-                                    width: parent.width
-                                    height: 14
-                                    color: gruvboxMouse.containsMouse ? theme.bg_light : "transparent"
-
-                                    MouseArea {
-                                        id: gruvboxMouse
-
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        onClicked: {
-                                            Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "preset", "gruvbox"]);
-                                        }
-                                    }
-
-                                    Item {
-                                        anchors.fill: parent
-                                        anchors.leftMargin: 6
-                                        anchors.rightMargin: 6
-
-                                        Text {
-                                            text: (root.currentThemeMode === "preset" && root.currentThemeValue === "gruvbox") ? "Gruvbox - active" : "Gruvbox"
-                                            color: (root.currentThemeMode === "preset" && root.currentThemeValue === "gruvbox") ? theme.accent : theme.fg_light
-                                            font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 8
-                                            font.bold: (root.currentThemeMode === "preset" && root.currentThemeValue === "gruvbox")
-                                            renderType: Text.NativeRendering
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.left: parent.left
-                                        }
-
-                                        Row {
-                                            spacing: 4
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.right: parent.right
-
-                                            Repeater {
-                                                model: ["#1d2021", "#ebdbb2", "#a9b665", "#7daea3", "#d8a657", "#cc241d"]
-
-                                                delegate: Rectangle {
-                                                    width: 8
-                                                    height: 8
-                                                    color: modelData
-                                                }
-
-                                            }
-
-                                        }
-
-                                    }
-
+                                // Empty state hint
+                                Text {
+                                    visible: root.presets.length === 0
+                                    text: "(no .toml presets found)"
+                                    color: theme.fg_light
+                                    opacity: 0.5
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 7
+                                    font.italic: true
+                                    renderType: Text.NativeRendering
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    topPadding: 4
                                 }
 
                             }
 
-                            // --- SECTION 4: GLASS BLUR SINGLE ROW SQUARE TOGGLE ---
-                            MouseArea {
-                                width: parent.width
-                                height: 14
-                                onClicked: {
-                                    Quickshell.execDetached([root.homeDir + "/doty/.config/rofi/scripts/toggle_glass"]);
+                        }
+
+                        // --- SECTION 4: GLASS BLUR TOGGLE ---
+                        MouseArea {
+                            width: parent.width
+                            height: 14
+                            onClicked: {
+                                Quickshell.execDetached([root.homeDir + "/doty/.config/rofi/scripts/toggle_glass"]);
+                            }
+
+                            Row {
+                                anchors.fill: parent
+                                spacing: 8
+
+                                Text {
+                                    text: "Glass Blur Mode"
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                    font.bold: false
+                                    renderType: Text.NativeRendering
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: parent.width - 36
                                 }
 
-                                Row {
-                                    anchors.fill: parent
-                                    spacing: 8
+                                Rectangle {
+                                    width: 28
+                                    height: 12
+                                    color: root.glassEnabled ? theme.accent : theme.bg_light
+                                    border.color: theme.accent
+                                    border.width: 1
+                                    anchors.verticalCenter: parent.verticalCenter
 
-                                    Text {
-                                        text: "Glass Blur Mode"
-                                        color: theme.accent
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
-                                        font.bold: false
-                                        renderType: Text.NativeRendering
+                                    Rectangle {
+                                        width: 8
+                                        height: 8
+                                        color: root.glassEnabled ? theme.bg : theme.accent
                                         anchors.verticalCenter: parent.verticalCenter
-                                        width: parent.width - 36
+                                        x: root.glassEnabled ? 18 : 2
+
+                                        Behavior on x {
+                                            NumberAnimation {
+                                                duration: 150
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
                                     }
 
-                                    // Square switch toggle (square track + square thumb)
-                                    Rectangle {
-                                        width: 28
-                                        height: 12
-                                        color: root.glassEnabled ? theme.accent : theme.bg_light
-                                        border.color: theme.accent
-                                        border.width: 1
-                                        anchors.verticalCenter: parent.verticalCenter
-
-                                        Rectangle {
-                                            width: 8
-                                            height: 8
-                                            color: root.glassEnabled ? theme.bg : theme.accent
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            x: root.glassEnabled ? 18 : 2
-
-                                            Behavior on x {
-                                                NumberAnimation {
-                                                    duration: 150
-                                                    easing.type: Easing.OutQuad
-                                                }
-
-                                            }
-
+                                    Behavior on color {
+                                        ColorAnimation {
+                                            duration: 150
                                         }
-
-                                        Behavior on color {
-                                            ColorAnimation {
-                                                duration: 150
-                                            }
-
-                                        }
-
                                     }
 
                                 }

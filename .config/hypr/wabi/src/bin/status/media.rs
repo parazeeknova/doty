@@ -50,11 +50,10 @@ fn get_history_path() -> PathBuf {
 
 fn load_settings() -> Settings {
     let path = get_settings_path();
-    if let Ok(content) = fs::read_to_string(&path) {
-        if let Ok(settings) = serde_json::from_str(&content) {
+    if let Ok(content) = fs::read_to_string(&path)
+        && let Ok(settings) = serde_json::from_str(&content) {
             return settings;
         }
-    }
     Settings::default()
 }
 
@@ -117,7 +116,6 @@ fn is_wf_recorder_running() -> bool {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let mut updated = false;
 
     if args.len() > 1 {
         let subcommand = &args[1];
@@ -153,7 +151,7 @@ fn main() {
                         history.truncate(20);
                     }
                     save_history(&history);
-                    updated = true;
+
                 }
             }
             "set-screenshot-dir" => {
@@ -161,7 +159,7 @@ fn main() {
                     let mut settings = load_settings();
                     settings.screenshot_dir = args[2].clone();
                     save_settings(&settings);
-                    updated = true;
+
                 }
             }
             "set-recording-dir" => {
@@ -169,12 +167,12 @@ fn main() {
                     let mut settings = load_settings();
                     settings.recording_dir = args[2].clone();
                     save_settings(&settings);
-                    updated = true;
+
                 }
             }
             "clear-history" => {
                 save_history(&[]);
-                updated = true;
+
             }
             _ => {}
         }

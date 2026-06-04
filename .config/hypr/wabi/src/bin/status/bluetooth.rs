@@ -1,8 +1,8 @@
-use wabi::print_json;
 use serde::Serialize;
 use std::collections::{HashMap, HashSet};
 use std::process::Command;
 use std::time::Duration;
+use wabi::print_json;
 
 #[derive(Serialize)]
 struct BluetoothDevice {

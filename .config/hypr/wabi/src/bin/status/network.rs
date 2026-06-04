@@ -1,6 +1,6 @@
-use wabi::{active_wifi_device, cidr_to_netmask, print_json, run_cmd, split_nmcli_t_line};
 use serde::Serialize;
 use std::collections::{HashMap, HashSet};
+use wabi::{active_wifi_device, cidr_to_netmask, print_json, run_cmd, split_nmcli_t_line};
 
 #[derive(Serialize)]
 struct WifiNetwork {

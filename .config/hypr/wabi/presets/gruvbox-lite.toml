@@ -1,0 +1,14 @@
+# Gruvbox Light — light variant
+# Source: https://github.com/morhetz/gruvbox
+
+[colors]
+surface = "#fbf1c7"
+surface_container = "#f9f5d7"
+surface_variant = "#ebdbb2"
+on_surface = "#282828"
+on_surface_variant = "#3c3836"
+primary = "#d65d0e"
+primary_container = "#d79921"
+secondary = "#458588"
+tertiary = "#98971a"
+error = "#cc241d"

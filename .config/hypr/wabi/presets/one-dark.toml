@@ -1,0 +1,14 @@
+# One Dark — Atom's iconic dark theme
+# Source: https://github.com/atom/atom/tree/master/packages/one-dark-syntax
+
+[colors]
+surface = "#282c34"
+surface_container = "#21252b"
+surface_variant = "#3e4451"
+on_surface = "#abb2bf"
+on_surface_variant = "#5c6370"
+primary = "#61afef"
+primary_container = "#c678dd"
+secondary = "#56b6c2"
+tertiary = "#e5c07b"
+error = "#e06c75"

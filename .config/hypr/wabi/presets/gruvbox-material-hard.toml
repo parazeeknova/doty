@@ -1,0 +1,14 @@
+# Gruvbox Material Hard — high contrast dark (orange as primary)
+# Source: https://github.com/sainnhe/gruvbox-material
+
+[colors]
+surface = "#1d2021"
+surface_container = "#282828"
+surface_variant = "#3c3836"
+on_surface = "#fbf1c7"
+on_surface_variant = "#d5c4a1"
+primary = "#fe8019"
+primary_container = "#fabd2f"
+secondary = "#83a598"
+tertiary = "#d3869b"
+error = "#fb4934"
