@@ -137,7 +137,10 @@ fn generate_thumb(wallpaper: &Wallpaper, thumb: &Path) -> bool {
 
     if let Some(parent) = thumb.parent() {
         if let Err(err) = fs::create_dir_all(parent) {
-            eprintln!("failed to create thumbnail cache {}: {err}", parent.display());
+            eprintln!(
+                "failed to create thumbnail cache {}: {err}",
+                parent.display()
+            );
             return false;
         }
     }
@@ -160,13 +163,19 @@ fn generate_thumb(wallpaper: &Wallpaper, thumb: &Path) -> bool {
         return false;
     };
     if !status.success() {
-        eprintln!("failed to generate thumbnail for {}", wallpaper.path.display());
+        eprintln!(
+            "failed to generate thumbnail for {}",
+            wallpaper.path.display()
+        );
         let _ = fs::remove_file(&tmp);
         return false;
     }
 
     if let Err(err) = fs::rename(&tmp, thumb) {
-        eprintln!("failed to move thumbnail into place {}: {err}", thumb.display());
+        eprintln!(
+            "failed to move thumbnail into place {}: {err}",
+            thumb.display()
+        );
         let _ = fs::remove_file(&tmp);
         return false;
     }
@@ -199,7 +208,10 @@ fn generate_colors(wallpaper: &Wallpaper, cache_dir: &Path) {
         Ok(out) => {
             if out.status.success() {
                 if let Err(err) = fs::write(&color_cache, &out.stdout) {
-                    eprintln!("failed to write cached colors to {}: {err}", color_cache.display());
+                    eprintln!(
+                        "failed to write cached colors to {}: {err}",
+                        color_cache.display()
+                    );
                 } else {
                     println!("colors {}", wallpaper.path.display());
                 }
@@ -224,8 +236,9 @@ fn cleanup_stale(cache_dir: &Path, live_thumbs: &BTreeSet<PathBuf>) {
 
     for entry in entries.flatten() {
         let path = entry.path();
-        if path.extension().and_then(|ext| ext.to_str()) != Some("jpg") &&
-           path.extension().and_then(|ext| ext.to_str()) != Some("json") {
+        if path.extension().and_then(|ext| ext.to_str()) != Some("jpg")
+            && path.extension().and_then(|ext| ext.to_str()) != Some("json")
+        {
             continue;
         }
         // Also keep live JSONs
@@ -272,9 +285,7 @@ fn link_anime_wallpapers() {
                 let resolved_src = fs::canonicalize(&path).ok();
                 resolved_existing != resolved_src
             }
-            Err(_) => {
-                !target_link.exists()
-            }
+            Err(_) => !target_link.exists(),
         };
 
         if needs_creation {
@@ -282,7 +293,11 @@ fn link_anime_wallpapers() {
                 let _ = fs::remove_file(&target_link);
             }
             if let Err(err) = std::os::unix::fs::symlink(&path, &target_link) {
-                eprintln!("failed to create symlink from {} to {}: {err}", path.display(), target_link.display());
+                eprintln!(
+                    "failed to create symlink from {} to {}: {err}",
+                    path.display(),
+                    target_link.display()
+                );
             } else {
                 println!("linked {} -> {}", target_link.display(), path.display());
             }

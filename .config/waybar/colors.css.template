@@ -17,3 +17,6 @@
 @define-color grey0 {{accent}};
 @define-color grey1 {{accent}};
 @define-color grey2 {{accent}};
+@define-color accent {{accent}};
+@define-color fg_light {{fg_light}};
+@define-color main_fg {{fg}};

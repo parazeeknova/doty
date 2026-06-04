@@ -7,4 +7,5 @@
     grey2:   {{bg_light}};
     blue:    {{secondary}};
     green:   {{accent}};
+    accent:  {{accent}};
 }

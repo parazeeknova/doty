@@ -1,7 +1,7 @@
-use wabi::{battery_snapshot, print_json, quickshell_dir, round_to};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::process::Command;
+use wabi::{battery_snapshot, print_json, quickshell_dir, round_to};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct BatteryResult {

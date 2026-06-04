@@ -1,10 +1,10 @@
-use wabi::{print_json, read_trimmed, run_cmd};
 use serde::Serialize;
 use std::fs::{self, File};
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::thread::sleep;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use wabi::{print_json, read_trimmed, run_cmd};
 
 #[derive(Serialize)]
 struct DiskInfo {
@@ -105,10 +105,18 @@ fn get_cpu_usage() -> i32 {
 }
 
 fn get_cpu_temp() -> i32 {
-    for entry in std::fs::read_dir("/sys/class/thermal").ok().into_iter().flatten() {
+    for entry in std::fs::read_dir("/sys/class/thermal")
+        .ok()
+        .into_iter()
+        .flatten()
+    {
         if let Ok(entry) = entry {
             let path = entry.path();
-            if path.file_name().and_then(|n| n.to_str()).map_or(false, |n| n.starts_with("thermal_zone")) {
+            if path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .map_or(false, |n| n.starts_with("thermal_zone"))
+            {
                 let type_path = path.join("type");
                 let temp_path = path.join("temp");
                 if let Ok(type_str) = std::fs::read_to_string(type_path) {
@@ -160,8 +168,8 @@ fn get_cpu_power(usage: i32) -> f64 {
 }
 
 fn get_gpu_name() -> String {
-    let out = run_cmd("nvidia-smi", &["--query-gpu=name", "--format=csv,noheader"])
-        .unwrap_or_default();
+    let out =
+        run_cmd("nvidia-smi", &["--query-gpu=name", "--format=csv,noheader"]).unwrap_or_default();
     let name = out.trim();
     if name.contains("RTX 3060") {
         return "RTX 3060".to_string();
@@ -176,7 +184,10 @@ fn get_gpu_name() -> String {
 fn get_gpu_usage() -> i32 {
     let out = run_cmd(
         "nvidia-smi",
-        &["--query-gpu=utilization.gpu", "--format=csv,noheader,nounits"],
+        &[
+            "--query-gpu=utilization.gpu",
+            "--format=csv,noheader,nounits",
+        ],
     )
     .unwrap_or_default();
     out.trim().parse::<i32>().unwrap_or(0)
@@ -185,7 +196,10 @@ fn get_gpu_usage() -> i32 {
 fn get_gpu_temp() -> i32 {
     let out = run_cmd(
         "nvidia-smi",
-        &["--query-gpu=temperature.gpu", "--format=csv,noheader,nounits"],
+        &[
+            "--query-gpu=temperature.gpu",
+            "--format=csv,noheader,nounits",
+        ],
     )
     .unwrap_or_default();
     out.trim().parse::<i32>().unwrap_or(0)
@@ -203,7 +217,10 @@ fn get_gpu_power() -> f64 {
 fn get_gpu_memory() -> (i32, i32) {
     let out = run_cmd(
         "nvidia-smi",
-        &["--query-gpu=memory.used,memory.total", "--format=csv,noheader,nounits"],
+        &[
+            "--query-gpu=memory.used,memory.total",
+            "--format=csv,noheader,nounits",
+        ],
     )
     .unwrap_or_default();
     let parts: Vec<&str> = out.split(',').collect();

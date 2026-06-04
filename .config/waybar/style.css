@@ -16,13 +16,13 @@ window#waybar {
 }
 
 #workspaces button {
-  color: @grey2;
+  color: @fg_light;
   min-width: 22px;
   padding: 2px 0;
 }
 
 #workspaces button.active {
-  color: @fg1;
+  color: @accent;
 }
 
 #clock {

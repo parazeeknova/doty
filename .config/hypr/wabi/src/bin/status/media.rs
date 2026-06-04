@@ -75,7 +75,7 @@ fn load_history() -> Vec<HistoryEntry> {
     } else {
         Vec::new()
     };
-    
+
     let mut changed = false;
     history.retain(|entry| {
         if entry.detail.starts_with('/') {
@@ -88,11 +88,11 @@ fn load_history() -> Vec<HistoryEntry> {
             true
         }
     });
-    
+
     if changed {
         save_history(&history);
     }
-    
+
     history
 }
 
@@ -107,10 +107,7 @@ fn save_history(history: &[HistoryEntry]) {
 }
 
 fn is_wf_recorder_running() -> bool {
-    let output = Command::new("pgrep")
-        .arg("-x")
-        .arg("wf-recorder")
-        .output();
+    let output = Command::new("pgrep").arg("-x").arg("wf-recorder").output();
     if let Ok(out) = output {
         out.status.success()
     } else {
@@ -121,7 +118,7 @@ fn is_wf_recorder_running() -> bool {
 fn main() {
     let args: Vec<String> = env::args().collect();
     let mut updated = false;
-    
+
     if args.len() > 1 {
         let subcommand = &args[1];
         match subcommand.as_str() {
@@ -130,7 +127,7 @@ fn main() {
                     let entry_type = &args[2];
                     let detail = &args[3];
                     let mut history = load_history();
-                    
+
                     let timestamp = Command::new("date")
                         .arg("+%H:%M:%S")
                         .output()
@@ -139,12 +136,12 @@ fn main() {
                         .unwrap_or_else(|| "00:00:00".to_string())
                         .trim()
                         .to_string();
-                    
+
                     let id = SystemTime::now()
                         .duration_since(SystemTime::UNIX_EPOCH)
                         .map(|d| d.as_millis() as u64)
                         .unwrap_or(0);
-                        
+
                     let entry = HistoryEntry {
                         id,
                         entry_type: entry_type.clone(),
@@ -182,7 +179,7 @@ fn main() {
             _ => {}
         }
     }
-    
+
     // Only output status on stdout if not doing a silent subcommand,
     // or if we just want to retrieve the new state.
     // Actually, printing the status unconditionally makes it easy for Quickshell
@@ -190,14 +187,14 @@ fn main() {
     let settings = load_settings();
     let history = load_history();
     let is_recording = is_wf_recorder_running();
-    
+
     let status = MediaStatus {
         is_recording,
         screenshot_dir: settings.screenshot_dir,
         recording_dir: settings.recording_dir,
         history,
     };
-    
+
     if let Ok(json) = serde_json::to_string(&status) {
         println!("{}", json);
     }

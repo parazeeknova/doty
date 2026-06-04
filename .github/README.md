@@ -1,6 +1,7 @@
 <div align="center">
 
-  <h3>stowed in ~ painted in gruvbox</h3>
+  <h2>wabi</h2>
+  <h3>stowed in ~, worn with time</h3>
   <br>
   <a href="https://github.com/parazeeknova/doty">
     <img src="assets/1.png" alt="homescreen" width="99%">

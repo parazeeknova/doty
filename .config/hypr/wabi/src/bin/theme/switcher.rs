@@ -104,15 +104,42 @@ fn get_everforest_palette() -> HashMap<String, String> {
 fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     let mut vars = HashMap::new();
 
-    let bg = palette.get("surface").cloned().unwrap_or_else(|| "#1d2021".to_string());
-    let bg_dark = palette.get("surface_container").cloned().unwrap_or_else(|| "#282828".to_string());
-    let bg_light = palette.get("surface_variant").cloned().unwrap_or_else(|| "#3c3836".to_string());
-    let fg = palette.get("on_surface").cloned().unwrap_or_else(|| "#ebdbb2".to_string());
-    let fg_light = palette.get("on_surface_variant").cloned().unwrap_or_else(|| "#d5c4a1".to_string());
-    let accent = palette.get("primary").cloned().unwrap_or_else(|| "#a9b665".to_string());
-    let secondary = palette.get("secondary").cloned().unwrap_or_else(|| "#7daea3".to_string());
-    let tertiary = palette.get("tertiary").cloned().unwrap_or_else(|| "#d8a657".to_string());
-    let error = palette.get("error").cloned().unwrap_or_else(|| "#cc241d".to_string());
+    let bg = palette
+        .get("surface")
+        .cloned()
+        .unwrap_or_else(|| "#1d2021".to_string());
+    let bg_dark = palette
+        .get("surface_container")
+        .cloned()
+        .unwrap_or_else(|| "#282828".to_string());
+    let bg_light = palette
+        .get("surface_variant")
+        .cloned()
+        .unwrap_or_else(|| "#3c3836".to_string());
+    let fg = palette
+        .get("on_surface")
+        .cloned()
+        .unwrap_or_else(|| "#ebdbb2".to_string());
+    let fg_light = palette
+        .get("on_surface_variant")
+        .cloned()
+        .unwrap_or_else(|| "#d5c4a1".to_string());
+    let accent = palette
+        .get("primary")
+        .cloned()
+        .unwrap_or_else(|| "#a9b665".to_string());
+    let secondary = palette
+        .get("secondary")
+        .cloned()
+        .unwrap_or_else(|| "#7daea3".to_string());
+    let tertiary = palette
+        .get("tertiary")
+        .cloned()
+        .unwrap_or_else(|| "#d8a657".to_string());
+    let error = palette
+        .get("error")
+        .cloned()
+        .unwrap_or_else(|| "#cc241d".to_string());
 
     vars.insert("bg".to_string(), bg.clone());
     vars.insert("bg_hex".to_string(), bg.replace("#", ""));
@@ -157,7 +184,11 @@ fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     vars
 }
 
-fn render_template(template_path: &Path, output_path: &Path, vars: &HashMap<String, String>) -> bool {
+fn render_template(
+    template_path: &Path,
+    output_path: &Path,
+    vars: &HashMap<String, String>,
+) -> bool {
     let Ok(content) = fs::read_to_string(template_path) else {
         return false;
     };
@@ -235,12 +266,10 @@ fn main() {
     let _ = fs::write(&cache_theme_path, format!("{} {}", mode, value));
 
     let palette = match mode.as_str() {
-        "preset" => {
-            match value.as_str() {
-                "everforest" => get_everforest_palette(),
-                _ => get_gruvbox_palette(),
-            }
-        }
+        "preset" => match value.as_str() {
+            "everforest" => get_everforest_palette(),
+            _ => get_gruvbox_palette(),
+        },
         "wallpaper" => {
             let wall = Path::new(&value);
             match get_matugen_palette(wall) {
@@ -262,19 +291,55 @@ fn main() {
 
     // Define all templates and their destinations
     let mappings = vec![
-        (".config/hypr/modules/colors.lua.template", ".config/hypr/modules/colors.lua"),
-        (".config/waybar/colors.css.template", ".config/waybar/colors/matugen.css"),
-        (".config/rofi/colors.rasi.template", ".config/rofi/colors.rasi"),
-        (".config/kitty/current-theme.conf.template", ".config/kitty/current-theme.conf"),
-        (".config/ghostty/theme.template", ".config/ghostty/themes/theme"),
-        (".config/quickshell/Theme.qml.template", ".config/quickshell/Theme.qml"),
-        (".config/gtk-3.0/colors.css.template", ".config/gtk-3.0/colors.css"),
-        (".config/gtk-4.0/colors.css.template", ".config/gtk-4.0/colors.css"),
-        (".config/qt5ct/style-colors.conf.template", ".config/qt5ct/style-colors.conf"),
-        (".config/qt6ct/style-colors.conf.template", ".config/qt6ct/style-colors.conf"),
+        (
+            ".config/hypr/modules/colors.lua.template",
+            ".config/hypr/modules/colors.lua",
+        ),
+        (
+            ".config/waybar/colors.css.template",
+            ".config/waybar/colors/matugen.css",
+        ),
+        (
+            ".config/rofi/colors.rasi.template",
+            ".config/rofi/colors.rasi",
+        ),
+        (
+            ".config/kitty/current-theme.conf.template",
+            ".config/kitty/current-theme.conf",
+        ),
+        (
+            ".config/ghostty/theme.template",
+            ".config/ghostty/themes/theme",
+        ),
+        (
+            ".config/quickshell/Theme.qml.template",
+            ".config/quickshell/Theme.qml",
+        ),
+        (
+            ".config/gtk-3.0/colors.css.template",
+            ".config/gtk-3.0/colors.css",
+        ),
+        (
+            ".config/gtk-4.0/colors.css.template",
+            ".config/gtk-4.0/colors.css",
+        ),
+        (
+            ".config/qt5ct/style-colors.conf.template",
+            ".config/qt5ct/style-colors.conf",
+        ),
+        (
+            ".config/qt6ct/style-colors.conf.template",
+            ".config/qt6ct/style-colors.conf",
+        ),
         (".config/mako/config.template", ".config/mako/config"),
-        (".config/hypr/hyprlock.conf.template", ".config/hypr/hyprlock.conf"),
-        (".config/Kvantum/Gruvbox/Gruvbox.kvconfig.template", ".config/Kvantum/Gruvbox/Gruvbox.kvconfig"),
+        (
+            ".config/hypr/hyprlock.conf.template",
+            ".config/hypr/hyprlock.conf",
+        ),
+        (
+            ".config/Kvantum/Gruvbox/Gruvbox.kvconfig.template",
+            ".config/Kvantum/Gruvbox/Gruvbox.kvconfig",
+        ),
     ];
 
     for (tmpl, dest) in mappings {
@@ -312,10 +377,7 @@ fn main() {
     }
 
     // Sync files
-    let _ = Command::new("make")
-        .arg("sync")
-        .current_dir(&doty)
-        .status();
+    let _ = Command::new("make").arg("sync").current_dir(&doty).status();
 
     // Reload services
     let _ = Command::new("hyprctl").arg("reload").status();
@@ -380,4 +442,3 @@ fn apply_papirus_folders(accent_hex: &str) {
         .arg(closest_color)
         .status();
 }
-

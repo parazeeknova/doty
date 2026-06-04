@@ -23,7 +23,7 @@
   "custom/tray_toggle": {
     "format": "{}",
     "return-type": "json",
-    "exec": "~/.config/waybar/scripts/tray_count.sh",
+    "exec": "~/.config/waybar/scripts/tray_count",
     "signal": 5,
     "on-click": "quickshell --config tray_popup",
     "tooltip": false

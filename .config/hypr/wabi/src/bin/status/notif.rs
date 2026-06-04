@@ -1,6 +1,6 @@
-use wabi::{print_json, run_cmd};
 use serde::Serialize;
 use serde_json::Value;
+use wabi::{print_json, run_cmd};
 
 #[derive(Serialize)]
 struct NotifItem {
@@ -112,7 +112,8 @@ fn is_audio_muted() -> bool {
 
 fn get_uptime() -> String {
     let out = run_cmd("uptime", &["-p"]).unwrap_or_default();
-    let clean = out.trim()
+    let clean = out
+        .trim()
         .replace("up ", "")
         .replace(" hours,", "h")
         .replace(" hour,", "h")

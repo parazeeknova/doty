@@ -1,6 +1,6 @@
-use wabi::{brightnessctl_percent, find_kbd_backlight_device, print_json, read_trimmed};
 use serde::Serialize;
 use std::path::Path;
+use wabi::{brightnessctl_percent, find_kbd_backlight_device, print_json, read_trimmed};
 
 #[derive(Serialize)]
 struct BrightnessStatus {

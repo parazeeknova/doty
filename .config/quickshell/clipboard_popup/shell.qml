@@ -340,7 +340,8 @@ Scope {
                                 verticalAlignment: TextInput.AlignVCenter
                                 color: "#d4be98"
                                 font.family: root.fontName
-                                font.pixelSize: 8
+                                font.pointSize: 8
+
                                 focus: true
                                 onTextChanged: {
                                     root.searchQuery = text.toLowerCase();
@@ -351,7 +352,7 @@ Scope {
                                     text: "search..."
                                     color: "#7c6f64"
                                     font.family: root.fontName
-                                    font.pixelSize: 8
+                                    font.pointSize: 8
                                     visible: searchInput.text === ""
                                     anchors.fill: parent
                                     verticalAlignment: Text.AlignVCenter
@@ -430,7 +431,7 @@ Scope {
                                             text: entryText.toLowerCase()
                                             color: (root.selectedIndex === index) ? "#ddc7a1" : "#d4be98"
                                             font.family: root.fontName
-                                            font.pixelSize: 8
+                                            font.pointSize: 8
                                             elide: Text.ElideRight
                                             wrapMode: Text.NoWrap
                                             verticalAlignment: Text.AlignVCenter
@@ -449,7 +450,7 @@ Scope {
                         Text {
                             text: "clear all"
                             font.family: root.fontName
-                            font.pixelSize: 8
+                            font.pointSize: 8
                             color: clearAllMouseArea.containsMouse ? "#fb4934" : "#7c6f64"
                             Layout.alignment: Qt.AlignRight
                             Layout.bottomMargin: 2

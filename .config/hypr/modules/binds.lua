@@ -109,7 +109,7 @@ hl.bind(mainMod .. " + ALT + H", hl.dsp
 ---     Rofi      ---
 ---------------------
 
-hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("rofi -show drun -mesg 'applications'"))
+hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("rofi -show drun -mesg 'applications' -placeholder 'search applications'"))
 hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd("rofi -show recents"))
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("rofi -show power"))
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("rofi -show sunset"))
@@ -140,7 +140,7 @@ hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(
     "quickshell -c brightness_popup ipc call brightness_popup close || quickshell --config brightness_popup"))
 hl.bind(mainMod .. " + SHIFT + N",
     hl.dsp.exec_cmd("quickshell -c notif_popup ipc call notif_popup close || quickshell --config notif_popup"))
-hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd("~/.config/rofi/scripts/toggle-glass.sh"))
+hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd("~/.config/rofi/scripts/toggle_glass"))
 hl.bind(mainMod .. " + O", hl.dsp.window.set_prop({
     prop = "opaque",
     value = "toggle",
@@ -190,7 +190,7 @@ hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd(
 ---------------------
 
 -- Waybar toggle
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/doty/.config/waybar/scripts/launch.sh"))
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/waybar/scripts/waybar_toggle"))
 
 -- Lock screen
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock -c ~/.config/hypr/hyprlock.conf"))

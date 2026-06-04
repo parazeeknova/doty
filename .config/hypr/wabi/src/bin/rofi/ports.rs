@@ -18,7 +18,10 @@ fn main() {
                     notify("Ports Rofi", &format!("Killed process with PID {}", pid));
                 }
                 _ => {
-                    notify("Ports Rofi", &format!("Failed to kill process with PID {}", pid));
+                    notify(
+                        "Ports Rofi",
+                        &format!("Failed to kill process with PID {}", pid),
+                    );
                 }
             }
         } else {
@@ -53,7 +56,7 @@ fn main() {
 
         if let Some(users_idx) = line.find("users:(") {
             let users_part = &line[users_idx..];
-            
+
             let mut cursor = users_part;
             while let Some(pid_idx) = cursor.find("pid=") {
                 let pre_pid = &cursor[..pid_idx];
@@ -61,15 +64,23 @@ fn main() {
                     let pre_quote = &pre_pid[..first_quote];
                     if let Some(second_quote) = pre_quote.rfind('"') {
                         let prog = &pre_quote[second_quote + 1..first_quote];
-                        
+
                         let after_pid = &cursor[pid_idx + 4..];
-                        let end_pid_idx = after_pid.find(',').unwrap_or_else(|| after_pid.find(')').unwrap_or(0));
+                        let end_pid_idx = after_pid
+                            .find(',')
+                            .unwrap_or_else(|| after_pid.find(')').unwrap_or(0));
                         let pid = &after_pid[..end_pid_idx];
 
-                        let key = (proto.clone(), port.to_string(), prog.to_string(), pid.to_string());
+                        let key = (
+                            proto.clone(),
+                            port.to_string(),
+                            prog.to_string(),
+                            pid.to_string(),
+                        );
                         if !seen.contains(&key) {
                             seen.insert(key.clone());
-                            let label = format!("[{}] Port {} -> {} (PID {})", proto, port, prog, pid);
+                            let label =
+                                format!("[{}] Port {} -> {} (PID {})", proto, port, prog, pid);
                             println!("{}\0info\x1f{}", label, pid);
                         }
                     }

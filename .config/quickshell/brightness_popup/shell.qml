@@ -648,7 +648,7 @@ Scope {
                                     onClicked: {
                                         var nextState = !root.caffeineActive;
                                         root.caffeineActive = nextState;
-                                        Quickshell.execDetached([root.homeDir + "/.config/rofi/scripts/caffeine.sh"]);
+                                        Quickshell.execDetached([root.homeDir + "/.config/rofi/scripts/caffeine"]);
                                         // Refresh in the background to sync state
                                         root.triggerRefresh();
                                     }

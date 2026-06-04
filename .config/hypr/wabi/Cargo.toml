@@ -6,3 +6,111 @@ edition = "2024"
 [dependencies]
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
+
+[lib]
+name = "wabi"
+path = "src/lib.rs"
+
+[[bin]]
+name = "get_audio_status"
+path = "src/bin/status/audio.rs"
+
+[[bin]]
+name = "get_battery_status"
+path = "src/bin/status/battery.rs"
+
+[[bin]]
+name = "get_bluetooth_status"
+path = "src/bin/status/bluetooth.rs"
+
+[[bin]]
+name = "get_brightness_status"
+path = "src/bin/status/brightness.rs"
+
+[[bin]]
+name = "get_github_graph"
+path = "src/bin/status/github.rs"
+
+[[bin]]
+name = "get_media_status"
+path = "src/bin/status/media.rs"
+
+[[bin]]
+name = "get_network_status"
+path = "src/bin/status/network.rs"
+
+[[bin]]
+name = "get_notif_status"
+path = "src/bin/status/notif.rs"
+
+[[bin]]
+name = "get_podman_status"
+path = "src/bin/status/podman.rs"
+
+[[bin]]
+name = "get_sysmon_status"
+path = "src/bin/status/sysmon.rs"
+
+[[bin]]
+name = "get_vm_status"
+path = "src/bin/status/vm.rs"
+
+[[bin]]
+name = "log_battery"
+path = "src/bin/utils/battery_log.rs"
+
+[[bin]]
+name = "osdctl"
+path = "src/bin/utils/osdctl.rs"
+
+[[bin]]
+name = "waybar_toggle"
+path = "src/bin/utils/waybar_toggle.rs"
+
+[[bin]]
+name = "tray_count"
+path = "src/bin/utils/tray_count.rs"
+
+[[bin]]
+name = "theme_switcher"
+path = "src/bin/theme/switcher.rs"
+
+[[bin]]
+name = "wallpaper_thumb_watcher"
+path = "src/bin/theme/watcher.rs"
+
+[[bin]]
+name = "ports_menu"
+path = "src/bin/rofi/ports.rs"
+
+[[bin]]
+name = "caffeine"
+path = "src/bin/rofi/caffeine.rs"
+
+[[bin]]
+name = "cliphist"
+path = "src/bin/rofi/cliphist.rs"
+
+[[bin]]
+name = "notif_center"
+path = "src/bin/rofi/notif_center.rs"
+
+[[bin]]
+name = "power_menu"
+path = "src/bin/rofi/power_menu.rs"
+
+[[bin]]
+name = "profile"
+path = "src/bin/rofi/profile.rs"
+
+[[bin]]
+name = "recents"
+path = "src/bin/rofi/recents.rs"
+
+[[bin]]
+name = "sunset"
+path = "src/bin/rofi/sunset.rs"
+
+[[bin]]
+name = "toggle_glass"
+path = "src/bin/rofi/toggle_glass.rs"

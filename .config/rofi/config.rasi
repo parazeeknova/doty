@@ -1,9 +1,9 @@
 configuration {
-    modi: "drun,recents:~/.config/rofi/scripts/recents.sh,noti:~/.config/rofi/scripts/notif-center.sh,power:~/.config/rofi/scripts/power-menu.sh,profile:~/.config/rofi/scripts/profile.sh,sunset:~/.config/rofi/scripts/sunset.sh,clip:~/.config/rofi/scripts/cliphist.sh,ports:~/.config/rofi/scripts/ports_menu";
+    modi: "drun,recents:~/.config/rofi/scripts/recents,noti:~/.config/rofi/scripts/notif_center,power:~/.config/rofi/scripts/power_menu,profile:~/.config/rofi/scripts/profile,sunset:~/.config/rofi/scripts/sunset,clip:~/.config/rofi/scripts/cliphist,ports:~/.config/rofi/scripts/ports_menu";
     show-icons: false;
     display-drun: "";
     drun-display-format: "{name}";
-    font: "FiraCode Nerd Font 9";
+    font: "FiraCode Nerd Font 8";
     sort: true;
     sorting-method: "fzf";
 }

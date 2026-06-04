@@ -3,7 +3,7 @@
 * {
     background-color: transparent;
     text-color: @fg;
-    font: "FiraCode Nerd Font 9";
+    font: "FiraCode Nerd Font 8";
     text-transform: lowercase;
 }
 
@@ -13,7 +13,8 @@ window {
     y-offset: 4px;
     width: 200px;
     background-color: @bg0;
-    border: 0;
+    border: 1px;
+    border-color: @accent;
     padding: 2px;
 }
 
@@ -25,7 +26,7 @@ mainbox {
 inputbar {
     padding: 0 0 2px 0;
     border: 0 0 1px 0;
-    border-color: @grey2;
+    border-color: @accent;
 }
 
 prompt {
@@ -33,8 +34,8 @@ prompt {
 }
 
 entry {
-    placeholder: "run";
     placeholder-color: @grey2;
+    cursor-color: @accent;
 }
 
 listview {
@@ -47,17 +48,21 @@ element {
     padding: 2px 4px;
 }
 
+element-text, element-icon {
+    text-color: inherit;
+}
+
 element normal.normal {
-    text-color: @fg;
+    text-color: @blue;
 }
 
 element selected.normal {
     background-color: @bg1;
-    text-color: @fg1;
+    text-color: @accent;
 }
 
 element alternate.normal {
-    text-color: @grey1;
+    text-color: @blue;
 }
 
 element normal.urgent {

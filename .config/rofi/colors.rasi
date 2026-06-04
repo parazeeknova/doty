@@ -7,4 +7,5 @@
     grey2:   #504539;
     blue:    #dfc2a2;
     green:   #f8bb71;
+    accent:  #f8bb71;
 }
