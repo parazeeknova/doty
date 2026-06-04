@@ -138,7 +138,7 @@ Scope {
                     implicitHeight: menuColumn.implicitHeight + 8
                     color: theme.trayBgColor // Semi-transparent Gruvbox dark background
                     border.width: 1
-                    border.color: "#d5c4a1" // Gruvbox retro warm text/border color
+                    border.color: theme.c.accent // Gruvbox retro warm text/border color
                     radius: 0
                     opacity: win.animOpacity
                     anchors.top: trayBar.bottom
@@ -186,7 +186,7 @@ Scope {
                                         Text {
                                             anchors.centerIn: parent
                                             text: modelData.checkState === Qt.Checked ? "✓" : ""
-                                            color: mouseArea.containsMouse ? "#ebdbb2" : "#d4be98"
+                                            color: mouseArea.containsMouse ? theme.c.accent : "#d4be98"
                                             font.bold: true
                                             font.pixelSize: 8
                                             visible: modelData.buttonType === 1 || modelData.buttonType === 2
@@ -196,7 +196,7 @@ Scope {
 
                                     Text {
                                         text: modelData.text.replace(/&/g, "")
-                                        color: modelData.enabled ? (mouseArea.containsMouse ? "#ebdbb2" : "#d4be98") : "#7c6f64" // Hover text only color shift
+                                        color: modelData.enabled ? (mouseArea.containsMouse ? theme.c.accent : "#d4be98") : "#7c6f64" // Hover text only color shift
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         renderType: Text.NativeRendering
@@ -238,7 +238,7 @@ Scope {
                     opacity: win.animOpacity
                     color: win.isMenuOpen ? "transparent" : theme.popupBgColor
                     border.width: win.isMenuOpen ? 0 : 1
-                    border.color: "#d5c4a1"
+                    border.color: theme.c.accent
                     radius: 0
                     antialiasing: false
                     focus: true

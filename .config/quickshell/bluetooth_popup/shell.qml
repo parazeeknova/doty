@@ -219,7 +219,7 @@ Scope {
                     opacity: win.animOpacity
                     color: theme.popupBgColor
                     border.width: 1
-                    border.color: "#d5c4a1"
+                    border.color: theme.c.accent
                     radius: 0
                     antialiasing: false
                     focus: true
@@ -252,7 +252,7 @@ Scope {
 
                                 Text {
                                     text: "Bluetooth"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 10
                                     font.bold: true
@@ -277,7 +277,7 @@ Scope {
                                             return d.name;
                                         }).join(", ");
                                     }
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     opacity: 0.6
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
@@ -294,7 +294,7 @@ Scope {
 
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: root.btEnabled === null ? "--" : (root.btEnabled ? "On" : "Off")
-                                color: "#d5c4a1"
+                                color: theme.c.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -303,8 +303,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btToggleText.color = "#ebdbb2"
-                                    onExited: btToggleText.color = "#d5c4a1"
+                                    onEntered: btToggleText.color = theme.c.accent
+                                    onExited: btToggleText.color = theme.c.accent
                                     onClicked: {
                                         if (root.btEnabled)
                                             Quickshell.execDetached(["bluetoothctl", "power", "off"]);
@@ -326,7 +326,7 @@ Scope {
 
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: "󰑐"
-                                color: "#d5c4a1"
+                                color: theme.c.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 11
                                 renderType: Text.NativeRendering
@@ -335,8 +335,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: scanBtn.color = "#ebdbb2"
-                                    onExited: scanBtn.color = "#d5c4a1"
+                                    onEntered: scanBtn.color = theme.c.accent
+                                    onExited: scanBtn.color = theme.c.accent
                                     onClicked: {
                                         if (checkStatusProc.running)
                                             return ;
@@ -365,13 +365,13 @@ Scope {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: "#d5c4a1"
+                            color: theme.c.accent
                             opacity: 0.15
                         }
 
                         Text {
                             text: "  Loading devices..."
-                            color: "#d5c4a1"
+                            color: theme.c.accent
                             opacity: 0.5
                             font.family: "FiraCode Nerd Font"
                             font.pixelSize: 8
@@ -389,7 +389,7 @@ Scope {
 
                             Text {
                                 text: "Connected"
-                                color: "#d5c4a1"
+                                color: theme.c.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -430,7 +430,7 @@ Scope {
                                                             icon = "󰊴";
                                                         return icon + " " + modelData.name;
                                                     }
-                                                    color: "#d5c4a1"
+                                                    color: theme.c.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     font.bold: true
@@ -447,7 +447,7 @@ Scope {
                                                 anchors.rightMargin: 6
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 text: modelData.battery !== null ? Math.round(modelData.battery) + "%" : ""
-                                                color: "#d5c4a1"
+                                                color: theme.c.accent
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
@@ -459,7 +459,7 @@ Scope {
                                                 anchors.right: parent.right
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 text: "disconnect"
-                                                color: "#d5c4a1"
+                                                color: theme.c.accent
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
@@ -467,8 +467,8 @@ Scope {
                                                 MouseArea {
                                                     anchors.fill: parent
                                                     hoverEnabled: true
-                                                    onEntered: disconnectBtn.color = "#ebdbb2"
-                                                    onExited: disconnectBtn.color = "#d5c4a1"
+                                                    onEntered: disconnectBtn.color = theme.c.accent
+                                                    onExited: disconnectBtn.color = theme.c.accent
                                                     onClicked: {
                                                         Quickshell.execDetached(["bluetoothctl", "disconnect", modelData.address]);
                                                         root.triggerRefresh();
@@ -487,7 +487,7 @@ Scope {
 
                             Text {
                                 text: "  No devices connected"
-                                color: "#d5c4a1"
+                                color: theme.c.accent
                                 opacity: 0.5
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
@@ -502,7 +502,7 @@ Scope {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: "#d5c4a1"
+                            color: theme.c.accent
                             opacity: 0.15
                             visible: !root.loading && root.btEnabled && root.devices.filter(function(d) {
                                 return d.connected;
@@ -519,7 +519,7 @@ Scope {
 
                             Text {
                                 text: "Paired"
-                                color: "#d5c4a1"
+                                color: theme.c.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -560,7 +560,7 @@ Scope {
                                                             icon = "󰊴";
                                                         return icon + " " + modelData.name;
                                                     }
-                                                    color: "#d5c4a1"
+                                                    color: theme.c.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     elide: Text.ElideRight
@@ -576,7 +576,7 @@ Scope {
                                                 anchors.rightMargin: 6
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 text: modelData.battery !== null ? Math.round(modelData.battery) + "%" : ""
-                                                color: "#d5c4a1"
+                                                color: theme.c.accent
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
@@ -588,7 +588,7 @@ Scope {
                                                 anchors.right: parent.right
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 text: "connect"
-                                                color: "#d5c4a1"
+                                                color: theme.c.accent
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
@@ -596,8 +596,8 @@ Scope {
                                                 MouseArea {
                                                     anchors.fill: parent
                                                     hoverEnabled: true
-                                                    onEntered: connectBtn.color = "#ebdbb2"
-                                                    onExited: connectBtn.color = "#d5c4a1"
+                                                    onEntered: connectBtn.color = theme.c.accent
+                                                    onExited: connectBtn.color = theme.c.accent
                                                     onClicked: {
                                                         Quickshell.execDetached(["bluetoothctl", "connect", modelData.address]);
                                                         root.triggerRefresh();
@@ -616,7 +616,7 @@ Scope {
 
                             Text {
                                 text: "  No paired devices"
-                                color: "#d5c4a1"
+                                color: theme.c.accent
                                 opacity: 0.5
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
@@ -631,7 +631,7 @@ Scope {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: "#d5c4a1"
+                            color: theme.c.accent
                             opacity: 0.15
                             visible: !root.loading && root.btEnabled && root.devices.filter(function(d) {
                                 return d.paired && !d.connected;
@@ -646,7 +646,7 @@ Scope {
 
                             Text {
                                 text: "Available"
-                                color: "#d5c4a1"
+                                color: theme.c.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -675,7 +675,7 @@ Scope {
                                                 anchors.left: parent.left
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 text: modelData.name
-                                                color: "#d5c4a1"
+                                                color: theme.c.accent
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
                                                 elide: Text.ElideRight
@@ -689,7 +689,7 @@ Scope {
                                                 anchors.right: parent.right
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 text: "pair"
-                                                color: "#d5c4a1"
+                                                color: theme.c.accent
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
@@ -697,8 +697,8 @@ Scope {
                                                 MouseArea {
                                                     anchors.fill: parent
                                                     hoverEnabled: true
-                                                    onEntered: pairBtn.color = "#ebdbb2"
-                                                    onExited: pairBtn.color = "#d5c4a1"
+                                                    onEntered: pairBtn.color = theme.c.accent
+                                                    onExited: pairBtn.color = theme.c.accent
                                                     onClicked: {
                                                         Quickshell.execDetached(["bluetoothctl", "pair", modelData.address]);
                                                         root.triggerRefresh();
@@ -717,7 +717,7 @@ Scope {
 
                             Text {
                                 text: "  No available devices"
-                                color: "#d5c4a1"
+                                color: theme.c.accent
                                 opacity: 0.5
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
@@ -732,7 +732,7 @@ Scope {
                         // --- FOOTER: Bluetooth off message ---
                         Text {
                             text: "  Bluetooth is disabled"
-                            color: "#d5c4a1"
+                            color: theme.c.accent
                             opacity: 0.5
                             font.family: "FiraCode Nerd Font"
                             font.pixelSize: 8

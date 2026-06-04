@@ -352,7 +352,7 @@ Scope {
                     opacity: win.animOpacity
                     color: theme.popupBgColor
                     border.width: 1
-                    border.color: "#d5c4a1"
+                    border.color: theme.c.accent
                     radius: 0
                     antialiasing: false
                     focus: true
@@ -402,7 +402,7 @@ Scope {
                                             var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
                                             return months[date.getMonth()] + " " + date.getFullYear();
                                         }
-                                        color: "#d5c4a1"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -424,7 +424,7 @@ Scope {
                                                 Text {
                                                     anchors.centerIn: parent
                                                     text: modelData
-                                                    color: "#d5c4a1"
+                                                    color: theme.c.accent
                                                     opacity: 0.5
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 7
@@ -451,14 +451,14 @@ Scope {
                                             delegate: Rectangle {
                                                 width: parent.width / 7
                                                 height: 13
-                                                color: modelData.isToday ? "#d5c4a1" : "transparent"
+                                                color: modelData.isToday ? theme.c.accent : "transparent"
                                                 border.width: 0
                                                 radius: 1
 
                                                 Text {
                                                     anchors.centerIn: parent
                                                     text: String(modelData.day)
-                                                    color: modelData.isToday ? "#1d2021" : "#d5c4a1"
+                                                    color: modelData.isToday ? theme.c.bg : theme.c.accent
                                                     opacity: modelData.isToday ? 1 : (modelData.isCurrentMonth ? 0.85 : 0.25)
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 7
@@ -481,7 +481,7 @@ Scope {
                                     anchors.top: parent.top
                                     anchors.right: parent.right
                                     text: ""
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     font.bold: true
@@ -503,7 +503,7 @@ Scope {
                                     anchors.right: parent.right
                                     anchors.bottomMargin: 2
                                     text: ""
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     font.bold: true
@@ -527,7 +527,7 @@ Scope {
 
                                 Text {
                                     text: root.hourStr
-                                    color: "#ebdbb2"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 22
                                     font.bold: true
@@ -537,7 +537,7 @@ Scope {
 
                                 Text {
                                     text: root.minStr
-                                    color: "#ebdbb2"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 22
                                     font.bold: false
@@ -551,7 +551,7 @@ Scope {
 
                                     Text {
                                         text: root.secStr
-                                        color: "#d5c4a1"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         renderType: Text.NativeRendering
@@ -559,7 +559,7 @@ Scope {
 
                                     Text {
                                         text: root.ampmStr
-                                        color: "#d5c4a1"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: false
@@ -575,7 +575,7 @@ Scope {
 
                                 Text {
                                     text: "X"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     opacity: 0.4
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
@@ -591,7 +591,7 @@ Scope {
 
                                 Text {
                                     text: root.uptimeStr.replace("UP ", "")
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     opacity: 0.75
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
@@ -607,7 +607,7 @@ Scope {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: "#d5c4a1"
+                            color: theme.c.accent
                             opacity: 0.15
                         }
 
@@ -625,7 +625,7 @@ Scope {
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Notifications"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 10
                                     font.bold: true
@@ -638,7 +638,7 @@ Scope {
                                     anchors.right: parent.right
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Clear All"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     font.bold: false
@@ -647,8 +647,8 @@ Scope {
                                     MouseArea {
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: clearAllBtn.color = "#ebdbb2"
-                                        onExited: clearAllBtn.color = "#d5c4a1"
+                                        onEntered: clearAllBtn.color = theme.c.accent
+                                        onExited: clearAllBtn.color = theme.c.accent
                                         onClicked: {
                                             Quickshell.execDetached(["makoctl", "dismiss", "-a"]);
                                             root.activeNotifs = [];
@@ -667,7 +667,7 @@ Scope {
 
                                 Text {
                                     text: "Active"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     font.bold: true
@@ -677,7 +677,7 @@ Scope {
 
                                 Text {
                                     text: "No active notifications"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     opacity: 0.4
@@ -692,9 +692,9 @@ Scope {
                                         width: parent.width
                                         // Size dynamically to Column child layout
                                         height: activeBoxCol.implicitHeight + 10
-                                        color: "#282828"
+                                        color: theme.c.bg_dark
                                         border.width: 1
-                                        border.color: modelData.urgency === "critical" ? "#ea6962" : "#3c3836"
+                                        border.color: modelData.urgency === "critical" ? "#ea6962" : theme.c.bg_light
 
                                         Column {
                                             id: activeBoxCol
@@ -737,7 +737,7 @@ Scope {
 
                                                         Text {
                                                             text: modelData.summary
-                                                            color: "#d5c4a1"
+                                                            color: theme.c.accent
                                                             font.family: "FiraCode Nerd Font"
                                                             font.pixelSize: 8
                                                             font.bold: true
@@ -755,7 +755,7 @@ Scope {
                                                             anchors.right: parent.right
                                                             anchors.verticalCenter: parent.verticalCenter
                                                             text: "dismiss"
-                                                            color: "#d5c4a1"
+                                                            color: theme.c.accent
                                                             font.family: "FiraCode Nerd Font"
                                                             font.pixelSize: 8
                                                             font.bold: true
@@ -764,8 +764,8 @@ Scope {
                                                             MouseArea {
                                                                 anchors.fill: parent
                                                                 hoverEnabled: true
-                                                                onEntered: dismissBtn.color = "#ebdbb2"
-                                                                onExited: dismissBtn.color = "#d5c4a1"
+                                                                onEntered: dismissBtn.color = theme.c.accent
+                                                                onExited: dismissBtn.color = theme.c.accent
                                                                 onClicked: {
                                                                     Quickshell.execDetached(["makoctl", "dismiss", "-n", String(modelData.id)]);
                                                                     root.triggerRefresh();
@@ -790,7 +790,7 @@ Scope {
                                                     id: descText
 
                                                     text: modelData.body
-                                                    color: "#d5c4a1"
+                                                    color: theme.c.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     wrapMode: Text.Wrap
@@ -813,7 +813,7 @@ Scope {
                                                         anchors.right: parent.right
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         text: root.expandedNotifIds[modelData.id] ? "show less" : "show more"
-                                                        color: "#d5c4a1"
+                                                        color: theme.c.accent
                                                         font.family: "FiraCode Nerd Font"
                                                         font.pixelSize: 7
                                                         font.bold: true
@@ -863,7 +863,7 @@ Scope {
 
                                     Text {
                                         text: root.historyExpanded ? "" : ""
-                                        color: "#d5c4a1"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -873,7 +873,7 @@ Scope {
 
                                     Text {
                                         text: "History"
-                                        color: "#d5c4a1"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -896,7 +896,7 @@ Scope {
                                     anchors.right: parent.right
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Restore Last"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -905,8 +905,8 @@ Scope {
                                     MouseArea {
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: restoreBtn.color = "#ebdbb2"
-                                        onExited: restoreBtn.color = "#d5c4a1"
+                                        onEntered: restoreBtn.color = theme.c.accent
+                                        onExited: restoreBtn.color = theme.c.accent
                                         onClicked: {
                                             Quickshell.execDetached(["makoctl", "restore"]);
                                             root.triggerRefresh();
@@ -924,7 +924,7 @@ Scope {
 
                                 Text {
                                     text: "No history"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     opacity: 0.4
@@ -938,9 +938,9 @@ Scope {
                                     delegate: Rectangle {
                                         width: parent.width
                                         height: histBoxCol.implicitHeight + 10
-                                        color: "#1d2021"
+                                        color: theme.c.bg
                                         border.width: 1
-                                        border.color: "#3c3836"
+                                        border.color: theme.c.bg_light
 
                                         Column {
                                             id: histBoxCol
@@ -979,7 +979,7 @@ Scope {
 
                                                     Text {
                                                         text: modelData.summary
-                                                        color: "#d5c4a1"
+                                                        color: theme.c.accent
                                                         font.family: "FiraCode Nerd Font"
                                                         font.pixelSize: 8
                                                         font.bold: true
@@ -1001,7 +1001,7 @@ Scope {
                                                     id: histDescText
 
                                                     text: modelData.body
-                                                    color: "#d5c4a1"
+                                                    color: theme.c.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     wrapMode: Text.Wrap
@@ -1022,7 +1022,7 @@ Scope {
                                                         anchors.right: parent.right
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         text: root.expandedNotifIds[modelData.id + "_hist"] ? "show less" : "show more"
-                                                        color: "#d5c4a1"
+                                                        color: theme.c.accent
                                                         font.family: "FiraCode Nerd Font"
                                                         font.pixelSize: 7
                                                         font.bold: true
@@ -1057,7 +1057,7 @@ Scope {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: "#d5c4a1"
+                            color: theme.c.accent
                             opacity: 0.15
                         }
 
@@ -1074,7 +1074,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: root.audioMuted ? "󰝟" : "󰕾"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
                                     renderType: Text.NativeRendering
@@ -1083,8 +1083,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnVol.color = "#ebdbb2"
-                                    onExited: btnVol.color = "#d5c4a1"
+                                    onEntered: btnVol.color = theme.c.accent
+                                    onExited: btnVol.color = theme.c.accent
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "volume_popup"]);
                                         win.closePopup();
@@ -1103,7 +1103,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: root.wifiEnabled ? "󰖩" : "󰖪"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
                                     renderType: Text.NativeRendering
@@ -1112,8 +1112,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnNet.color = "#ebdbb2"
-                                    onExited: btnNet.color = "#d5c4a1"
+                                    onEntered: btnNet.color = theme.c.accent
+                                    onExited: btnNet.color = theme.c.accent
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "network_popup"]);
                                         win.closePopup();
@@ -1132,7 +1132,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: root.btEnabled ? "󰂯" : "󰂲"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
                                     renderType: Text.NativeRendering
@@ -1141,8 +1141,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnBt.color = "#ebdbb2"
-                                    onExited: btnBt.color = "#d5c4a1"
+                                    onEntered: btnBt.color = theme.c.accent
+                                    onExited: btnBt.color = theme.c.accent
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "bluetooth_popup"]);
                                         win.closePopup();
@@ -1161,7 +1161,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: "󰃠"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
                                     renderType: Text.NativeRendering
@@ -1170,8 +1170,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnBright.color = "#ebdbb2"
-                                    onExited: btnBright.color = "#d5c4a1"
+                                    onEntered: btnBright.color = theme.c.accent
+                                    onExited: btnBright.color = theme.c.accent
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "brightness_popup"]);
                                         win.closePopup();
@@ -1190,7 +1190,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: "󰁹"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
                                     renderType: Text.NativeRendering
@@ -1199,8 +1199,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnBat.color = "#ebdbb2"
-                                    onExited: btnBat.color = "#d5c4a1"
+                                    onEntered: btnBat.color = theme.c.accent
+                                    onExited: btnBat.color = theme.c.accent
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "battery_popup"]);
                                         win.closePopup();
@@ -1219,7 +1219,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: ""
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
                                     renderType: Text.NativeRendering
@@ -1228,8 +1228,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnSysmon.color = "#ebdbb2"
-                                    onExited: btnSysmon.color = "#d5c4a1"
+                                    onEntered: btnSysmon.color = theme.c.accent
+                                    onExited: btnSysmon.color = theme.c.accent
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "sysmon_popup"]);
                                         win.closePopup();
@@ -1253,7 +1253,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: ""
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
                                     renderType: Text.NativeRendering
@@ -1262,8 +1262,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnPodman.color = "#ebdbb2"
-                                    onExited: btnPodman.color = "#d5c4a1"
+                                    onEntered: btnPodman.color = theme.c.accent
+                                    onExited: btnPodman.color = theme.c.accent
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "podman_popup"]);
                                         win.closePopup();
@@ -1282,7 +1282,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: "󰙃"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
                                     renderType: Text.NativeRendering
@@ -1291,8 +1291,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnEmoji.color = "#ebdbb2"
-                                    onExited: btnEmoji.color = "#d5c4a1"
+                                    onEntered: btnEmoji.color = theme.c.accent
+                                    onExited: btnEmoji.color = theme.c.accent
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "emoji_popup"]);
                                         win.closePopup();
@@ -1311,7 +1311,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: ""
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
                                     renderType: Text.NativeRendering
@@ -1320,8 +1320,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnOcr.color = "#ebdbb2"
-                                    onExited: btnOcr.color = "#d5c4a1"
+                                    onEntered: btnOcr.color = theme.c.accent
+                                    onExited: btnOcr.color = theme.c.accent
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "media_popup"]);
                                         win.closePopup();
@@ -1340,7 +1340,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: ""
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
                                     renderType: Text.NativeRendering
@@ -1349,8 +1349,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnVmm.color = "#ebdbb2"
-                                    onExited: btnVmm.color = "#d5c4a1"
+                                    onEntered: btnVmm.color = theme.c.accent
+                                    onExited: btnVmm.color = theme.c.accent
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "vm_popup"]);
                                         win.closePopup();
@@ -1369,7 +1369,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: root.glassEnabled ? "" : ""
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
                                     renderType: Text.NativeRendering
@@ -1397,7 +1397,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: ""
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 12
                                     renderType: Text.NativeRendering
@@ -1406,8 +1406,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnWallpaper.color = "#ebdbb2"
-                                    onExited: btnWallpaper.color = "#d5c4a1"
+                                    onEntered: btnWallpaper.color = theme.c.accent
+                                    onExited: btnWallpaper.color = theme.c.accent
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "wallpaper_switcher"]);
                                         win.closePopup();
@@ -1426,13 +1426,13 @@ Scope {
                             Rectangle {
                                 width: parent.width
                                 height: 1
-                                color: "#d5c4a1"
+                                color: theme.c.accent
                                 opacity: 0.1
                             }
 
                             Text {
                                 text: "Pomodoro"
-                                color: "#ebdbb2"
+                                color: theme.c.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
                                 font.bold: true
@@ -1452,7 +1452,7 @@ Scope {
                                     id: pomoIconText
 
                                     text: "󰔛"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -1474,7 +1474,7 @@ Scope {
                                         verticalAlignment: TextInput.AlignVCenter
                                         horizontalAlignment: TextInput.AlignHCenter
                                         text: root.pomoActive ? root.formatPomoTime(root.pomoTimeLeft) : String(Math.round(root.pomoDuration / 60))
-                                        color: "#ebdbb2"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         selectByMouse: true
@@ -1492,7 +1492,7 @@ Scope {
                                     Rectangle {
                                         width: parent.width
                                         height: 1
-                                        color: "#d5c4a1"
+                                        color: theme.c.accent
                                         opacity: 0.3
                                         anchors.bottom: parent.bottom
                                         visible: !root.pomoActive
@@ -1513,7 +1513,7 @@ Scope {
 
                                         delegate: Text {
                                             text: modelData + "m"
-                                            color: (root.pomoDuration === modelData * 60) ? "#ebdbb2" : "#a89984"
+                                            color: (root.pomoDuration === modelData * 60) ? theme.c.accent : "#a89984"
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             renderType: Text.NativeRendering
@@ -1537,14 +1537,14 @@ Scope {
 
                                     width: parent.width - pomoIconText.implicitWidth - pomoInputBox.width - pomoActionsRow.implicitWidth - (pomoMainRow.spacing * 4)
                                     height: 2
-                                    color: "#3c3836"
+                                    color: theme.c.bg_light
                                     anchors.verticalCenter: parent.verticalCenter
                                     visible: root.pomoActive
 
                                     Rectangle {
                                         height: parent.height
                                         width: parent.width * (root.pomoTimeLeft / root.pomoDuration)
-                                        color: "#d5c4a1"
+                                        color: theme.c.accent
 
                                         Behavior on width {
                                             NumberAnimation {
@@ -1576,7 +1576,7 @@ Scope {
 
                                     Text {
                                         text: root.pomoActive ? (root.pomoPaused ? "Resume" : "Pause") : "Start"
-                                        color: "#d5c4a1"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -1610,7 +1610,7 @@ Scope {
 
                                     Text {
                                         text: "Reset"
-                                        color: "#d5c4a1"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true

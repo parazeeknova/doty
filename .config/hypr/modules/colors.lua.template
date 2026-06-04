@@ -1,0 +1,5 @@
+return {
+    active_border = "rgba({{accent_hex}}ee)",
+    inactive_border = "rgba({{bg_light_hex}}aa)",
+    border_color = "rgb({{accent_hex}})"
+}

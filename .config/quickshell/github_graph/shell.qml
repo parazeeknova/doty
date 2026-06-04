@@ -14,10 +14,10 @@ Scope {
     property var contributionActivities: []
     property string hoverInfo: "Hover a cell to see details"
     // Gruvbox color tokens for GitHub contribution levels (Level 0 to 4)
-    readonly property var levelColors: ["#282828", "#40d5c4a1", "#80d5c4a1", "#c0d5c4a1", "#d5c4a1"]
-    readonly property color textPrimary: "#d5c4a1" // fg
+    readonly property var levelColors: [theme.c.bg_dark, "#40d5c4a1", "#80d5c4a1", "#c0d5c4a1", theme.c.fg_light]
+    readonly property color textPrimary: theme.c.fg_light // fg
     readonly property color textMuted: "#a89984" // gray
-    readonly property color borderColor: "#3c3836" // bg1
+    readonly property color borderColor: theme.c.bg_light // bg1
 
     Theme {
         id: theme

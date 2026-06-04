@@ -51,6 +51,13 @@ Scope {
         applyTimer.restart();
     }
 
+    function confirmWallpaper(path) {
+        Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "wallpaper", path]);
+        Quickshell.execDetached(["mkdir", "-p", root.homeDir + "/.cache"]);
+        Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" > " + root.homeDir + "/.cache/last_wallpaper", "sh", path]);
+        Qt.quit();
+    }
+
     onWallpapersChanged: {
         root.selectLastWallpaper();
     }
@@ -124,8 +131,6 @@ Scope {
         onTriggered: {
             if (root.activeWallpaper !== "") {
                 Quickshell.execDetached(["awww", "img", root.activeWallpaper]);
-                Quickshell.execDetached(["mkdir", "-p", root.homeDir + "/.cache"]);
-                Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" > " + root.homeDir + "/.cache/last_wallpaper", "sh", root.activeWallpaper]);
             }
         }
     }
@@ -293,7 +298,14 @@ Scope {
                         } else if (event.key === Qt.Key_Down) {
                             listView.incrementCurrentIndex();
                             event.accepted = true;
-                        } else if (event.key === Qt.Key_Escape || event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
+                        } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
+                            if (listView.currentIndex >= 0 && listView.currentIndex < root.wallpapers.length) {
+                                root.confirmWallpaper(root.wallpapers[listView.currentIndex].path);
+                            } else {
+                                win.closePopup();
+                            }
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
                         }
@@ -378,7 +390,7 @@ Scope {
                                     width: 220
                                     height: 124
                                     anchors.centerIn: parent
-                                    color: "#1d2021"
+                                    color: theme.c.bg
                                     radius: 8
                                     clip: true
 
@@ -407,7 +419,7 @@ Scope {
                                                 var filename = parts[parts.length - 1];
                                                 return filename.replace(/\.[^/.]+$/, "");
                                             }
-                                            color: "#ebdbb2"
+                                            color: theme.c.fg
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             elide: Text.ElideRight
@@ -425,6 +437,10 @@ Scope {
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: {
                                         listView.currentIndex = index;
+                                    }
+                                    onDoubleClicked: {
+                                        listView.currentIndex = index;
+                                        root.confirmWallpaper(root.wallpapers[index].path);
                                     }
                                 }
 

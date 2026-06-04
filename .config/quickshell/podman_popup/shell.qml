@@ -187,7 +187,7 @@ Scope {
                     opacity: win.animOpacity
                     color: theme.podmanBgColor // Sleek dark semi-transparent bg matching clipboard
                     border.width: 1
-                    border.color: "#d5c4a1"
+                    border.color: theme.c.accent
                     radius: 0
                     focus: true
                     Keys.onPressed: (event) => {
@@ -213,7 +213,7 @@ Scope {
 
                             Text {
                                 text: "Podman Contianers"
-                                color: "#d5c4a1"
+                                color: theme.c.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -226,7 +226,7 @@ Scope {
 
                             Text {
                                 text: "󰑐"
-                                color: refreshMouse.containsMouse ? "#ebdbb2" : "#a89984"
+                                color: refreshMouse.containsMouse ? theme.c.accent : "#a89984"
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 renderType: Text.NativeRendering
@@ -261,7 +261,7 @@ Scope {
 
                                     Text {
                                         text: "Containers"
-                                        color: "#ebdbb2"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: false
@@ -302,7 +302,7 @@ Scope {
 
                                                     Text {
                                                         text: (modelData.Names && modelData.Names.length > 0) ? modelData.Names[0] : "Unnamed"
-                                                        color: "#d5c4a1"
+                                                        color: theme.c.accent
                                                         font.family: "FiraCode Nerd Font"
                                                         font.pixelSize: 8
                                                         font.bold: true
@@ -340,7 +340,7 @@ Scope {
                                                     }).join(", ") : "") : "└── ports: " + (modelData.Ports ? modelData.Ports.map((p) => {
                                                         return p.hostPort + "->" + p.containerPort;
                                                     }).join(", ") : "")
-                                                    color: "#ebdbb2"
+                                                    color: theme.c.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     elide: Text.ElideRight
@@ -457,7 +457,7 @@ Scope {
 
                                     Text {
                                         text: "Networks"
-                                        color: "#ebdbb2"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: false
@@ -473,7 +473,7 @@ Scope {
 
                                             Text {
                                                 text: "├─ " + (modelData.name || "N/A") + " (" + (modelData.driver || "N/A") + ")"
-                                                color: "#d5c4a1"
+                                                color: theme.c.accent
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
                                                 elide: Text.ElideRight
@@ -513,7 +513,7 @@ Scope {
 
                                     Text {
                                         text: "Images"
-                                        color: "#ebdbb2"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: false
@@ -529,7 +529,7 @@ Scope {
 
                                             Text {
                                                 text: "├─ " + ((modelData.Names && modelData.Names.length > 0) ? modelData.Names[0] : "Unnamed Image")
-                                                color: "#d5c4a1"
+                                                color: theme.c.accent
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
                                                 font.bold: true

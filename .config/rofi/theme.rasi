@@ -1,16 +1,9 @@
-* {
-    bg0:     #1d202180;
-    bg1:     #282828;
-    fg:      #d4be98;
-    fg1:     #ddc7a1;
-    grey1:   #928374;
-    grey2:   #7c6f64;
-    blue:    #7daea3;
-    green:   #a9b665;
+@import "colors.rasi"
 
+* {
     background-color: transparent;
     text-color: @fg;
-    font: "FiraCode Nerd Font 8";
+    font: "FiraCode Nerd Font 9";
     text-transform: lowercase;
 }
 

@@ -22,6 +22,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("uwsm app -- pypr")
     hl.exec_cmd("uwsm app -- wl-paste --type text --watch cliphist store")
     hl.exec_cmd("uwsm app -- wl-paste --type image --watch cliphist store")
+    hl.exec_cmd("uwsm app -- ~/doty/scripts/theme_switcher restore")
     hl.exec_cmd("uwsm app -- ~/.config/quickshell/wallpaper_switcher/wallpaper_thumb_watcher")
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
     hl.exec_cmd(

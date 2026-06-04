@@ -187,7 +187,7 @@ Scope {
                     opacity: win.animOpacity
                     color: theme.popupBgColor
                     border.width: 1
-                    border.color: "#d5c4a1"
+                    border.color: theme.c.accent
                     radius: 0
                     antialiasing: false
                     // Request keyboard focus and listen for Escape key
@@ -213,7 +213,7 @@ Scope {
                             anchors.top: parent.top
                             anchors.left: parent.left
                             text: (root.status === "Charging" ? "󰢝 " : "󰁹 ") + "Battery: " + root.capacity + "%"
-                            color: "#d5c4a1"
+                            color: theme.c.accent
                             font.family: "FiraCode Nerd Font"
                             font.pixelSize: 10
                             font.bold: true
@@ -226,7 +226,7 @@ Scope {
                             anchors.top: parent.top
                             anchors.right: parent.right
                             text: root.powerDraw + "W"
-                            color: "#d5c4a1"
+                            color: theme.c.accent
                             font.family: "FiraCode Nerd Font"
                             font.pixelSize: 9
                             renderType: Text.NativeRendering
@@ -248,7 +248,7 @@ Scope {
                                 anchors.left: parent.left
                                 anchors.top: parent.top
                                 text: "Health: " + root.health + "%"
-                                color: "#d5c4a1"
+                                color: theme.c.accent
                                 opacity: 0.8
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
@@ -261,7 +261,7 @@ Scope {
                                 anchors.right: parent.right
                                 anchors.top: parent.top
                                 text: root.timeRemaining
-                                color: "#d5c4a1"
+                                color: theme.c.accent
                                 opacity: 0.8
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
@@ -291,7 +291,7 @@ Scope {
                                             return 2;
                                         }
                                         anchors.bottom: parent.bottom
-                                        color: "#d5c4a1"
+                                        color: theme.c.accent
                                         radius: 0
                                     }
 
@@ -310,7 +310,7 @@ Scope {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             height: 1
-                            color: "#d5c4a1"
+                            color: theme.c.accent
                             opacity: 0.25
                         }
 
@@ -322,7 +322,7 @@ Scope {
                             anchors.topMargin: 6
                             anchors.left: parent.left
                             text: "Power Mode"
-                            color: "#d5c4a1"
+                            color: theme.c.accent
                             font.family: "FiraCode Nerd Font"
                             font.pixelSize: 9
                             font.bold: true
@@ -352,7 +352,7 @@ Scope {
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: (root.activeProfile === "Quiet" ? "* " : "  ") + "Quiet"
-                                    color: root.activeProfile === "Quiet" ? "#ebdbb2" : "#d5c4a1"
+                                    color: root.activeProfile === "Quiet" ? theme.c.accent : theme.c.accent
                                     opacity: root.activeProfile === "Quiet" ? 1 : 0.7
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
@@ -364,13 +364,13 @@ Scope {
                                     hoverEnabled: true
                                     onEntered: {
                                         if (root.activeProfile !== "Quiet") {
-                                            quietText.color = "#ebdbb2";
+                                            quietText.color = theme.c.accent;
                                             quietText.opacity = 1;
                                         }
                                     }
                                     onExited: {
                                         if (root.activeProfile !== "Quiet") {
-                                            quietText.color = "#d5c4a1";
+                                            quietText.color = theme.c.accent;
                                             quietText.opacity = 0.7;
                                         }
                                     }
@@ -393,7 +393,7 @@ Scope {
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: (root.activeProfile === "Balanced" ? "* " : "  ") + "Balanced"
-                                    color: root.activeProfile === "Balanced" ? "#ebdbb2" : "#d5c4a1"
+                                    color: root.activeProfile === "Balanced" ? theme.c.accent : theme.c.accent
                                     opacity: root.activeProfile === "Balanced" ? 1 : 0.7
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
@@ -405,13 +405,13 @@ Scope {
                                     hoverEnabled: true
                                     onEntered: {
                                         if (root.activeProfile !== "Balanced") {
-                                            balancedText.color = "#ebdbb2";
+                                            balancedText.color = theme.c.accent;
                                             balancedText.opacity = 1;
                                         }
                                     }
                                     onExited: {
                                         if (root.activeProfile !== "Balanced") {
-                                            balancedText.color = "#d5c4a1";
+                                            balancedText.color = theme.c.accent;
                                             balancedText.opacity = 0.7;
                                         }
                                     }
@@ -434,7 +434,7 @@ Scope {
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: (root.activeProfile === "Performance" ? "* " : "  ") + "Performance"
-                                    color: root.activeProfile === "Performance" ? "#ebdbb2" : "#d5c4a1"
+                                    color: root.activeProfile === "Performance" ? theme.c.accent : theme.c.accent
                                     opacity: root.activeProfile === "Performance" ? 1 : 0.7
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
@@ -446,13 +446,13 @@ Scope {
                                     hoverEnabled: true
                                     onEntered: {
                                         if (root.activeProfile !== "Performance") {
-                                            perfText.color = "#ebdbb2";
+                                            perfText.color = theme.c.accent;
                                             perfText.opacity = 1;
                                         }
                                     }
                                     onExited: {
                                         if (root.activeProfile !== "Performance") {
-                                            perfText.color = "#d5c4a1";
+                                            perfText.color = theme.c.accent;
                                             perfText.opacity = 0.7;
                                         }
                                     }
@@ -472,7 +472,7 @@ Scope {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             height: 1
-                            color: "#d5c4a1"
+                            color: theme.c.accent
                             opacity: 0.25
                         }
 
@@ -499,7 +499,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: "󰍃 Exit"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
                                     renderType: Text.NativeRendering
@@ -509,10 +509,10 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
-                                        logoutText.color = "#ebdbb2";
+                                        logoutText.color = theme.c.accent;
                                     }
                                     onExited: {
-                                        logoutText.color = "#d5c4a1";
+                                        logoutText.color = theme.c.accent;
                                     }
                                     onClicked: {
                                         win.closePopup();
@@ -535,7 +535,7 @@ Scope {
 
                                     anchors.centerIn: parent
                                     text: "󰐥 Off"
-                                    color: "#d5c4a1"
+                                    color: theme.c.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
                                     renderType: Text.NativeRendering
@@ -545,10 +545,10 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
-                                        poweroffText.color = "#ebdbb2";
+                                        poweroffText.color = theme.c.accent;
                                     }
                                     onExited: {
-                                        poweroffText.color = "#d5c4a1";
+                                        poweroffText.color = theme.c.accent;
                                     }
                                     onClicked: {
                                         win.closePopup();

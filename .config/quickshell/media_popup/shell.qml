@@ -251,7 +251,7 @@ Scope {
                     opacity: win.animOpacity
                     color: "#f01d2021" // Solid/semi-transparent Gruvbox dark background
                     border.width: 1
-                    border.color: "#d5c4a1"
+                    border.color: theme.c.accent
                     radius: 0
                     antialiasing: false
                     focus: true
@@ -279,7 +279,7 @@ Scope {
 
                             Text {
                                 text: "Media Actions"
-                                color: "#ebdbb2"
+                                color: theme.c.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -308,7 +308,7 @@ Scope {
                                 Rectangle {
                                     width: (parent.width - 12) / 4
                                     height: 38
-                                    color: "#3c3836"
+                                    color: theme.c.bg_light
                                     border.width: 1
                                     border.color: "#504945"
 
@@ -318,7 +318,7 @@ Scope {
 
                                         Text {
                                             text: "󰆞"
-                                            color: "#ebdbb2"
+                                            color: theme.c.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 12
                                             anchors.horizontalCenter: parent.horizontalCenter
@@ -326,7 +326,7 @@ Scope {
 
                                         Text {
                                             text: "Area (Ed)"
-                                            color: "#ebdbb2"
+                                            color: theme.c.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 7
                                             anchors.horizontalCenter: parent.horizontalCenter
@@ -337,7 +337,7 @@ Scope {
                                     MouseArea {
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: parent.border.color = "#d5c4a1"
+                                        onEntered: parent.border.color = theme.c.accent
                                         onExited: parent.border.color = "#504945"
                                         onClicked: {
                                             win.closePopup();
@@ -352,7 +352,7 @@ Scope {
                                 Rectangle {
                                     width: (parent.width - 12) / 4
                                     height: 38
-                                    color: "#3c3836"
+                                    color: theme.c.bg_light
                                     border.width: 1
                                     border.color: "#504945"
 
@@ -362,7 +362,7 @@ Scope {
 
                                         Text {
                                             text: "󰹑"
-                                            color: "#ebdbb2"
+                                            color: theme.c.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 12
                                             anchors.horizontalCenter: parent.horizontalCenter
@@ -370,7 +370,7 @@ Scope {
 
                                         Text {
                                             text: "Area (Cl)"
-                                            color: "#ebdbb2"
+                                            color: theme.c.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 7
                                             anchors.horizontalCenter: parent.horizontalCenter
@@ -381,7 +381,7 @@ Scope {
                                     MouseArea {
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: parent.border.color = "#d5c4a1"
+                                        onEntered: parent.border.color = theme.c.accent
                                         onExited: parent.border.color = "#504945"
                                         onClicked: {
                                             win.closePopup();
@@ -396,7 +396,7 @@ Scope {
                                 Rectangle {
                                     width: (parent.width - 12) / 4
                                     height: 38
-                                    color: "#3c3836"
+                                    color: theme.c.bg_light
                                     border.width: 1
                                     border.color: "#504945"
 
@@ -406,7 +406,7 @@ Scope {
 
                                         Text {
                                             text: "󰉉"
-                                            color: "#ebdbb2"
+                                            color: theme.c.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 12
                                             anchors.horizontalCenter: parent.horizontalCenter
@@ -414,7 +414,7 @@ Scope {
 
                                         Text {
                                             text: "Full (Cl)"
-                                            color: "#ebdbb2"
+                                            color: theme.c.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 7
                                             anchors.horizontalCenter: parent.horizontalCenter
@@ -425,7 +425,7 @@ Scope {
                                     MouseArea {
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: parent.border.color = "#d5c4a1"
+                                        onEntered: parent.border.color = theme.c.accent
                                         onExited: parent.border.color = "#504945"
                                         onClicked: {
                                             win.closePopup();
@@ -439,7 +439,7 @@ Scope {
                                 Rectangle {
                                     width: (parent.width - 12) / 4
                                     height: 38
-                                    color: "#3c3836"
+                                    color: theme.c.bg_light
                                     border.width: 1
                                     border.color: "#504945"
 
@@ -449,7 +449,7 @@ Scope {
 
                                         Text {
                                             text: "󰄀"
-                                            color: "#ebdbb2"
+                                            color: theme.c.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 12
                                             anchors.horizontalCenter: parent.horizontalCenter
@@ -457,7 +457,7 @@ Scope {
 
                                         Text {
                                             text: "Full (Fi)"
-                                            color: "#ebdbb2"
+                                            color: theme.c.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 7
                                             anchors.horizontalCenter: parent.horizontalCenter
@@ -468,7 +468,7 @@ Scope {
                                     MouseArea {
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: parent.border.color = "#d5c4a1"
+                                        onEntered: parent.border.color = theme.c.accent
                                         onExited: parent.border.color = "#504945"
                                         onClicked: {
                                             win.closePopup();
@@ -503,14 +503,14 @@ Scope {
                                 Rectangle {
                                     width: root.isRecording ? parent.width : (parent.width - 4) / 2
                                     height: 18
-                                    color: root.isRecording ? "#80cc241d" : "#3c3836"
+                                    color: root.isRecording ? "#80cc241d" : theme.c.bg_light
                                     border.width: 1
-                                    border.color: root.isRecording ? "#cc241d" : "#504945"
+                                    border.color: root.isRecording ? theme.c.error : "#504945"
 
                                     Text {
                                         anchors.centerIn: parent
                                         text: root.isRecording ? "󰻃 Stop Recording" : "󰑋 Rec Area"
-                                        color: "#ebdbb2"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                     }
@@ -520,7 +520,7 @@ Scope {
                                         hoverEnabled: true
                                         onEntered: {
                                             if (!root.isRecording)
-                                                parent.border.color = "#d5c4a1";
+                                                parent.border.color = theme.c.accent;
 
                                         }
                                         onExited: {
@@ -550,7 +550,7 @@ Scope {
                                 Rectangle {
                                     width: (parent.width - 4) / 2
                                     height: 18
-                                    color: "#3c3836"
+                                    color: theme.c.bg_light
                                     border.width: 1
                                     border.color: "#504945"
                                     visible: !root.isRecording
@@ -558,7 +558,7 @@ Scope {
                                     Text {
                                         anchors.centerIn: parent
                                         text: "󰕧 Rec Fullscreen"
-                                        color: "#ebdbb2"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                     }
@@ -566,7 +566,7 @@ Scope {
                                     MouseArea {
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: parent.border.color = "#d5c4a1"
+                                        onEntered: parent.border.color = theme.c.accent
                                         onExited: parent.border.color = "#504945"
                                         onClicked: {
                                             win.closePopup();
@@ -652,14 +652,14 @@ Scope {
                                 Rectangle {
                                     width: (parent.width - 4) / 2
                                     height: 18
-                                    color: "#3c3836"
+                                    color: theme.c.bg_light
                                     border.width: 1
                                     border.color: "#504945"
 
                                     Text {
                                         anchors.centerIn: parent
                                         text: "󰙎 OCR Area"
-                                        color: "#ebdbb2"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                     }
@@ -667,7 +667,7 @@ Scope {
                                     MouseArea {
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: parent.border.color = "#d5c4a1"
+                                        onEntered: parent.border.color = theme.c.accent
                                         onExited: parent.border.color = "#504945"
                                         onClicked: {
                                             win.closePopup();
@@ -682,14 +682,14 @@ Scope {
                                 Rectangle {
                                     width: (parent.width - 4) / 2
                                     height: 18
-                                    color: "#3c3836"
+                                    color: theme.c.bg_light
                                     border.width: 1
                                     border.color: "#504945"
 
                                     Text {
                                         anchors.centerIn: parent
                                         text: "󰉋 OCR Image File"
-                                        color: "#ebdbb2"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                     }
@@ -697,7 +697,7 @@ Scope {
                                     MouseArea {
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: parent.border.color = "#d5c4a1"
+                                        onEntered: parent.border.color = theme.c.accent
                                         onExited: parent.border.color = "#504945"
                                         onClicked: {
                                             ocrImagePickerProc.running = true;
@@ -731,9 +731,9 @@ Scope {
                                 Rectangle {
                                     width: parent.width - 24
                                     height: 18
-                                    color: "#282828"
+                                    color: theme.c.bg_dark
                                     border.width: 1
-                                    border.color: "#3c3836"
+                                    border.color: theme.c.bg_light
 
                                     TextInput {
                                         id: scrInput
@@ -743,7 +743,7 @@ Scope {
                                         anchors.rightMargin: 4
                                         verticalAlignment: TextInput.AlignVCenter
                                         text: root.screenshotDir
-                                        color: "#ebdbb2"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         selectByMouse: true
@@ -760,14 +760,14 @@ Scope {
                                 Rectangle {
                                     width: 20
                                     height: 18
-                                    color: "#3c3836"
+                                    color: theme.c.bg_light
                                     border.width: 1
                                     border.color: "#504945"
 
                                     Text {
                                         anchors.centerIn: parent
                                         text: "󰉋"
-                                        color: "#ebdbb2"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                     }
@@ -789,9 +789,9 @@ Scope {
                                 Rectangle {
                                     width: parent.width - 24
                                     height: 18
-                                    color: "#282828"
+                                    color: theme.c.bg_dark
                                     border.width: 1
-                                    border.color: "#3c3836"
+                                    border.color: theme.c.bg_light
 
                                     TextInput {
                                         id: recInput
@@ -801,7 +801,7 @@ Scope {
                                         anchors.rightMargin: 4
                                         verticalAlignment: TextInput.AlignVCenter
                                         text: root.recordingDir
-                                        color: "#ebdbb2"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         selectByMouse: true
@@ -818,14 +818,14 @@ Scope {
                                 Rectangle {
                                     width: 20
                                     height: 18
-                                    color: "#3c3836"
+                                    color: theme.c.bg_light
                                     border.width: 1
                                     border.color: "#504945"
 
                                     Text {
                                         anchors.centerIn: parent
                                         text: "󰉋"
-                                        color: "#ebdbb2"
+                                        color: theme.c.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                     }
@@ -845,7 +845,7 @@ Scope {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: "#d5c4a1"
+                            color: theme.c.accent
                             opacity: 0.15
                         }
 
@@ -864,7 +864,7 @@ Scope {
 
                                     Text {
                                         text: "Asset history"
-                                        color: root.activeHistoryTab === "ALL" ? "#ebdbb2" : "#928374"
+                                        color: root.activeHistoryTab === "ALL" ? theme.c.accent : "#928374"
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: root.activeHistoryTab === "ALL"
@@ -878,7 +878,7 @@ Scope {
 
                                     Text {
                                         text: "OCR history"
-                                        color: root.activeHistoryTab === "OCR" ? "#ebdbb2" : "#928374"
+                                        color: root.activeHistoryTab === "OCR" ? theme.c.accent : "#928374"
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: root.activeHistoryTab === "OCR"
@@ -931,9 +931,9 @@ Scope {
                                         Rectangle {
                                             width: parent.width
                                             height: parent.width // Square shape
-                                            color: "#282828"
+                                            color: theme.c.bg_dark
                                             border.width: 1
-                                            border.color: "#3c3836"
+                                            border.color: theme.c.bg_light
 
                                             // Image thumbnail if screenshot or recording is a file
                                             Image {
@@ -956,8 +956,8 @@ Scope {
                                             MouseArea {
                                                 anchors.fill: parent
                                                 hoverEnabled: true
-                                                onEntered: parent.border.color = "#d5c4a1"
-                                                onExited: parent.border.color = "#3c3836"
+                                                onEntered: parent.border.color = theme.c.accent
+                                                onExited: parent.border.color = theme.c.bg_light
                                                 onClicked: {
                                                     if (modelData.type === "ocr") {
                                                         Quickshell.execDetached(["sh", "-c", "echo -n '" + modelData.detail.replace(/'/g, "'\\''") + "' | wl-copy && notify-send -t 1000 -a 'OCR' 'Copied OCR text'"]);
@@ -984,7 +984,7 @@ Scope {
 
                                                 return modelData.detail;
                                             }
-                                            color: "#ebdbb2"
+                                            color: theme.c.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 7
                                             elide: Text.ElideRight
@@ -1015,9 +1015,9 @@ Scope {
                                         Rectangle {
                                             width: parent.width
                                             height: 18
-                                            color: "#282828"
+                                            color: theme.c.bg_dark
                                             border.width: 1
-                                            border.color: root.expandedOcrIndex === index ? "#d5c4a1" : "#3c3836"
+                                            border.color: root.expandedOcrIndex === index ? theme.c.accent : theme.c.bg_light
 
                                             Item {
                                                 anchors.fill: parent
@@ -1048,7 +1048,7 @@ Scope {
 
                                                         return clean;
                                                     }
-                                                    color: "#ebdbb2"
+                                                    color: theme.c.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     elide: Text.ElideRight
@@ -1084,9 +1084,9 @@ Scope {
                                         Rectangle {
                                             width: parent.width
                                             height: expandedLayout.implicitHeight + 10
-                                            color: "#1d2021"
+                                            color: theme.c.bg
                                             border.width: 1
-                                            border.color: "#3c3836"
+                                            border.color: theme.c.bg_light
                                             visible: root.expandedOcrIndex === index
 
                                             Column {
@@ -1102,7 +1102,7 @@ Scope {
                                                     anchors.left: parent.left
                                                     anchors.right: parent.right
                                                     text: modelData.detail
-                                                    color: "#ebdbb2"
+                                                    color: theme.c.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     wrapMode: Text.Wrap
@@ -1112,7 +1112,7 @@ Scope {
                                                 Rectangle {
                                                     width: 68
                                                     height: 14
-                                                    color: "#3c3836"
+                                                    color: theme.c.bg_light
                                                     border.width: 1
                                                     border.color: "#504945"
                                                     anchors.right: parent.right
@@ -1120,7 +1120,7 @@ Scope {
                                                     Text {
                                                         anchors.centerIn: parent
                                                         text: "󰆏 Copy Text"
-                                                        color: "#ebdbb2"
+                                                        color: theme.c.accent
                                                         font.family: "FiraCode Nerd Font"
                                                         font.pixelSize: 7
                                                     }
@@ -1128,7 +1128,7 @@ Scope {
                                                     MouseArea {
                                                         anchors.fill: parent
                                                         hoverEnabled: true
-                                                        onEntered: parent.border.color = "#d5c4a1"
+                                                        onEntered: parent.border.color = theme.c.accent
                                                         onExited: parent.border.color = "#504945"
                                                         onClicked: {
                                                             Quickshell.execDetached(["sh", "-c", "echo -n '" + modelData.detail.replace(/'/g, "'\\''") + "' | wl-copy && notify-send -t 1000 -a 'OCR' 'Copied OCR text'"]);

@@ -1,0 +1,19 @@
+@define-color bg0 {{bg}};
+@define-color bg1 {{bg_dark}};
+@define-color bg2 {{bg_light}};
+@define-color bg3 {{bg_light}};
+@define-color bg4 {{bg_dark}};
+
+@define-color fg {{accent}};
+@define-color fg1 {{accent}};
+@define-color red {{error}};
+@define-color orange {{tertiary}};
+@define-color yellow {{tertiary}};
+@define-color green {{accent}};
+@define-color aqua {{secondary}};
+@define-color blue {{accent}};
+@define-color purple {{secondary}};
+
+@define-color grey0 {{accent}};
+@define-color grey1 {{accent}};
+@define-color grey2 {{accent}};

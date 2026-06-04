@@ -18,13 +18,13 @@ Scope {
     // Theme tokens (Gruvbox Material Dark)
     readonly property color colorBgDark: "#e61d2021"
     // Sleek dark background
-    readonly property color colorBgCell: "#282828"
+    readonly property color colorBgCell: theme.c.bg_dark
     // Item cell bg
     readonly property color colorBgActive: "#504945"
     // Selected cell bg
-    readonly property color colorBorder: "#d5c4a1"
+    readonly property color colorBorder: theme.c.accent
     // Accent border
-    readonly property color colorText: "#d5c4a1"
+    readonly property color colorText: theme.c.accent
     // Foreground text
     readonly property color colorTextMuted: "#a89984"
     // Muted text
@@ -307,7 +307,7 @@ Scope {
                             delegate: Rectangle {
                                 width: gridView.cellWidth - 2
                                 height: gridView.cellHeight - 2
-                                color: (root.selectedIndex === index) ? "#282828" : "transparent"
+                                color: (root.selectedIndex === index) ? theme.c.bg_dark : "transparent"
                                 radius: 0
 
                                 Text {

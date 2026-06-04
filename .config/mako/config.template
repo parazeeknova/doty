@@ -1,0 +1,26 @@
+font=FiraCode Nerd Font 9
+background-color={{bg}}80
+text-color={{accent}}
+border-color={{accent}}
+border-size=1
+border-radius=0
+padding=6
+width=240
+anchor=top-left
+margin=4
+default-timeout=3000
+layer=overlay
+max-visible=10
+
+[urgency=low]
+border-color={{accent}}
+text-color={{accent}}
+
+[urgency=normal]
+border-color={{accent}}
+text-color={{accent}}
+
+[urgency=critical]
+border-color={{error}}
+text-color={{error}}
+default-timeout=0

@@ -1,6 +1,6 @@
 # Parazeeknova's configuration
-theme = Gruvbox Dark Hard
-font-size = 8
+theme = theme
+font-size = 9
 font-family = FiraCode Nerd Font Mono
 font-feature = calt
 font-feature = liga
