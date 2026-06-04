@@ -234,7 +234,7 @@ Scope {
                     opacity: win.animOpacity
                     color: theme.popupBgColor
                     border.width: 1
-                    border.color: theme.c.accent
+                    border.color: theme.accent
                     radius: 0
                     antialiasing: false
                     focus: true
@@ -269,7 +269,7 @@ Scope {
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "󰃠 Brightness: " + root.screenBrightness + "%"
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
                                     font.bold: true
@@ -301,7 +301,7 @@ Scope {
                                         delegate: Rectangle {
                                             height: parent.height
                                             width: (screenSliderBlocks.width - (screenSliderBlocks.spacing * (screenSliderBlocks.totalBlocks - 1))) / screenSliderBlocks.totalBlocks
-                                            color: (index < Math.round(screenSliderBlocks.currentVal * screenSliderBlocks.totalBlocks)) ? theme.c.accent : theme.c.bg_light
+                                            color: (index < Math.round(screenSliderBlocks.currentVal * screenSliderBlocks.totalBlocks)) ? theme.accent : theme.bg_light
                                         }
 
                                     }
@@ -339,7 +339,7 @@ Scope {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: theme.c.accent
+                            color: theme.accent
                             opacity: 0.15
                         }
 
@@ -356,7 +356,7 @@ Scope {
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "󰥻 Keyboard Backlight: " + root.kbdBrightness + "%"
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
                                     font.bold: true
@@ -388,7 +388,7 @@ Scope {
                                         delegate: Rectangle {
                                             height: parent.height
                                             width: (kbdSliderBlocks.width - (kbdSliderBlocks.spacing * (kbdSliderBlocks.totalBlocks - 1))) / kbdSliderBlocks.totalBlocks
-                                            color: (index < Math.round(kbdSliderBlocks.currentVal * kbdSliderBlocks.totalBlocks)) ? theme.c.accent : theme.c.bg_light
+                                            color: (index < Math.round(kbdSliderBlocks.currentVal * kbdSliderBlocks.totalBlocks)) ? theme.accent : theme.bg_light
                                         }
 
                                     }
@@ -435,7 +435,7 @@ Scope {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: theme.c.accent
+                            color: theme.accent
                             opacity: 0.15
                         }
 
@@ -446,7 +446,7 @@ Scope {
 
                             Text {
                                 text: "Night Light (Hyprsunset)"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -455,7 +455,7 @@ Scope {
 
                             Text {
                                 text: "Current: " + root.sunsetState
-                                color: theme.c.accent
+                                color: theme.accent
                                 opacity: 0.6
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
@@ -470,13 +470,13 @@ Scope {
                                 Rectangle {
                                     width: 106
                                     height: 16
-                                    color: (root.sunsetState.toLowerCase() === "auto") ? theme.c.accent : theme.c.bg_light
+                                    color: (root.sunsetState.toLowerCase() === "auto") ? theme.accent : theme.bg_light
                                     radius: 0
 
                                     Text {
                                         anchors.centerIn: parent
                                         text: "Auto"
-                                        color: (root.sunsetState.toLowerCase() === "auto") ? theme.c.bg : theme.c.accent
+                                        color: (root.sunsetState.toLowerCase() === "auto") ? theme.bg : theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -498,13 +498,13 @@ Scope {
                                 Rectangle {
                                     width: 106
                                     height: 16
-                                    color: (root.sunsetState.toLowerCase() === "off") ? theme.c.accent : theme.c.bg_light
+                                    color: (root.sunsetState.toLowerCase() === "off") ? theme.accent : theme.bg_light
                                     radius: 0
 
                                     Text {
                                         anchors.centerIn: parent
                                         text: "Off"
-                                        color: (root.sunsetState.toLowerCase() === "off") ? theme.c.bg : theme.c.accent
+                                        color: (root.sunsetState.toLowerCase() === "off") ? theme.bg : theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -534,7 +534,7 @@ Scope {
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Temperature: " + (root.sunsetState.toLowerCase() === "off" ? "Identity (No change)" : root.sunsetState + "K")
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     opacity: 0.8
@@ -576,7 +576,7 @@ Scope {
                                         delegate: Rectangle {
                                             height: parent.height
                                             width: (tempSliderBlocks.width - (tempSliderBlocks.spacing * (tempSliderBlocks.totalBlocks - 1))) / tempSliderBlocks.totalBlocks
-                                            color: (index < Math.round(tempSliderBlocks.currentVal * tempSliderBlocks.totalBlocks)) ? theme.c.accent : theme.c.bg_light
+                                            color: (index < Math.round(tempSliderBlocks.currentVal * tempSliderBlocks.totalBlocks)) ? theme.accent : theme.bg_light
                                         }
 
                                     }
@@ -619,7 +619,7 @@ Scope {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: theme.c.accent
+                            color: theme.accent
                             opacity: 0.15
                         }
 
@@ -634,7 +634,7 @@ Scope {
                                 id: caffeineToggle
 
                                 text: "Caffeine: " + (root.caffeineActive ? "On" : "Off")
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -643,8 +643,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: caffeineToggle.color = theme.c.accent
-                                    onExited: caffeineToggle.color = theme.c.accent
+                                    onEntered: caffeineToggle.color = theme.accent
+                                    onExited: caffeineToggle.color = theme.accent
                                     onClicked: {
                                         var nextState = !root.caffeineActive;
                                         root.caffeineActive = nextState;
@@ -661,7 +661,7 @@ Scope {
                                 id: sleepToggle
 
                                 text: "Sleep: " + (root.caffeineActive ? "Off" : "On")
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true

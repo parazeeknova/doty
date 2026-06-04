@@ -18,13 +18,13 @@ Scope {
     // Theme tokens (Gruvbox Material Dark)
     readonly property color colorBgDark: "#e61d2021"
     // Sleek dark background
-    readonly property color colorBgCell: theme.c.bg_dark
+    readonly property color colorBgCell: theme.bg_dark
     // Item cell bg
     readonly property color colorBgActive: "#504945"
     // Selected cell bg
-    readonly property color colorBorder: theme.c.accent
+    readonly property color colorBorder: theme.accent
     // Accent border
-    readonly property color colorText: theme.c.accent
+    readonly property color colorText: theme.accent
     // Foreground text
     readonly property color colorTextMuted: "#a89984"
     // Muted text
@@ -263,7 +263,7 @@ Scope {
                                 anchors.fill: parent
                                 anchors.bottomMargin: 2
                                 verticalAlignment: TextInput.AlignVCenter
-                                color: "#d4be98"
+                                color: theme.fg
                                 font.family: root.fontName
                                 font.pixelSize: 8
                                 focus: true
@@ -273,7 +273,7 @@ Scope {
 
                                 Text {
                                     text: "search..."
-                                    color: "#7c6f64"
+                                    color: theme.secondary
                                     font.family: root.fontName
                                     font.pixelSize: 8
                                     visible: searchInput.text === ""
@@ -288,7 +288,7 @@ Scope {
                                 anchors.bottom: parent.bottom
                                 width: parent.width
                                 height: 1
-                                color: searchInput.activeFocus ? "#d4be98" : "#7c6f64"
+                                color: searchInput.activeFocus ? theme.fg : theme.secondary
                             }
 
                         }
@@ -307,7 +307,7 @@ Scope {
                             delegate: Rectangle {
                                 width: gridView.cellWidth - 2
                                 height: gridView.cellHeight - 2
-                                color: (root.selectedIndex === index) ? theme.c.bg_dark : "transparent"
+                                color: (root.selectedIndex === index) ? theme.bg_dark : "transparent"
                                 radius: 0
 
                                 Text {

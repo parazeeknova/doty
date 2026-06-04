@@ -177,7 +177,9 @@ fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     vars.insert("bg_dark_rgb".to_string(), hex_to_rgb(&bg_dark));
     vars.insert("bg_light_rgb".to_string(), hex_to_rgb(&bg_light));
     vars.insert("fg_rgb".to_string(), hex_to_rgb(&fg));
+    vars.insert("fg_light_rgb".to_string(), hex_to_rgb(&fg_light));
     vars.insert("accent_rgb".to_string(), hex_to_rgb(&accent));
+    vars.insert("secondary_rgb".to_string(), hex_to_rgb(&secondary));
     vars.insert("error_rgb".to_string(), hex_to_rgb(&error));
     vars.insert("home".to_string(), home_dir().to_string_lossy().to_string());
 
@@ -211,15 +213,108 @@ fn patch_kvantum_svg(svg_template: &Path, svg_output: &Path, vars: &HashMap<Stri
         return;
     };
 
-    // Replace standard gruvbox hex colors in Kvantum Gruvbox base theme with themed variables
+    let bg = &vars["bg"];
+    let bg_dark = &vars["bg_dark"];
+    let bg_light = &vars["bg_light"];
+    let fg = &vars["fg"];
+    let fg_light = &vars["fg_light"];
+    let accent = &vars["accent"];
+    let secondary = &vars["secondary"];
+    let tertiary = &vars["tertiary"];
+    let error = &vars["error"];
+
+    // Build replacement list: order matters — replace more specific colors first
+    // to avoid partial matches when colors share prefixes.
+    let replacements: Vec<(&str, &str)> = vec![
+        // === Accent / selection / checkboxes ===
+        // Gruvbox green — checkboxes, radio buttons, itemview selection, progress bars
+        ("#b8bb26", accent),
+        ("#a9b665", accent),
+        ("#98971a", accent),       // Darker Gruvbox green variant
+        // Gruvbox aqua dark — checked state backgrounds
+        ("#427b58", bg_light),
+        // Gruvbox aqua — secondary accent elements
+        ("#83a598", secondary),
+
+        // === Focused / hover accent ===
+        // Gruvbox yellow — focused close buttons, focused tab indicator, focused accent
+        ("#fabd2f", accent),
+        ("#fadb2f", accent),
+        ("#ffb90c", accent),
+        // Gruvbox orange — active/hover accents
+        ("#fe8018", accent),
+        ("#d65d0e", accent),
+        ("#d08770", secondary),
+
+        // === Error / close button pressed ===
+        ("#fb4934", error),
+
+        // === Foreground / text / icons ===
+        // Gruvbox fg (cream/light) — main text, mdi icons, close/min/max icons
+        ("#fbf1c7", fg),
+        ("#f8f6da", fg),
+        ("#f0e3c4", fg_light),
+        // Gruvbox grey — muted text, scrollbar handles, borders
+        ("#a89984", fg_light),
+
+        // === Backgrounds (replace most-specific first) ===
+        // Gruvbox bg3/bg2 — mid-tone surfaces
+        ("#504945", bg_light),
+        ("#3c3836", bg_light),
+        ("#32302f", bg_light),
+        // Gruvbox bg1 — slightly lighter bg
+        ("#5c5040", bg_light),
+
+        // Nord polar night — used for focus/hover highlight fills
+        ("#4c566a", bg_light),
+        ("#555761", bg_light),
+        ("#555564", bg_light),
+
+        // Generic dark greys used in gradient stops and generic fills
+        ("#6e6e70", bg_light),
+        ("#414143", bg_light),
+        ("#313131", bg_light),
+        ("#323234", bg_light),
+        ("#28282a", bg_dark),
+        ("#232325", bg_dark),
+        ("#22252e", bg_dark),
+        ("#1e1e20", bg_dark),
+        ("#1c1c1c", bg_dark),
+        ("#191919", bg_dark),
+        ("#131621", bg_dark),
+
+        // Gruvbox bg0 — main dark background
+        ("#282828", bg_dark),
+        // Gruvbox bg0_h — darkest background
+        ("#1d2021", bg),
+
+        // === Button gradient stops ===
+        ("#7a7a7c", bg_light),
+        ("#646466", bg_light),
+        ("#88888a", bg_light),
+        ("#727274", bg_light),
+        ("#525254", bg_light),
+        ("#48484a", bg_light),
+        ("#606062", bg_light),
+        ("#565658", bg_light),
+
+        // === Misc themed accents ===
+        ("#c3c370", accent),       // Tooltip shadow hint (yellowish-green)
+        ("#717e98", secondary),    // Muted blue-grey element
+        ("#3c4366", bg_light),     // Dark blue-grey
+        ("#5c616c", bg_light),     // Adwaita-style grey (used in close icon class)
+        ("#31363b", bg_light),     // Breeze-style dark grey (used in border class)
+        ("#222", bg),              // Shorthand dark grey (main window background!)
+        ("#333", bg_light),        // Shorthand lighter grey
+    ];
+
     let mut rendered = content;
-    rendered = rendered.replace("#1d2021", &vars["bg"]);
-    rendered = rendered.replace("#282828", &vars["bg_dark"]);
-    rendered = rendered.replace("#3c3836", &vars["bg_light"]);
-    rendered = rendered.replace("#ebdbb2", &vars["fg"]);
-    rendered = rendered.replace("#d5c4a1", &vars["fg_light"]);
-    rendered = rendered.replace("#b8bb26", &vars["accent"]);
-    rendered = rendered.replace("#a9b665", &vars["accent"]);
+    for (from, to) in replacements {
+        rendered = rendered.replace(from, to);
+    }
+
+    // Remove blur filter from menu background to make corners square/sharp
+    rendered = rendered.replace("filter:url(#filter2077)", "filter:none");
 
     if let Some(parent) = svg_output.parent() {
         let _ = fs::create_dir_all(parent);
@@ -317,7 +412,11 @@ fn main() {
         ),
         (
             ".config/gtk-3.0/colors.css.template",
-            ".config/gtk-3.0/colors.css",
+            ".themes/wabi/gtk-3.0/colors.css",
+        ),
+        (
+            ".config/gtk-3.0/colors.css.template",
+            ".themes/wabi/gtk-3.20/colors.css",
         ),
         (
             ".config/gtk-4.0/colors.css.template",
@@ -337,8 +436,12 @@ fn main() {
             ".config/hypr/hyprlock.conf",
         ),
         (
-            ".config/Kvantum/Gruvbox/Gruvbox.kvconfig.template",
-            ".config/Kvantum/Gruvbox/Gruvbox.kvconfig",
+            ".config/Kvantum/wabi/wabi.kvconfig.template",
+            ".config/Kvantum/wabi/wabi.kvconfig",
+        ),
+        (
+            ".config/color-schemes/Kvantum.colors.template",
+            ".local/share/color-schemes/Kvantum.colors",
         ),
     ];
 
@@ -364,8 +467,8 @@ fn main() {
     }
 
     // Patch Kvantum SVG
-    let svg_tmpl = doty.join(".config/Kvantum/Gruvbox/Gruvbox.svg.template");
-    let svg_dest = doty.join(".config/Kvantum/Gruvbox/Gruvbox.svg");
+    let svg_tmpl = doty.join(".config/Kvantum/wabi/wabi.svg.template");
+    let svg_dest = doty.join(".config/Kvantum/wabi/wabi.svg");
     if svg_tmpl.exists() {
         patch_kvantum_svg(&svg_tmpl, &svg_dest, &vars);
         println!("Patched: Kvantum SVG");
@@ -380,65 +483,142 @@ fn main() {
     let _ = Command::new("make").arg("sync").current_dir(&doty).status();
 
     // Reload services
+    let _ = Command::new("gsettings")
+        .arg("set")
+        .arg("org.gnome.desktop.interface")
+        .arg("gtk-theme")
+        .arg("wabi")
+        .status();
+    let _ = Command::new("gsettings")
+        .arg("set")
+        .arg("org.gnome.desktop.interface")
+        .arg("color-scheme")
+        .arg("prefer-dark")
+        .status();
     let _ = Command::new("hyprctl").arg("reload").status();
     let _ = Command::new("killall").arg("-USR2").arg("waybar").status();
     let _ = Command::new("makoctl").arg("reload").status();
     let _ = Command::new("thunar").arg("-q").status();
 
+    // Write colors.json to cache folder for dynamic color switching in QuickShell
+    let colors_json_dest = cache_colors_dir.join("colors.json");
+    if let Ok(json_str) = serde_json::to_string(&vars) {
+        let _ = fs::write(colors_json_dest, json_str);
+    }
+
     println!("Theme applied successfully!");
+}
+
+fn rgb_to_hsl(r: f64, g: f64, b: f64) -> (f64, f64, f64) {
+    let r = r / 255.0;
+    let g = g / 255.0;
+    let b = b / 255.0;
+    let max = r.max(g).max(b);
+    let min = r.min(g).min(b);
+    let l = (max + min) / 2.0;
+    if (max - min).abs() < 1e-6 {
+        return (0.0, 0.0, l);
+    }
+    let d = max - min;
+    let s = if l > 0.5 {
+        d / (2.0 - max - min)
+    } else {
+        d / (max + min)
+    };
+    let h = if (max - r).abs() < 1e-6 {
+        let mut h = (g - b) / d;
+        if g < b {
+            h += 6.0;
+        }
+        h
+    } else if (max - g).abs() < 1e-6 {
+        (b - r) / d + 2.0
+    } else {
+        (r - g) / d + 4.0
+    };
+    (h * 60.0, s, l)
 }
 
 fn apply_papirus_folders(accent_hex: &str) {
     let accent = accent_hex.trim_start_matches('#');
     let (r, g, b) = if accent.len() == 6 {
-        let r = u8::from_str_radix(&accent[0..2], 16).unwrap_or(0) as i32;
-        let g = u8::from_str_radix(&accent[2..4], 16).unwrap_or(0) as i32;
-        let b = u8::from_str_radix(&accent[4..6], 16).unwrap_or(0) as i32;
+        let r = u8::from_str_radix(&accent[0..2], 16).unwrap_or(0) as f64;
+        let g = u8::from_str_radix(&accent[2..4], 16).unwrap_or(0) as f64;
+        let b = u8::from_str_radix(&accent[4..6], 16).unwrap_or(0) as f64;
         (r, g, b)
     } else {
         return;
     };
 
-    let colors = vec![
-        ("black", (66, 66, 66)),
-        ("blue", (75, 127, 212)),
-        ("bluegrey", (96, 125, 139)),
-        ("brown", (141, 110, 99)),
-        ("carmine", (163, 0, 0)),
-        ("cyan", (0, 188, 212)),
-        ("darkcyan", (0, 139, 139)),
-        ("deeporange", (255, 87, 34)),
-        ("green", (135, 175, 135)),
-        ("grey", (158, 158, 158)),
-        ("indigo", (63, 81, 181)),
-        ("magenta", (233, 30, 99)),
-        ("nordic", (94, 129, 172)),
-        ("orange", (255, 152, 0)),
-        ("palebrown", (188, 170, 164)),
-        ("paleorange", (255, 171, 145)),
-        ("pink", (244, 143, 177)),
-        ("red", (239, 83, 80)),
-        ("teal", (0, 150, 136)),
-        ("violet", (156, 39, 176)),
-        ("white", (224, 224, 224)),
-        ("yaru", (233, 84, 32)),
-        ("yellow", (255, 235, 59)),
+    let (accent_h, accent_s, _accent_l) = rgb_to_hsl(r, g, b);
+
+    // Papirus color palette with representative RGB values
+    let colors: Vec<(&str, (f64, f64, f64))> = vec![
+        ("black", (66.0, 66.0, 66.0)),
+        ("blue", (75.0, 127.0, 212.0)),
+        ("bluegrey", (96.0, 125.0, 139.0)),
+        ("brown", (141.0, 110.0, 99.0)),
+        ("carmine", (163.0, 0.0, 0.0)),
+        ("cyan", (0.0, 188.0, 212.0)),
+        ("darkcyan", (0.0, 139.0, 139.0)),
+        ("deeporange", (255.0, 87.0, 34.0)),
+        ("green", (135.0, 175.0, 135.0)),
+        ("grey", (158.0, 158.0, 158.0)),
+        ("indigo", (63.0, 81.0, 181.0)),
+        ("magenta", (233.0, 30.0, 99.0)),
+        ("nordic", (94.0, 129.0, 172.0)),
+        ("orange", (255.0, 152.0, 0.0)),
+        ("palebrown", (188.0, 170.0, 164.0)),
+        ("paleorange", (255.0, 171.0, 145.0)),
+        ("pink", (244.0, 143.0, 177.0)),
+        ("red", (239.0, 83.0, 80.0)),
+        ("teal", (0.0, 150.0, 136.0)),
+        ("violet", (156.0, 39.0, 176.0)),
+        ("white", (224.0, 224.0, 224.0)),
+        ("yaru", (233.0, 84.0, 32.0)),
+        ("yellow", (255.0, 235.0, 59.0)),
     ];
 
-    let mut closest_color = "blue";
-    let mut min_dist = i32::MAX;
+    // If accent is very desaturated, use grey
+    if accent_s < 0.15 {
+        println!("Setting Papirus folders to: grey (desaturated accent)");
+        let _ = Command::new("papirus-folders")
+            .arg("-C")
+            .arg("grey")
+            .status();
+        return;
+    }
 
-    for (name, (cr, cg, cb)) in colors {
-        let dist = (r - cr).pow(2) + (g - cg).pow(2) + (b - cb).pow(2);
-        if dist < min_dist {
-            min_dist = dist;
-            closest_color = name;
+    let mut best_color = "blue";
+    let mut best_score = f64::MAX;
+
+    for (name, (cr, cg, cb)) in &colors {
+        let (ch, cs, _cl) = rgb_to_hsl(*cr, *cg, *cb);
+
+        // Skip achromatic colors for chromatic accents
+        if cs < 0.1 {
+            continue;
+        }
+
+        // Hue distance on circular 0-360 scale
+        let mut hue_diff = (accent_h - ch).abs();
+        if hue_diff > 180.0 {
+            hue_diff = 360.0 - hue_diff;
+        }
+
+        // Weighted score: hue is most important, saturation difference as tiebreaker
+        let sat_diff = (accent_s - cs).abs();
+        let score = hue_diff * 3.0 + sat_diff * 50.0;
+
+        if score < best_score {
+            best_score = score;
+            best_color = name;
         }
     }
 
-    println!("Setting Papirus folders to: {}", closest_color);
+    println!("Setting Papirus folders to: {}", best_color);
     let _ = Command::new("papirus-folders")
         .arg("-C")
-        .arg(closest_color)
+        .arg(best_color)
         .status();
 }

@@ -188,68 +188,68 @@ Scope {
     function getIconColor(msg) {
         var lower = msg.toLowerCase();
         if (msg.includes("Recording Started"))
-            return "#ea6962";
+            return theme.error;
 
         if (msg.includes("Recording Saved") || msg.includes("Recording Stopped"))
-            return theme.c.accent;
+            return theme.accent;
 
         if (msg.includes("Extracted") || msg.includes("OCR"))
-            return "#e78a4e";
+            return theme.tertiary;
 
         if (msg.includes("Glass: On"))
-            return theme.c.accent;
+            return theme.accent;
 
         if (msg.includes("Glass: Off"))
-            return "#ea6962";
+            return theme.error;
 
         // Caffeine
         if (lower.includes("caffeine on"))
-            return theme.c.accent;
+            return theme.accent;
 
         if (lower.includes("caffeine off"))
-            return "#7c6f64";
+            return theme.secondary;
 
         // Sunset
         if (lower.includes("sunset auto") || lower.includes("sunset off"))
-            return "#7c6f64";
+            return theme.secondary;
 
         if (lower.includes("sunset"))
-            return "#e78a4e";
+            return theme.tertiary;
 
         // Profile
         if (lower.includes("profile:")) {
             if (lower.includes("performance"))
-                return "#ea6962";
+                return theme.error;
 
             if (lower.includes("balanced"))
-                return theme.c.accent;
+                return theme.accent;
 
             if (lower.includes("quiet") || lower.includes("power-saver") || lower.includes("power saver"))
-                return "#7caea3";
+                return theme.secondary;
 
         }
         // Caps
         if (lower.includes("caps on"))
-            return "#ea6962";
+            return theme.error;
 
         if (lower.includes("caps off"))
-            return "#7c6f64";
+            return theme.secondary;
 
         // Mute states
         if (lower.includes("mute"))
-            return "#ea6962";
+            return theme.error;
 
         // Battery
         if (lower.includes("low battery") || lower.includes("critical battery") || lower.includes("battery dying"))
-            return "#ea6962";
+            return theme.error;
 
         if (lower.includes("charging") || lower.includes("battery full"))
-            return theme.c.accent;
+            return theme.accent;
 
         if (lower.includes("battery"))
-            return "#e78a4e";
+            return theme.tertiary;
 
-        return "#d4be98";
+        return theme.fg;
     }
 
     function defaultState() {
@@ -706,7 +706,7 @@ Scope {
                     opacity: win.animOpacity
                     color: theme.popupBgColor
                     border.width: 1
-                    border.color: root.kind === "good" ? theme.c.accent : root.kind === "bad" ? "#ea6962" : root.kind === "warn" ? "#e78a4e" : "#7c6f64"
+                    border.color: root.kind === "good" ? theme.accent : root.kind === "bad" ? theme.error : root.kind === "warn" ? theme.tertiary : theme.secondary
                     radius: 0
                     antialiasing: false
 
@@ -737,7 +737,7 @@ Scope {
 
                             Text {
                                 text: root.getPrefix(root.message)
-                                color: "#d4be98"
+                                color: theme.fg
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 renderType: Text.NativeRendering
@@ -761,7 +761,7 @@ Scope {
                                     delegate: Rectangle {
                                         height: parent.height
                                         width: 5
-                                        color: (index < Math.round(blockSlider.currentVal * blockSlider.totalBlocks)) ? theme.c.accent : theme.c.bg_light
+                                        color: (index < Math.round(blockSlider.currentVal * blockSlider.totalBlocks)) ? theme.accent : theme.bg_light
                                     }
 
                                 }
@@ -770,7 +770,7 @@ Scope {
 
                             Text {
                                 text: root.getPercentText(root.message)
-                                color: "#d4be98"
+                                color: theme.fg
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 renderType: Text.NativeRendering
@@ -803,7 +803,7 @@ Scope {
 
                                 Text {
                                     text: root.getPrefix(root.message)
-                                    color: "#d4be98"
+                                    color: theme.fg
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
                                     renderType: Text.NativeRendering
@@ -832,7 +832,7 @@ Scope {
                                         delegate: Rectangle {
                                             height: parent.height
                                             width: 5
-                                            color: (index < Math.round(kbdBlockSlider.currentVal * kbdBlockSlider.totalBlocks)) ? theme.c.accent : theme.c.bg_light
+                                            color: (index < Math.round(kbdBlockSlider.currentVal * kbdBlockSlider.totalBlocks)) ? theme.accent : theme.bg_light
                                         }
 
                                     }
@@ -841,7 +841,7 @@ Scope {
 
                                 Text {
                                     text: root.getPercentText(root.message)
-                                    color: "#d4be98"
+                                    color: theme.fg
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
                                     renderType: Text.NativeRendering
@@ -873,7 +873,7 @@ Scope {
                                 id: fallbackLabel
 
                                 text: root.message
-                                color: "#d4be98"
+                                color: theme.fg
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 renderType: Text.NativeRendering
@@ -886,7 +886,7 @@ Scope {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: theme.c.accent
+                            color: theme.accent
                             opacity: 0.15
                             visible: root.media !== null && root.message.includes("volume")
                         }
@@ -902,10 +902,10 @@ Scope {
                             Rectangle {
                                 width: 18
                                 height: 18
-                                color: theme.c.bg_light
+                                color: theme.bg_light
                                 radius: 0
                                 border.width: 1
-                                border.color: theme.c.accent
+                                border.color: theme.accent
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 Image {
@@ -921,7 +921,7 @@ Scope {
                                 Text {
                                     anchors.centerIn: parent
                                     text: "󰎆"
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     visible: !artImage.visible
@@ -944,7 +944,7 @@ Scope {
                                     Text {
                                         width: parent.width - osdSourceIndicator.implicitWidth - 4
                                         text: root.media ? root.media.title : ""
-                                        color: theme.c.accent
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -966,9 +966,9 @@ Scope {
                                             delegate: Rectangle {
                                                 width: 3
                                                 height: 3
-                                                color: index === root.currentMediaSourceIndex() ? theme.c.accent : theme.c.bg_light
+                                                color: index === root.currentMediaSourceIndex() ? theme.accent : theme.bg_light
                                                 border.width: 1
-                                                border.color: theme.c.accent
+                                                border.color: theme.accent
                                                 opacity: index === root.currentMediaSourceIndex() ? 1 : 0.55
                                             }
 
@@ -981,7 +981,7 @@ Scope {
                                 Text {
                                     width: parent.width
                                     text: root.media ? (root.media.artist ? root.media.artist + " • " + root.media.player : root.media.player) : ""
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     opacity: 0.6
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 7
@@ -997,7 +997,7 @@ Scope {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: theme.c.accent
+                            color: theme.accent
                             opacity: 0.15
                             visible: root.message.includes("brightness") && !root.message.includes("kbd")
                         }
@@ -1011,7 +1011,7 @@ Scope {
                             Text {
                                 anchors.left: parent.left
                                 text: "Sunset: " + root.sunsetState
-                                color: theme.c.accent
+                                color: theme.accent
                                 opacity: 0.6
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
@@ -1021,7 +1021,7 @@ Scope {
                             Text {
                                 anchors.right: parent.right
                                 text: root.caffeineActive ? "Caffeine: On" : "Sleep: On"
-                                color: theme.c.accent
+                                color: theme.accent
                                 opacity: 0.6
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
@@ -1072,7 +1072,7 @@ Scope {
                     anchors.fill: parent
                     color: (root.pomoShowAlways || root.pomoHovered) ? "#e61d2021" : "#01000000"
                     border.width: (root.pomoShowAlways || root.pomoHovered) ? 1 : 0
-                    border.color: theme.c.accent
+                    border.color: theme.accent
                     radius: 0
                     opacity: (root.pomoShowAlways || root.pomoHovered) ? 1 : 0.01
 
@@ -1082,7 +1082,7 @@ Scope {
 
                         Text {
                             text: root.formatPomoTime(root.pomoTimeLeft)
-                            color: theme.c.accent
+                            color: theme.accent
                             font.family: "FiraCode Nerd Font"
                             font.pixelSize: 8
                             font.bold: true
@@ -1128,3 +1128,4 @@ Scope {
     }
 
 }
+

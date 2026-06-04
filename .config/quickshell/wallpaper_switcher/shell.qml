@@ -390,7 +390,7 @@ Scope {
                                     width: 220
                                     height: 124
                                     anchors.centerIn: parent
-                                    color: theme.c.bg
+                                    color: theme.bg
                                     radius: 8
                                     clip: true
 
@@ -419,7 +419,7 @@ Scope {
                                                 var filename = parts[parts.length - 1];
                                                 return filename.replace(/\.[^/.]+$/, "");
                                             }
-                                            color: theme.c.fg
+                                            color: theme.fg
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             elide: Text.ElideRight

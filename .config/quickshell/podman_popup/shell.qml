@@ -187,7 +187,7 @@ Scope {
                     opacity: win.animOpacity
                     color: theme.podmanBgColor // Sleek dark semi-transparent bg matching clipboard
                     border.width: 1
-                    border.color: theme.c.accent
+                    border.color: theme.accent
                     radius: 0
                     focus: true
                     Keys.onPressed: (event) => {
@@ -213,7 +213,7 @@ Scope {
 
                             Text {
                                 text: "Podman Contianers"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -226,7 +226,7 @@ Scope {
 
                             Text {
                                 text: "󰑐"
-                                color: refreshMouse.containsMouse ? theme.c.accent : "#a89984"
+                                color: refreshMouse.containsMouse ? theme.accent : "#a89984"
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 renderType: Text.NativeRendering
@@ -261,7 +261,7 @@ Scope {
 
                                     Text {
                                         text: "Containers"
-                                        color: theme.c.accent
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: false
@@ -302,7 +302,7 @@ Scope {
 
                                                     Text {
                                                         text: (modelData.Names && modelData.Names.length > 0) ? modelData.Names[0] : "Unnamed"
-                                                        color: theme.c.accent
+                                                        color: theme.accent
                                                         font.family: "FiraCode Nerd Font"
                                                         font.pixelSize: 8
                                                         font.bold: true
@@ -340,7 +340,7 @@ Scope {
                                                     }).join(", ") : "") : "└── ports: " + (modelData.Ports ? modelData.Ports.map((p) => {
                                                         return p.hostPort + "->" + p.containerPort;
                                                     }).join(", ") : "")
-                                                    color: theme.c.accent
+                                                    color: theme.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     elide: Text.ElideRight
@@ -355,7 +355,7 @@ Scope {
 
                                                     Text {
                                                         text: "└── act:"
-                                                        color: "#7c6f64"
+                                                        color: theme.secondary
                                                         font.family: "FiraCode Nerd Font"
                                                         font.pixelSize: 8
                                                         renderType: Text.NativeRendering
@@ -442,7 +442,7 @@ Scope {
                                     Text {
                                         visible: !root.podmanData.containers || root.podmanData.containers.length === 0
                                         text: " └── none"
-                                        color: "#7c6f64"
+                                        color: theme.secondary
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         renderType: Text.NativeRendering
@@ -457,7 +457,7 @@ Scope {
 
                                     Text {
                                         text: "Networks"
-                                        color: theme.c.accent
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: false
@@ -473,7 +473,7 @@ Scope {
 
                                             Text {
                                                 text: "├─ " + (modelData.name || "N/A") + " (" + (modelData.driver || "N/A") + ")"
-                                                color: theme.c.accent
+                                                color: theme.accent
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
                                                 elide: Text.ElideRight
@@ -498,7 +498,7 @@ Scope {
                                     Text {
                                         visible: !root.podmanData.networks || root.podmanData.networks.length === 0
                                         text: " └── none"
-                                        color: "#7c6f64"
+                                        color: theme.secondary
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         renderType: Text.NativeRendering
@@ -513,7 +513,7 @@ Scope {
 
                                     Text {
                                         text: "Images"
-                                        color: theme.c.accent
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: false
@@ -529,7 +529,7 @@ Scope {
 
                                             Text {
                                                 text: "├─ " + ((modelData.Names && modelData.Names.length > 0) ? modelData.Names[0] : "Unnamed Image")
-                                                color: theme.c.accent
+                                                color: theme.accent
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
                                                 font.bold: true
@@ -555,7 +555,7 @@ Scope {
                                     Text {
                                         visible: !root.podmanData.images || root.podmanData.images.length === 0
                                         text: " └── none"
-                                        color: "#7c6f64"
+                                        color: theme.secondary
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         renderType: Text.NativeRendering

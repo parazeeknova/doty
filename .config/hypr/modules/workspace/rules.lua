@@ -19,7 +19,8 @@
 hl.window_rule({
     match = {
         class = "^()$",
-        title = "^()$"
+        title = "^()$",
+        xwayland = true
     },
     no_blur = true,
     opacity = 1

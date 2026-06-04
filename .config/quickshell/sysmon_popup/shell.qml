@@ -234,7 +234,7 @@ Scope {
                     opacity: win.animOpacity
                     color: theme.popupBgColor
                     border.width: 1
-                    border.color: theme.c.accent
+                    border.color: theme.accent
                     radius: 0
                     antialiasing: false
                     focus: true
@@ -265,7 +265,7 @@ Scope {
                                 anchors.left: parent.left
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: "System Monitor"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -279,7 +279,7 @@ Scope {
                                 anchors.right: parent.right
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: "launch btop"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 renderType: Text.NativeRendering
@@ -287,8 +287,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnBtop.color = theme.c.accent
-                                    onExited: btnBtop.color = theme.c.accent
+                                    onEntered: btnBtop.color = theme.accent
+                                    onExited: btnBtop.color = theme.accent
                                     onClicked: {
                                         Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] ghostty --title=btop -e btop --force-utf")']);
                                         win.closePopup();
@@ -315,7 +315,7 @@ Scope {
 
                                     Text {
                                         text: " CPU: " + root.cpuName
-                                        color: theme.c.accent
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: true
@@ -326,7 +326,7 @@ Scope {
                                     // CPU Box
                                     Text {
                                         text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelVal("usage:", String(root.cpuUsage), "%", 17) + "┃\n" + "┃" + root.formatLabelVal("temp:", String(root.cpuTemp), "°C", 17) + "┃\n" + "┃" + root.formatLabelVal("freq:", root.cpuFreq.toFixed(2), "GHz", 17) + "┃\n" + "┃" + root.formatLabelVal("power:", root.cpuPower.toFixed(1), "W", 17) + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
-                                        color: theme.c.accent
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: false
@@ -346,7 +346,7 @@ Scope {
 
                                     Text {
                                         text: "󰢮 GPU: " + root.gpuName
-                                        color: theme.c.accent
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: true
@@ -357,7 +357,7 @@ Scope {
                                     // GPU Box
                                     Text {
                                         text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelVal("usage:", String(root.gpuUsage), "%", 17) + "┃\n" + "┃" + root.formatLabelVal("temp:", String(root.gpuTemp), "°C", 17) + "┃\n" + "┃" + root.formatLabelVal("used:", String(root.gpuMemUsed), "M", 17) + "┃\n" + "┃" + root.formatLabelVal("power:", root.gpuPower.toFixed(1), "W", 17) + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
-                                        color: theme.c.accent
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: false
@@ -374,7 +374,7 @@ Scope {
                             // 󰍛MEM label
                             Text {
                                 text: "󰍛 MEM: Micron Crucial CT2K16G48C40S5"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -384,7 +384,7 @@ Scope {
                             // RAM Box
                             Text {
                                 text: "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelVal("type:", root.ramName, "", 18) + " " + root.formatLabelVal("speed:", root.ramSpeed, "", 18) + "┃\n" + "┃" + root.formatLabelVal("ram:", (root.ramUsed.toFixed(2) + "/" + root.ramTotal.toFixed(2)), "G", 18) + " " + root.formatLabelVal("usg:", String(root.ramUsage), "%", 18) + "┃\n" + "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: false
@@ -397,7 +397,7 @@ Scope {
                             // 󰋊 DISKS heading
                             Text {
                                 text: "󰋊 DISKS"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -416,7 +416,7 @@ Scope {
 
                                     Text {
                                         text: root.disk0Name
-                                        color: theme.c.accent
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: true
@@ -428,7 +428,7 @@ Scope {
 
                                     Text {
                                         text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelVal("R:", root.disk0ReadRate.toFixed(1), "M/s", 17) + "┃\n" + "┃" + root.formatLabelVal("W:", root.disk0WriteRate.toFixed(1), "M/s", 17) + "┃\n" + "┃" + root.formatLabelVal("total:", root.disk0TotalGb.toFixed(0), "G", 17) + "┃\n" + "┃" + root.formatLabelVal("used:", root.disk0UsedGb.toFixed(0), "G", 17) + "┃\n" + "┃" + root.formatLabelVal("free:", root.disk0FreeGb.toFixed(0), "G", 17) + "┃\n" + "┃" + root.formatLabelVal("usg:", String(root.disk0UsagePct), "%", 17) + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
-                                        color: theme.c.accent
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: false
@@ -447,7 +447,7 @@ Scope {
 
                                     Text {
                                         text: root.disk1Name
-                                        color: theme.c.accent
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: true
@@ -459,7 +459,7 @@ Scope {
 
                                     Text {
                                         text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelVal("R:", root.disk1ReadRate.toFixed(1), "M/s", 17) + "┃\n" + "┃" + root.formatLabelVal("W:", root.disk1WriteRate.toFixed(1), "M/s", 17) + "┃\n" + "┃" + root.formatLabelVal("total:", root.disk1TotalGb.toFixed(0), "G", 17) + "┃\n" + "┃" + root.formatLabelVal("used:", root.disk1UsedGb.toFixed(0), "G", 17) + "┃\n" + "┃" + root.formatLabelVal("free:", root.disk1FreeGb.toFixed(0), "G", 17) + "┃\n" + "┃" + root.formatLabelVal("usg:", String(root.disk1UsagePct), "%", 17) + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
-                                        color: theme.c.accent
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: false

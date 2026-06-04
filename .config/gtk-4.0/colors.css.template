@@ -25,3 +25,29 @@
 @define-color bg_dim {{bg_dark}};
 @define-color bg_light {{bg_light}};
 @define-color border_color {{bg_light}};
+
+/* Libadwaita color mappings */
+@define-color window_bg_color @bg_color;
+@define-color window_fg_color @fg_color;
+@define-color view_bg_color @base_color;
+@define-color view_fg_color @text_color;
+@define-color headerbar_bg_color @bg_dim;
+@define-color headerbar_fg_color @fg_color;
+@define-color headerbar_border_color @border_color;
+@define-color card_bg_color @bg_light;
+@define-color card_fg_color @fg_color;
+@define-color accent_color @selected_bg_color;
+@define-color accent_bg_color @selected_bg_color;
+@define-color accent_fg_color @selected_fg_color;
+@define-color destructive_bg_color @red;
+@define-color destructive_fg_color @selected_fg_color;
+@define-color destructive_color @red;
+@define-color success_bg_color @green;
+@define-color success_fg_color @selected_fg_color;
+@define-color success_color @green;
+@define-color warning_bg_color @orange;
+@define-color warning_fg_color @selected_fg_color;
+@define-color warning_color @orange;
+@define-color error_bg_color @red;
+@define-color error_fg_color @selected_fg_color;
+@define-color error_color @red;

@@ -33,14 +33,14 @@ Scope {
     property real draggedHeight: 50
     property bool dragMoved: false
     // Concise, Single Color Theme (Gruvbox Material Dark / fg: #d5c4a1)
-    readonly property color colorBgDark: theme.glassEnabled ? Qt.rgba(theme.c.bg.r, theme.c.bg.g, theme.c.bg.b, 0.5) : theme.c.bg
-    readonly property color colorBgCell: theme.glassEnabled ? Qt.rgba(theme.c.bg_dark.r, theme.c.bg_dark.g, theme.c.bg_dark.b, 0.5) : theme.c.bg_dark
-    readonly property color colorBgCellActive: theme.glassEnabled ? Qt.rgba(theme.c.bg_light.r, theme.c.bg_light.g, theme.c.bg_light.b, 0.69) : theme.c.bg_light
-    readonly property color colorBgCellHover: theme.glassEnabled ? Qt.rgba(theme.c.fg_light.r, theme.c.fg_light.g, theme.c.fg_light.b, 0.81) : theme.c.fg_light
+    readonly property color colorBgDark: theme.glassEnabled ? Qt.rgba(theme.bg.r, theme.bg.g, theme.bg.b, 0.5) : theme.bg
+    readonly property color colorBgCell: theme.glassEnabled ? Qt.rgba(theme.bg_dark.r, theme.bg_dark.g, theme.bg_dark.b, 0.5) : theme.bg_dark
+    readonly property color colorBgCellActive: theme.glassEnabled ? Qt.rgba(theme.bg_light.r, theme.bg_light.g, theme.bg_light.b, 0.69) : theme.bg_light
+    readonly property color colorBgCellHover: theme.glassEnabled ? Qt.rgba(theme.fg_light.r, theme.fg_light.g, theme.fg_light.b, 0.81) : theme.fg_light
     // Filled hovered/drop cell bg
-    readonly property color colorTheme: theme.c.accent
+    readonly property color colorTheme: theme.accent
     // The single primary color (fg/borders)
-    readonly property color colorThemeLight: theme.c.fg
+    readonly property color colorThemeLight: theme.fg
     // High contrast hover color
     readonly property string fontName: "FiraCode Nerd Font"
 
@@ -516,7 +516,7 @@ Scope {
                                         id: wsBadge
                                         width: Math.max(16, badgeText.implicitWidth + 6)
                                         height: 18
-                                        color: root.activeWorkspaceId === wsId ? root.colorTheme : theme.c.bg_dark
+                                        color: root.activeWorkspaceId === wsId ? root.colorTheme : theme.bg_dark
                                         border.width: 1
                                         border.color: root.colorTheme
                                         radius: 0
@@ -536,7 +536,7 @@ Scope {
                                             font.pixelSize: 9
                                             font.bold: true
                                             font.family: root.fontName
-                                            color: root.activeWorkspaceId === wsId ? theme.c.bg : root.colorTheme
+                                            color: root.activeWorkspaceId === wsId ? theme.bg : root.colorTheme
                                             renderType: Text.NativeRendering
                                         }
                                     }

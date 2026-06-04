@@ -221,7 +221,7 @@ Scope {
                     opacity: win.animOpacity
                     color: theme.popupBgColor
                     border.width: 1
-                    border.color: theme.c.accent
+                    border.color: theme.accent
                     radius: 0
                     antialiasing: false
                     focus: true
@@ -252,7 +252,7 @@ Scope {
 
                             Text {
                                 text: root.connected ? "Wi-Fi Connected" : "Wi-Fi Disconnected"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 10
                                 font.bold: true
@@ -266,7 +266,7 @@ Scope {
 
                                 Text {
                                     text: "SSID: " + root.activeSsid
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
                                     elide: Text.ElideRight
@@ -275,7 +275,7 @@ Scope {
 
                                 Text {
                                     text: "Signal: " + root.activeSignal + "%"
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     opacity: 0.6
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
@@ -289,7 +289,7 @@ Scope {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: theme.c.accent
+                            color: theme.accent
                             opacity: 0.15
                         }
 
@@ -303,7 +303,7 @@ Scope {
                                 id: wifiToggleText
 
                                 text: "Wi-Fi: " + (root.wifiEnabled ? "On" : "Off")
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -312,8 +312,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: wifiToggleText.color = theme.c.accent
-                                    onExited: wifiToggleText.color = theme.c.accent
+                                    onEntered: wifiToggleText.color = theme.accent
+                                    onExited: wifiToggleText.color = theme.accent
                                     onClicked: {
                                         if (root.wifiEnabled)
                                             Quickshell.execDetached(["nmcli", "radio", "wifi", "off"]);
@@ -330,7 +330,7 @@ Scope {
                                 id: airplaneToggleText
 
                                 text: "Airplane: " + (root.airplaneMode ? "On" : "Off")
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -339,8 +339,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: airplaneToggleText.color = theme.c.accent
-                                    onExited: airplaneToggleText.color = theme.c.accent
+                                    onEntered: airplaneToggleText.color = theme.accent
+                                    onExited: airplaneToggleText.color = theme.accent
                                     onClicked: {
                                         if (root.airplaneMode)
                                             Quickshell.execDetached(["rfkill", "unblock", "all"]);
@@ -357,7 +357,7 @@ Scope {
                         Rectangle {
                             width: parent.width
                             height: 1
-                            color: theme.c.accent
+                            color: theme.accent
                             opacity: 0.15
                         }
 
@@ -372,7 +372,7 @@ Scope {
 
                                 Text {
                                     text: "Details " + (root.detailsExpanded ? "󰅀" : "󰅂")
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
                                     font.bold: true
@@ -395,7 +395,7 @@ Scope {
 
                                 Text {
                                     text: "  IP: " + root.details.ip_address
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -403,7 +403,7 @@ Scope {
 
                                 Text {
                                     text: "  Gateway: " + root.details.gateway
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -411,7 +411,7 @@ Scope {
 
                                 Text {
                                     text: "  Subnet: " + root.details.subnet
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -419,7 +419,7 @@ Scope {
 
                                 Text {
                                     text: "  DNS: " + root.details.dns
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -427,7 +427,7 @@ Scope {
 
                                 Text {
                                     text: "  BSSID: " + root.details.bssid
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -435,7 +435,7 @@ Scope {
 
                                 Text {
                                     text: "  Security: " + root.details.security
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -445,7 +445,7 @@ Scope {
 
                             Text {
                                 text: "  No connection active"
-                                color: theme.c.accent
+                                color: theme.accent
                                 opacity: 0.5
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
@@ -462,7 +462,7 @@ Scope {
 
                             Text {
                                 text: "VPN"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -479,7 +479,7 @@ Scope {
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "WARP: " + (root.warpConnected ? "Connected" : "Disconnected")
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -491,7 +491,7 @@ Scope {
                                     anchors.right: parent.right
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: root.warpConnected ? "disconnect" : "connect"
-                                    color: theme.c.accent
+                                    color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -499,8 +499,8 @@ Scope {
                                     MouseArea {
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: warpToggleBtn.color = theme.c.accent
-                                        onExited: warpToggleBtn.color = theme.c.accent
+                                        onEntered: warpToggleBtn.color = theme.accent
+                                        onExited: warpToggleBtn.color = theme.accent
                                         onClicked: {
                                             if (root.warpConnected)
                                                 Quickshell.execDetached(["warp-cli", "disconnect"]);
@@ -533,7 +533,7 @@ Scope {
                                             anchors.left: parent.left
                                             anchors.verticalCenter: parent.verticalCenter
                                             text: modelData.name + " (" + modelData.vpn_type + ")"
-                                            color: theme.c.accent
+                                            color: theme.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             renderType: Text.NativeRendering
@@ -545,7 +545,7 @@ Scope {
                                             anchors.right: parent.right
                                             anchors.verticalCenter: parent.verticalCenter
                                             text: modelData.active ? "disconnect" : "connect"
-                                            color: theme.c.accent
+                                            color: theme.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             renderType: Text.NativeRendering
@@ -553,8 +553,8 @@ Scope {
                                             MouseArea {
                                                 anchors.fill: parent
                                                 hoverEnabled: true
-                                                onEntered: vpnActionBtn.color = theme.c.accent
-                                                onExited: vpnActionBtn.color = theme.c.accent
+                                                onEntered: vpnActionBtn.color = theme.accent
+                                                onExited: vpnActionBtn.color = theme.accent
                                                 onClicked: {
                                                     if (modelData.active)
                                                         Quickshell.execDetached(["nmcli", "connection", "down", modelData.name]);
@@ -574,7 +574,7 @@ Scope {
 
                             Text {
                                 text: "  Disabled"
-                                color: theme.c.accent
+                                color: theme.accent
                                 opacity: 0.5
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
@@ -591,7 +591,7 @@ Scope {
 
                             Text {
                                 text: "WiFi Networks"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -622,7 +622,7 @@ Scope {
 
                                                 Text {
                                                     text: (modelData.active ? "* " : "  ") + modelData.ssid
-                                                    color: theme.c.accent
+                                                    color: theme.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     font.bold: modelData.active
@@ -640,8 +640,8 @@ Scope {
                                                 textFormat: Text.RichText
                                                 text: {
                                                     var activeLimit = Math.round(modelData.signal / 20);
-                                                    var activeColor = theme.c.accent;
-                                                    var inactiveColor = theme.c.bg_light;
+                                                    var activeColor = theme.accent;
+                                                    var inactiveColor = theme.bg_light;
                                                     var str = "";
                                                     for (var i = 0; i < 5; i++) {
                                                         var color = (i < activeLimit) ? activeColor : inactiveColor;
@@ -680,7 +680,7 @@ Scope {
                                                     id: connActionBtn
 
                                                     text: modelData.active ? "Disconnect" : "Connect"
-                                                    color: theme.c.accent
+                                                    color: theme.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
@@ -688,8 +688,8 @@ Scope {
                                                     MouseArea {
                                                         anchors.fill: parent
                                                         hoverEnabled: true
-                                                        onEntered: connActionBtn.color = theme.c.accent
-                                                        onExited: connActionBtn.color = theme.c.accent
+                                                        onEntered: connActionBtn.color = theme.accent
+                                                        onExited: connActionBtn.color = theme.accent
                                                         onClicked: {
                                                             if (modelData.active) {
                                                                 Quickshell.execDetached(["nmcli", "device", "disconnect", "wlan0"]);
@@ -708,7 +708,7 @@ Scope {
                                                     id: forgetActionBtn
 
                                                     text: "Forget"
-                                                    color: theme.c.accent
+                                                    color: theme.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
@@ -716,8 +716,8 @@ Scope {
                                                     MouseArea {
                                                         anchors.fill: parent
                                                         hoverEnabled: true
-                                                        onEntered: forgetActionBtn.color = theme.c.accent
-                                                        onExited: forgetActionBtn.color = theme.c.accent
+                                                        onEntered: forgetActionBtn.color = theme.accent
+                                                        onExited: forgetActionBtn.color = theme.accent
                                                         onClicked: {
                                                             Quickshell.execDetached(["nmcli", "connection", "delete", modelData.ssid]);
                                                             root.expandedNetworkSsid = "";
@@ -731,7 +731,7 @@ Scope {
                                                     id: autoActionBtn
 
                                                     text: "Auto: " + (modelData.autoconnect ? "On" : "Off")
-                                                    color: theme.c.accent
+                                                    color: theme.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
@@ -739,8 +739,8 @@ Scope {
                                                     MouseArea {
                                                         anchors.fill: parent
                                                         hoverEnabled: true
-                                                        onEntered: autoActionBtn.color = theme.c.accent
-                                                        onExited: autoActionBtn.color = theme.c.accent
+                                                        onEntered: autoActionBtn.color = theme.accent
+                                                        onExited: autoActionBtn.color = theme.accent
                                                         onClicked: {
                                                             var val = modelData.autoconnect ? "no" : "yes";
                                                             Quickshell.execDetached(["nmcli", "connection", "modify", modelData.ssid, "connection.autoconnect", val]);
@@ -756,7 +756,7 @@ Scope {
                                             Text {
                                                 anchors.horizontalCenter: parent.horizontalCenter
                                                 text: "Security: " + modelData.security + " | Rate: " + modelData.rate
-                                                color: theme.c.accent
+                                                color: theme.accent
                                                 opacity: 0.6
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 7
@@ -783,7 +783,7 @@ Scope {
                                 id: settingsBtn
 
                                 text: "Settings"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 renderType: Text.NativeRendering
@@ -791,8 +791,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: settingsBtn.color = theme.c.accent
-                                    onExited: settingsBtn.color = theme.c.accent
+                                    onEntered: settingsBtn.color = theme.accent
+                                    onExited: settingsBtn.color = theme.accent
                                     onClicked: {
                                         Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] ghostty --title=impala -e impala")']);
                                         win.closePopup(); // Close popup when launching settings editor
@@ -806,7 +806,7 @@ Scope {
                                 id: restartBtn
 
                                 text: "Restart Wi-Fi"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 renderType: Text.NativeRendering
@@ -814,8 +814,8 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: restartBtn.color = theme.c.accent
-                                    onExited: restartBtn.color = theme.c.accent
+                                    onEntered: restartBtn.color = theme.accent
+                                    onExited: restartBtn.color = theme.accent
                                     onClicked: {
                                         Quickshell.execDetached(["nmcli", "radio", "wifi", "off"]);
                                         // Detached delay helper or execute sequential shell command

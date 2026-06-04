@@ -18,13 +18,13 @@ Scope {
     // Theme tokens (Gruvbox Material Dark)
     readonly property color colorBgDark: "#e61d2021"
     // Sleek dark background
-    readonly property color colorBgCell: theme.c.bg_dark
+    readonly property color colorBgCell: theme.bg_dark
     // Item cell bg
     readonly property color colorBgActive: "#504945"
     // Selected cell bg
-    readonly property color colorBorder: theme.c.accent
+    readonly property color colorBorder: theme.accent
     // Accent border
-    readonly property color colorText: theme.c.accent
+    readonly property color colorText: theme.accent
     // Foreground text
     readonly property color colorTextMuted: "#a89984"
     // Muted text
@@ -338,7 +338,7 @@ Scope {
                                 anchors.fill: parent
                                 anchors.bottomMargin: 2
                                 verticalAlignment: TextInput.AlignVCenter
-                                color: "#d4be98"
+                                color: theme.fg
                                 font.family: root.fontName
                                 font.pointSize: 8
 
@@ -350,7 +350,7 @@ Scope {
 
                                 Text {
                                     text: "search..."
-                                    color: "#7c6f64"
+                                    color: theme.secondary
                                     font.family: root.fontName
                                     font.pointSize: 8
                                     visible: searchInput.text === ""
@@ -365,7 +365,7 @@ Scope {
                                 anchors.bottom: parent.bottom
                                 width: parent.width
                                 height: 1
-                                color: searchInput.activeFocus ? "#d4be98" : "#7c6f64"
+                                color: searchInput.activeFocus ? theme.fg : theme.secondary
                             }
 
                         }
@@ -387,7 +387,7 @@ Scope {
 
                                 width: listView.width
                                 height: previewType === "image" ? 40 : 16
-                                color: (root.selectedIndex === index) ? theme.c.bg_dark : "transparent"
+                                color: (root.selectedIndex === index) ? theme.bg_dark : "transparent"
                                 radius: 0
 
                                 MouseArea {
@@ -429,7 +429,7 @@ Scope {
                                             visible: previewType === "text"
                                             anchors.fill: parent
                                             text: entryText.toLowerCase()
-                                            color: (root.selectedIndex === index) ? "#ddc7a1" : "#d4be98"
+                                            color: (root.selectedIndex === index) ? "#ddc7a1" : theme.fg
                                             font.family: root.fontName
                                             font.pointSize: 8
                                             elide: Text.ElideRight
@@ -451,7 +451,7 @@ Scope {
                             text: "clear all"
                             font.family: root.fontName
                             font.pointSize: 8
-                            color: clearAllMouseArea.containsMouse ? "#fb4934" : "#7c6f64"
+                            color: clearAllMouseArea.containsMouse ? "#fb4934" : theme.secondary
                             Layout.alignment: Qt.AlignRight
                             Layout.bottomMargin: 2
                             Layout.rightMargin: 4

@@ -292,7 +292,7 @@ Scope {
                     opacity: win.animOpacity
                     color: theme.popupBgColor
                     border.width: 1
-                    border.color: theme.c.accent
+                    border.color: theme.accent
                     radius: 0
                     antialiasing: false
                     focus: true
@@ -323,7 +323,7 @@ Scope {
                                 anchors.left: parent.left
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: "Virtual Machines"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 10
                                 font.bold: true
@@ -338,7 +338,7 @@ Scope {
 
                                 Text {
                                     text: " create vmw"
-                                    color: "#7caea3"
+                                    color: theme.secondary
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -361,7 +361,7 @@ Scope {
 
                                 Text {
                                     text: " create qemu"
-                                    color: "#e78a4e"
+                                    color: theme.tertiary
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -390,7 +390,7 @@ Scope {
                                 anchors.right: parent.right
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: "refresh"
-                                color: theme.c.accent
+                                color: theme.accent
                                 opacity: 0.7
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
@@ -417,7 +417,7 @@ Scope {
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: "󰆧 " + root.vms.length + " vmware · " + root.qemuVms.length + " kvm/qemu"
-                                color: theme.c.accent
+                                color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -430,7 +430,7 @@ Scope {
                         Text {
                             visible: root.vms.length === 0
                             text: "no vms found"
-                            color: "#7c6f64"
+                            color: theme.secondary
                             font.family: "FiraCode Nerd Font"
                             font.pixelSize: 8
                             renderType: Text.NativeRendering
@@ -484,10 +484,10 @@ Scope {
 
                                         width: 120
                                         height: 88
-                                        color: theme.c.bg_light
+                                        color: theme.bg_light
                                         radius: 0
                                         border.width: 1
-                                        border.color: modelData.running ? theme.c.accent : "#7c6f64"
+                                        border.color: modelData.running ? theme.accent : theme.secondary
 
                                         // Live screenshot when running
                                         Image {
@@ -514,7 +514,7 @@ Scope {
                                             anchors.centerIn: parent
                                             visible: !thumbImage.hasLoaded || thumbImage.status === Image.Error
                                             text: modelData.icon
-                                            color: "#7c6f64"
+                                            color: theme.secondary
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 36
                                             renderType: Text.NativeRendering
@@ -532,7 +532,7 @@ Scope {
                                             Text {
                                                 anchors.centerIn: parent
                                                 text: modelData.icon
-                                                color: theme.c.accent
+                                                color: theme.accent
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 12
                                                 renderType: Text.NativeRendering
@@ -561,7 +561,7 @@ Scope {
                                         Text {
                                             width: parent.width
                                             text: modelData.name
-                                            color: theme.c.accent
+                                            color: theme.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 9
                                             font.bold: true
@@ -577,7 +577,7 @@ Scope {
                                             Text {
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 text: modelData.running ? "● running (" + modelData.cpu_usage.toFixed(1) + "% cpu)" : "○ stopped"
-                                                color: modelData.running ? theme.c.accent : "#7c6f64"
+                                                color: modelData.running ? theme.accent : theme.secondary
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
@@ -587,7 +587,7 @@ Scope {
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 visible: modelData.encrypted
                                                 text: " 󰌾 lock"
-                                                color: "#e78a4e"
+                                                color: theme.tertiary
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
@@ -608,7 +608,7 @@ Scope {
                                             Text {
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 text: " " + root.formatRam(modelData.ram_mb) + " ·  " + modelData.cpus + "c · 󰋊 " + root.formatStorage(modelData.storage_bytes)
-                                                color: theme.c.accent
+                                                color: theme.accent
                                                 opacity: 0.7
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
@@ -672,7 +672,7 @@ Scope {
 
                                                         return " start";
                                                     }
-                                                    color: modelData.running ? "#ea6962" : theme.c.accent
+                                                    color: modelData.running ? theme.error : theme.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
@@ -699,7 +699,7 @@ Scope {
                                                     id: openLbl
 
                                                     text: " open"
-                                                    color: theme.c.accent
+                                                    color: theme.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
@@ -720,7 +720,7 @@ Scope {
                                                     id: deleteLbl
 
                                                     text: " delete"
-                                                    color: "#ea6962"
+                                                    color: theme.error
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
@@ -756,7 +756,7 @@ Scope {
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             text: "·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·"
-                            color: "#7c6f64"
+                            color: theme.secondary
                             opacity: 0.6
                             font.family: "FiraCode Nerd Font"
                             font.pixelSize: 8
@@ -769,7 +769,7 @@ Scope {
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             text: "0 kvm/qemu vms"
-                            color: "#7c6f64"
+                            color: theme.secondary
                             font.family: "FiraCode Nerd Font"
                             font.pixelSize: 8
                         }
@@ -821,10 +821,10 @@ Scope {
 
                                         width: 120
                                         height: 88
-                                        color: theme.c.bg_light
+                                        color: theme.bg_light
                                         radius: 0
                                         border.width: 1
-                                        border.color: modelData.running ? theme.c.accent : "#7c6f64"
+                                        border.color: modelData.running ? theme.accent : theme.secondary
 
                                         // Live screenshot when running
                                         Image {
@@ -851,7 +851,7 @@ Scope {
                                             anchors.centerIn: parent
                                             visible: !qemuThumbImage.hasLoaded || qemuThumbImage.status === Image.Error
                                             text: modelData.icon
-                                            color: "#7c6f64"
+                                            color: theme.secondary
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 36
                                             renderType: Text.NativeRendering
@@ -869,7 +869,7 @@ Scope {
                                             Text {
                                                 anchors.centerIn: parent
                                                 text: modelData.icon
-                                                color: theme.c.accent
+                                                color: theme.accent
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 12
                                                 renderType: Text.NativeRendering
@@ -898,7 +898,7 @@ Scope {
                                         Text {
                                             width: parent.width
                                             text: modelData.name
-                                            color: theme.c.accent
+                                            color: theme.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 9
                                             font.bold: true
@@ -914,7 +914,7 @@ Scope {
                                             Text {
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 text: modelData.running ? "● running (" + modelData.cpu_usage.toFixed(1) + "% cpu)" : "○ " + modelData.state
-                                                color: modelData.running ? theme.c.accent : "#7c6f64"
+                                                color: modelData.running ? theme.accent : theme.secondary
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
@@ -923,7 +923,7 @@ Scope {
                                             Text {
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 text: "libvirt"
-                                                color: "#7c6f64"
+                                                color: theme.secondary
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 7
                                                 renderType: Text.NativeRendering
@@ -939,7 +939,7 @@ Scope {
                                             Text {
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 text: " " + root.formatRam(modelData.ram_mb) + " ·  " + modelData.cpus + "c · 󰋊 " + root.formatStorage(modelData.storage_bytes)
-                                                color: theme.c.accent
+                                                color: theme.accent
                                                 opacity: 0.7
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 8
@@ -985,7 +985,7 @@ Scope {
 
                                                         return " start";
                                                     }
-                                                    color: modelData.running ? "#ea6962" : theme.c.accent
+                                                    color: modelData.running ? theme.error : theme.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
@@ -1012,7 +1012,7 @@ Scope {
                                                     id: qemuOpenLbl
 
                                                     text: " open"
-                                                    color: theme.c.accent
+                                                    color: theme.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
@@ -1033,7 +1033,7 @@ Scope {
                                                     id: qemuDeleteLbl
 
                                                     text: " delete"
-                                                    color: "#ea6962"
+                                                    color: theme.error
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering

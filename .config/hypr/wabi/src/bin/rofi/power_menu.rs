@@ -46,11 +46,11 @@ fn main() {
         }
     }
 
-    print!("lock\0info\x1flock\n");
-    print!("sleep\0info\x1fsleep\n");
-    print!("reboot\0info\x1freboot\n");
-    print!("poweroff\0info\x1fpoweroff\n");
-    print!("logout\0info\x1flogout\n");
+    print!(" lock\0info\x1flock\n");
+    print!(" sleep\0info\x1fsleep\n");
+    print!(" reboot\0info\x1freboot\n");
+    print!(" poweroff\0info\x1fpoweroff\n");
+    print!("󰍃 logout\0info\x1flogout\n");
     print!("\0message\x1fpower\n");
     let _ = io::stdout().flush();
 }

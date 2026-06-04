@@ -75,7 +75,7 @@ label:disabled {
 }
 
 /* ===== Text Entries ===== */
-entry, .entry, spinbutton, .spinbutton {
+entry, spinbutton {
   min-height: 34px;
   padding: 0 8px;
   border-radius: 0;
@@ -83,23 +83,6 @@ entry, .entry, spinbutton, .spinbutton {
   background-color: alpha(#d5c4a1, 0.07);
   color: @fg_color;
   border: 1px solid @border_color;
-}
-
-entry:focus, .entry:focus, spinbutton:focus, .spinbutton:focus {
-  background-color: alpha(#d5c4a1, 0.07);
-  border-color: @selected_bg_color;
-  box-shadow: none;
-}
-
-entry:disabled, .entry:disabled, spinbutton:disabled, .spinbutton:disabled {
-  background-color: alpha(@fg_color, 0.04);
-  color: alpha(@fg_color, 0.5);
-  border-color: @border_color;
-}
-
-entry selection, .entry selection, spinbutton selection, .spinbutton selection {
-  background-color: @selected_bg_color;
-  color: @selected_fg_color;
 }
 
 entry:focus, spinbutton:focus {
@@ -120,7 +103,7 @@ entry selection, spinbutton selection {
 }
 
 /* ===== Buttons ===== */
-button, .button {
+button {
   min-height: 24px;
   min-width: 16px;
   padding: 5px 9px;
@@ -130,60 +113,6 @@ button, .button {
   color: @fg_color;
   border: 1px solid @border_color;
   box-shadow: none;
-}
-
-button:hover, .button:hover {
-  background-color: alpha(#d5c4a1, 0.12);
-}
-
-button:active, .button:active {
-  background-color: alpha(#d5c4a1, 0.18);
-}
-
-button:checked, .button:checked {
-  background-color: @selected_bg_color;
-  color: @selected_fg_color;
-}
-
-button:disabled, .button:disabled {
-  background-color: alpha(@fg_color, 0.04);
-  color: alpha(@fg_color, 0.5);
-  border-color: @border_color;
-}
-
-button:focus, .button:focus {
-  box-shadow: none;
-  border-color: @selected_bg_color;
-}
-
-button.flat, .button.flat {
-  background-color: transparent;
-  border-color: transparent;
-  box-shadow: none;
-}
-
-button.flat:hover, .button.flat:hover {
-  background-color: alpha(#d5c4a1, 0.07);
-}
-
-button.suggested-action, .button.suggested-action {
-  background-color: @green;
-  color: @selected_fg_color;
-  border-color: @green;
-}
-
-button.suggested-action:hover, .button.suggested-action:hover {
-  background-color: @green_light;
-}
-
-button.destructive-action, .button.destructive-action {
-  background-color: @red;
-  color: @selected_fg_color;
-  border-color: @red;
-}
-
-button.destructive-action:hover, .button.destructive-action:hover {
-  background-color: @red_light;
 }
 
 button:hover {
@@ -563,14 +492,14 @@ tooltip * {
 }
 
 /* ===== Combobox ===== */
-combobox button.toggle, combobox .button.toggle {
+combobox button.toggle {
   border-radius: 0;
   background-color: @bg_dim;
   color: @fg_color;
   border: 1px solid @border_color;
 }
 
-combobox button.toggle:hover, combobox .button.toggle:hover {
+combobox button.toggle:hover {
   background-color: alpha(#d5c4a1, 0.12);
 }
 
@@ -583,13 +512,13 @@ combobox cellview {
 }
 
 /* Thunar comboboxes */
-.thunar combobox button, .thunar combobox .button, .thunar combobox button.toggle, .thunar combobox .button.toggle {
+.thunar combobox button, .thunar combobox button.toggle {
   background-color: @bg_dim;
   color: @fg_color;
   border: 1px solid @border_color;
 }
 
-.thunar combobox button:hover, .thunar combobox .button:hover, .thunar combobox button.toggle:hover, .thunar combobox .button.toggle:hover {
+.thunar combobox button:hover, .thunar combobox button.toggle:hover {
   background-color: alpha(#d5c4a1, 0.12);
 }
 
@@ -767,17 +696,17 @@ thunar .infobar label a, thunar .infobar label {
 .dialog-action-box button,
 .response-area button,
 window.dialog button {
-  background-color: alpha(@fg_color, 0.07) !important;
-  color: @fg_color !important;
-  border: 1px solid @border_color !important;
-  box-shadow: none !important;
+  background-color: alpha(@fg_color, 0.07);
+  color: @fg_color;
+  border: 1px solid @border_color;
+  box-shadow: none;
 }
 
 .dialog-action-area button:hover,
 .dialog-action-box button:hover,
 .response-area button:hover,
 window.dialog button:hover {
-  background-color: alpha(#d5c4a1, 0.12) !important;
-  color: @fg_color !important;
+  background-color: alpha(#d5c4a1, 0.12);
+  color: @fg_color;
 }
 
