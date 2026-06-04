@@ -4,6 +4,67 @@
  */
 
 /* ============================================================
+ * 0. SMOOTH TRANSITIONS ON THEME SWITCH
+ *    The watcher unregisters + re-registers userChrome.css on
+ *    mtime change. With these transitions declared on the
+ *    themed elements, the new color/bg fades in instead of
+ *    snapping. Smooth cubic-bezier curve for a buttery feel.
+ * ============================================================ */
+#navigator-toolbox,
+#titlebar,
+#TabsToolbar,
+#tabbrowser-tabs,
+.tabbrowser-tab,
+.tab-background,
+.tab-stack,
+.tab-content,
+#zen-sidebar-splitter,
+#zen-workspaces-button,
+.zen-workspace-tabs-section,
+.zen-current-workspace-indicator,
+#zen-appcontent-navbar-container,
+#urlbar,
+#urlbar-container,
+.urlbar-background,
+.content-shortcuts,
+menupopup,
+panel,
+menu,
+menuitem,
+menucaption,
+.subviewbutton,
+.subviewbutton-nav,
+.subviewbutton-iconic,
+.toolbarbutton-1,
+.urlbar-page-action,
+.identity-box-button,
+#PanelUI-menu-button,
+#back-button,
+#forward-button,
+#reload-button,
+#downloads-button,
+#bookmarks-menu-button,
+#history-button,
+#addons-button,
+.zen-folder .tab-group-label-container,
+.tab-group-label,
+zen-folder,
+#zen-sidebar-foot-buttons > toolbarbutton,
+#downloadsPanel,
+#downloadsListBox,
+#downloadsFooter,
+#appMenu-mainView,
+.panel-viewstack,
+.panel-subview-body {
+  transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              fill 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              outline-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
  * 1. ROOT VARIABLES (caelestia-aligned Zen token mapping)
  * ============================================================ */
 :root {
