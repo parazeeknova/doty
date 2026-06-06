@@ -1,0 +1,3732 @@
+/* ============================================================
+ * GitHub (no @-moz-document wrapper — these rules are injected
+ * into the content document via the Matugen JSWindowActor child
+ * as a <style> element, and @-moz-document only works in
+ * Firefox userContent.css, NOT in injected stylesheets).
+ *
+ * The actor child only injects this CSS when the document
+ * hostname matches a supported site (currently github.com and
+ * its subdomains). The bridge reads both this file and the
+ * global matugen-userstyles.css and serves them keyed by
+ * hostname.
+ *
+ * Strategy: override GitHub's high-level Primer design tokens
+ * (--color-canvas-*, --color-fg-*, --color-accent-*, etc.) on
+ * the root element. GitHub's own CSS consumes these vars
+ * everywhere, so a small set of overrides themes the whole
+ * site. The matugen palette doesn't have a red/danger, so
+ * danger stays on a neutral rose that works for both dark and
+ * light matugen palettes.
+ * ============================================================ */
+
+/* Smooth color transitions when the matugen theme switches.
+ * Applies to every element so a wallpaper change fades the
+ * whole page from one palette to the next. */
+html,
+body,
+.Layout,
+.application-main,
+*,
+*::before,
+*::after {
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    fill 0.35s ease,
+    stroke 0.35s ease,
+    box-shadow 0.35s ease !important;
+}
+
+:root,
+html[data-color-mode] {
+  /* Surfaces / backgrounds */
+  --color-canvas-default: var(--matugen-bg-dark) !important;
+  --color-canvas-subtle: var(--matugen-bg) !important;
+  --color-canvas-inset: var(--matugen-bg-dark) !important;
+  --color-canvas-overlay: var(--matugen-bg) !important;
+  --color-canvas-primary: var(--matugen-bg) !important;
+
+  /* Text */
+  --color-fg-default: var(--matugen-fg) !important;
+  --color-fg-muted: var(--matugen-fg-light) !important;
+  --color-fg-subtle: var(--matugen-fg-light) !important;
+  --color-fg-on-emphasis: var(--matugen-bg-dark) !important;
+  --color-fg-link: var(--matugen-accent) !important;
+
+  /* Accent (links, primary buttons, mentions, focus rings) */
+  --color-accent-fg: var(--matugen-accent) !important;
+  --color-accent-emphasis: var(--matugen-accent) !important;
+  --color-accent-muted: color-mix(in srgb, var(--matugen-accent) 35%, transparent) !important;
+  --color-accent-subtle: color-mix(in srgb, var(--matugen-accent) 12%, transparent) !important;
+  --color-accent-contrast: var(--matugen-bg-dark) !important;
+
+  /* Primary buttons */
+  --color-btn-primary-bg: var(--matugen-accent) !important;
+  --color-btn-primary-hover-bg: color-mix(in srgb, var(--matugen-accent) 88%, var(--matugen-fg) 12%) !important;
+  --color-btn-primary-active-bg: color-mix(in srgb, var(--matugen-accent) 78%, var(--matugen-fg) 20%) !important;
+  --color-btn-primary-text: var(--matugen-bg-dark) !important;
+  --color-btn-primary-border: var(--matugen-accent) !important;
+  --color-btn-primary-hover-border: var(--matugen-accent) !important;
+  --color-btn-primary-active-border: var(--matugen-accent) !important;
+  --color-btn-primary-disabled-bg: color-mix(in srgb, var(--matugen-accent) 40%, transparent) !important;
+  --color-btn-primary-disabled-border: color-mix(in srgb, var(--matugen-accent) 40%, transparent) !important;
+  --color-btn-primary-disabled-text: var(--matugen-bg-dark) !important;
+  --color-btn-primary-icon: var(--matugen-bg-dark) !important;
+  --color-btn-primary-hover-icon: var(--matugen-bg-dark) !important;
+  --color-btn-primary-active-icon: var(--matugen-bg-dark) !important;
+
+  /* Status: success (diff added, merged, passed) -> tertiary */
+  --color-success-fg: var(--matugen-tertiary) !important;
+  --color-success-emphasis: var(--matugen-tertiary) !important;
+  --color-success-muted: color-mix(in srgb, var(--matugen-tertiary) 35%, transparent) !important;
+  --color-success-subtle: color-mix(in srgb, var(--matugen-tertiary) 12%, transparent) !important;
+  --color-success-contrast: var(--matugen-bg-dark) !important;
+
+  /* Status: danger (diff removed, closed, failed) -> neutral rose.
+   * matugen palette doesn't have red; this works on both dark
+   * and light matugen palettes without clashing. */
+  --color-danger-fg: #f5a3a3 !important;
+  --color-danger-emphasis: #f08080 !important;
+  --color-danger-muted: rgba(245, 163, 163, 0.35) !important;
+  --color-danger-subtle: rgba(245, 163, 163, 0.12) !important;
+  --color-danger-contrast: var(--matugen-bg-dark) !important;
+
+  /* Status: attention (warning, draft) -> secondary */
+  --color-attention-fg: var(--matugen-secondary) !important;
+  --color-attention-emphasis: var(--matugen-secondary) !important;
+  --color-attention-muted: color-mix(in srgb, var(--matugen-secondary) 35%, transparent) !important;
+  --color-attention-subtle: color-mix(in srgb, var(--matugen-secondary) 12%, transparent) !important;
+  --color-attention-contrast: var(--matugen-bg-dark) !important;
+
+  /* Severe danger (errors) */
+  --color-severe-fg: #f08080 !important;
+  --color-severe-emphasis: #e06060 !important;
+  --color-severe-muted: rgba(240, 128, 128, 0.35) !important;
+  --color-severe-subtle: rgba(240, 128, 128, 0.12) !important;
+
+  /* Done / sponsors (subtle accent-ish) */
+  --color-done-fg: var(--matugen-tertiary) !important;
+  --color-done-emphasis: var(--matugen-tertiary) !important;
+  --color-done-muted: color-mix(in srgb, var(--matugen-tertiary) 35%, transparent) !important;
+  --color-done-subtle: color-mix(in srgb, var(--matugen-tertiary) 12%, transparent) !important;
+
+  /* Sponsors (pink in Catppuccin) */
+  --color-sponsors-fg: #f5bde6 !important;
+  --color-sponsors-emphasis: #f5bde6 !important;
+  --color-sponsors-muted: rgba(245, 189, 230, 0.35) !important;
+  --color-sponsors-subtle: rgba(245, 189, 230, 0.12) !important;
+
+  /* Borders */
+  --color-border-default: var(--matugen-bg-light) !important;
+  --color-border-muted: color-mix(in srgb, var(--matugen-bg-light) 60%, transparent) !important;
+  --color-border-subtle: color-mix(in srgb, var(--matugen-bg-light) 30%, transparent) !important;
+
+  /* Diff blob (PR/commit view) */
+  --color-diff-blob-addition-num-bg: color-mix(in srgb, var(--matugen-tertiary) 30%, transparent) !important;
+  --color-diff-blob-addition-num-text: var(--matugen-fg) !important;
+  --color-diff-blob-addition-line-bg: color-mix(in srgb, var(--matugen-tertiary) 15%, transparent) !important;
+  --color-diff-blob-addition-word-bg: color-mix(in srgb, var(--matugen-tertiary) 30%, transparent) !important;
+  --color-diff-blob-addition-word-text: var(--matugen-fg) !important;
+  --color-diff-blob-deletion-num-bg: rgba(245, 163, 163, 0.3) !important;
+  --color-diff-blob-deletion-num-text: var(--matugen-fg) !important;
+  --color-diff-blob-deletion-line-bg: rgba(245, 163, 163, 0.15) !important;
+  --color-diff-blob-deletion-word-bg: rgba(245, 163, 163, 0.3) !important;
+  --color-diff-blob-deletion-word-text: var(--matugen-fg) !important;
+  --color-diff-blob-hunk-num-bg: color-mix(in srgb, var(--matugen-accent) 40%, transparent) !important;
+  --color-diff-blob-expander-icon: var(--matugen-fg-light) !important;
+  --color-diff-blob-empty-num-bg: var(--matugen-bg) !important;
+  --color-diff-blob-empty-line-bg: var(--matugen-bg) !important;
+
+  /* Contribution graph */
+  --color-calendar-graph-day-bg: var(--matugen-bg-light) !important;
+  --color-calendar-graph-day-L1-bg: color-mix(in srgb, var(--matugen-accent) 40%, transparent) !important;
+  --color-calendar-graph-day-L2-bg: color-mix(in srgb, var(--matugen-accent) 60%, transparent) !important;
+  --color-calendar-graph-day-L3-bg: color-mix(in srgb, var(--matugen-accent) 80%, transparent) !important;
+  --color-calendar-graph-day-L4-bg: var(--matugen-accent) !important;
+
+  /* Mention chips */
+  --color-user-mention-fg: var(--matugen-accent) !important;
+  --color-user-mention-bg: color-mix(in srgb, var(--matugen-accent) 30%, transparent) !important;
+
+  /* Page header / hero band */
+  --color-page-header-bg: var(--matugen-bg) !important;
+
+  /* Code blocks (lightweight override; full CodeMirror
+   * theming is much bigger and out of scope for v1) */
+  --color-markdown-code-bg: var(--matugen-bg) !important;
+
+  /* Header bar */
+  --color-header-bg: var(--matugen-bg-dark) !important;
+  --color-header-fg: var(--matugen-fg) !important;
+  --color-header-logo: var(--matugen-fg) !important;
+
+  /* Top-level: ensures the OS theme picker doesn't fight us */
+  accent-color: var(--matugen-accent) !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Direct body/html/application backgrounds. GitHub's body
+ * background-color doesn't always come from --color-canvas-default
+ * (it can be set on a child layout element, or the body itself
+ * can have an inline style), so we override the actual elements
+ * directly with !important. The .application-main selector
+ * covers GitHub's main content wrapper which carries the
+ * primary surface color. */
+html,
+body,
+.application-main,
+.Layout,
+.Layout-main,
+.Layout-sidebar {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Headers and chrome (top navigation, etc.) */
+.Header,
+.AppHeader,
+[role="banner"] {
+  background-color: var(--matugen-bg-dark) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* ============================================================
+ * ELEMENT-LEVEL OVERRIDES
+ * GitHub's Primer CSS doesn't always consume the
+ * --color-* variables for actual rendered elements (a lot of
+ * computed styles use scoped class names like .color-fg-default
+ * or hardcoded hex). Override the elements directly so the
+ * theme is visible regardless of whether the variables are
+ * read by Primer.
+ * ============================================================ */
+
+/* Links: default + visited + hover. */
+a,
+.Link--primary,
+.Link--secondary,
+.Link--muted {
+  color: var(--matugen-accent) !important;
+}
+a:hover,
+.Link--primary:hover,
+.Link--secondary:hover {
+  color: color-mix(in srgb, var(--matugen-accent) 80%, var(--matugen-fg) 20%) !important;
+}
+
+/* Primary buttons (the green "Code" / "Pull request" etc.) */
+.btn-primary,
+.BtnGroup .btn-primary,
+[data-variant="primary"] {
+  background-color: var(--matugen-accent) !important;
+  border-color: var(--matugen-accent) !important;
+  color: var(--matugen-bg-dark) !important;
+}
+.btn-primary:hover,
+.BtnGroup .btn-primary:hover {
+  background-color: color-mix(in srgb, var(--matugen-accent) 88%, var(--matugen-fg) 12%) !important;
+  border-color: color-mix(in srgb, var(--matugen-accent) 88%, var(--matugen-fg) 12%) !important;
+  color: var(--matugen-bg-dark) !important;
+}
+
+/* Secondary / outline buttons */
+.btn,
+.btn-outline,
+.BtnGroup-item {
+  background-color: var(--matugen-bg-light) !important;
+  border-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+}
+.btn:hover,
+.btn-outline:hover,
+.BtnGroup-item:hover {
+  background-color: color-mix(in srgb, var(--matugen-bg-light) 85%, var(--matugen-fg) 15%) !important;
+  border-color: color-mix(in srgb, var(--matugen-bg-light) 70%, var(--matugen-fg) 30%) !important;
+}
+
+/* Inline code and code blocks */
+code,
+pre,
+.CodeMirror,
+.markdown-body code,
+.markdown-body pre {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* Borders — every Box, divider, table cell, etc. uses .border-* or border-color. */
+.border,
+.border-top,
+.border-bottom,
+.border-left,
+.border-right,
+.Box,
+.Box-row,
+.Box-header,
+.Box-body,
+.Box-footer,
+.BorderGrid,
+.BorderGrid-cell,
+.divider,
+hr {
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* Cards and surface containers */
+.Box,
+.commit-tease,
+.NewComment,
+.TimelineItem,
+.js-comment-container,
+.discussion-timeline,
+.file-navigation,
+.Box--overlay,
+.color-bg-default,
+.color-bg-subtle,
+.color-bg-emphasis {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+}
+.color-bg-emphasis {
+  background-color: var(--matugen-accent) !important;
+  color: var(--matugen-bg-dark) !important;
+}
+
+/* Muted text */
+.color-fg-muted,
+.color-fg-subtle,
+.text-muted,
+.Link--muted,
+.text-gray,
+.text-gray-dark,
+.text-gray-light {
+  color: var(--matugen-fg-light) !important;
+}
+
+/* Tab navigation underlinks (repo tabs: Code, Issues, PRs, ...) */
+.UnderlineNav-item,
+.tabnav-tabs .tabnav-tab {
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+}
+.UnderlineNav-item:hover,
+.tabnav-tabs .tabnav-tab:hover {
+  color: var(--matugen-accent) !important;
+  border-color: var(--matugen-accent) !important;
+}
+.UnderlineNav-item.selected,
+.tabnav-tabs .tabnav-tab.selected {
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-accent) !important;
+  border-bottom-color: var(--matugen-accent) !important;
+}
+
+/* Inputs / textareas / select */
+input,
+textarea,
+select,
+.form-control,
+.InputGroup .form-control,
+.color-bg-canvas {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* ============================================================
+ * PROFILE / DASHBOARD ELEMENTS
+ * Specific GitHub surfaces that don't pick up the generic
+ * overrides: contribution graph, contribution activity,
+ * pinned repos, dashboard cards.
+ * ============================================================ */
+
+/* Contribution graph wrapper and individual day cells. The
+ * cells use --color-calendar-graph-day-* which we already
+ * override, but the wrapper has a different bg that needs
+ * its own override. The graph wrapper matches the page bg so
+ * it blends in (no card look around the contribution squares). */
+.graph-before-activity-overview,
+.border.graph-before-activity-overview,
+.js-calendar-graph,
+.calendar-graph,
+.ContributionCalendar,
+.ContributionCalendar-grid,
+.calendar-graph-box,
+.contrib-column,
+.contrib-number,
+.contrib-legend,
+.graph-canvas,
+.activity-overview-box,
+.Box.activity-overview-box {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-dark) !important;
+}
+
+/* Profile README section (the .markdown-body box below profile info) */
+.markdown-body,
+.Box:has(> .Box-body .markdown-body),
+.Box-body:has(.markdown-body) {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-dark) !important;
+}
+
+/* The <pre><code> ASCII art block inside the README
+ * (wrapped in .snippet-clipboard-content) — blend with the README's bg-dark */
+.snippet-clipboard-content pre,
+.snippet-clipboard-content pre code,
+.snippet-clipboard-content code {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-dark) !important;
+}
+
+/* Contribution activity list (the timeline on profile pages) */
+.ContributionActivity,
+.contribution-activity,
+.js-profile-timeline-year-list,
+.profile-timeline-card-wrapper,
+.profile-timeline-card {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* Pinned repositories, repo cards, dashboard news blocks */
+.pinned-item-list-item-content,
+.dashboard-breakme,
+.news,
+.news .alert,
+.dashboard .Box,
+.dashboard .Box-row,
+.dashboard .Box-header,
+.js-dashboard-deferred,
+.js-repos-container {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* Pinned card borders blend with its bg-dark background */
+.pinned-item-list-item-content {
+  border-color: var(--matugen-bg-dark) !important;
+}
+
+/* Pinned card outer wrapper (.Box with padding) — fill the padding
+   area with bg-dark so the card looks like a single solid surface */
+.pinned-item-list-item > .Box,
+.pinned-item-list-item .Box.tmp-p-3 {
+  background-color: var(--matugen-bg-dark) !important;
+  border-color: var(--matugen-bg-dark) !important;
+}
+
+/* Repo "card" (each pinned repo / search result row) */
+.Box-row,
+.col-12.d-block,
+.border-bottom.color-border-muted {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* Filter chips / topic tags */
+.topic-tag,
+.topic,
+.IssueLabel,
+.label,
+.Label {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* "Latest activity" / pinned items header */
+.pinned-item-list-heading,
+h2.sr-only + .Box,
+h2.sr-only + * {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Reactions count buttons (emoji +/-, comments) */
+.reaction-summary-item,
+.social-reaction-summary-item,
+.btn-link {
+  color: var(--matugen-fg-light) !important;
+}
+
+/* Issues / PR state pills (Open, Closed, Merged) */
+.State,
+.State--open,
+.State--closed,
+.State--merged,
+.State--draft {
+  color: var(--matugen-bg-dark) !important;
+}
+.State--open,
+.State--draft {
+  background-color: var(--matugen-tertiary) !important;
+  border-color: var(--matugen-tertiary) !important;
+}
+.State--closed {
+  background-color: #f5a3a3 !important;
+  border-color: #f5a3a3 !important;
+}
+.State--merged {
+  background-color: var(--matugen-accent) !important;
+  border-color: var(--matugen-accent) !important;
+}
+
+/* ============================================================
+ * CONTRIBUTION GRAPH — direct cell + SVG overrides
+ * GitHub renders the contribution graph as SVG <rect> elements
+ * (class="day", data-level="N") with a `fill` attribute, NOT
+ * as divs with background-color. Override the SVG fill via
+ * the data-level attribute, which is set on the rect by
+ * GitHub's JS. Also handle the div fallback for older
+ * renderers and the hover tooltip styles.
+ * ============================================================ */
+/* The contribution graph renders as <td data-level="N" class="ContributionCalendar-day">
+ * containing a <div class="ContributionCalendar-day rounded-1 mr-1 tmp-mr-1"> that is
+ * the actual visible square. The data-level attribute is on the TD only — the DIV
+ * does not have it. We target both: TD via [data-level], DIV via its parent's level. */
+td.ContributionCalendar-day[data-level="0"],
+td.ContributionCalendar-day[data-level="0"] .ContributionCalendar-day.rounded-1,
+.ContributionCalendar-day.rounded-1[data-level="0"],
+rect.day[data-level="0"] {
+  background-color: var(--matugen-bg-light) !important;
+  fill: var(--matugen-bg-light) !important;
+  stroke: var(--matugen-bg-light) !important;
+}
+td.ContributionCalendar-day[data-level="1"],
+td.ContributionCalendar-day[data-level="1"] .ContributionCalendar-day.rounded-1,
+.ContributionCalendar-day.rounded-1[data-level="1"],
+rect.day[data-level="1"] {
+  background-color: color-mix(in srgb, var(--matugen-accent) 25%, var(--matugen-bg)) !important;
+  fill: color-mix(in srgb, var(--matugen-accent) 25%, var(--matugen-bg)) !important;
+  stroke: color-mix(in srgb, var(--matugen-accent) 35%, var(--matugen-bg)) !important;
+}
+td.ContributionCalendar-day[data-level="2"],
+td.ContributionCalendar-day[data-level="2"] .ContributionCalendar-day.rounded-1,
+.ContributionCalendar-day.rounded-1[data-level="2"],
+rect.day[data-level="2"] {
+  background-color: color-mix(in srgb, var(--matugen-accent) 50%, var(--matugen-bg)) !important;
+  fill: color-mix(in srgb, var(--matugen-accent) 50%, var(--matugen-bg)) !important;
+  stroke: color-mix(in srgb, var(--matugen-accent) 60%, var(--matugen-bg)) !important;
+}
+td.ContributionCalendar-day[data-level="3"],
+td.ContributionCalendar-day[data-level="3"] .ContributionCalendar-day.rounded-1,
+.ContributionCalendar-day.rounded-1[data-level="3"],
+rect.day[data-level="3"] {
+  background-color: color-mix(in srgb, var(--matugen-accent) 75%, var(--matugen-bg)) !important;
+  fill: color-mix(in srgb, var(--matugen-accent) 75%, var(--matugen-bg)) !important;
+  stroke: color-mix(in srgb, var(--matugen-accent) 85%, var(--matugen-bg)) !important;
+}
+td.ContributionCalendar-day[data-level="4"],
+td.ContributionCalendar-day[data-level="4"] .ContributionCalendar-day.rounded-1,
+.ContributionCalendar-day.rounded-1[data-level="4"],
+rect.day[data-level="4"] {
+  background-color: var(--matugen-accent) !important;
+  fill: var(--matugen-accent) !important;
+  stroke: var(--matugen-accent) !important;
+}
+
+/* "Less ▢▢▢▢ More" legend at the bottom of the graph */
+.contrib-legend .legend,
+.contrib-legend .legend li,
+.contrib-legend ul,
+.contrib-legend li,
+.contrib-legend .legend-box,
+.Legend,
+.Legend-item {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+}
+
+/* Activity overview SVG (the crosshair chart "96% Commits / 4% Pull requests") */
+.activity-overview-axis,
+.activity-overview-point,
+.activity-overview-bar,
+rect.day,
+rect.ContributionCalendar-day,
+.contrib-column graph-rect,
+.contrib-cell {
+  stroke: var(--matugen-accent) !important;
+  color: var(--matugen-accent) !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Month/day labels above the contribution graph */
+.ContributionCalendar-label,
+.ContributionCalendar-label[colspan],
+table.ContributionCalendar-grid td.ContributionCalendar-label,
+td.ContributionCalendar-label,
+.contrib-legend,
+.contrib-legend .Legend,
+.contrib-legend ul li {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* "Show more activity" button: GitHub renders it as a full-width
+ * .btn with a colored top border. Don't apply our generic .btn
+ * rules (which would make it bg-light); let it be accent. */
+#dashboard-show-more-activity,
+.ajax-pagination-form .btn,
+[data-target="pagination-full-display.btn"] {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+
+/* Contribution progress bars (the "Created 43 commits" green bar at the right) */
+.ContributionCalendar-label,
+.Progress,
+.Progress-item,
+.Progress-bar,
+.ContributionProgress {
+  background-color: var(--matugen-accent) !important;
+}
+.Progress-item + .Progress-item {
+  background-color: var(--matugen-tertiary) !important;
+}
+
+/* Selection already global; this scopes it tightly in case GitHub's
+ * own ruleset tries to override with --color-canvas-subtle etc. */
+::selection,
+::-moz-selection {
+  background-color: color-mix(in srgb, var(--matugen-accent) 70%, transparent) !important;
+  color: var(--matugen-bg-dark) !important;
+}
+
+/* Year filter tabs on profile (2022-2026 list in right sidebar) */
+.js-profile-timeline-year-list {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+.js-year-link.filter-item {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+}
+.js-year-link.filter-item:hover {
+  color: var(--matugen-accent) !important;
+  background-color: var(--matugen-bg-light) !important;
+}
+.js-year-link.filter-item.selected,
+.filter-item.selected {
+  color: var(--matugen-bg-dark) !important;
+  background-color: var(--matugen-accent) !important;
+  border-color: var(--matugen-accent) !important;
+}
+
+/* Year dropdown TRIGGER button + the menu it opens */
+.Button--secondary,
+[data-variant="secondary"] {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+.Button--secondary:hover,
+[data-variant="secondary"]:hover {
+  background-color: color-mix(in srgb, var(--matugen-bg-light) 80%, var(--matugen-fg) 20%) !important;
+  border-color: color-mix(in srgb, var(--matugen-bg-light) 60%, var(--matugen-fg) 40%) !important;
+}
+.Overlay,
+.Overlay-body,
+.ActionListWrap,
+.ActionListWrap--inset {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+  box-shadow: none !important;
+}
+.ActionListItem,
+.ActionListContent {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+}
+.ActionListItem:hover,
+.ActionListContent:hover {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+}
+
+/* Contribution activity timeline — match the page bg (bg) so
+ * this section doesn't pop out as a separate card. */
+.contribution-activity-listing,
+.activity-listing,
+.contribution-activity-listing > .width-full,
+.contribution-activity-listing .TimelineItem,
+.contribution-activity-listing .TimelineItem-body,
+.ContributionActivity,
+.contribution-activity .TimelineItem {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+.TimelineItem-badge {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+  border-color: var(--matugen-bg-light) !important;
+  box-shadow: none !important;
+}
+.TimelineItem-badge svg {
+  fill: var(--matugen-accent) !important;
+  color: var(--matugen-accent) !important;
+}
+.TimelineItem-break,
+.contribution-activity-listing .color-bg-default {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+}
+/* The "June 2026" month header span inside the contribution activity
+ * section uses .color-bg-default as a fill behind the text. Match
+ * the page bg so it doesn't look like a separate tab. */
+.contribution-activity-listing h3 .color-bg-default,
+.color-bg-default.pl-2 {
+  background-color: var(--matugen-bg) !important;
+}
+
+/* Progress bars in the contribution activity list.
+ * GitHub uses inline `style="background-color: #216e39"` on the
+ * .Progress-item. We override that to use matugen-accent so the
+ * bar matches the theme, and theme the parent .Progress track. */
+.Progress {
+  background-color: var(--matugen-bg-light) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+.Progress-item {
+  background-color: var(--matugen-accent) !important;
+  border-color: var(--matugen-accent) !important;
+  color: var(--matugen-bg-dark) !important;
+}
+
+/* "Show more activity" pagination form (spinner + button + footer) */
+.ajax-pagination-form,
+.ajax-pagination-form .contribution-activity-spinner {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+.ajax-pagination-form .color-fg-muted,
+.ajax-pagination-form p {
+  color: var(--matugen-fg-light) !important;
+}
+.ajax-pagination-form a.Link--inTextBlock {
+  color: var(--matugen-accent) !important;
+}
+.ajax-pagination-btn {
+  background-color: var(--matugen-accent) !important;
+  color: var(--matugen-bg-dark) !important;
+  border: 1px solid var(--matugen-accent) !important;
+  border-radius: 6px !important;
+  padding: 6px 16px !important;
+  font-weight: 600 !important;
+  fill: currentColor !important;
+}
+.ajax-pagination-btn:hover {
+  background-color: color-mix(in srgb, var(--matugen-accent) 80%, var(--matugen-fg) 20%) !important;
+  border-color: color-mix(in srgb, var(--matugen-accent) 80%, var(--matugen-fg) 20%) !important;
+}
+
+/* User status circle badge next to avatar (the small dot/profile).
+ * The .user-status-circle-badge-container is a layout wrapper and
+ * should be transparent — only the inner .user-status-circle-badge
+ * (the actual circle) gets a visible bg. */
+.user-status-circle-badge,
+.vcard-detail .user-status-message-wrapper,
+.js-user-status-container {
+  background-color: var(--matugen-bg-light) !important;
+  border-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+}
+.user-status-circle-badge-container {
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+/* Profile sidebar vcard icons (organization/link/ORCID/X/LinkedIn SVGs).
+ * Primer octicons render as inline <svg> with paths; ORCID/X/LinkedIn paths
+ * use fill="currentColor" while github octicons rely on default fill.
+ * Set fill on both the <svg> and any child path so all variants are themed. */
+.Layout-sidebar .vcard-detail svg,
+.Layout-sidebar .vcard-detail svg path,
+.Layout-sidebar .vcard-details svg,
+.Layout-sidebar .vcard-details svg path {
+  fill: var(--matugen-accent) !important;
+  color: var(--matugen-accent) !important;
+}
+
+/* Zen injects a divider into the github header (from styles-module). */
+[class*="itemDivider"],
+[class*="appHeader"] [class*="divider"] {
+  background-color: var(--matugen-bg-light) !important;
+}
+
+/* ============================================================
+ * GITHUB GLOBAL TOPBAR
+ * The new github.com header uses Primer React (prc-) classes
+ * with data-variant="invisible" / "default" buttons. Without
+ * explicit overrides, icons and labels don't match the theme.
+ * ============================================================ */
+
+/* Main topbar background — already themed via .GlobalNav rule above */
+
+/* All topbar buttons (icon + label) */
+.styles-module__appHeaderButton__axedQ,
+[data-variant="invisible"][class*="prc-Button-ButtonBase"],
+.GlobalCreateMenu-module__actionMenuButton__Hj_iB,
+.CopilotItems-module__CopilotMenu__DVdfE,
+.CopilotItems-module__AgentsMenu__WsBs_,
+.CopilotItems-module__AgentsMenuStandalone__G1nhD,
+.GlobalNavUserMenu-module__anchor__Dcej6 {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+.styles-module__appHeaderButton__axedQ:hover,
+[data-variant="invisible"][class*="prc-Button-ButtonBase"]:hover,
+.GlobalCreateMenu-module__actionMenuButton__Hj_iB:hover,
+.CopilotItems-module__CopilotMenu__DVdfE:hover,
+.CopilotItems-module__AgentsMenu__WsBs_:hover,
+.CopilotItems-module__AgentsMenuStandalone__G1nhD:hover,
+.GlobalNavUserMenu-module__anchor__Dcej6:hover {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Breadcrumbs (e.g. "parazeeknova" crumb in profile) */
+[class*="prc-Breadcrumbs-Item"],
+.styles-module__contextCrumb__IzGIq,
+.styles-module__contextCrumbLast__tI2e3,
+[class*="prc-Breadcrumbs-BreadcrumbsList"] {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+}
+[class*="prc-Breadcrumbs-Item"]:hover {
+  color: var(--matugen-accent) !important;
+  background-color: var(--matugen-bg-light) !important;
+}
+
+/* Search button (collapsed) */
+.Search-module__searchButton__aiE0a,
+.Search-module__searchButtonGroup__aetw5,
+.Search-module__smallSearchButton___8Gvn {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg-light) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+.Search-module__searchButton__aiE0a:hover,
+.Search-module__searchButtonGroup__aetw5:hover,
+.Search-module__smallSearchButton___8Gvn:hover {
+  background-color: color-mix(in srgb, var(--matugen-bg-light) 80%, var(--matugen-fg) 20%) !important;
+  border-color: var(--matugen-accent) !important;
+  color: var(--matugen-fg) !important;
+}
+.Search-module__placeholder__p9hbG,
+.Search-module__text__veSYi,
+.Search-module__value__TFoak {
+  color: var(--matugen-fg-light) !important;
+}
+.Search-module__kbd__WCskr,
+[class*="prc-KeybindingHint-KeybindingHint"],
+[class*="prc-KeybindingHint-KeybindingHint"] kbd,
+kbd.Search-module__kbd__WCskr {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+  box-shadow: none !important;
+}
+[class*="prc-KeybindingHint-KeybindingHint"] kbd span {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+}
+
+/* Local navigation (Overview / Repositories / Projects / Packages / Stars / Sponsoring) */
+.LocalNavigation-module__LocalNavigation__b0Xc0,
+.prc-components-UnderlineWrapper-eT-Yj {
+  background-color: var(--matugen-bg-dark) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+.prc-components-UnderlineItem-7fP-n,
+[class*="prc-UnderlineNav-UnderlineNavItem"] a {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+.prc-components-UnderlineItem-7fP-n:hover,
+[class*="prc-UnderlineNav-UnderlineNavItem"] a:hover {
+  color: var(--matugen-accent) !important;
+  background-color: transparent !important;
+  border-color: var(--matugen-accent) !important;
+}
+.prc-components-UnderlineItem-7fP-n[aria-current="page"],
+[class*="prc-UnderlineNav-UnderlineNavItem"] a[aria-current="page"] {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+  border-color: var(--matugen-accent) !important;
+  border-bottom-color: var(--matugen-accent) !important;
+}
+
+/* Counter labels (41 repos, 2 packages, 175 stars) */
+[class*="prc-CounterLabel-CounterLabel"],
+[data-component="CounterLabel"] {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+}
+
+/* Avatar border in topbar */
+[class*="prc-Avatar-Avatar"],
+.GlobalNavUserMenu-module__anchor__Dcej6 img,
+.GlobalNavUserMenu-module__container__NaVIt img {
+  border-color: var(--matugen-bg-light) !important;
+  background-color: var(--matugen-bg-light) !important;
+}
+
+/* Tooltips (Hover "Open menu", "Homepage", etc.) */
+.prc-TooltipV2-Tooltip-tLeuB {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+.prc-TooltipV2-Tooltip-tLeuB kbd {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* Copilot menu trigger and items */
+.CopilotItems-module__Wrapper__BFG9q,
+[class*="prc-ButtonGroup-ButtonGroup"] {
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+/* Notification indicator / unread dot */
+.styles-module__notificationIndicator__D_jL0::after,
+.styles-module__notificationIndicator__D_jL0 > * {
+  color: var(--matugen-accent) !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Item divider between sections in topbar */
+.styles-module__itemDivider__nunbs {
+  background-color: var(--matugen-bg-light) !important;
+}
+
+/* SVG icons throughout the topbar inherit currentColor */
+.styles-module__appHeader__YzYWk svg,
+.styles-module__appHeader__YzYWk svg path,
+.LocalNavigation-module__LocalNavigation__b0Xc0 svg,
+.LocalNavigation-module__LocalNavigation__b0Xc0 svg path {
+  fill: currentColor !important;
+}
+
+/* ============================================================
+ * GITHUB GLOBAL NAVIGATION SIDEBAR (the hamburger menu dialog)
+ * ============================================================ */
+
+/* Dialog container / scrollable region / list root */
+[class*="prc-Dialog-Dialog"],
+[class*="prc-ScrollableRegion-ScrollableRegion"],
+[class*="prc-Dialog-DialogOverflowWrapper"] {
+  background-color: var(--matugen-bg-dark) !important;
+  border-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Padding wrapper around the nav */
+[class*="prc-ScrollableRegion-ScrollableRegion"] .p-2 {
+  background-color: transparent !important;
+}
+
+/* The nav list itself */
+[class*="prc-ActionList-ActionList"],
+[class*="prc-ActionList-Group"],
+[class*="prc-ActionList-GroupList"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Individual action list items (the links) */
+[class*="prc-ActionList-ActionListItem"],
+[class*="prc-ActionList-ActionListContent"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+}
+
+/* .TimelineItem-badge */
+.TimelineItem-badge {
+  background-color: transparent !important;
+  color: var(--matugen-accent) !important;
+}
+[class*="prc-ActionList-ActionListItem"]:active,
+[class*="prc-ActionList-ActionListContent"]:active {
+  background-color: var(--matugen-accent) !important;
+  color: var(--matugen-bg) !important;
+}
+
+/* The current/active page link (gets [aria-current="page"] in some ActionLists) */
+[class*="prc-ActionList-ActionListItem"] [aria-current="page"],
+[class*="prc-ActionList-ActionListContent"][aria-current="page"] {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+  font-weight: 600 !important;
+}
+
+/* Item label */
+[class*="prc-ActionList-ItemLabel"] {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+
+/* Leading visual (icon wrapper) */
+[class*="prc-ActionList-LeadingVisual"],
+[class*="prc-ActionList-VisualWrap"],
+[class*="prc-ActionList-TrailingVisual"] {
+  color: inherit !important;
+  background-color: transparent !important;
+  fill: currentColor !important;
+}
+[class*="prc-ActionList-ActionListItem"] svg,
+[class*="prc-ActionList-ActionListContent"] svg {
+  fill: currentColor !important;
+}
+
+/* Spacer (depth indicator) */
+[class*="prc-ActionList-Spacer"] {
+  background-color: transparent !important;
+}
+
+/* Dividers between groups */
+[class*="prc-ActionList-Divider"] {
+  background-color: var(--matugen-bg-light) !important;
+  border-color: var(--matugen-bg-light) !important;
+  list-style: none !important;
+  height: 1px !important;
+  margin: 4px 8px !important;
+  padding: 0 !important;
+}
+
+/* Group heading wrapper (subtle variant) */
+[class*="prc-ActionList-GroupHeadingWrap"] {
+  background-color: transparent !important;
+}
+[class*="prc-ActionList-GroupHeading"],
+[class*="prc-NavList-GroupHeading"],
+.styles-module__groupHeading__tR4kX {
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+  padding: 8px 12px 4px 12px !important;
+}
+[class*="prc-ActionList-GroupHeadingWrap"] button {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+}
+[class*="prc-ActionList-GroupHeadingWrap"] button:hover {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+}
+
+/* Avatar in sidebar items */
+[class*="prc-ActionList-ActionListItem"] [class*="prc-Avatar-Avatar"],
+[class*="prc-ActionList-ActionListContent"] [class*="prc-Avatar-Avatar"] {
+  border-color: var(--matugen-bg-light) !important;
+  background-color: var(--matugen-bg-light) !important;
+}
+
+/* "Show more" button at the bottom */
+[class*="prc-ActionList-ActionListItem"] [data-testid="dynamic-side-panel-items-show-more"],
+[class*="prc-ActionList-ActionListContent"] {
+  color: var(--matugen-fg-light) !important;
+}
+[class*="prc-ActionList-ActionListItem"] [data-testid="dynamic-side-panel-items-show-more"]:hover {
+  color: var(--matugen-accent) !important;
+  background-color: var(--matugen-bg-light) !important;
+}
+
+/* Muted color spans ("Show more" + descriptions) */
+.color-fg-muted {
+  color: var(--matugen-fg-light) !important;
+}
+
+/* Backdrop / overlay backdrop under sidebar */
+prc-overlay-backdrop,
+div[data-component="Overlay"].Overlay,
+div[data-component="OverlayBackdrop"] {
+  background-color: var(--matugen-bg) !important;
+  opacity: 0.5 !important;
+}
+
+/* ============================================================
+ * GITHUB GLOBAL SEARCH SUGGESTIONS DROPDOWN (QueryBuilder)
+ * The search-bar popover showing "Repositories / Code / Copilot"
+ * results, plus the footer with "Search syntax tips" + "Give feedback"
+ * ============================================================ */
+
+/* Main wrapper */
+.search-suggestions,
+.query-builder-container {
+  background-color: var(--matugen-bg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  box-shadow: 0 0 0 1px var(--matugen-bg-light) !important;
+}
+
+/* Top input bar (StyledInput) */
+.QueryBuilder-StyledInput,
+.QueryBuilder-StyledInputContainer,
+.QueryBuilder-InputWrapper {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* Search input field */
+.FormControl-input.QueryBuilder-Input,
+.FormControl-input.QueryBuilder-Input:focus,
+.FormControl-input.QueryBuilder-Input:focus-visible {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Search leading icon (magnifying glass) */
+.FormControl-input-leadingVisualWrap,
+.QueryBuilder-leadingVisualWrap,
+.FormControl-input-leadingVisual {
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+  fill: var(--matugen-fg-light) !important;
+}
+.FormControl-input-leadingVisual svg,
+.FormControl-input-leadingVisual path {
+  fill: currentColor !important;
+}
+
+/* The styled input content (e.g. "owner:parazeeknova ") */
+.QueryBuilder-StyledInputContent {
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+}
+.QueryBuilder-StyledInputContent .qb-filter-value {
+  color: var(--matugen-accent) !important;
+  font-weight: 600 !important;
+  background-color: var(--matugen-bg-light) !important;
+  padding: 0 4px !important;
+  border-radius: 3px !important;
+}
+
+/* Clear (X) button */
+.Button--invisible.Button--iconOnly,
+.Button--invisible.Button--iconOnly:hover {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg-light) !important;
+}
+.Button--invisible.Button--iconOnly:hover {
+  color: var(--matugen-accent) !important;
+  background-color: var(--matugen-bg-light) !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Results list */
+.ActionListWrap.QueryBuilder-ListWrap,
+.ActionListWrap {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* Section dividers (Repositories, Code, Copilot headings) */
+.ActionList-sectionDivider {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.ActionList-sectionDivider-title.QueryBuilder-sectionTitle {
+  color: var(--matugen-fg-light) !important;
+  background-color: var(--matugen-bg) !important;
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  padding: 8px 12px 4px 12px !important;
+  border: none !important;
+}
+
+/* Empty divider rows between sections */
+.ActionList-sectionDivider[aria-hidden="true"] {
+  height: 1px !important;
+  background-color: var(--matugen-bg-light) !important;
+  margin: 4px 8px !important;
+}
+
+/* Result item */
+.ActionListItem {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+}
+.QueryBuilder-ListItem-link.ActionListContent,
+.QueryBuilder-ListItem-link.ActionListContent:hover {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+.ActionListItem:hover,
+.ActionListItem:focus,
+.ActionListItem:focus-within,
+.ActionListItem:hover .QueryBuilder-ListItem-link.ActionListContent,
+.ActionListItem[aria-selected="true"],
+.ActionListItem[aria-selected="true"] .QueryBuilder-ListItem-link.ActionListContent {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+}
+
+/* Result item leading visual (icon) */
+.ActionListItem-visual,
+.ActionListItem-visual--leading {
+  color: inherit !important;
+  background-color: transparent !important;
+  fill: currentColor !important;
+}
+.ActionListItem-visual svg,
+.ActionListItem-visual svg path {
+  fill: currentColor !important;
+}
+
+/* Result item label */
+.ActionListItem-label.text-normal {
+  color: inherit !important;
+  background-color: transparent !important;
+  font-weight: 500 !important;
+}
+
+/* Result item description / trailing "Jump to" */
+.ActionListItem-description,
+.ActionListItem-description.QueryBuilder-ListItem-trailing {
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+  font-size: 12px !important;
+}
+.ActionListItem:hover .ActionListItem-description,
+.ActionListItem[aria-selected="true"] .ActionListItem-description {
+  color: var(--matugen-accent) !important;
+}
+
+/* Footer (Search syntax tips / Give feedback) */
+.search-feedback-prompt,
+.color-bg-default.search-feedback-prompt {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg-light) !important;
+  border-top: 1px solid var(--matugen-bg-light) !important;
+}
+.color-fg-accent.text-normal,
+a.color-fg-accent,
+a.color-fg-accent:visited {
+  color: var(--matugen-accent) !important;
+  background-color: transparent !important;
+}
+.color-fg-accent.text-normal:hover {
+  color: var(--matugen-fg) !important;
+}
+
+/* "Give feedback" Button--link */
+.Button--link.Button--medium.Button,
+.Button--link.Button--medium.Button:hover {
+  background-color: transparent !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+}
+.Button--link.Button--medium.Button:hover {
+  color: var(--matugen-fg) !important;
+}
+
+/* Inline validation message (e.g. error icon for bad query) */
+.FormControl-inlineValidation,
+.FormControl-inlineValidation--visual {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+  fill: var(--matugen-fg-light) !important;
+}
+
+/* ============================================================
+ * USER STATUS BUTTON (the "reaching singularity" pill with emoji)
+ * ============================================================ */
+
+.user-status-emoji-only-header.circle,
+.user-status-emoji-only-header,
+.user-status-header.circle,
+.user-status-header {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid transparent !important;
+}
+.user-status-emoji-only-header.circle:hover,
+.user-status-emoji-only-header:hover,
+.user-status-header.circle:hover,
+.user-status-header:hover {
+  background-color: color-mix(in srgb, var(--matugen-bg-light) 70%, var(--matugen-accent) 30%) !important;
+  border-color: var(--matugen-accent) !important;
+}
+
+.user-status-emoji-container,
+.user-status-emoji-container.flex-shrink-0 {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+.user-status-message-wrapper,
+.user-status-message-wrapper.f6,
+.user-status-message-wrapper .color-fg-default,
+.user-status-message-wrapper .css-truncate,
+.user-status-message-wrapper .css-truncate-target {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+[data-target="react-partial-anchor.anchor"].Button--link,
+.Link--secondary.no-underline.Button--link.Button--medium.Button {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+}
+[data-target="react-partial-anchor.anchor"].Button--link:hover,
+.Link--secondary.no-underline.Button--link.Button--medium.Button:hover {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+}
+
+/* Profile sidebar status button (the "reaching singularity" pill with
+ * emoji) — keep bg transparent even on hover. Selector uses :has() to
+ * scope only to the button whose content includes the status header. */
+.Layout-sidebar button:has(.user-status-message-wrapper),
+.Layout-sidebar button:has(.user-status-message-wrapper):hover {
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+/* ============================================================
+ * FOR-YOU FEED (homepage "For you" release cards)
+ * ============================================================ */
+
+/* Outer feed wrapper (rounded-2) and feed-item content (rounded-1) */
+.feed-item-content,
+.feed-item-content.rounded-1,
+.feed-item-content.d-flex.flex-column {
+  background-color: var(--matugen-bg-dark) !important;
+  border-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+}
+
+.feed-item-content .rounded-1,
+.feed-item-content .rounded-2 {
+  background-color: transparent !important;
+}
+
+/* Release body section (markdown body with color-bg-subtle rounded-1) */
+.feed-item-content section.dashboard-break-word.comment-body.markdown-body.color-bg-subtle.rounded-1,
+.feed-item-content .markdown-body.color-bg-subtle.rounded-1 {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+.feed-item-content .markdown-body p,
+.feed-item-content .markdown-body li,
+.feed-item-content .markdown-body strong,
+.feed-item-content .markdown-body a,
+.feed-item-content .markdown-body a.issue-link,
+.feed-item-content .markdown-body a:not(.issue-link) {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+}
+.feed-item-content .markdown-body a:hover {
+  color: var(--matugen-accent) !important;
+}
+
+/* Kebab (action menu) button */
+.feed-item-heading-menu-button,
+.feed-item-heading-menu-button.Button--iconOnly.Button--invisible {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg-light) !important;
+}
+.feed-item-heading-menu-button:hover {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Action menu overlay (anchored-position) */
+.anchored-position .Overlay.Overlay--size-auto,
+.anchored-position .Overlay-body.Overlay-body--paddingNone,
+.anchored-position .ActionListWrap--inset.ActionListWrap,
+.anchored-position ul.ActionListWrap--inset,
+.Overlay--size-auto .Overlay-body--paddingNone,
+.ActionListWrap--inset {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+  box-shadow: 0 0 0 1px var(--matugen-bg-light) !important;
+}
+.anchored-position .ActionListItem,
+.anchored-position .ActionListContent,
+.anchored-position .ActionListItem .ActionListContent {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+.anchored-position .ActionListItem:hover,
+.anchored-position .ActionListItem:hover .ActionListContent,
+.anchored-position .ActionListContent:hover {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+}
+.anchored-position .ActionListItem-label {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+
+/* "Send feedback" dialog (Overlay-whenNarrow rounded-3) */
+dialog.Overlay.Overlay-whenNarrow.Overlay--size-medium,
+dialog.Overlay.Overlay-whenNarrow.rounded-3,
+dialog.Overlay--disableScroll,
+dialog.Overlay--motion-scaleFade {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+.Overlay-header.color-bg-subtle,
+.Overlay-header.color-bg-subtle.pb-1.border-bottom {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border-bottom: 1px solid var(--matugen-bg-light) !important;
+}
+.Overlay-titleWrap .Box-title {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+}
+.Overlay-titleWrap .color-fg-muted {
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+}
+.Overlay-actionWrap .close-button.Overlay-closeButton,
+.Overlay-closeButton {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+  fill: var(--matugen-fg-light) !important;
+  border-color: transparent !important;
+}
+.Overlay-closeButton:hover {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-accent) !important;
+  fill: var(--matugen-accent) !important;
+}
+.Overlay-body {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+}
+scrollable-region {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* "Send feedback" checkboxes */
+.js-disinterest-checkbox {
+  background-color: var(--matugen-bg-light) !important;
+  border-color: var(--matugen-bg-light) !important;
+  accent-color: var(--matugen-accent) !important;
+}
+
+/* "Submit" button in dialog (Button--secondary Button--fullWidth) */
+.Button--secondary.Button--fullWidth,
+.Button--secondary.Button--medium.Button--fullWidth {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+.Button--secondary.Button--fullWidth:hover,
+.Button--secondary.Button--medium.Button--fullWidth:hover {
+  background-color: var(--matugen-accent) !important;
+  color: var(--matugen-bg) !important;
+  border-color: var(--matugen-accent) !important;
+}
+.Button--secondary.Button--fullWidth[disabled],
+.Button--secondary.Button--medium.Button--fullWidth[disabled] {
+  opacity: 0.5 !important;
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg-light) !important;
+}
+
+/* Reaction button (circle + color-bg-subtle + border + color-border-muted) */
+.circle.reaction-dropdown-button,
+.circle.reaction-dropdown-button.reaction-dropdown-button--inline.btn-invisible.btn,
+summary.reaction-dropdown-button {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg-light) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+  fill: var(--matugen-fg-light) !important;
+}
+.circle.reaction-dropdown-button:hover {
+  background-color: color-mix(in srgb, var(--matugen-bg-light) 70%, var(--matugen-accent) 30%) !important;
+  border-color: var(--matugen-accent) !important;
+  color: var(--matugen-accent) !important;
+  fill: var(--matugen-accent) !important;
+}
+.reaction-dropdown-button .octicon-smiley.social-button-emoji {
+  fill: currentColor !important;
+}
+
+/* Reaction dropdown menu (ul.dropdown-menu-reactions) */
+ul.dropdown-menu.dropdown-menu-reactions,
+ul.dropdown-menu.dropdown-menu-reactions.dropdown-menu-ne,
+ul.dropdown-menu-reactions {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+  box-shadow: 0 0 0 1px var(--matugen-bg-light) !important;
+}
+ul.dropdown-menu-reactions .dropdown-item.dropdown-item-reaction.btn-invisible.btn.rounded-2,
+ul.dropdown-menu-reactions li button.dropdown-item-reaction {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+  border: 1px solid transparent !important;
+}
+ul.dropdown-menu-reactions .dropdown-item-reaction:hover {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+  border-color: var(--matugen-accent) !important;
+}
+
+/* "Show less activity like this" / "All reactions" link button */
+.AllReactions .Button--link.Button--medium.Button {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+  border-color: transparent !important;
+}
+.AllReactions .Button--link.Button--medium.Button:hover {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+}
+
+/* Dismissed item placeholder */
+#dismissed-item-placeholder-10356552512,
+[id^="dismissed-item-placeholder-"] {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg-light) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+#dismissed-item-placeholder-10356552512 .btn-link,
+#dismissed-item-placeholder-10356552512 button.btn-link,
+[id^="dismissed-item-placeholder-"] .btn-link,
+[id^="dismissed-item-placeholder-"] button.btn-link {
+  background-color: transparent !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+}
+#dismissed-item-placeholder-10356552512 .btn-link:hover,
+[id^="dismissed-item-placeholder-"] .btn-link:hover {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Section title (e.g. "ggml-org/llama.cpp published 2 releases · See more") */
+.feed-item-content h3.h5.text-normal.color-fg-muted,
+.feed-item-content .h5.color-fg-muted {
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+}
+.feed-item-content h3.h5 .Link--primary.Link,
+.feed-item-content h3.h5 a.Link--primary {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+}
+.feed-item-content h3.h5 .Link--primary.Link:hover,
+.feed-item-content h3.h5 a.Link--primary:hover {
+  color: var(--matugen-accent) !important;
+}
+.feed-item-content h3.h5 .Truncate-text {
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+}
+.feed-item-content h3.h5 .Truncate-text a.Link--primary {
+  color: var(--matugen-accent) !important;
+}
+
+/* Release title (e.g. "b9542") */
+.feed-item-content h3.lh-condensed a.Link--primary.Link.text-bold {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+}
+.feed-item-content h3.lh-condensed a.Link--primary.Link.text-bold:hover {
+  color: var(--matugen-accent) !important;
+}
+
+/* "Read more" link */
+.feed-item-content section.dashboard-break-word + a.Link--primary.Link.text-bold,
+.feed-item-content a.Link--primary.Link.text-bold.d-block.mt-2 {
+  color: var(--matugen-accent) !important;
+  background-color: transparent !important;
+}
+.feed-item-content a.Link--primary.Link.text-bold.d-block.mt-2:hover {
+  color: var(--matugen-fg) !important;
+}
+
+/* Timestamp (relative-time) */
+.feed-item-content relative-time,
+.feed-item-content h4.color-fg-muted.text-small.text-normal {
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+}
+
+/* HR between releases */
+.feed-item-content hr,
+.feed-item-content hr.tmp-mb-3.mt-2 {
+  background-color: var(--matugen-bg-light) !important;
+  border-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-bg-light) !important;
+  height: 1px !important;
+  border-top: none !important;
+  margin: 16px 0 !important;
+}
+
+/* Feed item heading icon (small tag icon over avatar) */
+.feed-item-heading-icon,
+.feed-item-heading-icon.circle {
+  color: var(--matugen-accent) !important;
+  fill: var(--matugen-accent) !important;
+  background-color: var(--matugen-bg-dark) !important;
+}
+
+/* ============================================================
+ * USER NAVIGATION MENU (avatar dropdown, top-right)
+ * ============================================================ */
+
+/* Main overlay ([class*="prc-Overlay-Overlay"]) */
+[role="dialog"][aria-labelledby="global-nav-user-menu-header"],
+[class*="prc-Overlay-Overlay"],
+div[class*="prc-Overlay-Overlay"][data-component="AnchoredOverlay"] {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+  box-shadow: 0 0 0 1px var(--matugen-bg-light) !important;
+}
+
+/* Inner padding wrapper */
+[class*="prc-Overlay-Overlay"] .p-2,
+[class*="prc-Overlay-Overlay"] .d-flex.tmp-pr-3.tmp-pl-3.tmp-pt-3 {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Header: avatar + name + secondary name */
+[class*="prc-Overlay-Overlay"] .lh-condensed.overflow-hidden.d-flex.flex-column {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+[class*="prc-Overlay-Overlay"] .lh-condensed .text-bold {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+  font-weight: 600 !important;
+}
+[class*="prc-Overlay-Overlay"] .lh-condensed .fgColor-muted,
+[class*="prc-Overlay-Overlay"] .fgColor-muted {
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+}
+[class*="prc-Overlay-Overlay"] [class*="prc-Truncate-Truncate"] {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+[class*="prc-Overlay-Overlay"] [class*="prc-Avatar-Avatar"] {
+  border: 1px solid var(--matugen-bg-light) !important;
+  background-color: var(--matugen-bg-light) !important;
+}
+
+/* Account switcher (arrow-switch) and Close (x) IconButtons in header */
+[class*="prc-Overlay-Overlay"] [data-component="IconButton"][class*="prc-Button-ButtonBase"],
+[class*="prc-Overlay-Overlay"] [data-component="Dialog.CloseButton"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg-light) !important;
+}
+[class*="prc-Overlay-Overlay"] [data-component="IconButton"]:hover,
+[class*="prc-Overlay-Overlay"] [data-component="Dialog.CloseButton"]:hover {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Stack container of the action list */
+[class*="prc-Overlay-Overlay"] [class*="prc-Stack-Stack"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* The "full" variant action list inside the user menu (data-variant="full") */
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-ActionList"][data-variant="full"],
+[class*="prc-Overlay-Overlay"] ul[class*="prc-ActionList-ActionList"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+}
+
+/* Each item in the user menu list */
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-ActionListItem"],
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-ActionListContent"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+}
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-ActionListItem"]:hover,
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-ActionListItem"]:hover [class*="prc-ActionList-ActionListContent"],
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-ActionListContent"]:hover {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+}
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-ActionListItem"]:active,
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-ActionListContent"]:active {
+  background-color: var(--matugen-accent) !important;
+  color: var(--matugen-bg) !important;
+}
+
+/* Item label */
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-ItemLabel"] {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+
+/* Leading visual (icons) */
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-LeadingVisual"],
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-VisualWrap"] {
+  color: inherit !important;
+  background-color: transparent !important;
+  fill: currentColor !important;
+}
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-ActionListItem"] svg,
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-ActionListContent"] svg {
+  fill: currentColor !important;
+}
+
+/* Spacer (depth indicator) */
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-Spacer"] {
+  background-color: transparent !important;
+}
+
+/* Dividers between sections in the user menu */
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-Divider"],
+[class*="prc-Overlay-Overlay"] .hide-whenRegular[class*="prc-ActionList-Divider"] {
+  background-color: var(--matugen-bg-light) !important;
+  border-color: var(--matugen-bg-light) !important;
+  list-style: none !important;
+  height: 1px !important;
+  margin: 4px 8px !important;
+  padding: 0 !important;
+}
+
+/* Status row at top of menu (the "reaching singularity" with emoji) */
+[class*="prc-Overlay-Overlay"] .styles-module__emojiContainer__Qedlm,
+[class*="prc-Overlay-Overlay"] .styles-module__emojiContainer__Qedlm > div {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+[class*="prc-Overlay-Overlay"] .emoji-module__emojiIcon__zcD5E,
+[class*="prc-Overlay-Overlay"] img.emoji {
+  background-color: transparent !important;
+}
+
+/* "Free" Label in Try Enterprise row */
+[class*="prc-Overlay-Overlay"] [class*="prc-Label-Label"][data-variant="primary"],
+[class*="prc-Overlay-Overlay"] [class*="prc-Label-Label"] {
+  background-color: var(--matugen-accent) !important;
+  color: var(--matugen-bg) !important;
+  border: 1px solid transparent !important;
+  font-weight: 600 !important;
+}
+[class*="prc-Overlay-Overlay"] [class*="prc-Label-Label"]:hover {
+  background-color: color-mix(in srgb, var(--matugen-accent) 80%, var(--matugen-fg) 20%) !important;
+}
+
+/* Trailing visual (wraps the Label in Try Enterprise row) */
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-TrailingVisual"] {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+/* Edit status tooltip */
+[class*="prc-Overlay-Overlay"] .prc-TooltipV2-Tooltip-tLeuB,
+[class*="prc-Overlay-Overlay"] [data-component="Tooltip"] {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+
+/* SubContent (sub-list wrapper inside each item) */
+[class*="prc-Overlay-Overlay"] [class*="prc-ActionList-ActionListSubContent"] {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+/* Hide-whenRegular items (mobile-only items, hidden on desktop) */
+[class*="prc-Overlay-Overlay"] .hide-whenRegular {
+  background-color: transparent !important;
+}
+
+/* link + current page indicator */
+[class*="prc-Overlay-Overlay"] [class*="prc-Link-Link"] {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+
+/* ============================================================
+ * COPILOT CHAT INPUT + COMMAND STARTERS
+ * ============================================================ */
+
+/* Main containers */
+.CopilotChatInputPartial-module__inputContainer__ULM7D,
+.CopilotChatInputPartial-module__inputSection__fsBax,
+.ChatInput-module__container__KgJ7p,
+.ChatInput-module__chatForm__YoMl2,
+.ChatInput-module__inputContainer__xJ5m6,
+.ChatInput-module__inputContainerNewConversation__wkuTL,
+.InlineAutocomplete-module__container__NQUmo,
+.InlineAutocomplete-module__fullWidth__Cph_I,
+.CopilotImmersiveEmbedded-module__CopilotChatContainer__Hqz45 {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* Textarea (the actual input) */
+.ChatInput-module__input__lPYf_,
+.ChatInput-module__input__lPYf_:focus,
+.ChatInput-module__input__lPYf_:focus-visible,
+textarea.ChatInput-module__input__lPYf_ {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  caret-color: var(--matugen-accent) !important;
+}
+.ChatInput-module__input__lPYf_::placeholder,
+textarea.ChatInput-module__input__lPYf_::placeholder {
+  color: var(--matugen-fg-light) !important;
+  opacity: 0.7 !important;
+}
+
+/* Input preview (the formatted command text shown above textarea) */
+.ChatInput-module__inputPreview__DrDP3 {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  pointer-events: none !important;
+}
+.UserMessage-module__command__OOnAY,
+.UserMessage-module__command {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+  font-weight: 600 !important;
+  padding: 0 4px !important;
+  border-radius: 3px !important;
+}
+
+/* Toolbar */
+.ChatInput-module__toolbar__GgrRy {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border-color: transparent !important;
+}
+.ChatInput-module__mode__NL1lh,
+.ChatInput-module__extra__SMO8K,
+.ChatInput-module__actions__sh8XX,
+.ChatInput-module__actionsMultiple__T49V8,
+.ChatInput-module__toolbarButtons__Mqs1z {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Mode select button (Ask) — borderless */
+.ChatInput-module__modeSelectButton__cyrB_,
+.ChatInput-module__modeSelectButton__cyrB_[class*="prc-Button-ButtonBase"] {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  fill: currentColor !important;
+}
+.ChatInput-module__modeSelectButton__cyrB_:hover {
+  background-color: color-mix(in srgb, var(--matugen-bg-light) 70%, var(--matugen-accent) 30%) !important;
+  color: var(--matugen-accent) !important;
+}
+[class*="prc-Button-Label"],
+[class*="prc-Button-ButtonContent"] {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+[class*="prc-Button-Visual"],
+[class*="prc-Button-VisualWrap"] {
+  color: inherit !important;
+  background-color: transparent !important;
+  fill: currentColor !important;
+}
+
+/* Repos selector button (invisible with border) — borderless */
+.ReposSelector-module__invisibleWithBorder__i5BXF,
+.ReposSelector-module__invisibleWithBorder__i5BXF[class*="prc-Button-ButtonBase"] {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  fill: currentColor !important;
+}
+.ReposSelector-module__invisibleWithBorder__i5BXF:hover {
+  background-color: color-mix(in srgb, var(--matugen-bg-light) 70%, var(--matugen-accent) 30%) !important;
+  color: var(--matugen-accent) !important;
+}
+[class*="prc-Truncate-Truncate"] {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+
+/* Attachment + button (data-variant="default" + plus icon) — borderless */
+.ChatInput-module__attachmentIconButton__FyRnH,
+.ChatInput-module__attachmentIconButton__FyRnH[class*="prc-Button-ButtonBase"] {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  fill: currentColor !important;
+}
+.ChatInput-module__attachmentIconButton__FyRnH:hover {
+  background-color: color-mix(in srgb, var(--matugen-bg-light) 70%, var(--matugen-accent) 30%) !important;
+  color: var(--matugen-accent) !important;
+}
+
+/* Model picker (Claude Haiku 4.5) — borderless */
+.ModelPicker-module__menuButton__Imu_h,
+.ModelPicker-module__menuButton__Imu_h[class*="prc-Button-ButtonBase"] {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  fill: currentColor !important;
+}
+.ModelPicker-module__menuButton__Imu_h:hover {
+  background-color: color-mix(in srgb, var(--matugen-bg-light) 70%, var(--matugen-accent) 30%) !important;
+  color: var(--matugen-accent) !important;
+}
+.ModelPicker-module__buttonName__xOg9m {
+  color: inherit !important;
+  background-color: transparent !important;
+  font-weight: 600 !important;
+}
+
+/* Send button (paper-airplane) - inactive state */
+button[aria-disabled="true"][data-component="IconButton"][class*="prc-Button-ButtonBase"][class*="prc-Button-IconButton"],
+[class*="prc-Button-IconButton"][data-inactive="true"] {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg-light) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg-light) !important;
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+button[data-component="IconButton"][class*="prc-Button-ButtonBase"][class*="prc-Button-IconButton"]:not([aria-disabled="true"]):not([data-inactive="true"]) {
+  background-color: var(--matugen-accent) !important;
+  color: var(--matugen-bg) !important;
+  border-color: var(--matugen-accent) !important;
+  fill: var(--matugen-bg) !important;
+}
+button[data-component="IconButton"][class*="prc-Button-ButtonBase"][class*="prc-Button-IconButton"]:not([aria-disabled="true"]):hover {
+  background-color: color-mix(in srgb, var(--matugen-accent) 80%, var(--matugen-fg) 20%) !important;
+  border-color: color-mix(in srgb, var(--matugen-accent) 80%, var(--matugen-fg) 20%) !important;
+}
+
+/* Tooltip on action buttons (Account switcher, Add files, Complete slash) */
+.prc-TooltipV2-Tooltip-tLeuB {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+
+/* Command Starters container */
+.CommandStarters-module__container__TvPD1 {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+.CommandStarters-module__list__KFS6N {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Command pills (Agent, Create issue, Spark) - rounded bg buttons */
+.CommandPill-module__button__AvnQL,
+button.CommandPill-module__button__AvnQL {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+  fill: currentColor !important;
+  padding: 6px 10px !important;
+}
+.CommandPill-module__button__AvnQL:hover {
+  background-color: color-mix(in srgb, var(--matugen-bg-light) 70%, var(--matugen-accent) 30%) !important;
+  color: var(--matugen-accent) !important;
+  border-color: var(--matugen-accent) !important;
+}
+.CommandPill-module__text__PhF8n {
+  color: inherit !important;
+  background-color: transparent !important;
+  font-weight: 500 !important;
+}
+
+/* Starter pills (Git, Pull requests) */
+.StarterPill-module__container__Lj4wi,
+button.StarterPill-module__container__Lj4wi {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+  fill: currentColor !important;
+  padding: 6px 10px !important;
+}
+.StarterPill-module__container__Lj4wi:hover {
+  background-color: color-mix(in srgb, var(--matugen-bg-light) 70%, var(--matugen-accent) 30%) !important;
+  color: var(--matugen-accent) !important;
+  border-color: var(--matugen-accent) !important;
+}
+.StarterPill-module__icon__RdhR0,
+.StarterPill-module__title__r09RI {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+.StarterPill-module__dropdown__XAzLT {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+.Icon-module__container__UDr_N,
+.Icon-module__customColor__UimTV {
+  color: inherit !important;
+  background-color: transparent !important;
+  fill: currentColor !important;
+}
+
+/* ============================================================
+ * DASHBOARD BODY (homepage "For you" / "Following" feed)
+ * Use var(--matugen-bg) (the darkest) so feed blends with page bg
+ * ============================================================ */
+
+.feed-content,
+.feed-content.d-flex,
+.feed-content.flex-justify-center,
+.feed-content.tmp-pt-4,
+.feed-rollup-content,
+.feed-main,
+.feed-item-component,
+.feed-item-view,
+.feed-item-next-component {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Dashboard wrappers above .feed-content (ApplicationMain, Layout) */
+.application-main .feed-content,
+.Layout .feed-content,
+.Layout-main .feed-content {
+  background-color: var(--matugen-bg) !important;
+}
+
+/* Border lines on dashboard */
+.feed-content .border-bottom,
+.feed-content .border-top,
+.feed-content .border,
+.feed-content hr,
+.feed-content .divider {
+  border-color: var(--matugen-bg-light) !important;
+  background-color: var(--matugen-bg-light) !important;
+}
+
+/* Sub-containers within dashboard feed (cards within feed) */
+.feed-item-content,
+.feed-item-content.d-flex,
+.feed-item-content.rounded-1,
+.feed-item-content.d-flex.flex-column {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* Feed rollup/sidebar (right column on dashboard) */
+.feed-right,
+.feed-sponsors,
+.feed-sponsor-container,
+.feed-sponsors-message,
+.feed-additional-content,
+.feed-sponsor {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-bg-light) !important;
+}
+
+/* Dashboard changelog card ("Latest from our changelog") */
+.dashboard-changelog,
+.dashboard-changelog.color-bg-default,
+.dashboard-changelog.rounded-3,
+div.dashboard-changelog {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+.dashboard-changelog__title,
+.dashboard-changelog h2.f5.text-bold {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+}
+.dashboard-changelog .list-style-none {
+  background-color: transparent !important;
+}
+.dashboard-changelog .TimelineItem,
+.dashboard-changelog .TimelineItem-body,
+.dashboard-changelog .TimelineItem-body.mt-n1 {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+.dashboard-changelog .dashboard-changelog-timestamp,
+.dashboard-changelog .text-small.color-fg-muted,
+.dashboard-changelog .text-small.color-fg-muted.dashboard-changelog-timestamp,
+.dashboard-changelog relative-time {
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+}
+.dashboard-changelog .Link--primary.line-clamp-2.Link,
+.dashboard-changelog a.Link--primary {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+}
+.dashboard-changelog .Link--primary.line-clamp-2.Link:hover,
+.dashboard-changelog a.Link--primary:hover {
+  color: var(--matugen-accent) !important;
+}
+.dashboard-changelog .octicon-dot-fill {
+  color: var(--matugen-accent) !important;
+  fill: var(--matugen-accent) !important;
+  background-color: transparent !important;
+}
+.dashboard-changelog .width-full.ml-1.pt-2.tmp-pl-4.border-left {
+  border-left-color: var(--matugen-bg-light) !important;
+  background-color: transparent !important;
+}
+.dashboard-changelog a.text-small.mt-2.Link--muted,
+.dashboard-changelog .Link--muted {
+  color: var(--matugen-accent) !important;
+  background-color: transparent !important;
+}
+.dashboard-changelog a.text-small.mt-2.Link--muted:hover,
+.dashboard-changelog .Link--muted:hover {
+  color: var(--matugen-fg) !important;
+}
+
+/* ============================================================
+ * LAYOUT COLUMNS (col-lg-8, col-md-12, flex-auto, etc.)
+ * Force transparent bg so the parent bg-dark shows through
+ * ============================================================ */
+
+.col-lg-8,
+.col-lg-12,
+.col-md-8,
+.col-md-12,
+.col-sm-12,
+.col-12,
+[class^="col-"],
+[class*=" col-"],
+.flex-auto,
+.flex-1,
+.gutter-condensed,
+.gutter,
+.gx-3,
+.gx-4,
+.dashboard-changelog-container,
+.dashboard-sidebar,
+.dashboard-main {
+  background-color: transparent !important;
+}
+
+/* Padded wrappers (tmp-px-*, p-*, px-*) */
+.tmp-px-md-0,
+.tmp-px-sm-3,
+.tmp-px-3,
+.tmp-pl-4,
+.p-3,
+.px-3,
+.py-2,
+.p-2 {
+  background-color: transparent !important;
+}
+
+/* ============================================================
+ * DASHBOARD ACCENTS — make visible elements use accent
+ * ============================================================ */
+
+/* "Show more" link at bottom of repos sidebar */
+.Sidebar-module__sidebar__k2z9w a.text-small.Link--muted,
+.dashboard-sidebar a.text-small.Link--muted,
+a.text-small.Link--muted[href*="/search"],
+a.text-small.Link--muted {
+  color: var(--matugen-accent) !important;
+  background-color: transparent !important;
+  font-weight: 500 !important;
+}
+.Sidebar-module__sidebar__k2z9w a.text-small.Link--muted:hover,
+.dashboard-sidebar a.text-small.Link--muted:hover,
+a.text-small.Link--muted:hover {
+  color: var(--matugen-fg) !important;
+  text-decoration: underline !important;
+}
+
+/* "See more" / "Read more" links in feed cards */
+.feed-item-content .Truncate-text .Link--primary,
+.feed-item-content a.Link--primary.Link.text-bold.rgh-seen,
+.feed-item-content a.Link--primary[href*="/releases"],
+.feed-item-content a.Link--primary.Link.text-bold.d-block,
+.feed-item-content .Link--primary.Link.text-bold.d-block {
+  color: var(--matugen-accent) !important;
+  background-color: transparent !important;
+  font-weight: 600 !important;
+}
+.feed-item-content a.Link--primary.Link.text-bold.rgh-seen:hover,
+.feed-item-content a.Link--primary.Link.text-bold.d-block:hover,
+.feed-item-content .Link--primary.Link.text-bold.d-block:hover {
+  color: var(--matugen-fg) !important;
+}
+
+/* Filter button (top-right of Feed) — accent border */
+.feed-item-component [data-component="Button"]:has(svg),
+.filter-button,
+button.Button--secondary[data-component="Button"]:has(svg) {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+.feed-item-component [data-component="Button"]:hover {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-accent) !important;
+  border-color: var(--matugen-accent) !important;
+}
+
+/* Kebab (···) menu button hover */
+.feed-item-heading-menu-button,
+button.Button--iconOnly.Button--invisible {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+  fill: var(--matugen-fg-light) !important;
+}
+.feed-item-heading-menu-button:hover,
+button.Button--iconOnly.Button--invisible:hover {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-accent) !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Release title (b9542, b9541, Tolaria Alpha ...) — accent on hover */
+.feed-item-content h3.lh-condensed a.Link--primary.Link.text-bold,
+.feed-item-content h3.lh-condensed a.Link--primary.Link.text-bold.rgh-seen,
+.feed-item-content h3 a.Link--primary.Link.text-bold {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+}
+.feed-item-content h3.lh-condensed a.Link--primary.Link.text-bold:hover,
+.feed-item-content h3.lh-condensed a.Link--primary.Link.text-bold.rgh-seen:hover {
+  color: var(--matugen-accent) !important;
+}
+
+/* Reaction smiley button — accent border on hover */
+.circle.reaction-dropdown-button:hover {
+  border-color: var(--matugen-accent) !important;
+  background-color: var(--matugen-bg) !important;
+}
+
+/* "1 hour ago" / "2 days ago" timestamps — accent dot on hover */
+.dashboard-changelog .octicon-dot-fill,
+.TimelineItem-badge .octicon-dot-fill {
+  color: var(--matugen-accent) !important;
+  fill: var(--matugen-accent) !important;
+  background-color: transparent !important;
+}
+
+/* "Issue" link in release body (#24226) */
+.feed-item-content .markdown-body a.issue-link,
+.feed-item-content .markdown-body a[href*="/pull/"],
+.feed-item-content .markdown-body a[href*="/issues/"] {
+  color: var(--matugen-accent) !important;
+  background-color: transparent !important;
+  font-weight: 500 !important;
+}
+.feed-item-content .markdown-body a.issue-link:hover,
+.feed-item-content .markdown-body a[href*="/pull/"]:hover,
+.feed-item-content .markdown-body a[href*="/issues/"]:hover {
+  color: var(--matugen-fg) !important;
+  text-decoration: underline !important;
+}
+
+/* Heading section titles (Feed, Home) */
+h2.h2.text-normal,
+h2.h2,
+.feed-item-component h2,
+.feed-item-component .h2,
+.feed-content h2 {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--matugen-bg-light) !important;
+  padding-bottom: 8px !important;
+  margin-bottom: 12px !important;
+}
+
+/* Sidebar "Top repositories" heading */
+.Sidebar-module__sidebar__k2z9w h2,
+.dashboard-sidebar h2,
+.Sidebar-module__Heading__mZJ7g,
+.styles-module__groupHeading__tR4kX {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+  font-weight: 600 !important;
+}
+
+/* Top repos search input */
+.Sidebar-module__sidebar__k2z9w input[type="text"],
+.dashboard-sidebar input[type="text"],
+input[type="text"].form-control,
+input[type="search"] {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+.Sidebar-module__sidebar__k2z9w input[type="text"]:focus,
+.dashboard-sidebar input[type="text"]:focus,
+input[type="text"].form-control:focus,
+input[type="search"]:focus {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-accent) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+.Sidebar-module__sidebar__k2z9w input[type="text"]::placeholder,
+input[type="text"].form-control::placeholder,
+input[type="search"]::placeholder {
+  color: var(--matugen-fg-light) !important;
+  opacity: 0.7 !important;
+}
+
+/* Sidebar repo list items */
+.Sidebar-module__sidebar__k2z9w a,
+.dashboard-sidebar a,
+.repo-link,
+.repo-row {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+}
+.Sidebar-module__sidebar__k2z9w a:hover,
+.dashboard-sidebar a:hover,
+.repo-link:hover {
+  color: var(--matugen-accent) !important;
+  background-color: var(--matugen-bg-light) !important;
+}
+
+/* "Home" small label above dashboard content */
+.dashboard-home-header,
+.dashboard-home-header h2 {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+  font-weight: 600 !important;
+  font-size: 20px !important;
+}
+
+/* ============================================================
+ * DASHBOARD-SPECIFIC ELEMENTS (seen in /dashboard HTML)
+ * ============================================================ */
+
+/* Main dashboard wrapper — same bg as the Feed (bg) so there's
+ * no visual seam between the page bg, the wrapper, and the feed */
+.feed-background {
+  background-color: var(--matugen-bg) !important;
+}
+
+/* Force the html/body bg on the dashboard so the wrapper above and
+ * the feed below are guaranteed to match. The body in dashboard.html
+ * does NOT have a `.dashboard` class, so we target body directly. */
+body,
+html,
+body .application-main,
+body .Layout,
+body .Layout-main,
+body .feed-background {
+  background-color: var(--matugen-bg) !important;
+}
+
+/* Toast notifications (e.g. "Failed to apply filters. Resetting your feed.") */
+.Toast,
+.Toast--warning,
+.Toast--error,
+.Toast--success,
+div.Toast {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 6px !important;
+}
+.Toast--warning {
+  border-color: var(--matugen-secondary) !important;
+}
+.Toast-icon {
+  color: var(--matugen-secondary) !important;
+  fill: var(--matugen-secondary) !important;
+}
+.Toast--error .Toast-icon {
+  color: #f08080 !important;
+  fill: #f08080 !important;
+}
+.Toast--success .Toast-icon {
+  color: var(--matugen-tertiary) !important;
+  fill: var(--matugen-tertiary) !important;
+}
+.Toast-content {
+  color: var(--matugen-fg) !important;
+}
+.Toast-dismissButton {
+  color: var(--matugen-fg-light) !important;
+  fill: var(--matugen-fg-light) !important;
+}
+.Toast-dismissButton:hover {
+  color: var(--matugen-fg) !important;
+  fill: var(--matugen-fg) !important;
+}
+
+/* Flash messages (top-of-page banners, session warnings, etc.) */
+.flash,
+.flash-container .flash,
+.flash-full,
+div.flash {
+  background-color: var(--matugen-bg) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+  border-radius: 6px !important;
+}
+.flash-error,
+.flash.flash-error {
+  background-color: rgba(245, 163, 163, 0.12) !important;
+  color: var(--matugen-fg) !important;
+  border-color: rgba(245, 163, 163, 0.35) !important;
+}
+.flash-warn,
+.flash.flash-warn {
+  background-color: color-mix(in srgb, var(--matugen-secondary) 15%, transparent) !important;
+  color: var(--matugen-fg) !important;
+  border-color: color-mix(in srgb, var(--matugen-secondary) 35%, transparent) !important;
+}
+.flash-success,
+.flash.flash-success {
+  background-color: color-mix(in srgb, var(--matugen-tertiary) 15%, transparent) !important;
+  color: var(--matugen-fg) !important;
+  border-color: color-mix(in srgb, var(--matugen-tertiary) 35%, transparent) !important;
+}
+.flash .octicon-alert {
+  color: #f08080 !important;
+  fill: #f08080 !important;
+}
+.flash-warn .octicon-alert {
+  color: var(--matugen-secondary) !important;
+  fill: var(--matugen-secondary) !important;
+}
+.flash-success .octicon-check {
+  color: var(--matugen-tertiary) !important;
+  fill: var(--matugen-tertiary) !important;
+}
+.flash-close {
+  color: var(--matugen-fg-light) !important;
+  fill: var(--matugen-fg-light) !important;
+}
+.flash-close:hover {
+  color: var(--matugen-fg) !important;
+  fill: var(--matugen-fg) !important;
+}
+
+/* Blankslate (empty state — "You don't have any repositories yet") */
+.blankslate,
+.blankslate-container,
+.blankslate.color-bg-default {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border: 1px dashed var(--matugen-bg-light) !important;
+  border-radius: 6px !important;
+}
+.blankslate-heading {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+  font-weight: 600 !important;
+}
+.blankslate-description {
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+}
+
+/* Popover / hover card (e.g. user hover card showing mini profile) */
+.Popover,
+.Popover.js-hovercard-content,
+.Popover-message,
+.Popover-message.Box.color-shadow-large {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  border-radius: 6px !important;
+}
+
+/* Box--overlay user list / list-membership dialog (the modal that
+ * lists users when you click "Manage access" / "Add people") */
+.Box.Box--overlay,
+.Box.Box--overlay.hx_rsm-dialog,
+.Box.Box--overlay.hx_rsm-modal,
+details-dialog.Box.Box--overlay {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+.Box-btn-octicon,
+.Box-btn-octicon.btn-octicon {
+  color: var(--matugen-fg-light) !important;
+  fill: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+  border: none !important;
+}
+.Box-btn-octicon:hover,
+.Box-btn-octicon.btn-octicon:hover {
+  color: var(--matugen-fg) !important;
+  fill: var(--matugen-fg) !important;
+  background-color: var(--matugen-bg-light) !important;
+}
+
+/* The dismiss "X" in the Toast/flash and any dialog title bar */
+.close-button,
+.Overlay-closeButton,
+button[data-close-dialog] {
+  color: var(--matugen-fg-light) !important;
+  fill: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+  border: none !important;
+}
+.close-button:hover,
+.Overlay-closeButton:hover,
+button[data-close-dialog]:hover {
+  color: var(--matugen-fg) !important;
+  fill: var(--matugen-fg) !important;
+  background-color: var(--matugen-bg-light) !important;
+}
+
+/* ============================================================
+ * THREE MISSING prc- MODULES (seen in dashboard.html but
+ * not in the topbar/dialog templates) — use [class*="..."] wildcards
+ * ============================================================ */
+
+/* Breadcrumb base wrapper (the <nav> element containing breadcrumbs) */
+nav[class*="prc-Breadcrumbs-BreadcrumbsBase"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Breadcrumb item wrapper (each <li> in the breadcrumb list) */
+[class*="prc-Breadcrumbs-ItemWrapper"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Generic text element (used inline for kbd text, kbd chords, etc.) */
+[class*="prc-Text-Text"] {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+
+/* Tooltip popup (appears on hover over topbar buttons). Uses Primer
+ * popover API. The dialog-style background is themed via tokens but
+ * the wrapper itself is a popover-element with default white bg. */
+[class*="prc-TooltipV2-Tooltip"] {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+[class*="prc-TooltipV2-Tooltip"] kbd {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+
+/* ============================================================
+ * REPO PAGE
+ * Files tab: Latest commit row in the file tree. The row is
+ * wrapped in a <tr> with a colspan-3 <td> carrying the Primer
+ * .bgColor-muted utility. The container itself uses the
+ * LatestCommit module class. The "accentify" treatment: subtle
+ * accent-tinted bg with an accent border, accent-colored
+ * commit message and hash, fg author name.
+ * ============================================================ */
+
+/* README article on the repo page: the article is wrapped in
+ * DirectoryRichtextContent-module__SharedMarkdownContent (Primer
+ * module class) which has its own padding/gap. The article itself
+ * is bg-dark from the profile rule above, but the wrapper around
+ * it (and the padding area) was still showing the page bg, leaving
+ * a visible gap. Force the wrapper + padding to bg-dark. */
+[class*="DirectoryRichtextContent-module__SharedMarkdownContent"],
+.js-snippet-clipboard-copy-unpositioned {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+}
+article.markdown-body.entry-content,
+article.markdown-body.entry-content.container-lg {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+  /* Ensure the bg fills the padding area, not just the content box. */
+  background-clip: padding-box !important;
+}
+
+/* Row wrapper: subtle accent tint, accent border. */
+tr[class*="DirectoryContent-module__"] > td.bgColor-muted,
+td.bgColor-muted.rounded-top-2,
+tr[class*="DirectoryContent-module__"] td {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 8%,
+    var(--matugen-bg-dark)
+  ) !important;
+  border-color: var(--matugen-accent) !important;
+}
+
+/* Latest commit container — transparent so the td bg shows through. */
+[class*="LatestCommit-module__"] {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Author avatar container — transparent. */
+[class*="AuthorAvatar-module__"] {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Author name link (the hoverable author label). */
+[class*="AuthorAvatar-module__authorHoverableLink"] {
+  color: var(--matugen-fg) !important;
+  font-weight: 600 !important;
+}
+[class*="AuthorAvatar-module__authorHoverableLink"]:hover {
+  color: var(--matugen-accent) !important;
+}
+
+/* Commit attribution container — transparent. */
+[class*="CommitAttribution-module__"] {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Commit message link — accent so it stands out. */
+[data-testid="latest-commit-html"] a,
+[data-testid="latest-commit-html"] a.Link--secondary,
+.Truncate-text a.Link--secondary {
+  color: var(--matugen-accent) !important;
+}
+[data-testid="latest-commit-html"] a:hover,
+[data-testid="latest-commit-html"] a.Link--secondary:hover,
+.Truncate-text a.Link--secondary:hover {
+  color: color-mix(
+    in srgb,
+    var(--matugen-accent) 80%,
+    var(--matugen-fg) 20%
+  ) !important;
+}
+
+/* Commit hash link + date — accent hash, fg-light date. */
+[data-testid="latest-commit-details"] a.Link--secondary,
+[data-testid="latest-commit-details"] a.prc-Link-Link-9ZwDx {
+  color: var(--matugen-accent) !important;
+  font-family: var(--fontStack-monospace, monospace) !important;
+}
+[data-testid="latest-commit-details"] a:hover {
+  color: color-mix(
+    in srgb,
+    var(--matugen-accent) 80%,
+    var(--matugen-fg) 20%
+  ) !important;
+}
+[data-testid="latest-commit-details"] .fgColor-muted,
+[data-testid="latest-commit-details"] relative-time {
+  color: var(--matugen-fg-light) !important;
+}
+
+/* "106 Commits" history link button — accent text on transparent bg. */
+[class*="LinkButton-module__linkButton"],
+[class*="LinkButton-module__linkButton"] span {
+  background-color: transparent !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+}
+[class*="LinkButton-module__linkButton"]:hover,
+[class*="LinkButton-module__linkButton"]:hover span {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    transparent
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+}
+
+/* Icon button (the ellipsis menu on mobile) — transparent. */
+[class*="LatestCommit-module__IconButton"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+}
+[class*="LatestCommit-module__IconButton"]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    transparent
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+}
+
+/* ============================================================
+ * REPO PAGE: FILE TREE (directory listing table)
+ * The table is built with Primer React modules:
+ *   - table.Table-module__Box__HZKiQ
+ *   - tr.react-directory-row
+ *   - td.react-directory-row-name-cell-{small,large}-screen
+ *   - td.react-directory-row-commit-cell
+ * Theme: bg-dark bg with accent borders between rows, accent
+ * file/folder name links, accent commit message links.
+ * ============================================================ */
+
+table[class*="Table-module__"],
+table[class*="Table-module__"] thead,
+table[class*="Table-module__"] tbody {
+  background-color: var(--matugen-bg-dark) !important;
+  border-color: var(--matugen-accent) !important;
+}
+
+tr.react-directory-row {
+  background-color: var(--matugen-bg-dark) !important;
+  border: none !important;
+  border-color: transparent !important;
+}
+tr.react-directory-row:hover,
+tr.react-directory-row:focus-within {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 10%,
+    var(--matugen-bg-dark)
+  ) !important;
+}
+
+td.react-directory-row-name-cell-small-screen,
+td.react-directory-row-name-cell-large-screen,
+td.react-directory-row-commit-cell {
+  background-color: transparent !important;
+  border: none !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Filename column: icon + name wrapper. */
+.react-directory-filename-column,
+.react-directory-filename-cell,
+.react-directory-truncate {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* File/folder name links — accent so they pop. */
+.react-directory-truncate a.Link--primary,
+.react-directory-filename-column a.Link--primary {
+  color: var(--matugen-accent) !important;
+}
+.react-directory-truncate a.Link--primary:hover,
+.react-directory-filename-column a.Link--primary:hover {
+  color: color-mix(
+    in srgb,
+    var(--matugen-accent) 80%,
+    var(--matugen-fg) 20%
+  ) !important;
+}
+
+/* Commit message + age columns. */
+.react-directory-commit-message,
+.react-directory-commit-age {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+}
+/* Override Refined GitHub's heat-map coloring on the <relative-time>
+ * element inside the commit-age cell. RGH sets a color directly on
+ * the relative-time via the data-rgh-heat attribute, so the parent
+ * color rule above doesn't reach it. */
+.react-directory-commit-age relative-time,
+.react-directory-commit-age [data-rgh-heat] {
+  color: var(--matugen-fg-light) !important;
+}
+.react-directory-commit-message a.Link--secondary {
+  color: var(--matugen-accent) !important;
+}
+.react-directory-commit-message a.Link--secondary:hover {
+  color: color-mix(
+    in srgb,
+    var(--matugen-accent) 80%,
+    var(--matugen-fg) 20%
+  ) !important;
+}
+
+/* Folder/file icon SVGs inside the directory row — accent fill. */
+.react-directory-row svg.octicon-file-directory-fill,
+.react-directory-row svg.octicon-file,
+.react-directory-row svg.octicon-file-symlink-file,
+.react-directory-row svg.octicon {
+  fill: var(--matugen-accent) !important;
+  color: var(--matugen-accent) !important;
+}
+
+/* ============================================================
+ * REPO PAGE: FILE PREVIEW (code viewer when a file is opened)
+ * The code viewer uses .blob-wrapper / .blob-num / .blob-code
+ * from Primer CSS, plus Box/Box-header for the file header.
+ * Theme: bg-dark bg with accent borders, accent line numbers.
+ * ============================================================ */
+
+/* The file header (filename + metadata bar at the top of the
+ * code viewer). */
+.Box-header--blue,
+.Box-header.Details--closed,
+[class*="Box-module__BoxHeader"] {
+  background-color: var(--matugen-bg-dark) !important;
+  border-color: var(--matugen-accent) !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Code wrapper (the actual code block area). */
+.blob-wrapper,
+.blob-wrapper-embedded,
+.blob-code,
+.blob-code-inner,
+.blob-num,
+.blob-num-deletion,
+.blob-num-addition,
+.blob-code-deletion,
+.blob-code-addition {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border-color: var(--matugen-accent) !important;
+}
+
+/* Line numbers column — accent to distinguish from code. */
+.blob-num,
+.blob-code-deletion .blob-num,
+.blob-code-addition .blob-num {
+  color: var(--matugen-accent) !important;
+  background-color: var(--matugen-bg-dark) !important;
+}
+
+/* The "Copy" / "Raw" / "Download" buttons in the file header. */
+.Box-header .btn,
+.Box-header [class*="prc-Button-ButtonBase"],
+.Box-header [class*="prc-Button-IconButton"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+}
+.Box-header .btn:hover,
+.Box-header [class*="prc-Button-ButtonBase"]:hover,
+.Box-header [class*="prc-Button-IconButton"]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    transparent
+  ) !important;
+  color: var(--matugen-accent) !important;
+}
+
+/* ============================================================
+ * REPO PAGE: FILE NAVIGATION BAR (README | MIT license tabs +
+ * Edit + Outline buttons on the right)
+ * The outer wrapper is OverviewRepoFiles-module__Box_3 which
+ * contains the UnderlineNav and the two right-side buttons
+ * (edit pencil + outline menu). The nav itself is already
+ * bg-dark via the global UnderlineWrapper rule, but the outer
+ * Box needs the same treatment. The buttons use data-variant=
+ * "invisible" which is already covered globally, but the
+ * OverviewRepoFiles-specific classes get explicit rules to
+ * override any Primer defaults that might bleed through.
+ * ============================================================ */
+
+[class*="OverviewRepoFiles-module__Box_3"] {
+  background-color: var(--matugen-bg-dark) !important;
+  border-color: var(--matugen-accent) !important;
+  color: var(--matugen-fg) !important;
+}
+
+[class*="OverviewRepoFiles-module__UnderlineNav"] {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Edit (pencil) button — transparent, accent on hover. */
+[class*="OverviewRepoFiles-module__editButton"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+[class*="OverviewRepoFiles-module__editButton"]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    transparent
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Outline (list-unordered) menu button — transparent, accent on hover. */
+[class*="OverviewRepoFiles-module__ActionMenu_Button"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+[class*="OverviewRepoFiles-module__ActionMenu_Button"]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    transparent
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* ============================================================
+ * REPO PAGE: HEADER BAR
+ * Branch selector (RefSelector), Branches/Tags count buttons,
+ * Go-to-file search input, Go-to-file button, Add file dropdown,
+ * Agent button, Code (primary) button, Kebab menu.
+ * The invisible-variant buttons (Branches/Tags counts) are
+ * already themed by the global invisible rule. This section
+ * themes the default-variant buttons and the search input.
+ * ============================================================ */
+
+/* OverviewContent module containers — transparent so the page
+ * bg shows through and the section blends. */
+[class*="OverviewContent-module__Box_1"],
+[class*="OverviewContent-module__Box_2"],
+[class*="OverviewContent-module__Box_3"],
+[class*="OverviewContent-module__Box_4"],
+[class*="OverviewContent-module__Box_5"],
+[class*="OverviewContent-module__Box_6"],
+[class*="OverviewContent-module__Box_7"],
+[class*="OverviewContent-module__Box_8"],
+[class*="OverviewContent-module__Box_9"],
+[class*="OverviewContent-module__Box_10"] {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Branch selector button (data-variant="default") — bg-dark, no border. */
+[class*="RefSelectorAnchoredOverlay-module__RefSelectorOverlayBtn"],
+.overview-ref-selector {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+[class*="RefSelectorAnchoredOverlay-module__RefSelectorOverlayBtn"]:hover,
+.overview-ref-selector:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    var(--matugen-bg-dark)
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* RefSelector inner containers — transparent. */
+[class*="RefSelectorAnchoredOverlay-module__RefSelectorOverlayContainer"],
+[class*="RefSelectorAnchoredOverlay-module__RefSelectorOverlayHeader"],
+[class*="RefSelectorAnchoredOverlay-module__RefSelectorBtnTextContainer"],
+[class*="RefSelectorAnchoredOverlay-module__RefSelectorText"] {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Branches/Tags count buttons (data-variant="invisible") — fg
+ * text, accent on hover. Already partly covered by global
+ * invisible rule, but explicit for completeness. */
+[class*="OverviewContent-module__Button___Uotu"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+[class*="OverviewContent-module__Button___Uotu"]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    transparent
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Branches/Tags icon buttons (data-variant="invisible") */
+[class*="OverviewContent-module__Button_1"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+[class*="OverviewContent-module__Button_1"]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    transparent
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Go-to-file search input — bg-dark, no border. */
+[class*="FileResultsList-module__FilesSearchBox"],
+[class*="prc-components-TextInputWrapper-Hpdqi"] {
+  background-color: var(--matugen-bg-dark) !important;
+  border: none !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+[class*="FileResultsList-module__FilesSearchBox"]:focus-within,
+[class*="prc-components-TextInputWrapper-Hpdqi"]:focus-within {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+[class*="prc-components-Input-IwWrt"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+}
+[class*="prc-components-Input-IwWrt"]::placeholder {
+  color: var(--matugen-fg-light) !important;
+}
+.TextInput-icon {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+  fill: var(--matugen-fg-light) !important;
+}
+
+/* Keybinding hint kbd (the "T" badge inside the search input). */
+[class*="prc-KeybindingHint-KeybindingHint"] {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+
+/* Go-to-file button, Add file button, Agent button, Kebab menu
+ * (all data-variant="default") — bg-dark, no border. */
+[class*="OverviewContent-module__Box_9"] button[data-variant="default"],
+button[data-variant="default"][class*="prc-Button-ButtonBase"] {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+[class*="OverviewContent-module__Box_9"] button[data-variant="default"]:hover,
+button[data-variant="default"][class*="prc-Button-ButtonBase"]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    var(--matugen-bg-dark)
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Add file dropdown button text + icon containers — transparent. */
+[class*="AddFileDropdownButton-module__addFileButton"],
+[class*="AddFileDropdownButton-module__addFileIcon"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  fill: var(--matugen-fg) !important;
+}
+
+/* ============================================================
+ * REPO PAGE: REPOSITORY CONTAINER HEADER
+ * The top bar with repo name + Public label on the left and
+ * Pin / Watch / Fork / Star buttons on the right. Also the
+ * description, license, and stats links below.
+ * Theme: page bg (blend), accent-tinted btn-sm buttons,
+ * accent Label for "Public", accent repo name link, accent
+ * description/license/stats links.
+ * ============================================================ */
+
+#repository-container-header {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Repo title area: avatar + name + Public label. */
+#repo-title-component {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+#repo-title-component a.color-fg-default {
+  color: var(--matugen-accent) !important;
+  font-weight: 600 !important;
+}
+#repo-title-component a.color-fg-default:hover {
+  color: color-mix(
+    in srgb,
+    var(--matugen-accent) 80%,
+    var(--matugen-fg) 20%
+  ) !important;
+}
+
+/* "Public" Label — accent bg with bg-dark text. */
+.Label--secondary,
+.Label.Label--secondary,
+#repo-title-component .Label {
+  background-color: var(--matugen-accent) !important;
+  color: var(--matugen-bg-dark) !important;
+  border: 1px solid var(--matugen-accent) !important;
+}
+
+/* pagehead-actions list wrapper. */
+.pagehead-actions {
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+.pagehead-actions li {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Pin / Fork / Star btn-sm buttons — bg-dark, no border. */
+.btn-sm.btn,
+.btn-with-aria-count.btn-sm,
+.BtnGroup-item.btn-sm,
+a.btn-sm.btn,
+button.btn-sm.btn {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+.btn-sm.btn:hover,
+.btn-with-aria-count.btn-sm:hover,
+.BtnGroup-item.btn-sm:hover,
+a.btn-sm.btn:hover,
+button.btn-sm.btn:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    var(--matugen-bg-dark)
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+.btn-sm.btn:disabled,
+.btn-with-aria-count.btn-sm:disabled {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg-light) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg-light) !important;
+  opacity: 0.6 !important;
+}
+
+/* Counter spans inside Star/Fork buttons — fg-light, no own bg. */
+.Counter,
+.Counter.js-social-count,
+#repo-network-counter,
+#repo-stars-counter-star,
+#repo-stars-counter-unstar {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+  border: none !important;
+  font-weight: 600 !important;
+}
+
+/* Watch button (NotificationsSubscriptionsMenu) — bg-dark, no border. */
+[class*="NotificationsSubscriptionsMenu-module__ActionMenuButton"] {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+[class*="NotificationsSubscriptionsMenu-module__ActionMenuButton"]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    var(--matugen-bg-dark)
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* CounterLabel inside Watch button (the "0" badge). */
+[class*="NotificationsSubscriptionsMenu-module__ActionMenuButton"] [class*="prc-CounterLabel-CounterLabel"],
+[data-component="CounterLabel"] {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid var(--matugen-bg-light) !important;
+}
+
+/* Description text below title. */
+.color-fg-muted.f4,
+p.f4.color-fg-muted {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* License link. */
+.Link--muted {
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+}
+.Link--muted:hover {
+  color: var(--matugen-accent) !important;
+}
+
+/* Stats links (stars, forks, watching, branches, tags, activity). */
+ul[aria-label="Repository details"] a.Link--secondary,
+ul[aria-label="Repository details"] a.no-underline {
+  color: var(--matugen-fg) !important;
+  background-color: transparent !important;
+}
+ul[aria-label="Repository details"] a.Link--secondary:hover,
+ul[aria-label="Repository details"] a.no-underline:hover {
+  color: var(--matugen-accent) !important;
+  background-color: transparent !important;
+}
+ul[aria-label="Repository details"] a .color-fg-default,
+ul[aria-label="Repository details"] a strong {
+  color: var(--matugen-accent) !important;
+  font-weight: 600 !important;
+}
+ul[aria-label="Repository details"] a .color-fg-muted {
+  color: var(--matugen-fg-light) !important;
+}
+
+/* "Public repository" label with globe icon. */
+.d-flex.color-fg-muted {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+  fill: var(--matugen-fg-light) !important;
+}
+
+/* Bottom border separator after the header. */
+#repository-container-header + .border-bottom,
+.repository-container-header + .border-bottom,
+div.border-bottom {
+  background-color: var(--matugen-accent) !important;
+  border-color: var(--matugen-accent) !important;
+}
+
+/* Button--secondary icon-only buttons (the triangle-down dropdowns
+ * next to Star/Fork/Watch in the pagehead-actions area). These use
+ * the newer Primer CSS class set, not the legacy .btn-sm. */
+.Button--secondary.Button--small,
+.Button--secondary.Button--medium,
+.Button--iconOnly.Button--secondary {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+.Button--secondary.Button--small:hover,
+.Button--secondary.Button--medium:hover,
+.Button--iconOnly.Button--secondary:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    var(--matugen-bg-dark)
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* ============================================================
+ * REPO PAGE: UNIVERSAL ACTION BUTTONS
+ * Broad catch-all for ALL action buttons in the repo page
+ * header areas: pagehead-actions (Pin, Watch, Fork, Star) and
+ * OverviewContent (branch selector, Go to file, Add file, Agent,
+ * Kebab). Every button that is NOT primary and NOT invisible
+ * gets bg-dark bg with accent border. Hover: accent tint.
+ * ============================================================ */
+
+/* All non-primary, non-invisible buttons in pagehead-actions. */
+.pagehead-actions button:not([data-variant="primary"]):not([data-variant="invisible"]),
+.pagehead-actions summary.btn-sm.btn,
+.pagehead-actions a.btn-sm.btn {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+.pagehead-actions button:not([data-variant="primary"]):not([data-variant="invisible"]):hover,
+.pagehead-actions summary.btn-sm.btn:hover,
+.pagehead-actions a.btn-sm.btn:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    var(--matugen-bg-dark)
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* All non-primary, non-invisible buttons in OverviewContent header. */
+[class*="OverviewContent-module__Box_1"] button:not([data-variant="primary"]):not([data-variant="invisible"]),
+[class*="OverviewContent-module__Box_2"] button:not([data-variant="primary"]):not([data-variant="invisible"]),
+[class*="OverviewContent-module__Box_3"] button:not([data-variant="primary"]):not([data-variant="invisible"]),
+[class*="OverviewContent-module__Box_6"] button:not([data-variant="primary"]):not([data-variant="invisible"]),
+[class*="OverviewContent-module__Box_7"] button:not([data-variant="primary"]):not([data-variant="invisible"]),
+[class*="OverviewContent-module__Box_9"] button:not([data-variant="primary"]):not([data-variant="invisible"]),
+[class*="OverviewContent-module__Box_10"] button:not([data-variant="primary"]):not([data-variant="invisible"]) {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+[class*="OverviewContent-module__Box_1"] button:not([data-variant="primary"]):not([data-variant="invisible"]):hover,
+[class*="OverviewContent-module__Box_2"] button:not([data-variant="primary"]):not([data-variant="invisible"]):hover,
+[class*="OverviewContent-module__Box_3"] button:not([data-variant="primary"]):not([data-variant="invisible"]):hover,
+[class*="OverviewContent-module__Box_6"] button:not([data-variant="primary"]):not([data-variant="invisible"]):hover,
+[class*="OverviewContent-module__Box_7"] button:not([data-variant="primary"]):not([data-variant="invisible"]):hover,
+[class*="OverviewContent-module__Box_9"] button:not([data-variant="primary"]):not([data-variant="invisible"]):hover,
+[class*="OverviewContent-module__Box_10"] button:not([data-variant="primary"]):not([data-variant="invisible"]):hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    var(--matugen-bg-dark)
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* ============================================================
+ * REPO PAGE: PULL REQUESTS / ISSUES LIST
+ * The PR/Issues list page toolbar (Open/Closed/Merged toggle,
+ * Author/Label/Projects/Milestones/Reviews/Assignee/Sort filters,
+ * Mark as/Label/Projects/Milestone/Assign triage buttons) and
+ * the issue rows below.
+ * ============================================================ */
+
+/* Outer Box wrapper. */
+.Box.Box--responsive.hx_Box--firstRowRounded0 {
+  background-color: var(--matugen-bg-dark) !important;
+  border: none !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Box-header (the toolbar at the top). */
+.Box-header#js-issues-toolbar {
+  background-color: var(--matugen-bg-dark) !important;
+  border: none !important;
+  border-bottom: none !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Filter toggle area (Open/Closed/Merged). */
+.table-list-header-toggle.states a.btn-link,
+.table-list-header-toggle a.btn-link {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+  border: none !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg-light) !important;
+}
+.table-list-header-toggle.states a.btn-link:hover,
+.table-list-header-toggle a.btn-link:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    transparent
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+.table-list-header-toggle.states a.btn-link.selected,
+.table-list-header-toggle a.btn-link.selected {
+  background-color: transparent !important;
+  color: var(--matugen-accent) !important;
+  border: none !important;
+  border-bottom: 2px solid var(--matugen-accent) !important;
+  font-weight: 600 !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Filter dropdown buttons (Author, Label, Projects, etc.). */
+.table-list-filters .btn-link,
+.table-list-header-toggle .btn-link,
+#js-issues-toolbar summary.btn-link,
+#js-issues-toolbar .btn-link {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+.table-list-filters .btn-link:hover,
+.table-list-header-toggle .btn-link:hover,
+#js-issues-toolbar summary.btn-link:hover,
+#js-issues-toolbar .btn-link:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    var(--matugen-bg-dark)
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* "Open all" button. */
+.rgh-open-all-conversations.btn-link {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+.rgh-open-all-conversations.btn-link:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    var(--matugen-bg-dark)
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+}
+
+/* Triage area (right side: "0 selected", Mark as, Label, etc.). */
+.table-list-triage {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+}
+.table-list-triage .btn-link,
+.table-list-triage summary.btn-link,
+.table-list-triage .select-menu-button.btn-link {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+.table-list-triage .btn-link:hover,
+.table-list-triage summary.btn-link:hover,
+.table-list-triage .select-menu-button.btn-link:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    var(--matugen-bg-dark)
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Issue/PR rows. */
+.Box-row {
+  background-color: var(--matugen-bg-dark) !important;
+  border: none !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+.Box-row:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 8%,
+    var(--matugen-bg-dark)
+  ) !important;
+}
+
+/* PR/Issue status icons (open/closed/merged). */
+.color-fg-open {
+  fill: var(--matugen-accent) !important;
+  color: var(--matugen-accent) !important;
+}
+.color-fg-closed,
+.color-fg-red {
+  fill: var(--matugen-fg-light) !important;
+  color: var(--matugen-fg-light) !important;
+}
+.color-fg-green {
+  fill: var(--matugen-accent) !important;
+  color: var(--matugen-accent) !important;
+}
+
+/* Issue/PR title link. */
+.Box-row .Link--primary,
+.js-issue-row a.Link--primary {
+  color: var(--matugen-accent) !important;
+  font-weight: 600 !important;
+}
+.Box-row .Link--primary:hover,
+.js-issue-row a.Link--primary:hover {
+  color: color-mix(
+    in srgb,
+    var(--matugen-accent) 80%,
+    var(--matugen-fg) 20%
+  ) !important;
+}
+
+/* "opened by" text and relative-time. */
+.Box-row .opened-by,
+.Box-row .color-fg-muted {
+  color: var(--matugen-fg-light) !important;
+}
+.Box-row .opened-by a.Link--muted {
+  color: var(--matugen-fg) !important;
+}
+.Box-row .opened-by a.Link--muted:hover {
+  color: var(--matugen-accent) !important;
+}
+.Box-row relative-time {
+  color: var(--matugen-fg-light) !important;
+}
+
+/* "Bot" label inside row. */
+.Box-row .Label.Label--secondary,
+.Box-row .Label {
+  background-color: var(--matugen-bg-light) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  border-color: transparent !important;
+}
+
+/* ============================================================
+ * REPO PAGE: ISSUES/PR FILTER SEARCH BAR
+ * The "Search Issues" bar with the filter expression input
+ * (sort:updated-desc is:issue is:open), clear button, and
+ * search submit button. The suggestions dropdown below.
+ * ============================================================ */
+
+/* Outer filter wrapper. */
+[class*="Filter-module__Box_0"] {
+  background-color: transparent !important;
+  border: none !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Filter input wrapper. */
+[class*="FilterInputWrapper-module__Box_1"] {
+  background-color: var(--matugen-bg-dark) !important;
+  border: none !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* The rounded input container (left side). */
+[class*="Filter-module__Box_2"] {
+  background-color: var(--matugen-bg-dark) !important;
+  border: none !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Styled input container (the chip display). */
+[class*="Input-module__Box_0"] {
+  background-color: transparent !important;
+  border: none !important;
+  color: var(--matugen-fg) !important;
+}
+
+/* Filter expression display (sort:updated-desc is:issue is:open).
+ * Must stay inline — these are <span> elements that GitHub
+ * positions for the chip-style filter input. */
+[class*="Input-module__Box_1"] {
+  display: inline !important;
+  background-color: transparent !important;
+  border: none !important;
+  color: var(--matugen-fg) !important;
+  white-space: nowrap !important;
+}
+[class*="Input-module__Box_1"] [data-type="filter-expression"] {
+  display: inline !important;
+  background-color: transparent !important;
+}
+[class*="Input-module__Box_1"] [data-type="filter"] {
+  display: inline !important;
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+}
+[class*="Input-module__Box_1"] [data-type="filter-value"] {
+  display: inline !important;
+  color: var(--matugen-accent) !important;
+  background-color: transparent !important;
+  font-weight: 600 !important;
+}
+[class*="Input-module__Box_1"] .delimiter {
+  display: inline !important;
+  color: var(--matugen-fg-light) !important;
+  background-color: transparent !important;
+}
+
+/* Hidden input content (the actual <input> wrapper). */
+[class*="Input-module__Box_2"] {
+  background-color: transparent !important;
+  border: none !important;
+  color: var(--matugen-fg) !important;
+}
+/* The measurement mirror div (aria-hidden) — GitHub renders
+ * it visibly for width measurement, which collides with the
+ * actual input. Push it off-screen and hide it. */
+[class*="Input-module__Box_3"] {
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  color: var(--matugen-fg) !important;
+}
+[class*="Input-module__Box_4"] {
+  background-color: transparent !important;
+  border: none !important;
+  color: var(--matugen-fg) !important;
+}
+[class*="Input-module__Box_4"]::placeholder {
+  color: var(--matugen-fg-light) !important;
+}
+
+/* Clear button (invisible variant) — transparent, accent on hover. */
+[class*="ClearButton-module__clearButton"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg-light) !important;
+  border: none !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg-light) !important;
+}
+[class*="ClearButton-module__clearButton"]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    transparent
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Search submit button (default variant) — bg-dark, no border. */
+[class*="SubmitButton-module__IconButton_0"],
+[class*="SubmitButton-module__IconButton"] {
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+  border-color: transparent !important;
+  fill: var(--matugen-fg) !important;
+}
+[class*="SubmitButton-module__IconButton_0"]:hover,
+[class*="SubmitButton-module__IconButton"]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    var(--matugen-bg-dark)
+  ) !important;
+  color: var(--matugen-accent) !important;
+  border-color: transparent !important;
+  fill: var(--matugen-accent) !important;
+}
+
+/* Suggestions dropdown (appears when typing). */
+[class*="SuggestionsList-module__Box_1"],
+[class*="SuggestionsList-module__Box_3"] {
+  background-color: var(--matugen-bg-dark) !important;
+  border: none !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+[class*="SuggestionsList-module__ActionList"],
+[class*="SuggestionsList-module__ActionList_0"] {
+  background-color: var(--matugen-bg-dark) !important;
+  border: none !important;
+  border-color: transparent !important;
+  color: var(--matugen-fg) !important;
+}
+[class*="SuggestionsList-module__ActionList"] [class*="prc-ActionList-Item"],
+[class*="SuggestionsList-module__ActionList_0"] [class*="prc-ActionList-Item"] {
+  background-color: transparent !important;
+  color: var(--matugen-fg) !important;
+  border: none !important;
+}
+[class*="SuggestionsList-module__ActionList"] [class*="prc-ActionList-Item"]:hover,
+[class*="SuggestionsList-module__ActionList_0"] [class*="prc-ActionList-Item"]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--matugen-accent) 15%,
+    var(--matugen-bg-dark)
+  ) !important;
+  color: var(--matugen-accent) !important;
+}
+}

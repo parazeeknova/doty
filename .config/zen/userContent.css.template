@@ -196,3 +196,11 @@
   color: var(--matugen-bg-dark) !important;
   outline: 1px solid var(--matugen-accent) !important;
 }
+
+/* ============================================================
+ * GitHub theming has moved to userContent.github.template.
+ * When this CSS is injected via the Matugen JSWindowActor child
+ * as a <style> element, @-moz-document rules are ignored, so
+ * per-site rules live in their own file and the actor child
+ * injects them only when the document hostname matches.
+ * ============================================================ */
