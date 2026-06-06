@@ -37,6 +37,7 @@ install: build
 	cp target/release/recents ../../rofi/scripts/recents
 	cp target/release/sunset ../../rofi/scripts/sunset
 	cp target/release/toggle_glass ../../rofi/scripts/toggle_glass
+	cp target/release/rofi_wrap ../../rofi/scripts/rofi_wrap
 	cp target/release/waybar_toggle ../../waybar/scripts/waybar_toggle
 	cp target/release/tray_count ../../waybar/scripts/tray_count
 	cp target/release/wallpaper_thumb_watcher ../../quickshell/wallpaper_switcher/wallpaper_thumb_watcher

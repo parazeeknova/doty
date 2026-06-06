@@ -109,12 +109,12 @@ hl.bind(mainMod .. " + ALT + H", hl.dsp
 ---     Rofi      ---
 ---------------------
 
-hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("rofi -show drun -mesg 'applications' -placeholder 'search applications'"))
-hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd("rofi -show recents"))
-hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("rofi -show power"))
-hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("rofi -show sunset"))
-hl.bind(mainMod .. " + slash", hl.dsp.exec_cmd("rofi -show ports -mesg 'occupied ports'"))
-hl.bind("XF86Launch3", hl.dsp.exec_cmd("rofi -show profile"))
+hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show drun -mesg 'applications' -placeholder 'search applications'"))
+hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show recents"))
+hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show power"))
+hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show sunset"))
+hl.bind(mainMod .. " + slash", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show ports -mesg 'occupied ports'"))
+hl.bind("XF86Launch3", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show profile"))
 
 ---------------------
 ---   Pyprland    ---
@@ -201,7 +201,7 @@ hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock -c ~/.config/hypr/hyprlock.
 hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprpicker -a -n"))
 
 -- Power menu / Logout
-hl.bind("XF86PowerOff", hl.dsp.exec_cmd("rofi -show power"))
+hl.bind("XF86PowerOff", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show power"))
 hl.bind(mainMod .. " + ALT + E", hl.dsp.exec_cmd(
     "sh -c 'if command -v uwsm >/dev/null 2>&1 && uwsm check; then uwsm stop; else hyprctl dispatch exit; fi'"))
 

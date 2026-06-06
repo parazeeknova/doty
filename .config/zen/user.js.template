@@ -1,7 +1,10 @@
 // Zen profile prefs - managed by wabi theme switcher
 
-// Enables chrome/userChrome.js auto-loading (needed for live-reload watcher)
-user_pref("general.config.sandbox_enabled", false);
+// Enables fx-autoconfig's experimental JSWindowActor support so the
+// matugen-bridge.uc.js @WindowActor directive registers the Matugen
+// child/parent actors. Without this, the bridge has no way to push
+// colors into content processes (Fission safe).
+user_pref("userChromeJS.experimental.enabled", true);
 
 // Enables Browser Toolbox (Ctrl+Shift+Alt+I) for debugging
 user_pref("devtools.chrome.enabled", true);

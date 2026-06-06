@@ -39,6 +39,17 @@ hl.layer_rule({
 })
 
 hl.window_rule({
+    name = "rofi-normal-window",
+    match = {
+        class = "^[Rr]ofi$"
+    },
+    float = true,
+    center = true,
+    no_shadow = true,
+    pin = true
+})
+
+hl.window_rule({
     name = "satty-float",
     match = {
         class = "satty"

@@ -643,16 +643,58 @@ fn main() {
                 );
             }
 
-        let js_src = doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/zen-reload.uc.js");
-        let js_dest = chrome_dir.join("JS").join("zen-reload.uc.js");
+        let js_src = doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/matugen-bridge.uc.js");
+        let js_dest = chrome_dir.join("JS").join("matugen-bridge.uc.js");
         if js_src.exists() {
             let _ = fs::create_dir_all(chrome_dir.join("JS"));
             if fs::copy(&js_src, &js_dest).is_ok() {
                 println!(
-                    "Synced Zen Browser zen-reload.uc.js for {:?}",
+                    "Synced matugen-bridge.uc.js for {:?}",
                     zen_profile.file_name().unwrap_or_default()
                 );
             }
+        }
+
+        let actor_parent_src = doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/Matugen/MatugenParent.sys.mjs");
+        let actor_parent_dest = chrome_dir.join("JS").join("Matugen").join("MatugenParent.sys.mjs");
+        if actor_parent_src.exists() {
+            let _ = fs::create_dir_all(chrome_dir.join("JS").join("Matugen"));
+            let _ = fs::copy(&actor_parent_src, &actor_parent_dest);
+        }
+
+        let actor_child_src = doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/Matugen/MatugenChild.sys.mjs");
+        let actor_child_dest = chrome_dir.join("JS").join("Matugen").join("MatugenChild.sys.mjs");
+        if actor_child_src.exists() {
+            let _ = fs::create_dir_all(chrome_dir.join("JS").join("Matugen"));
+            let _ = fs::copy(&actor_child_src, &actor_child_dest);
+        }
+
+        // Remove legacy files from earlier reload-watcher attempts
+        let _ = fs::remove_file(chrome_dir.join("JS").join("zen-reload.uc.js"));
+        let _ = fs::remove_file(chrome_dir.join("JS").join("zen-reload.uc.js.disabled"));
+        let _ = fs::remove_file(chrome_dir.join("JS").join("zen-reload-frame.js"));
+        let _ = fs::remove_file(chrome_dir.join("userChrome.js"));
+
+        // Write matugen-vars.json — the bridge polls this file and on
+        // mtime change calls Services.prefs.setStringPref for each
+        // matugen.theme.* key, which fires pref observers that push
+        // the new --matugen-* values into chrome + every content tab.
+        let json = serde_json::json!({
+            "bg": vars.get("bg").cloned().unwrap_or_else(|| "#1d2021".into()),
+            "bg-dark": vars.get("bg_dark").cloned().unwrap_or_else(|| "#282828".into()),
+            "bg-light": vars.get("bg_light").cloned().unwrap_or_else(|| "#3c3836".into()),
+            "fg": vars.get("fg").cloned().unwrap_or_else(|| "#ebdbb2".into()),
+            "fg-light": vars.get("fg_light").cloned().unwrap_or_else(|| "#d5c4a1".into()),
+            "accent": vars.get("accent").cloned().unwrap_or_else(|| "#a9b665".into()),
+            "secondary": vars.get("secondary").cloned().unwrap_or_else(|| "#7daea3".into()),
+            "tertiary": vars.get("tertiary").cloned().unwrap_or_else(|| "#d8a657".into()),
+        });
+        let json_dest = chrome_dir.join("matugen-vars.json");
+        if fs::write(&json_dest, serde_json::to_string_pretty(&json).unwrap_or_default()).is_ok() {
+            println!(
+                "Wrote matugen-vars.json for {:?}",
+                zen_profile.file_name().unwrap_or_default()
+            );
         }
 
         // Sync fx-autoconfig utils (chrome.manifest, boot.sys.mjs, etc.)

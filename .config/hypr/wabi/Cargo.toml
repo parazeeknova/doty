@@ -119,3 +119,7 @@ path = "src/bin/rofi/sunset.rs"
 [[bin]]
 name = "toggle_glass"
 path = "src/bin/rofi/toggle_glass.rs"
+
+[[bin]]
+name = "rofi_wrap"
+path = "src/bin/rofi/rofi_wrap.rs"
