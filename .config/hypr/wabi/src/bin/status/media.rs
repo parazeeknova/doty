@@ -28,7 +28,7 @@ struct MediaStatus {
     screenshot_dir: String,
     recording_dir: String,
     assets: Vec<media_db::Asset>,
-    tags: Vec<media_db::TagCount>,
+    history: Vec<media_db::OcrItem>,
     colors: Vec<media_db::PickedColor>,
     monitor_fps: u32,
 }
@@ -97,6 +97,35 @@ fn run() -> i32 {
 
     if args.len() > 1 {
         match args[1].as_str() {
+            "add" => {
+                if args.len() < 4 {
+                    print_error("usage: add <type> <detail>");
+                    return 1;
+                }
+                let conn = match media_db::open() {
+                    Ok(c) => c,
+                    Err(e) => {
+                        print_error(&format!("db open: {e}"));
+                        return 1;
+                    }
+                };
+                if args[2] == "ocr" {
+                    match media_db::add_ocr(&conn, &args[3]) {
+                        Ok(id) => {
+                            trigger_ping();
+                            println!("{}", id);
+                            return 0;
+                        }
+                        Err(e) => {
+                            print_error(&e);
+                            return 1;
+                        }
+                    }
+                } else {
+                    print_error("unknown add type");
+                    return 1;
+                }
+            }
             "add-asset" => {
                 if args.len() < 4 {
                     print_error("usage: add-asset <type> <path>");
@@ -111,6 +140,7 @@ fn run() -> i32 {
                 };
                 match media_db::add_asset(&conn, &args[2], &args[3]) {
                     Ok(id) => {
+                        trigger_ping();
                         println!("{}", id);
                         return 0;
                     }
@@ -119,35 +149,6 @@ fn run() -> i32 {
                         return 1;
                     }
                 }
-            }
-            "set-tags" => {
-                if args.len() < 4 {
-                    print_error("usage: set-tags <asset_id> <csv-tags>");
-                    return 1;
-                }
-                let id: i64 = match args[2].parse() {
-                    Ok(v) => v,
-                    Err(_) => {
-                        print_error("invalid asset id");
-                        return 1;
-                    }
-                };
-                let tags: Vec<String> = args[3]
-                    .split(',')
-                    .map(|s| s.to_string())
-                    .collect();
-                let conn = match media_db::open() {
-                    Ok(c) => c,
-                    Err(e) => {
-                        print_error(&format!("db open: {e}"));
-                        return 1;
-                    }
-                };
-                if let Err(e) = media_db::set_tags(&conn, id, &tags) {
-                    print_error(&e);
-                    return 1;
-                }
-                return 0;
             }
             "remove-asset" => {
                 if args.len() < 3 {
@@ -172,6 +173,37 @@ fn run() -> i32 {
                     print_error(&e);
                     return 1;
                 }
+                trigger_ping();
+                return 0;
+            }
+            "clear-assets" => {
+                let conn = match media_db::open() {
+                    Ok(c) => c,
+                    Err(e) => {
+                        print_error(&format!("db open: {e}"));
+                        return 1;
+                    }
+                };
+                if let Err(e) = media_db::clear_assets(&conn) {
+                    print_error(&e);
+                    return 1;
+                }
+                trigger_ping();
+                return 0;
+            }
+            "clear-ocr" => {
+                let conn = match media_db::open() {
+                    Ok(c) => c,
+                    Err(e) => {
+                        print_error(&format!("db open: {e}"));
+                        return 1;
+                    }
+                };
+                if let Err(e) = media_db::clear_ocr(&conn) {
+                    print_error(&e);
+                    return 1;
+                }
+                trigger_ping();
                 return 0;
             }
             "clear-all" => {
@@ -186,6 +218,7 @@ fn run() -> i32 {
                     print_error(&e);
                     return 1;
                 }
+                trigger_ping();
                 return 0;
             }
             "set-screenshot-dir" => {
@@ -222,6 +255,7 @@ fn run() -> i32 {
                 };
                 match media_db::add_color(&conn, &args[2]) {
                     Ok(id) => {
+                        trigger_ping();
                         println!("{id}");
                         return 0;
                     }
@@ -254,6 +288,7 @@ fn run() -> i32 {
                     print_error(&e);
                     return 1;
                 }
+                trigger_ping();
                 return 0;
             }
             "pick-color" => {
@@ -271,6 +306,7 @@ fn run() -> i32 {
                     print_error(&e);
                     return 1;
                 }
+                trigger_ping();
                 return 0;
             }
             _ => {
@@ -287,12 +323,17 @@ fn run() -> i32 {
             return 1;
         }
     };
-    let _ = media_db::check_deleted(&conn);
+    // Run filesystem check in a background thread to avoid blocking startup
+    std::thread::spawn(|| {
+        if let Ok(conn) = media_db::open() {
+            let _ = media_db::check_deleted(&conn);
+        }
+    });
     let settings = load_settings();
     let is_recording = is_wf_recorder_running();
 
-    let assets = media_db::list_assets(&conn, None, None, 50).unwrap_or_default();
-    let tags = media_db::list_tags(&conn).unwrap_or_default();
+    let assets = media_db::list_assets(&conn, None, 50).unwrap_or_default();
+    let history = media_db::list_ocr(&conn, 50).unwrap_or_default();
     let colors = media_db::list_colors(&conn, 24).unwrap_or_default();
 
     let status = MediaStatus {
@@ -300,7 +341,7 @@ fn run() -> i32 {
         screenshot_dir: settings.screenshot_dir,
         recording_dir: settings.recording_dir,
         assets,
-        tags,
+        history,
         colors,
         monitor_fps: detect_monitor_fps(),
     };
@@ -314,6 +355,18 @@ fn run() -> i32 {
 fn ping_path() -> PathBuf {
     let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
     PathBuf::from(home).join(".config/quickshell/media_popup/ping.txt")
+}
+
+fn trigger_ping() {
+    if let Some(parent) = ping_path().parent() {
+        let _ = fs::create_dir_all(parent);
+    }
+    if let Ok(ts) = SystemTime::now().duration_since(UNIX_EPOCH) {
+        let _ = fs::write(
+            ping_path(),
+            format!("{}.{}\n", ts.as_secs(), ts.subsec_nanos()),
+        );
+    }
 }
 
 fn pick_color() -> i32 {
@@ -355,15 +408,7 @@ fn pick_color() -> i32 {
 
     match media_db::add_color(&conn, &hex) {
         Ok(id) => {
-            if let Some(parent) = ping_path().parent() {
-                let _ = fs::create_dir_all(parent);
-            }
-            if let Ok(ts) = SystemTime::now().duration_since(UNIX_EPOCH) {
-                let _ = fs::write(
-                    ping_path(),
-                    format!("{}.{}\n", ts.as_secs(), ts.subsec_nanos()),
-                );
-            }
+            trigger_ping();
             println!("{id}");
             0
         }

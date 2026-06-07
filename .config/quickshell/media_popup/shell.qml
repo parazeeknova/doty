@@ -836,13 +836,16 @@ Scope {
                                 spacing: 4
                                 visible: !root.isRecording
 
-                                Item {
+                                Rectangle {
                                     width: (parent.width - 4) / 2
-                                    height: 14
+                                    height: 18
+                                    color: flagsAdapter.recordAudio ? "#504945" : theme.bg_light
+                                    border.width: 1
+                                    border.color: flagsAdapter.recordAudio ? "#fe8019" : "#504945"
 
                                     Text {
                                         anchors.centerIn: parent
-                                        text: "System Audio: " + (flagsAdapter.recordAudio ? "ON" : "OFF")
+                                        text: (flagsAdapter.recordAudio ? "󰕾 " : "󰖁 ") + "System Audio"
                                         color: flagsAdapter.recordAudio ? "#fe8019" : "#a89984"
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
@@ -850,18 +853,24 @@ Scope {
 
                                     MouseArea {
                                         anchors.fill: parent
+                                        hoverEnabled: true
+                                        onEntered: parent.border.color = flagsAdapter.recordAudio ? "#fe8019" : theme.accent
+                                        onExited: parent.border.color = flagsAdapter.recordAudio ? "#fe8019" : "#504945"
                                         onClicked: flagsAdapter.recordAudio = !flagsAdapter.recordAudio
                                     }
 
                                 }
 
-                                Item {
+                                Rectangle {
                                     width: (parent.width - 4) / 2
-                                    height: 14
+                                    height: 18
+                                    color: flagsAdapter.recordMic ? "#504945" : theme.bg_light
+                                    border.width: 1
+                                    border.color: flagsAdapter.recordMic ? "#fe8019" : "#504945"
 
                                     Text {
                                         anchors.centerIn: parent
-                                        text: "Microphone: " + (flagsAdapter.recordMic ? "ON" : "OFF")
+                                        text: (flagsAdapter.recordMic ? "󰍬 " : "󰍭 ") + "Microphone"
                                         color: flagsAdapter.recordMic ? "#fe8019" : "#a89984"
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
@@ -869,6 +878,9 @@ Scope {
 
                                     MouseArea {
                                         anchors.fill: parent
+                                        hoverEnabled: true
+                                        onEntered: parent.border.color = flagsAdapter.recordMic ? "#fe8019" : theme.accent
+                                        onExited: parent.border.color = flagsAdapter.recordMic ? "#fe8019" : "#504945"
                                         onClicked: flagsAdapter.recordMic = !flagsAdapter.recordMic
                                     }
 
@@ -994,192 +1006,200 @@ Scope {
 
                             }
 
-                            // Pick Color button
-                            Rectangle {
+                            // COLOR PICKER + HISTORY
+                            Column {
                                 width: parent.width
-                                height: 18
-                                color: theme.bg_light
-                                border.width: 1
-                                border.color: "#504945"
+                                spacing: 3
                                 visible: !root.isRecording
 
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "󰏘 Pick Color"
-                                    color: theme.accent
-                                    font.family: "FiraCode Nerd Font"
-                                    font.pixelSize: 8
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onEntered: parent.border.color = theme.accent
-                                    onExited: parent.border.color = "#504945"
-                                    onClicked: {
-                                        root.requestClose();
-                                        Quickshell.execDetached([root.helperPath, "pick-color"]);
-                                    }
-                                }
-
-                            }
-
-                        }
-
-                        // COLOR HISTORY SECTION
-                        Column {
-                            width: parent.width
-                            spacing: 3
-
-                            RowLayout {
-                                width: parent.width
-                                spacing: 4
-
-                                Text {
-                                    text: "Color History"
-                                    color: "#a89984"
-                                    font.family: "FiraCode Nerd Font"
-                                    font.pixelSize: 8
-                                    font.bold: true
-                                    Layout.alignment: Qt.AlignVCenter
-                                }
-
-                                Item {
-                                    Layout.fillWidth: true
-                                    height: 1
-                                }
-
-                                Item {
-                                    id: refreshBtn
-
-                                    implicitWidth: refreshText.implicitWidth + 6
-                                    implicitHeight: refreshText.implicitHeight + 4
-                                    Layout.alignment: Qt.AlignVCenter
+                                RowLayout {
+                                    width: parent.width
+                                    spacing: 4
 
                                     Text {
-                                        id: refreshText
-
-                                        anchors.centerIn: parent
-                                        text: "↻"
-                                        color: "#928374"
+                                        text: "Color Picker"
+                                        color: "#a89984"
                                         font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 9
+                                        font.pixelSize: 8
+                                        font.bold: true
+                                        Layout.alignment: Qt.AlignVCenter
                                     }
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onEntered: refreshText.color = theme.accent
-                                        onExited: refreshText.color = "#928374"
-                                        onClicked: {
-                                            root.updateStatus();
+                                    Item {
+                                        Layout.fillWidth: true
+                                        height: 1
+                                    }
+
+                                    Item {
+                                        id: refreshBtn
+
+                                        implicitWidth: refreshText.implicitWidth + 6
+                                        implicitHeight: refreshText.implicitHeight + 4
+                                        Layout.alignment: Qt.AlignVCenter
+
+                                        Text {
+                                            id: refreshText
+
+                                            anchors.centerIn: parent
+                                            text: "↻"
+                                            color: "#928374"
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 9
                                         }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onEntered: refreshText.color = theme.accent
+                                            onExited: refreshText.color = "#928374"
+                                            onClicked: {
+                                                root.updateStatus();
+                                            }
+                                        }
+
+                                    }
+
+                                    Item {
+                                        id: clearBtn
+
+                                        visible: root.colors.length > 0
+                                        implicitWidth: clearText.implicitWidth + 6
+                                        implicitHeight: clearText.implicitHeight + 4
+                                        Layout.alignment: Qt.AlignVCenter
+
+                                        Text {
+                                            id: clearText
+
+                                            anchors.centerIn: parent
+                                            text: "clear"
+                                            color: "#928374"
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 7
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onEntered: clearText.color = theme.error
+                                            onExited: clearText.color = "#928374"
+                                            onClicked: {
+                                                Quickshell.execDetached([root.helperPath, "clear-colors"]);
+                                                root.updateStatus();
+                                            }
+                                        }
+
                                     }
 
                                 }
 
-                                Item {
-                                    id: clearBtn
+                                Row {
+                                    width: parent.width
+                                    spacing: 4
 
-                                    visible: root.colors.length > 0
-                                    implicitWidth: clearText.implicitWidth + 6
-                                    implicitHeight: clearText.implicitHeight + 4
-                                    Layout.alignment: Qt.AlignVCenter
-
-                                    Text {
-                                        id: clearText
-
-                                        anchors.centerIn: parent
-                                        text: "clear"
-                                        color: "#928374"
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 7
-                                    }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onEntered: clearText.color = theme.error
-                                        onExited: clearText.color = "#928374"
-                                        onClicked: {
-                                            Quickshell.execDetached([root.helperPath, "clear-colors"]);
-                                            root.updateStatus();
-                                        }
-                                    }
-
-                                }
-
-                            }
-
-                            ListView {
-                                width: parent.width
-                                height: 18
-                                orientation: ListView.Horizontal
-                                spacing: 4
-                                clip: true
-                                interactive: false
-                                model: colorModel
-
-                                delegate: Item {
-                                    id: colorDelegate
-
-                                    required property var modelData
-                                    property string hex: modelData ? modelData.hex : ""
-                                    property int colorId: modelData ? modelData.id : -1
-
-                                    width: 18
-                                    height: 18
-
+                                    // Square Pick Color button
                                     Rectangle {
-                                        id: swatch
-
-                                        anchors.fill: parent
-                                        radius: 2
-                                        color: colorDelegate.hex
+                                        width: 24
+                                        height: 24
+                                        color: theme.bg_light
                                         border.width: 1
                                         border.color: "#504945"
+                                        radius: 2
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "󰏘"
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 12
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onEntered: parent.border.color = theme.accent
+                                            onExited: parent.border.color = "#504945"
+                                            onClicked: {
+                                                root.requestClose();
+                                                Quickshell.execDetached([root.helperPath, "pick-color"]);
+                                            }
+                                        }
+
                                     }
 
-                                    Rectangle {
-                                        id: hoverRing
+                                    // Color history swatches
+                                    ListView {
+                                        width: parent.width - 28
+                                        height: 24
+                                        orientation: ListView.Horizontal
+                                        spacing: 4
+                                        clip: true
+                                        interactive: false
+                                        model: colorModel
 
-                                        anchors.fill: swatch
-                                        anchors.margins: -2
-                                        color: "transparent"
-                                        border.width: 1
-                                        border.color: "transparent"
-                                        radius: 3
-                                    }
+                                        delegate: Item {
+                                            id: colorDelegate
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onEntered: hoverRing.border.color = theme.accent
-                                        onExited: hoverRing.border.color = "transparent"
-                                        onClicked: {
-                                            Quickshell.execDetached(["wl-copy", colorDelegate.hex]);
+                                            required property var modelData
+                                            property string hex: modelData ? modelData.hex : ""
+                                            property int colorId: modelData ? modelData.id : -1
+
+                                            width: 24
+                                            height: 24
+
+                                            Rectangle {
+                                                id: swatch
+
+                                                anchors.fill: parent
+                                                radius: 2
+                                                color: colorDelegate.hex
+                                                border.width: 1
+                                                border.color: "#504945"
+                                            }
+
+                                            Rectangle {
+                                                id: hoverRing
+
+                                                anchors.fill: swatch
+                                                anchors.margins: -2
+                                                color: "transparent"
+                                                border.width: 1
+                                                border.color: "transparent"
+                                                radius: 3
+                                            }
+
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onEntered: hoverRing.border.color = theme.accent
+                                                onExited: hoverRing.border.color = "transparent"
+                                                onClicked: {
+                                                    Quickshell.execDetached(["wl-copy", colorDelegate.hex]);
+                                                }
+                                                onPressAndHold: {
+                                                    Quickshell.execDetached([root.helperPath, "remove-color", String(colorDelegate.colorId)]);
+                                                    root.updateStatus();
+                                                }
+                                            }
+
                                         }
-                                        onPressAndHold: {
-                                            Quickshell.execDetached([root.helperPath, "remove-color", String(colorDelegate.colorId)]);
-                                            root.updateStatus();
-                                        }
+
                                     }
 
                                 }
 
-                            }
+                                Text {
+                                    visible: root.colors.length === 0
+                                    text: "no colors picked yet"
+                                    color: "#928374"
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 7
+                                    font.italic: true
+                                }
 
-                            Text {
-                                visible: root.colors.length === 0
-                                text: "no colors picked yet"
-                                color: "#928374"
-                                font.family: "FiraCode Nerd Font"
-                                font.pixelSize: 7
-                                font.italic: true
                             }
 
                         }
@@ -2236,36 +2256,25 @@ Scope {
 
                                     delegate: Column {
                                         width: parent.width
-                                        spacing: 2
+                                        spacing: 0
 
                                         // Collapsible Header Row
                                         Rectangle {
                                             width: parent.width
                                             height: 18
                                             color: theme.bg_dark
-                                            border.width: 1
-                                            border.color: root.expandedOcrIndex === index ? theme.accent : theme.bg_light
 
                                             Item {
                                                 anchors.fill: parent
-                                                anchors.margins: 2
-
-                                                Text {
-                                                    id: ocrIcon
-
-                                                    text: "󰙎"
-                                                    color: "#fb4934"
-                                                    font.family: "FiraCode Nerd Font"
-                                                    font.pixelSize: 8
-                                                    anchors.left: parent.left
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                }
+                                                anchors.leftMargin: 6
+                                                anchors.rightMargin: 6
+                                                anchors.topMargin: 2
+                                                anchors.bottomMargin: 2
 
                                                 Text {
                                                     id: ocrHeaderVal
 
-                                                    anchors.left: ocrIcon.right
-                                                    anchors.leftMargin: 4
+                                                    anchors.left: parent.left
                                                     anchors.right: ocrArrow.left
                                                     anchors.rightMargin: 4
                                                     text: {
@@ -2310,10 +2319,8 @@ Scope {
                                         // Expanded Text & Copy Row
                                         Rectangle {
                                             width: parent.width
-                                            height: expandedLayout.implicitHeight + 10
-                                            color: theme.bg
-                                            border.width: 1
-                                            border.color: theme.bg_light
+                                            height: expandedLayout.childrenRect.height + 10
+                                            color: theme.bg_dark
                                             visible: root.expandedOcrIndex === index
 
                                             Column {
@@ -2325,14 +2332,47 @@ Scope {
                                                 anchors.margins: 4
                                                 spacing: 4
 
-                                                Text {
+                                                // Subtle separator
+                                                Rectangle {
+                                                    width: parent.width
+                                                    height: 1
+                                                    color: "#504945"
+                                                }
+
+                                                Flickable {
+                                                    id: ocrFlick
+
                                                     anchors.left: parent.left
                                                     anchors.right: parent.right
-                                                    text: modelData.detail
-                                                    color: theme.accent
-                                                    font.family: "FiraCode Nerd Font"
-                                                    font.pixelSize: 8
-                                                    wrapMode: Text.Wrap
+                                                    height: Math.min(ocrContentText.implicitHeight, 80)
+                                                    contentHeight: ocrContentText.implicitHeight
+                                                    clip: true
+                                                    flickableDirection: Flickable.VerticalFlick
+                                                    boundsBehavior: Flickable.StopAtBounds
+
+                                                    Text {
+                                                        id: ocrContentText
+
+                                                        width: ocrFlick.width
+                                                        text: modelData.detail
+                                                        color: theme.accent
+                                                        font.family: "FiraCode Nerd Font"
+                                                        font.pixelSize: 8
+                                                        wrapMode: Text.Wrap
+                                                    }
+
+                                                    ScrollBar.vertical: ScrollBar {
+                                                        policy: ocrFlick.contentHeight > ocrFlick.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                                                        width: 3
+
+                                                        contentItem: Rectangle {
+                                                            radius: 2
+                                                            color: "#928374"
+                                                            opacity: 0.6
+                                                        }
+
+                                                    }
+
                                                 }
 
                                                 // Copy Action Button

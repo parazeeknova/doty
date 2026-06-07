@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name matugen-boosts
 // @description Bridges matugen color JSON to Zen Browser's per-domain Boost system. Watches the palette + per-site CSS files, and on every change updates the matching domain's Zen Boost with the latest customCSS. Replaces the Matugen JSWindowActor + per-site injection that matugen-bridge.uc.js used to do — Zen's built-in ZenBoostsChild actor handles the content-process side now.
-// @author doty
+// @author parazeeknova
 // @version 1.5
 // @ignorecache
 // ==/UserScript==
@@ -90,25 +90,30 @@ function _logFile() {
 }
 function _appendLog(level, msg) {
   const line = `[matugen-boosts] [${level}] ${msg}\n`;
-  try { console.log(line); } catch (e) {}
+  try {
+    console.log(line);
+  } catch (e) {}
   try {
     const p = _logFile();
     if (p) {
       const file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
       file.initWithPath(p);
-      const foStream = Cc["@mozilla.org/network/file-output-stream;1"]
-        .createInstance(Ci.nsIFileOutputStream);
+      const foStream = Cc[
+        "@mozilla.org/network/file-output-stream;1"
+      ].createInstance(Ci.nsIFileOutputStream);
       foStream.init(file, 0x02 | 0x08 | 0x10, 0o644, 0);
       foStream.write(line, line.length);
       foStream.flush();
       foStream.close();
     }
   } catch (e) {
-    try { console.log("[matugen-boosts] log write failed: " + e); } catch (e2) {}
+    try {
+      console.log("[matugen-boosts] log write failed: " + e);
+    } catch (e2) {}
   }
 }
-const logInfo  = (m) => _appendLog("INFO",  m);
-const logWarn  = (m) => _appendLog("WARN",  m);
+const logInfo = (m) => _appendLog("INFO", m);
+const logWarn = (m) => _appendLog("WARN", m);
 const logError = (m) => _appendLog("ERROR", m);
 
 logInfo("SCRIPT TOP — version 1.5 (Zen Boosts bridge)");
@@ -119,13 +124,19 @@ logInfo("SCRIPT TOP — version 1.5 (Zen Boosts bridge)");
 
 function readFile(file) {
   try {
-    const fstream = Cc["@mozilla.org/network/file-input-stream;1"]
-      .createInstance(Ci.nsIFileInputStream);
+    const fstream = Cc[
+      "@mozilla.org/network/file-input-stream;1"
+    ].createInstance(Ci.nsIFileInputStream);
     fstream.init(file, -1, 0, 0);
-    const converter = Cc["@mozilla.org/intl/converter-input-stream;1"]
-      .createInstance(Ci.nsIConverterInputStream);
-    converter.init(fstream, "utf-8", 4096,
-      Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
+    const converter = Cc[
+      "@mozilla.org/intl/converter-input-stream;1"
+    ].createInstance(Ci.nsIConverterInputStream);
+    converter.init(
+      fstream,
+      "utf-8",
+      4096,
+      Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER,
+    );
     let str = "";
     let chunk = {};
     while (converter.readString(4096, chunk)) {
@@ -231,7 +242,7 @@ function applyJson(data) {
 async function loadBoostsManager() {
   try {
     const mod = await ChromeUtils.importESModule(
-      "resource:///modules/zen/boosts/ZenBoostsManager.sys.mjs"
+      "resource:///modules/zen/boosts/ZenBoostsManager.sys.mjs",
     );
     return mod.gZenBoostsManager;
   } catch (e) {
@@ -285,7 +296,9 @@ function updateBoostForDomain(domain, css) {
 
   try {
     boostsManager.updateBoost(boost);
-    logInfo(`Updated boost[${domain}]: id=${boost.id} customCSS=${css.length}B enableColorBoost=${boostData.enableColorBoost}`);
+    logInfo(
+      `Updated boost[${domain}]: id=${boost.id} customCSS=${css.length}B enableColorBoost=${boostData.enableColorBoost}`,
+    );
   } catch (e) {
     logError(`updateBoost(${domain}): ${e.message}`);
   }

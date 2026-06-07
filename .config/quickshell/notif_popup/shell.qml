@@ -349,8 +349,10 @@ Scope {
 
                 Rectangle {
                     id: popupBg
+
                     property string hoveredButtonName: ""
                     property var hoveredButton: null
+
                     anchors.fill: parent
                     opacity: win.animOpacity
                     color: theme.popupBgColor
@@ -366,6 +368,17 @@ Scope {
                     }
                     Component.onCompleted: {
                         forceActiveFocus();
+                    }
+
+                    Timer {
+                        id: tooltipHideTimer
+
+                        interval: 120
+                        repeat: false
+                        onTriggered: {
+                            popupBg.hoveredButtonName = "";
+                            popupBg.hoveredButton = null;
+                        }
                     }
 
                     Column {
@@ -925,131 +938,127 @@ Scope {
                                 height: root.historyExpanded ? historyContent.implicitHeight : 0
                                 clip: true
 
-                                Behavior on height {
-                                    NumberAnimation {
-                                        duration: 180
-                                        easing.type: Easing.InOutQuad
-                                    }
-                                }
-
                                 Column {
                                     id: historyContent
+
                                     width: parent.width
                                     spacing: 6
 
-                                Text {
-                                    text: "No history"
-                                    color: theme.accent
-                                    font.family: "FiraCode Nerd Font"
-                                    font.pixelSize: 8
-                                    opacity: 0.4
-                                    renderType: Text.NativeRendering
-                                    visible: root.historyNotifs.length === 0
-                                }
+                                    Text {
+                                        text: "No history"
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        opacity: 0.4
+                                        renderType: Text.NativeRendering
+                                        visible: root.historyNotifs.length === 0
+                                    }
 
-                                Repeater {
-                                    model: root.historyNotifs
+                                    Repeater {
+                                        model: root.historyNotifs
 
-                                    delegate: Rectangle {
-                                        width: parent.width
-                                        height: histBoxCol.implicitHeight + 10
-                                        color: theme.bg
-                                        border.width: 0
+                                        delegate: Rectangle {
+                                            width: parent.width
+                                            height: histBoxCol.implicitHeight + 10
+                                            color: theme.bg
+                                            border.width: 0
 
-                                        Column {
-                                            id: histBoxCol
+                                            Column {
+                                                id: histBoxCol
 
-                                            anchors.top: parent.top
-                                            anchors.left: parent.left
-                                            anchors.right: parent.right
-                                            anchors.margins: 5
-                                            spacing: 4
+                                                anchors.top: parent.top
+                                                anchors.left: parent.left
+                                                anchors.right: parent.right
+                                                anchors.margins: 5
+                                                spacing: 4
 
-                                            Row {
-                                                width: parent.width
-                                                spacing: 8
+                                                Row {
+                                                    width: parent.width
+                                                    spacing: 8
 
-                                                // App Icon
-                                                Rectangle {
-                                                    width: 20
-                                                    height: 20
-                                                    color: "transparent"
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                    visible: modelData.app_icon !== ""
+                                                    // App Icon
+                                                    Rectangle {
+                                                        width: 20
+                                                        height: 20
+                                                        color: "transparent"
+                                                        anchors.verticalCenter: parent.verticalCenter
+                                                        visible: modelData.app_icon !== ""
 
-                                                    Image {
-                                                        anchors.fill: parent
-                                                        source: modelData.app_icon.startsWith("/") ? ("file://" + modelData.app_icon) : ("image://icon/" + modelData.app_icon)
-                                                        fillMode: Image.PreserveAspectFit
-                                                        asynchronous: true
+                                                        Image {
+                                                            anchors.fill: parent
+                                                            source: modelData.app_icon.startsWith("/") ? ("file://" + modelData.app_icon) : ("image://icon/" + modelData.app_icon)
+                                                            fillMode: Image.PreserveAspectFit
+                                                            asynchronous: true
+                                                        }
+
+                                                    }
+
+                                                    Column {
+                                                        width: parent.width - (modelData.app_icon !== "" ? 28 : 0)
+                                                        spacing: 2
+                                                        anchors.verticalCenter: parent.verticalCenter
+
+                                                        Text {
+                                                            text: modelData.summary
+                                                            color: theme.accent
+                                                            font.family: "FiraCode Nerd Font"
+                                                            font.pixelSize: 8
+                                                            font.bold: true
+                                                            elide: Text.ElideRight
+                                                            width: parent.width
+                                                            renderType: Text.NativeRendering
+                                                        }
+
                                                     }
 
                                                 }
 
+                                                // Description Box
                                                 Column {
-                                                    width: parent.width - (modelData.app_icon !== "" ? 28 : 0)
+                                                    width: parent.width
                                                     spacing: 2
-                                                    anchors.verticalCenter: parent.verticalCenter
 
                                                     Text {
-                                                        text: modelData.summary
+                                                        id: histDescText
+
+                                                        text: modelData.body
                                                         color: theme.accent
                                                         font.family: "FiraCode Nerd Font"
                                                         font.pixelSize: 8
-                                                        font.bold: true
-                                                        elide: Text.ElideRight
+                                                        wrapMode: Text.Wrap
                                                         width: parent.width
+                                                        elide: root.expandedNotifIds[modelData.id + "_hist"] ? Text.ElideNone : Text.ElideRight
+                                                        maximumLineCount: root.expandedNotifIds[modelData.id + "_hist"] ? 99 : 1
                                                         renderType: Text.NativeRendering
                                                     }
 
-                                                }
+                                                    Item {
+                                                        width: parent.width
+                                                        height: 10
+                                                        visible: modelData.body.length > 60 || modelData.body.includes("\n")
 
-                                            }
+                                                        Text {
+                                                            id: histShowMoreBtn
 
-                                            // Description Box
-                                            Column {
-                                                width: parent.width
-                                                spacing: 2
+                                                            anchors.right: parent.right
+                                                            anchors.verticalCenter: parent.verticalCenter
+                                                            text: root.expandedNotifIds[modelData.id + "_hist"] ? "show less" : "show more"
+                                                            color: theme.accent
+                                                            font.family: "FiraCode Nerd Font"
+                                                            font.pixelSize: 7
+                                                            font.bold: true
+                                                            renderType: Text.NativeRendering
 
-                                                Text {
-                                                    id: histDescText
-
-                                                    text: modelData.body
-                                                    color: theme.accent
-                                                    font.family: "FiraCode Nerd Font"
-                                                    font.pixelSize: 8
-                                                    wrapMode: Text.Wrap
-                                                    width: parent.width
-                                                    elide: root.expandedNotifIds[modelData.id + "_hist"] ? Text.ElideNone : Text.ElideRight
-                                                    maximumLineCount: root.expandedNotifIds[modelData.id + "_hist"] ? 99 : 1
-                                                    renderType: Text.NativeRendering
-                                                }
-
-                                                Item {
-                                                    width: parent.width
-                                                    height: 10
-                                                    visible: modelData.body.length > 60 || modelData.body.includes("\n")
-
-                                                    Text {
-                                                        id: histShowMoreBtn
-
-                                                        anchors.right: parent.right
-                                                        anchors.verticalCenter: parent.verticalCenter
-                                                        text: root.expandedNotifIds[modelData.id + "_hist"] ? "show less" : "show more"
-                                                        color: theme.accent
-                                                        font.family: "FiraCode Nerd Font"
-                                                        font.pixelSize: 7
-                                                        font.bold: true
-                                                        renderType: Text.NativeRendering
-
-                                                        MouseArea {
-                                                            anchors.fill: parent
-                                                            onClicked: {
-                                                                var copy = Object.assign({
-                                                                }, root.expandedNotifIds);
-                                                                copy[modelData.id + "_hist"] = !copy[modelData.id + "_hist"];
-                                                                root.expandedNotifIds = copy;
+                                                            MouseArea {
+                                                                anchors.fill: parent
+                                                                onClicked: {
+                                                                    var copy = Object.assign({
+                                                                    }, root.expandedNotifIds);
+                                                                    copy[modelData.id + "_hist"] = !copy[modelData.id + "_hist"];
+                                                                    root.expandedNotifIds = copy;
+                                                                }
                                                             }
+
                                                         }
 
                                                     }
@@ -1064,7 +1073,13 @@ Scope {
 
                                 }
 
-                            }
+                                Behavior on height {
+                                    NumberAnimation {
+                                        duration: 180
+                                        easing.type: Easing.InOutQuad
+                                    }
+
+                                }
 
                             }
 
@@ -1100,14 +1115,14 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
+                                        tooltipHideTimer.stop();
                                         popupBg.hoveredButtonName = "Volume (SUPER+SHIFT+M)";
                                         popupBg.hoveredButton = parent;
-                                        btnVol.color = theme.accent;
+                                        btnVol.opacity = 0.7;
                                     }
                                     onExited: {
-                                        popupBg.hoveredButtonName = "";
-                                        popupBg.hoveredButton = null;
-                                        btnVol.color = theme.accent;
+                                        tooltipHideTimer.restart();
+                                        btnVol.opacity = 1;
                                     }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "volume_popup"]);
@@ -1137,14 +1152,14 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
+                                        tooltipHideTimer.stop();
                                         popupBg.hoveredButtonName = "Network (SUPER+SHIFT+W)";
                                         popupBg.hoveredButton = parent;
-                                        btnNet.color = theme.accent;
+                                        btnNet.opacity = 0.7;
                                     }
                                     onExited: {
-                                        popupBg.hoveredButtonName = "";
-                                        popupBg.hoveredButton = null;
-                                        btnNet.color = theme.accent;
+                                        tooltipHideTimer.restart();
+                                        btnNet.opacity = 1;
                                     }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "network_popup"]);
@@ -1174,14 +1189,14 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
+                                        tooltipHideTimer.stop();
                                         popupBg.hoveredButtonName = "Bluetooth (SUPER+SHIFT+F)";
                                         popupBg.hoveredButton = parent;
-                                        btnBt.color = theme.accent;
+                                        btnBt.opacity = 0.7;
                                     }
                                     onExited: {
-                                        popupBg.hoveredButtonName = "";
-                                        popupBg.hoveredButton = null;
-                                        btnBt.color = theme.accent;
+                                        tooltipHideTimer.restart();
+                                        btnBt.opacity = 1;
                                     }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "bluetooth_popup"]);
@@ -1211,14 +1226,14 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
+                                        tooltipHideTimer.stop();
                                         popupBg.hoveredButtonName = "Brightness (SUPER+SHIFT+B)";
                                         popupBg.hoveredButton = parent;
-                                        btnBright.color = theme.accent;
+                                        btnBright.opacity = 0.7;
                                     }
                                     onExited: {
-                                        popupBg.hoveredButtonName = "";
-                                        popupBg.hoveredButton = null;
-                                        btnBright.color = theme.accent;
+                                        tooltipHideTimer.restart();
+                                        btnBright.opacity = 1;
                                     }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "brightness_popup"]);
@@ -1248,14 +1263,14 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
+                                        tooltipHideTimer.stop();
                                         popupBg.hoveredButtonName = "Battery";
                                         popupBg.hoveredButton = parent;
-                                        btnBat.color = theme.accent;
+                                        btnBat.opacity = 0.7;
                                     }
                                     onExited: {
-                                        popupBg.hoveredButtonName = "";
-                                        popupBg.hoveredButton = null;
-                                        btnBat.color = theme.accent;
+                                        tooltipHideTimer.restart();
+                                        btnBat.opacity = 1;
                                     }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "battery_popup"]);
@@ -1285,14 +1300,14 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
+                                        tooltipHideTimer.stop();
                                         popupBg.hoveredButtonName = "System Monitor";
                                         popupBg.hoveredButton = parent;
-                                        btnSysmon.color = theme.accent;
+                                        btnSysmon.opacity = 0.7;
                                     }
                                     onExited: {
-                                        popupBg.hoveredButtonName = "";
-                                        popupBg.hoveredButton = null;
-                                        btnSysmon.color = theme.accent;
+                                        tooltipHideTimer.restart();
+                                        btnSysmon.opacity = 1;
                                     }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "sysmon_popup"]);
@@ -1327,14 +1342,14 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
+                                        tooltipHideTimer.stop();
                                         popupBg.hoveredButtonName = "Podman (SUPER+ALT+/)";
                                         popupBg.hoveredButton = parent;
-                                        btnPodman.color = theme.accent;
+                                        btnPodman.opacity = 0.7;
                                     }
                                     onExited: {
-                                        popupBg.hoveredButtonName = "";
-                                        popupBg.hoveredButton = null;
-                                        btnPodman.color = theme.accent;
+                                        tooltipHideTimer.restart();
+                                        btnPodman.opacity = 1;
                                     }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "podman_popup"]);
@@ -1364,14 +1379,14 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
+                                        tooltipHideTimer.stop();
                                         popupBg.hoveredButtonName = "Emoji (SUPER+,)";
                                         popupBg.hoveredButton = parent;
-                                        btnEmoji.color = theme.accent;
+                                        btnEmoji.opacity = 0.7;
                                     }
                                     onExited: {
-                                        popupBg.hoveredButtonName = "";
-                                        popupBg.hoveredButton = null;
-                                        btnEmoji.color = theme.accent;
+                                        tooltipHideTimer.restart();
+                                        btnEmoji.opacity = 1;
                                     }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "emoji_popup"]);
@@ -1401,14 +1416,14 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
+                                        tooltipHideTimer.stop();
                                         popupBg.hoveredButtonName = "Media (SUPER+SHIFT+G)";
                                         popupBg.hoveredButton = parent;
-                                        btnOcr.color = theme.accent;
+                                        btnOcr.opacity = 0.7;
                                     }
                                     onExited: {
-                                        popupBg.hoveredButtonName = "";
-                                        popupBg.hoveredButton = null;
-                                        btnOcr.color = theme.accent;
+                                        tooltipHideTimer.restart();
+                                        btnOcr.opacity = 1;
                                     }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "media_popup"]);
@@ -1438,14 +1453,14 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
+                                        tooltipHideTimer.stop();
                                         popupBg.hoveredButtonName = "Virtual Machine (SUPER+SHIFT+V)";
                                         popupBg.hoveredButton = parent;
-                                        btnVmm.color = theme.accent;
+                                        btnVmm.opacity = 0.7;
                                     }
                                     onExited: {
-                                        popupBg.hoveredButtonName = "";
-                                        popupBg.hoveredButton = null;
-                                        btnVmm.color = theme.accent;
+                                        tooltipHideTimer.restart();
+                                        btnVmm.opacity = 1;
                                     }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "vm_popup"]);
@@ -1456,41 +1471,41 @@ Scope {
                             }
 
                             // Colorscheme Button
-                             Item {
-                                 width: parent.width / 6
-                                 height: 14
+                            Item {
+                                width: parent.width / 6
+                                height: 14
 
-                                 Text {
-                                     id: btnColorscheme
+                                Text {
+                                    id: btnColorscheme
 
-                                     anchors.centerIn: parent
-                                     text: ""
-                                     color: theme.accent
-                                     font.family: "FiraCode Nerd Font"
-                                     font.pixelSize: 12
-                                     renderType: Text.NativeRendering
-                                 }
+                                    anchors.centerIn: parent
+                                    text: ""
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 12
+                                    renderType: Text.NativeRendering
+                                }
 
-                                 MouseArea {
-                                     anchors.fill: parent
-                                     hoverEnabled: true
-                                     onEntered: {
-                                         popupBg.hoveredButtonName = "Colorscheme (SUPER+ALT+C)";
-                                         popupBg.hoveredButton = parent;
-                                         btnColorscheme.opacity = 0.7;
-                                     }
-                                     onExited: {
-                                         popupBg.hoveredButtonName = "";
-                                         popupBg.hoveredButton = null;
-                                         btnColorscheme.opacity = 1;
-                                     }
-                                     onClicked: {
-                                         Quickshell.execDetached(["quickshell", "--config", "colorscheme_popup"]);
-                                         win.closePopup();
-                                     }
-                                 }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onEntered: {
+                                        tooltipHideTimer.stop();
+                                        popupBg.hoveredButtonName = "Colorscheme (SUPER+ALT+C)";
+                                        popupBg.hoveredButton = parent;
+                                        btnColorscheme.opacity = 0.7;
+                                    }
+                                    onExited: {
+                                        tooltipHideTimer.restart();
+                                        btnColorscheme.opacity = 1;
+                                    }
+                                    onClicked: {
+                                        Quickshell.execDetached(["quickshell", "--config", "colorscheme_popup"]);
+                                        win.closePopup();
+                                    }
+                                }
 
-                             }
+                            }
 
                             // Wallpaper Switcher Button
                             Item {
@@ -1512,14 +1527,14 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
+                                        tooltipHideTimer.stop();
                                         popupBg.hoveredButtonName = "Wallpaper (SUPER+ALT+W)";
                                         popupBg.hoveredButton = parent;
-                                        btnWallpaper.color = theme.accent;
+                                        btnWallpaper.opacity = 0.7;
                                     }
                                     onExited: {
-                                        popupBg.hoveredButtonName = "";
-                                        popupBg.hoveredButton = null;
-                                        btnWallpaper.color = theme.accent;
+                                        tooltipHideTimer.restart();
+                                        btnWallpaper.opacity = 1;
                                     }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "wallpaper_switcher"]);
@@ -1754,8 +1769,9 @@ Scope {
                     // Custom Tooltip Overlay for bottom buttons
                     Rectangle {
                         id: btnTooltip
+
                         visible: opacity > 0
-                        opacity: popupBg.hoveredButtonName !== "" ? 1.0 : 0.0
+                        opacity: popupBg.hoveredButtonName !== "" ? 1 : 0
                         z: 100000
                         x: popupBg.hoveredButton ? Math.min(Math.max(popupBg.hoveredButton.mapToItem(popupBg, 0, 0).x + (popupBg.hoveredButton.width - width) / 2, 8), popupBg.width - width - 8) : 0
                         y: popupBg.hoveredButton ? (popupBg.hoveredButton.mapToItem(popupBg, 0, 0).y - height - 6) : 0
@@ -1766,12 +1782,9 @@ Scope {
                         border.color: theme.accent
                         radius: 2
 
-                        Behavior on opacity {
-                            NumberAnimation { duration: 100 }
-                        }
-
                         Text {
                             id: tooltipText
+
                             text: popupBg.hoveredButtonName
                             color: theme.accent
                             font.pixelSize: 9
@@ -1780,6 +1793,14 @@ Scope {
                             anchors.centerIn: parent
                             renderType: Text.NativeRendering
                         }
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: 100
+                            }
+
+                        }
+
                     }
 
                 }

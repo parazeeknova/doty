@@ -52,13 +52,15 @@ pub struct Asset {
     pub width: Option<i32>,
     pub height: Option<i32>,
     pub duration_ms: Option<i32>,
-    pub tags: Vec<String>,
 }
 
 #[derive(Serialize, Clone, Debug)]
-pub struct TagCount {
-    pub name: String,
-    pub count: i64,
+pub struct OcrItem {
+    pub id: i64,
+    #[serde(rename = "type")]
+    pub item_type: String,
+    pub detail: String,
+    pub created_at: i64,
 }
 
 pub fn cache_dir() -> PathBuf {
@@ -129,23 +131,19 @@ fn init_schema(conn: &Connection) -> Result<(), rusqlite::Error> {
             height          INTEGER,
             duration_ms     INTEGER
         );
-        CREATE TABLE IF NOT EXISTS tags (
-            id    INTEGER PRIMARY KEY AUTOINCREMENT,
-            name  TEXT    NOT NULL UNIQUE COLLATE NOCASE
-        );
-        CREATE TABLE IF NOT EXISTS asset_tags (
-            asset_id INTEGER NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
-            tag_id   INTEGER NOT NULL REFERENCES tags(id)   ON DELETE CASCADE,
-            PRIMARY KEY (asset_id, tag_id)
-        );
         CREATE TABLE IF NOT EXISTS colors (
             id         INTEGER PRIMARY KEY AUTOINCREMENT,
             hex        TEXT    NOT NULL,
             picked_at  INTEGER NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS ocr_history (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            detail      TEXT    NOT NULL,
+            created_at  INTEGER NOT NULL
+        );
         CREATE INDEX IF NOT EXISTS idx_assets_created_at ON assets(created_at DESC);
-        CREATE INDEX IF NOT EXISTS idx_asset_tags_tag    ON asset_tags(tag_id);
         CREATE INDEX IF NOT EXISTS idx_colors_picked_at  ON colors(picked_at DESC);
+        CREATE INDEX IF NOT EXISTS idx_ocr_created_at ON ocr_history(created_at DESC);
         "#,
     )?;
 
@@ -352,44 +350,6 @@ fn ensure_thumbnail(source: &Path, id: i64, asset_type: AssetType) {
     }
 }
 
-pub fn set_tags(conn: &Connection, asset_id: i64, tags: &[String]) -> Result<(), String> {
-    let mut seen = std::collections::HashSet::new();
-    let mut normalized: Vec<String> = Vec::new();
-    for t in tags {
-        let trimmed = t.trim();
-        if trimmed.is_empty() {
-            continue;
-        }
-        let key = trimmed.to_ascii_lowercase();
-        if seen.insert(key) {
-            normalized.push(trimmed.to_string());
-        }
-    }
-
-    let tx = conn.unchecked_transaction().map_err(|e| e.to_string())?;
-    for name in &normalized {
-        tx.execute(
-            "INSERT OR IGNORE INTO tags (name) VALUES (?1)",
-            params![name],
-        )
-        .map_err(|e| e.to_string())?;
-    }
-    tx.execute(
-        "DELETE FROM asset_tags WHERE asset_id = ?1",
-        params![asset_id],
-    )
-    .map_err(|e| e.to_string())?;
-    for name in &normalized {
-        tx.execute(
-            "INSERT INTO asset_tags (asset_id, tag_id) SELECT ?1, id FROM tags WHERE name = ?2 COLLATE NOCASE",
-            params![asset_id, name],
-        )
-        .map_err(|e| e.to_string())?;
-    }
-    tx.commit().map_err(|e| e.to_string())?;
-    Ok(())
-}
-
 pub fn remove_asset(conn: &Connection, asset_id: i64) -> Result<(), String> {
     let thumb: Option<String> = conn
         .query_row(
@@ -410,7 +370,7 @@ pub fn remove_asset(conn: &Connection, asset_id: i64) -> Result<(), String> {
     Ok(())
 }
 
-pub fn clear_all(conn: &Connection) -> Result<(), String> {
+pub fn clear_assets(conn: &Connection) -> Result<(), String> {
     let mut stmt = conn
         .prepare("SELECT thumbnail_path FROM assets")
         .map_err(|e| e.to_string())?;
@@ -428,8 +388,12 @@ pub fn clear_all(conn: &Connection) -> Result<(), String> {
     }
     conn.execute("DELETE FROM assets", [])
         .map_err(|e| e.to_string())?;
-    conn.execute("DELETE FROM tags", [])
-        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+pub fn clear_all(conn: &Connection) -> Result<(), String> {
+    clear_assets(conn)?;
+    clear_ocr(conn)?;
     Ok(())
 }
 
@@ -466,7 +430,6 @@ pub fn check_deleted(conn: &Connection) -> Result<(), String> {
 pub fn list_assets(
     conn: &Connection,
     search: Option<&str>,
-    active_tag: Option<&str>,
     limit: i64,
 ) -> Result<Vec<Asset>, String> {
     let mut sql = String::from(
@@ -476,17 +439,10 @@ pub fn list_assets(
     let mut conditions: Vec<String> = Vec::new();
     let mut binds: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
 
-    if let Some(tag) = active_tag.filter(|t| !t.is_empty()) {
-        sql.push_str(
-            " JOIN asset_tags at ON at.asset_id = a.id \
-              JOIN tags t ON t.id = at.tag_id AND t.name = ?1 COLLATE NOCASE",
-        );
-        binds.push(Box::new(tag.to_string()));
-    }
     if let Some(s) = search.filter(|s| !s.is_empty()) {
         let idx = binds.len() + 1;
         conditions.push(format!(
-            "(a.source_path LIKE ?{idx} ESCAPE '\\' OR EXISTS (SELECT 1 FROM asset_tags at2 JOIN tags t2 ON t2.id = at2.tag_id WHERE at2.asset_id = a.id AND t2.name LIKE ?{idx} ESCAPE '\\'))"
+            "a.source_path LIKE ?{idx} ESCAPE '\\'"
         ));
         let pattern = format!("%{}%", s.replace('\\', "\\\\").replace('%', "\\%").replace('_', "\\_"));
         binds.push(Box::new(pattern));
@@ -528,10 +484,10 @@ pub fn list_assets(
     for row in asset_iter {
         let (id, asset_type, source_path, thumbnail_path, created_at, deleted_at, file_size, width, height, duration_ms) =
             row.map_err(|e| e.to_string())?;
-        let mut asset = Asset {
+        let asset = Asset {
             id,
             asset_type,
-            source_path: source_path.clone(),
+            source_path,
             thumbnail_path,
             created_at,
             deleted: deleted_at.is_some(),
@@ -539,43 +495,10 @@ pub fn list_assets(
             width,
             height,
             duration_ms,
-            tags: Vec::new(),
         };
-        let mut tag_stmt = conn
-            .prepare(
-                "SELECT t.name FROM tags t JOIN asset_tags at ON at.tag_id = t.id WHERE at.asset_id = ?1 ORDER BY t.name",
-            )
-            .map_err(|e| e.to_string())?;
-        let tag_iter = tag_stmt
-            .query_map(params![id], |r| r.get::<_, String>(0))
-            .map_err(|e| e.to_string())?;
-        for t in tag_iter.flatten() {
-            asset.tags.push(t);
-        }
         assets.push(asset);
     }
     Ok(assets)
-}
-
-pub fn list_tags(conn: &Connection) -> Result<Vec<TagCount>, String> {
-    let mut stmt = conn
-        .prepare(
-            "SELECT t.name, COUNT(at.asset_id) AS cnt FROM tags t \
-             LEFT JOIN asset_tags at ON at.tag_id = t.id \
-             GROUP BY t.id \
-             HAVING cnt > 0 \
-             ORDER BY cnt DESC, t.name ASC",
-        )
-        .map_err(|e| e.to_string())?;
-    let iter = stmt
-        .query_map([], |r| {
-            Ok(TagCount {
-                name: r.get(0)?,
-                count: r.get(1)?,
-            })
-        })
-        .map_err(|e| e.to_string())?;
-    Ok(iter.flatten().collect())
 }
 
 #[derive(Serialize, Clone, Debug)]
@@ -631,4 +554,39 @@ pub fn list_colors(conn: &Connection, limit: i64) -> Result<Vec<PickedColor>, St
         })
         .map_err(|e| e.to_string())?;
     Ok(iter.flatten().collect())
+}
+
+pub fn add_ocr(conn: &Connection, detail: &str) -> Result<i64, String> {
+    let now = now_millis();
+    conn.execute(
+        "INSERT INTO ocr_history (detail, created_at) VALUES (?1, ?2)",
+        params![detail, now],
+    )
+    .map_err(|e| e.to_string())?;
+    Ok(conn.last_insert_rowid())
+}
+
+pub fn list_ocr(conn: &Connection, limit: i64) -> Result<Vec<OcrItem>, String> {
+    let mut stmt = conn
+        .prepare(
+            "SELECT id, detail, created_at FROM ocr_history ORDER BY created_at DESC LIMIT ?1",
+        )
+        .map_err(|e| e.to_string())?;
+    let iter = stmt
+        .query_map(params![limit], |r| {
+            Ok(OcrItem {
+                id: r.get(0)?,
+                item_type: "ocr".to_string(),
+                detail: r.get(1)?,
+                created_at: r.get(2)?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+    Ok(iter.flatten().collect())
+}
+
+pub fn clear_ocr(conn: &Connection) -> Result<(), String> {
+    conn.execute("DELETE FROM ocr_history", [])
+        .map_err(|e| e.to_string())?;
+    Ok(())
 }

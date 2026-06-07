@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name matugen-bridge
 // @description Bridges matugen color JSON to Firefox CSS variables (chrome + content via JSWindowActor), and pushes per-site userstyles CSS to Zen's per-domain Boost system. The actor handles global :root vars on every page (since userContent.css is unreliable on Zen 1.20.1b); Zen's built-in ZenBoostsChild actor handles per-site customCSS via AGENT_SHEET registration.
-// @author doty
-// @version 1.6
+// @author parazeeknova
+// @version 1.7
 // @ignorecache
 // ==/UserScript==
 
@@ -23,14 +23,17 @@ function _logFile() {
 }
 function _appendLog(level, msg) {
   const line = `[matugen-bridge] [${level}] ${msg}\n`;
-  try { console.log(line); } catch (e) {}
+  try {
+    console.log(line);
+  } catch (e) {}
   try {
     const p = _logFile();
     if (p) {
       const file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
       file.initWithPath(p);
-      const foStream = Cc["@mozilla.org/network/file-output-stream;1"]
-        .createInstance(Ci.nsIFileOutputStream);
+      const foStream = Cc[
+        "@mozilla.org/network/file-output-stream;1"
+      ].createInstance(Ci.nsIFileOutputStream);
       // PR_WRITE_ONLY | PR_CREATE_FILE | PR_APPEND
       foStream.init(file, 0x02 | 0x08 | 0x10, 0o644, 0);
       foStream.write(line, line.length);
@@ -38,16 +41,24 @@ function _appendLog(level, msg) {
       foStream.close();
     }
   } catch (e) {
-    try { console.log("[matugen-bridge] log write failed: " + e); } catch (e2) {}
+    try {
+      console.log("[matugen-bridge] log write failed: " + e);
+    } catch (e2) {}
   }
 }
-function logInfo(msg) { _appendLog("INFO", msg); }
-function logWarn(msg) { _appendLog("WARN", msg); }
-function logError(msg) { _appendLog("ERROR", msg); }
+function logInfo(msg) {
+  _appendLog("INFO", msg);
+}
+function logWarn(msg) {
+  _appendLog("WARN", msg);
+}
+function logError(msg) {
+  _appendLog("ERROR", msg);
+}
 
-logInfo("SCRIPT TOP — version 1.4");
+logInfo("SCRIPT TOP — version 1.7");
 
-"use strict";
+("use strict");
 
 const POLL_MS = 1000;
 
@@ -74,8 +85,10 @@ const PREF_TO_VAR = {
 };
 
 const ACTOR_NAME = "Matugen";
-const ACTOR_PARENT_URI = "chrome://userscripts/content/Matugen/MatugenParent.sys.mjs";
-const ACTOR_CHILD_URI = "chrome://userscripts/content/Matugen/MatugenChild.sys.mjs";
+const ACTOR_PARENT_URI =
+  "chrome://userscripts/content/Matugen/MatugenParent.sys.mjs";
+const ACTOR_CHILD_URI =
+  "chrome://userscripts/content/Matugen/MatugenChild.sys.mjs";
 const USERSTYLES_PREFIX = "matugen-userstyles-";
 const USERSTYLES_GLOBAL = "matugen-userstyles.css";
 
@@ -115,8 +128,8 @@ const BOOST_SITES = {
       dotDistance: 0.91,
       secondaryDotAngleDegDelta: 55,
       secondaryDotPos: { x: 0.5, y: 0.81 },
-      changeWasMade: true,  // <-- required: parent actor checks this
-                              //     before returning the stylesheet
+      changeWasMade: true, // <-- required: parent actor checks this
+      //     before returning the stylesheet
     },
   },
 };
@@ -130,6 +143,7 @@ let userstyles = {
 };
 let lastMtime = 0;
 let pollTimer = null;
+let universalPollTimer = null;
 let actorReady = false;
 let customWebThemeEnabled = true;
 let lastWebThemeStateMtime = 0;
@@ -144,7 +158,7 @@ function readWebThemeState() {
     const text = readFile(file);
     return {
       enabled: text.trim() !== "false",
-      mtime: file.lastModifiedTime
+      mtime: file.lastModifiedTime,
     };
   } catch (e) {
     return { enabled: true, mtime: 0 };
@@ -153,13 +167,19 @@ function readWebThemeState() {
 
 function readFile(file) {
   try {
-    const fstream = Cc["@mozilla.org/network/file-input-stream;1"]
-      .createInstance(Ci.nsIFileInputStream);
+    const fstream = Cc[
+      "@mozilla.org/network/file-input-stream;1"
+    ].createInstance(Ci.nsIFileInputStream);
     fstream.init(file, -1, 0, 0);
-    const converter = Cc["@mozilla.org/intl/converter-input-stream;1"]
-      .createInstance(Ci.nsIConverterInputStream);
-    converter.init(fstream, "utf-8", 4096,
-      Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
+    const converter = Cc[
+      "@mozilla.org/intl/converter-input-stream;1"
+    ].createInstance(Ci.nsIConverterInputStream);
+    converter.init(
+      fstream,
+      "utf-8",
+      4096,
+      Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER,
+    );
     let str = "";
     let chunk = {};
     while (converter.readString(4096, chunk)) {
@@ -187,7 +207,9 @@ function loadUserstylesFor(name, file) {
   const oldCss = oldEntry ? oldEntry.css : null;
   userstyles[name] = { css, mtime: file.lastModifiedTime, path: file.path };
   if (oldCss === null || oldCss !== css) {
-    logInfo(`Loaded userstyles[${name}]: ${css.length} bytes from ${file.path}`);
+    logInfo(
+      `Loaded userstyles[${name}]: ${css.length} bytes from ${file.path}`,
+    );
   }
 }
 
@@ -208,6 +230,7 @@ function loadAllUserstyles() {
         const fname = f.leafName;
         if (!fname || !fname.startsWith(USERSTYLES_PREFIX)) continue;
         if (fname === USERSTYLES_GLOBAL) continue;
+        if (fname.endsWith(".disabled")) continue;
         if (!f.isFile()) continue;
         const suffix = fname.slice(USERSTYLES_PREFIX.length, -4); // strip prefix and .css
         loadUserstylesFor(suffix, f);
@@ -215,7 +238,11 @@ function loadAllUserstyles() {
         // push the freshly-loaded CSS into a Zen Boost's customCSS
         // field so Zen's built-in actor takes over injection.
         for (const [domain, config] of Object.entries(BOOST_SITES)) {
-          if (config.cssFile === fname && userstyles[suffix] && userstyles[suffix].css) {
+          if (
+            config.cssFile === fname &&
+            userstyles[suffix] &&
+            userstyles[suffix].css
+          ) {
             syncBoostForDomain(domain, config, userstyles[suffix].css);
           }
         }
@@ -224,7 +251,14 @@ function loadAllUserstyles() {
         logError(`scan entry error: ${e.message}`);
       }
     }
-    if (found > 0) logInfo(`Scanned userstyles dir: ${found} per-site file(s) (${Object.keys(userstyles).filter(k => k !== "global").join(", ")})`);
+    if (found > 0)
+      logInfo(
+        `Scanned userstyles dir: ${found} per-site file(s) (${Object.keys(
+          userstyles,
+        )
+          .filter((k) => k !== "global")
+          .join(", ")})`,
+      );
   } catch (e) {
     logError(`scan userstyles dir: ${e.message}`);
   }
@@ -237,7 +271,7 @@ function loadAllUserstyles() {
 async function loadBoostsManager() {
   try {
     const mod = await ChromeUtils.importESModule(
-      "resource:///modules/zen/boosts/ZenBoostsManager.sys.mjs"
+      "resource:///modules/zen/boosts/ZenBoostsManager.sys.mjs",
     );
     return mod.gZenBoostsManager;
   } catch (e) {
@@ -279,6 +313,163 @@ function syncBoostForDomain(domain, config, css) {
   } catch (e) {
     logError(`updateBoost(${domain}): ${e.message}`);
   }
+}
+
+// Default boost knobs applied to any visited domain that doesn't
+// already have a boost with customCSS. Tints every color toward
+// the active Zen workspace's gradient color (which is set from the
+// wallpaper). This is the "every site gets tinted" layer — the
+// whole point of Zen Boosts.
+const UNIVERSAL_BOOST_OPTIONS = {
+  boostName: "matugen universal",
+  enableColorBoost: true,
+  autoTheme: true, // pull hue from active workspace gradient
+  smartInvert: false,
+  brightness: 0.5,
+  saturation: 0.5,
+  contrast: 0.75,
+  dotAngleDeg: 131.61,
+  dotPos: { x: 0.76, y: 0.66 },
+  dotDistance: 0.91,
+  secondaryDotAngleDegDelta: 55,
+  secondaryDotPos: { x: 0.5, y: 0.81 },
+  changeWasMade: true,
+};
+
+let universalBoostedDomains = new Set();
+
+// Iterate over all open browser tabs. For any tab whose hostname
+// doesn't yet have a registered boost, create one with the
+// universal tint knobs. This is the universal "every site gets
+// tinted" layer. Returns the count of new boosts created.
+function syncUniversalBoosts() {
+  if (!boostsManager) {
+    logInfo(`Universal sync skipped: no boostsManager`);
+    return 0;
+  }
+  let created = 0;
+  let windows = 0;
+  let tabs = 0;
+  let httpTabs = 0;
+  let skippedNoHost = 0;
+  let skippedAlreadyBoosted = 0;
+  let skippedPerSite = 0;
+  let skippedRegistered = 0;
+  try {
+    const wm = Services.wm.getEnumerator("navigator:browser");
+    while (wm.hasMoreElements()) {
+      windows++;
+      const win = wm.getNext();
+      if (!win.gBrowser) continue;
+      for (const tab of win.gBrowser.tabs) {
+        tabs++;
+        try {
+          const browser = tab.linkedBrowser;
+          if (!browser) continue;
+          // browser.currentURI is normally safe to read, but some
+          // tabs (lazy-loading, preloaded, about:blank with no
+          // principal) can have a URI whose .host getter throws
+          // NS_ERROR_FAILURE. We bail out cleanly in that case.
+          let uri;
+          try {
+            uri = browser.currentURI;
+          } catch (_) {
+            skippedNoHost++;
+            continue;
+          }
+          if (!uri) {
+            skippedNoHost++;
+            continue;
+          }
+          let host;
+          try {
+            host = uri.host;
+          } catch (_) {
+            skippedNoHost++;
+            continue;
+          }
+          if (!host) {
+            skippedNoHost++;
+            continue;
+          }
+          // Only HTTP/HTTPS — Zen restricts boost schemes to these
+          // (see canBoostSite() in ZenBoostsManager).
+          if (!uri.schemeIs("http") && !uri.schemeIs("https")) {
+            skippedNoHost++;
+            continue;
+          }
+          httpTabs++;
+          const domain = host;
+          if (universalBoostedDomains.has(domain)) {
+            skippedAlreadyBoosted++;
+            continue;
+          }
+          // Skip domains that have an explicit per-site boost
+          // entry in BOOST_SITES — BUT only if their userstyles
+          // file actually exists on disk. If the file is missing
+          // (e.g. user renamed the template to .disabled), fall
+          // through to the universal tint so the domain doesn't
+          // end up unthemed.
+          if (BOOST_SITES[domain]) {
+            const cfg = BOOST_SITES[domain];
+            const f = userstylesDir.clone();
+            f.append(cfg.cssFile);
+            if (f.exists() && !cfg.cssFile.endsWith(".disabled")) {
+              universalBoostedDomains.add(domain);
+              skippedPerSite++;
+              continue;
+            }
+            // Fall through: per-site CSS is gone, use universal.
+            logInfo(
+              `Per-site CSS for ${domain} missing, falling back to universal tint`,
+            );
+          }
+          // Skip if Zen already has a registered boost for this
+          // domain (user might have created one in the Zen UI).
+          if (boostsManager.registeredBoostForDomain(domain)) {
+            universalBoostedDomains.add(domain);
+            skippedRegistered++;
+            continue;
+          }
+          // Create a new boost with the universal tint knobs.
+          // getOrCreateActiveBoost handles both the "no entry" case
+          // (creates + activates) and the "existing entry, not active"
+          // case (activates an existing one).
+          const boost = getOrCreateActiveBoost(domain);
+          if (!boost) {
+            logError(`getOrCreateActiveBoost returned null for ${domain}`);
+            continue;
+          }
+          const { boostData } = boost.boostEntry;
+          for (const [k, v] of Object.entries(UNIVERSAL_BOOST_OPTIONS)) {
+            boostData[k] = v;
+          }
+          boostsManager.updateBoost(boost);
+          universalBoostedDomains.add(domain);
+          created++;
+        } catch (e) {
+          logError(`universal sync tab: ${e.message}`);
+        }
+      }
+    }
+  } catch (e) {
+    logError(`syncUniversalBoosts: ${e.message}`);
+  }
+  logInfo(
+    `Universal sync: ${windows}w/${tabs}t (http=${httpTabs}, noHost=${skippedNoHost}, perSite=${skippedPerSite}, registered=${skippedRegistered}, already=${skippedAlreadyBoosted}) created=${created}`,
+  );
+  // Always re-run the workspace sync after the universal sync —
+  // this picks up the HSL path for any domains we now know about
+  // (whether just created or pre-existing in Zen's storage).
+  if (universalBoostedDomains.size > 0) {
+    try {
+      const data = readJson();
+      if (data) syncWorkspaceTheme(data);
+    } catch (e) {
+      logError(`post-universal sync: ${e.message}`);
+    }
+  }
+  return created;
 }
 
 function getUserstylesForHostname(hostname) {
@@ -331,7 +522,9 @@ function applyChromeVars(values) {
 function broadcastToActors(values) {
   if (!values || !Object.keys(values).length) return;
   if (!actorReady) return;
-  let total = 0, sent = 0, skipped = 0;
+  let total = 0,
+    sent = 0,
+    skipped = 0;
   try {
     const windows = Services.wm.getEnumerator("navigator:browser");
     while (windows.hasMoreElements()) {
@@ -341,13 +534,25 @@ function broadcastToActors(values) {
         total++;
         try {
           const browser = tab.linkedBrowser;
-          if (!browser) { skipped++; continue; }
+          if (!browser) {
+            skipped++;
+            continue;
+          }
           const bc = browser.browsingContext;
-          if (!bc) { skipped++; continue; }
+          if (!bc) {
+            skipped++;
+            continue;
+          }
           const wg = bc.currentWindowGlobal;
-          if (!wg) { skipped++; continue; }
+          if (!wg) {
+            skipped++;
+            continue;
+          }
           const actor = wg.getActor(ACTOR_NAME);
-          if (!actor) { skipped++; continue; }
+          if (!actor) {
+            skipped++;
+            continue;
+          }
           actor.sendAsyncMessage("Matugen:ApplyVars", values);
           sent++;
         } catch (e) {
@@ -355,7 +560,9 @@ function broadcastToActors(values) {
         }
       }
     }
-    logInfo(`Broadcast vars to ${sent}/${total} tab actors (skipped=${skipped})`);
+    logInfo(
+      `Broadcast vars to ${sent}/${total} tab actors (skipped=${skipped})`,
+    );
   } catch (e) {
     logError(`broadcastToActors: ${e.message}`);
   }
@@ -363,7 +570,9 @@ function broadcastToActors(values) {
 
 function broadcastUserstyles() {
   if (!actorReady) return;
-  let total = 0, sent = 0, skipped = 0;
+  let total = 0,
+    sent = 0,
+    skipped = 0;
   try {
     const windows = Services.wm.getEnumerator("navigator:browser");
     while (windows.hasMoreElements()) {
@@ -373,13 +582,25 @@ function broadcastUserstyles() {
         total++;
         try {
           const browser = tab.linkedBrowser;
-          if (!browser) { skipped++; continue; }
+          if (!browser) {
+            skipped++;
+            continue;
+          }
           const bc = browser.browsingContext;
-          if (!bc) { skipped++; continue; }
+          if (!bc) {
+            skipped++;
+            continue;
+          }
           const wg = bc.currentWindowGlobal;
-          if (!wg) { skipped++; continue; }
+          if (!wg) {
+            skipped++;
+            continue;
+          }
           const actor = wg.getActor(ACTOR_NAME);
-          if (!actor) { skipped++; continue; }
+          if (!actor) {
+            skipped++;
+            continue;
+          }
           let hostname = "";
           try {
             if (browser.currentURI) hostname = browser.currentURI.host || "";
@@ -396,7 +617,9 @@ function broadcastUserstyles() {
         }
       }
     }
-    logInfo(`Broadcast userstyles to ${sent}/${total} tab actors (skipped=${skipped})`);
+    logInfo(
+      `Broadcast userstyles to ${sent}/${total} tab actors (skipped=${skipped})`,
+    );
   } catch (e) {
     logError(`broadcastUserstyles: ${e.message}`);
   }
@@ -447,7 +670,145 @@ function applyJson(data) {
   }
   if (count > 0) {
     logInfo(`Wrote ${count} prefs from matugen-vars.json`);
-    onPrefChange();
+    applyChromeVars(collectValues());
+    // Also push the new palette into the active Zen workspace's
+    // theme gradient. Zen's boost C++ layer reads
+    // workspace.theme.gradientColors[primary].c when
+    // boostData.autoTheme is true, so without this push the
+    // universal tints won't hot-reload — they keep the gradient
+    // color from when the boost was first applied.
+    syncWorkspaceTheme(data);
+  }
+}
+
+// Convert "#fcb974" / "#fff" to [r, g, b] in 0..1 floats.
+function hexToRgb01(hex) {
+  if (!hex || typeof hex !== "string") return null;
+  let s = hex.trim().replace(/^#/, "");
+  if (s.length === 3)
+    s = s
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  if (s.length !== 6) return null;
+  const r = parseInt(s.slice(0, 2), 16) / 255;
+  const g = parseInt(s.slice(2, 4), 16) / 255;
+  const b = parseInt(s.slice(4, 6), 16) / 255;
+  if ([r, g, b].some((v) => Number.isNaN(v))) return null;
+  return [r, g, b];
+}
+
+// Convert [r,g,b] in 0..1 to {h, s, l} in degrees/0..1/0..1.
+function rgbToHsl(r, g, b) {
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  let h, s;
+  if (max === min) {
+    h = s = 0; // achromatic
+  } else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+    h *= 60; // to degrees
+  }
+  return { h, s, l };
+}
+
+function syncWorkspaceTheme(data) {
+  logInfo(`syncWorkspaceTheme: called with accent=${data?.accent}`);
+  try {
+    const win = Services.wm.getMostRecentWindow("navigator:browser");
+    if (!win) {
+      logWarn("syncWorkspaceTheme: no browser window");
+      return;
+    }
+    const accentHex = data.accent;
+    const accentRgb = hexToRgb01(accentHex);
+    if (!accentRgb) {
+      logWarn(`syncWorkspaceTheme: bad accent ${accentHex}`);
+      return;
+    }
+    const [r, g, b] = accentRgb;
+    const { h, s, l } = rgbToHsl(r, g, b);
+    logInfo(
+      `syncWorkspaceTheme: accent=${accentHex} → hsl(${h.toFixed(1)}°, ${(s * 100).toFixed(0)}%, ${(l * 100).toFixed(0)}%)`,
+    );
+
+    // Path 1: try to push into the active Zen workspace gradient
+    // (used when the user has Zen Workspaces enabled). The C++ boost
+    // layer reads workspace.theme.gradientColors[primary].c when
+    // boostData.autoTheme is true, so this drives the C++ tint.
+    if (win.gZenWorkspaces) {
+      const ws = win.gZenWorkspaces.getActiveWorkspace();
+      if (ws && ws.theme) {
+        const gradientColors = [{ c: accentRgb, isPrimary: true }];
+        const bgDark = hexToRgb01(data["bg-dark"]);
+        if (bgDark) gradientColors.push({ c: bgDark });
+        const bgLight = hexToRgb01(data["bg-light"]);
+        if (bgLight) gradientColors.push({ c: bgLight });
+        ws.theme.gradientColors = gradientColors;
+        ws.theme.type = "gradient";
+        ws.theme.opacity = ws.theme.opacity ?? 0.5;
+        ws.theme.texture = ws.theme.texture ?? 0;
+        win.gZenWorkspaces.saveWorkspace(ws);
+        Services.obs.notifyObservers(null, "zen-space-gradient-update");
+        logInfo(
+          `Synced workspace gradient: ${gradientColors.length} color(s) from accent ${accentHex}`,
+        );
+        return;
+      }
+      logInfo(
+        "syncWorkspaceTheme: no active workspace, falling back to direct HSL on boosts",
+      );
+    } else {
+      logInfo(
+        "syncWorkspaceTheme: gZenWorkspaces not available, falling back to direct HSL on boosts",
+      );
+    }
+
+    // Path 2: directly update the dot-picker knobs on every
+    // universal-boosted domain. The C++ tint layer reads
+    // dotAngleDeg/saturation/brightness (HSL in disguise) — see
+    // ZenBoostsChild.#buildBoostColor. This works for users
+    // without Zen Workspaces enabled.
+    if (!boostsManager) {
+      logWarn("syncWorkspaceTheme: no boostsManager for HSL fallback");
+      return;
+    }
+    let updated = 0;
+    for (const domain of universalBoostedDomains) {
+      try {
+        const boost = boostsManager.loadActiveBoostFromStore(domain);
+        if (!boost) continue;
+        const { boostData } = boost.boostEntry;
+        // Use the workspace gradient path — set autoTheme: false and
+        // explicit HSL on the dot picker. light 0.1..0.9 -> brightness 0..1.
+        boostData.autoTheme = false;
+        boostData.dotAngleDeg = h;
+        boostData.saturation = 1 - s;
+        boostData.brightness = Math.max(0, Math.min(1, (l - 0.1) / 0.9));
+        boostData.enableColorBoost = true;
+        boostData.changeWasMade = true;
+        boostsManager.updateBoost(boost);
+        updated++;
+      } catch (e) {
+        logError(`update boost[${domain}] HSL: ${e.message}`);
+      }
+    }
+    logInfo(`Updated ${updated} boost(s) with HSL from accent ${accentHex}`);
+  } catch (e) {
+    logError(`syncWorkspaceTheme: ${e.message}\n${e.stack || ""}`);
   }
 }
 
@@ -478,7 +839,9 @@ function poll() {
           const nextVal = text.trim() !== "false";
           if (nextVal !== customWebThemeEnabled) {
             customWebThemeEnabled = nextVal;
-            logInfo(`Custom web theme state changed to: ${customWebThemeEnabled}`);
+            logInfo(
+              `Custom web theme state changed to: ${customWebThemeEnabled}`,
+            );
             broadcastUserstyles();
           }
         }
@@ -530,6 +893,9 @@ function poll() {
             if (fname === USERSTYLES_GLOBAL) continue;
             if (!f.isFile()) continue;
             const suffix = fname.slice(USERSTYLES_PREFIX.length, -4);
+            // Skip disabled files (e.g. foo.css.disabled) — they're
+            // not active userstyles.
+            if (fname.endsWith(".disabled")) continue;
             const m = f.lastModifiedTime;
             const cur = userstyles[suffix];
             if (!cur || cur.mtime !== m) {
@@ -539,6 +905,48 @@ function poll() {
           } catch (e) {}
         }
       } catch (e) {}
+      // If a previously-known suffix is no longer in the dir (file
+      // renamed to .disabled, or deleted), clear the boost's
+      // customCSS so the page reverts to Zen's defaults.
+      const currentSuffixes = new Set();
+      try {
+        const entries = userstylesDir.directoryEntries;
+        while (entries.hasMoreElements()) {
+          const raw = entries.getNext();
+          try {
+            const f = raw.QueryInterface(Ci.nsIFile);
+            const fname = f.leafName;
+            if (!fname || !fname.startsWith(USERSTYLES_PREFIX)) continue;
+            if (fname === USERSTYLES_GLOBAL) continue;
+            if (!f.isFile()) continue;
+            if (fname.endsWith(".disabled")) continue;
+            const suffix = fname.slice(USERSTYLES_PREFIX.length, -4);
+            currentSuffixes.add(suffix);
+          } catch (e) {}
+        }
+      } catch (e) {}
+      for (const [domain, config] of Object.entries(BOOST_SITES)) {
+        const fileSuffix = config.cssFile.slice(USERSTYLES_PREFIX.length, -4);
+        if (!currentSuffixes.has(fileSuffix) && userstyles[fileSuffix]) {
+          logInfo(
+            `Userstyles[${fileSuffix}] removed, clearing boost[${domain}].customCSS`,
+          );
+          userstyles[fileSuffix] = { css: "", mtime: 0, path: null };
+          if (boostsManager) {
+            try {
+              const boost = getOrCreateActiveBoost(domain);
+              if (boost) {
+                boost.boostEntry.boostData.customCSS = "";
+                boost.boostEntry.boostData.changeWasMade = false;
+                boostsManager.updateBoost(boost);
+              }
+            } catch (e) {
+              logError(`clear boost[${domain}]: ${e.message}`);
+            }
+          }
+          changed = true;
+        }
+      }
       if (changed) {
         logInfo(`Userstyles changed, broadcasting`);
         broadcastUserstyles();
@@ -553,6 +961,20 @@ function startPolling() {
   if (pollTimer) return;
   pollTimer = setInterval(poll, POLL_MS);
   logInfo(`Polling every ${POLL_MS}ms`);
+
+  // Universal boost sync runs less frequently — it walks all open
+  // tabs and creates a Zen Boost for any unhosted domain. We don't
+  // need to do this every second; a few seconds is fine because the
+  // user only notices after they navigate to a new site anyway.
+  if (universalPollTimer) return;
+  universalPollTimer = setInterval(() => {
+    try {
+      syncUniversalBoosts();
+    } catch (e) {
+      logError(`Universal poll: ${e.message}`);
+    }
+  }, 3000);
+  logInfo(`Universal boost sync every 3000ms`);
 }
 
 function resolveChromeDir() {
@@ -615,7 +1037,9 @@ async function init() {
     if (boostsManager) {
       logInfo("Loaded Zen Boosts Manager");
     } else {
-      logWarn("Zen Boosts Manager not available — per-site CSS will only be injected via the actor fallback");
+      logWarn(
+        "Zen Boosts Manager not available — per-site CSS will only be injected via the actor fallback",
+      );
     }
 
     registerActor();
@@ -635,6 +1059,18 @@ async function init() {
     loadAllUserstyles();
 
     startPolling();
+
+    // Initial pass: tint any open tabs that don't yet have a boost.
+    if (boostsManager) {
+      try {
+        const created = syncUniversalBoosts();
+        if (created > 0) {
+          logInfo(`Initial universal boost sync: ${created} new boost(s)`);
+        }
+      } catch (e) {
+        logError(`Initial universal sync: ${e.message}`);
+      }
+    }
   } catch (e) {
     logError(`Init: ${e.message}\n${e.stack || ""}`);
   }
@@ -659,7 +1095,9 @@ globalThis.__matugenBridge = {
           break;
         }
       }
-      logInfo(`[bridge.getUserstyles] host="${hostname}" suffix="${suffix}" userstyles.global=${userstyles.global ? userstyles.global.css.length : "null"} userstyles.${suffix}=${userstyles[suffix] ? userstyles[suffix].css.length : "null"} -> ${result.length}B`);
+      logInfo(
+        `[bridge.getUserstyles] host="${hostname}" suffix="${suffix}" userstyles.global=${userstyles.global ? userstyles.global.css.length : "null"} userstyles.${suffix}=${userstyles[suffix] ? userstyles[suffix].css.length : "null"} -> ${result.length}B`,
+      );
     } catch (e) {}
     return result;
   },
@@ -674,4 +1112,4 @@ globalThis.__matugenBridge = {
   },
 };
 
-init().catch(e => logError(`init() failed: ${e.message}\n${e.stack || ""}`));
+init().catch((e) => logError(`init() failed: ${e.message}\n${e.stack || ""}`));

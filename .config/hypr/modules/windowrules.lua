@@ -160,11 +160,11 @@ hl.layer_rule({
 
 -- Workspace assignments for specific applications using exact class names (anchored regex)
 local workspace_assignments = {
-    ["1"] = {"^zen$", "^brave-origin-nightly$"},
+    ["1"] = {"^zen$"},
     ["2"] = {"^Code$", "^code-insiders$", "^dev\\.warp\\.Warp$"},
     ["3"] = {"^thunar$"},
     ["4"] = {"^com\\.mitchellh\\.ghostty$"},
-    ["5"] = {"^vesktop$", "^TelegramDesktop$"},
+    ["5"] = {"^vesktop$", "^TelegramDesktop$", "^brave-origin-nightly$"},
     ["9"] = {"^virt-manager$", "^qemu.*$", "^Qemu.*$"},
     ["10"] = {"^[Vv]mware.*$"}
 }
@@ -231,4 +231,3 @@ hl.window_rule({
     },
     opacity = "1.0 override 1.0 override"
 })
-
