@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name matugen-bridge
-// @description Bridges matugen color JSON to Firefox CSS variables (chrome + content via JSWindowActor), and injects per-site userstyles CSS into content documents.
+// @description Bridges matugen color JSON to Firefox CSS variables (chrome + content via JSWindowActor), and pushes per-site userstyles CSS to Zen's per-domain Boost system. The actor handles global :root vars on every page (since userContent.css is unreliable on Zen 1.20.1b); Zen's built-in ZenBoostsChild actor handles per-site customCSS via AGENT_SHEET registration.
 // @author doty
-// @version 1.4
+// @version 1.6
 // @ignorecache
 // ==/UserScript==
 
@@ -89,6 +89,38 @@ const HOST_TO_FILE = {
   "raw.githubusercontent.com": "github",
 };
 
+// Per-site boost config — sibling of HOST_TO_FILE. When a hostname
+// matches a suffix here, the bridge also pushes the CSS into a
+// Zen Boost's customCSS field. Zen's ZenBoostsChild actor then
+// registers it as an AGENT_SHEET (survives Fission, hot-reloadable
+// via the 'zen-boosts-update' observer event).
+//
+// `enableColorBoost: false` because we have explicit CSS — the
+// C++ tint layer would fight the customCSS. Zen's own editor can
+// override these per-site if a user wants the tint instead.
+let boostsManager = null;
+const BOOST_SITES = {
+  "github.com": {
+    cssFile: "matugen-userstyles-github.css",
+    options: {
+      boostName: "matugen github",
+      enableColorBoost: false,
+      autoTheme: false,
+      smartInvert: false,
+      brightness: 0.5,
+      saturation: 0.5,
+      contrast: 0.75,
+      dotAngleDeg: 131.61,
+      dotPos: { x: 0.76, y: 0.66 },
+      dotDistance: 0.91,
+      secondaryDotAngleDegDelta: 55,
+      secondaryDotPos: { x: 0.5, y: 0.81 },
+      changeWasMade: true,  // <-- required: parent actor checks this
+                              //     before returning the stylesheet
+    },
+  },
+};
+
 let chromeDir = null;
 let jsonFile = null;
 let userstylesDir = null;
@@ -99,7 +131,25 @@ let userstyles = {
 let lastMtime = 0;
 let pollTimer = null;
 let actorReady = false;
+let customWebThemeEnabled = true;
+let lastWebThemeStateMtime = 0;
 let suppressBroadcast = false;
+
+function readWebThemeState() {
+  try {
+    const file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
+    const homeDir = Services.dirsvc.get("Home", Ci.nsIFile).path;
+    file.initWithPath(homeDir + "/.cache/quickshell/custom_web_theme_state");
+    if (!file.exists()) return { enabled: true, mtime: 0 };
+    const text = readFile(file);
+    return {
+      enabled: text.trim() !== "false",
+      mtime: file.lastModifiedTime
+    };
+  } catch (e) {
+    return { enabled: true, mtime: 0 };
+  }
+}
 
 function readFile(file) {
   try {
@@ -161,6 +211,14 @@ function loadAllUserstyles() {
         if (!f.isFile()) continue;
         const suffix = fname.slice(USERSTYLES_PREFIX.length, -4); // strip prefix and .css
         loadUserstylesFor(suffix, f);
+        // Side-effect: if there's a BOOST_SITES entry for this file,
+        // push the freshly-loaded CSS into a Zen Boost's customCSS
+        // field so Zen's built-in actor takes over injection.
+        for (const [domain, config] of Object.entries(BOOST_SITES)) {
+          if (config.cssFile === fname && userstyles[suffix] && userstyles[suffix].css) {
+            syncBoostForDomain(domain, config, userstyles[suffix].css);
+          }
+        }
         found++;
       } catch (e) {
         logError(`scan entry error: ${e.message}`);
@@ -172,22 +230,75 @@ function loadAllUserstyles() {
   }
 }
 
-function getUserstylesForHostname(hostname) {
-  const parts = (hostname || "").split(".");
-  let suffix = null;
-  for (let i = 0; i < parts.length; i++) {
-    const candidate = parts.slice(i).join(".");
-    if (HOST_TO_FILE[candidate]) {
-      suffix = HOST_TO_FILE[candidate];
-      break;
-    }
+// ============================================================================
+// Zen Boosts integration
+// ============================================================================
+
+async function loadBoostsManager() {
+  try {
+    const mod = await ChromeUtils.importESModule(
+      "resource:///modules/zen/boosts/ZenBoostsManager.sys.mjs"
+    );
+    return mod.gZenBoostsManager;
+  } catch (e) {
+    logError(`Failed to import ZenBoostsManager: ${e.message}`);
+    return null;
   }
+}
+
+function getOrCreateActiveBoost(domain) {
+  if (!boostsManager) return null;
+  let boost = boostsManager.loadActiveBoostFromStore(domain);
+  if (boost) return boost;
+  const all = boostsManager.loadBoostsFromStore(domain);
+  if (all && all.length > 0) {
+    boostsManager.makeBoostActiveForDomain(domain, all[0].id);
+    return boostsManager.loadActiveBoostFromStore(domain);
+  }
+  const newBoost = boostsManager.createNewBoost(domain);
+  if (!newBoost) return null;
+  boostsManager.makeBoostActiveForDomain(domain, newBoost.id);
+  return boostsManager.loadActiveBoostFromStore(domain);
+}
+
+function syncBoostForDomain(domain, config, css) {
+  if (!boostsManager) return;
+  const boost = getOrCreateActiveBoost(domain);
+  if (!boost) {
+    logError(`No boost for ${domain}, skipped sync`);
+    return;
+  }
+  const { boostData } = boost.boostEntry;
+  boostData.customCSS = css;
+  for (const [k, v] of Object.entries(config.options)) {
+    boostData[k] = v;
+  }
+  try {
+    boostsManager.updateBoost(boost);
+    logInfo(`Synced boost[${domain}]: id=${boost.id} customCSS=${css.length}B`);
+  } catch (e) {
+    logError(`updateBoost(${domain}): ${e.message}`);
+  }
+}
+
+function getUserstylesForHostname(hostname) {
   const out = [];
   if (userstyles.global && userstyles.global.css) {
     out.push(userstyles.global.css);
   }
-  if (suffix && userstyles[suffix] && userstyles[suffix].css) {
-    out.push(userstyles[suffix].css);
+  if (customWebThemeEnabled) {
+    const parts = (hostname || "").split(".");
+    let suffix = null;
+    for (let i = 0; i < parts.length; i++) {
+      const candidate = parts.slice(i).join(".");
+      if (HOST_TO_FILE[candidate]) {
+        suffix = HOST_TO_FILE[candidate];
+        break;
+      }
+    }
+    if (suffix && userstyles[suffix] && userstyles[suffix].css) {
+      out.push(userstyles[suffix].css);
+    }
   }
   return out.join("\n/* ---- per-site overlay ---- */\n");
 }
@@ -354,6 +465,37 @@ function readJson() {
 
 function poll() {
   try {
+    // Check custom web theme state file
+    try {
+      const file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
+      const homeDir = Services.dirsvc.get("Home", Ci.nsIFile).path;
+      file.initWithPath(homeDir + "/.cache/quickshell/custom_web_theme_state");
+      if (file.exists()) {
+        const m = file.lastModifiedTime;
+        if (m !== lastWebThemeStateMtime) {
+          lastWebThemeStateMtime = m;
+          const text = readFile(file);
+          const nextVal = text.trim() !== "false";
+          if (nextVal !== customWebThemeEnabled) {
+            customWebThemeEnabled = nextVal;
+            logInfo(`Custom web theme state changed to: ${customWebThemeEnabled}`);
+            broadcastUserstyles();
+          }
+        }
+      } else {
+        if (lastWebThemeStateMtime !== 0) {
+          lastWebThemeStateMtime = 0;
+          if (!customWebThemeEnabled) {
+            customWebThemeEnabled = true;
+            logInfo(`Custom web theme state file deleted, default to enabled`);
+            broadcastUserstyles();
+          }
+        }
+      }
+    } catch (e) {
+      logError(`poll web theme state: ${e.message}`);
+    }
+
     if (jsonFile && jsonFile.exists()) {
       const mtime = jsonFile.lastModifiedTime;
       if (mtime !== lastMtime) {
@@ -443,7 +585,7 @@ function registerActor() {
   }
 }
 
-function init() {
+async function init() {
   try {
     chromeDir = resolveChromeDir();
     if (!chromeDir) {
@@ -460,6 +602,21 @@ function init() {
 
     userstylesDir = chromeDir.clone();
     logInfo(`Watching: ${userstylesDir.path} for matugen-userstyles*.css`);
+
+    const state = readWebThemeState();
+    customWebThemeEnabled = state.enabled;
+    lastWebThemeStateMtime = state.mtime;
+    logInfo(`Initial custom web theme enabled state: ${customWebThemeEnabled}`);
+
+    // Load Zen's boost manager — used to push per-site userstyles into
+    // Zen Boosts (customCSS) so Zen's built-in actor injects them as
+    // AGENT_SHEETs. Failure is non-fatal: we just skip boost sync.
+    boostsManager = await loadBoostsManager();
+    if (boostsManager) {
+      logInfo("Loaded Zen Boosts Manager");
+    } else {
+      logWarn("Zen Boosts Manager not available — per-site CSS will only be injected via the actor fallback");
+    }
 
     registerActor();
     registerPrefObservers();
@@ -517,4 +674,4 @@ globalThis.__matugenBridge = {
   },
 };
 
-init();
+init().catch(e => logError(`init() failed: ${e.message}\n${e.stack || ""}`));

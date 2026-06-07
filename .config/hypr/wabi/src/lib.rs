@@ -4,6 +4,8 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+pub mod media_db;
+
 pub fn run_cmd(cmd: &str, args: &[&str]) -> Option<String> {
     let output = Command::new(cmd).args(args).output().ok()?;
     if !output.status.success() {

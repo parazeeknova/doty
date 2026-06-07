@@ -164,24 +164,21 @@ hl.bind("SUPER_L", hl.dsp
 ---   Screenshots ---
 ---------------------
 
+local media_helper = "$HOME/.config/quickshell/media_popup/get_media_status"
+local ss_dir = "$HOME/Pictures/Screenshots"
+local ss_path = ss_dir .. "/Screenshot_$(date '+%Y-%m-%d_%H.%M.%S').png"
 local grimhyprctl = "grim -o \"$(hyprctl activeworkspace -j | jq -r '.monitor')\""
-hl.bind("Print", hl.dsp.exec_cmd(grimhyprctl .. " - | wl-copy"), {
+local slurp_cmd = "slurp -b \\#1d2021b0 -c \\#d5c4a1ff -s \\#00000000"
+
+local save_register_ss = "mkdir -p " .. ss_dir .. " && FILE=" .. ss_path .. " && " .. grimhyprctl .. " \"$FILE\" && wl-copy < \"$FILE\" && " .. media_helper .. " add-asset screenshot \"$FILE\""
+local save_register_ss_region = "mkdir -p " .. ss_dir .. " && FILE=" .. ss_path .. " && grim -g \"$(" .. slurp_cmd .. ")\" \"$FILE\" && wl-copy < \"$FILE\" && " .. media_helper .. " add-asset screenshot \"$FILE\""
+local save_register_ss_region_swappy = "mkdir -p " .. ss_dir .. " && FILE=" .. ss_path .. " && grim -g \"$(" .. slurp_cmd .. ")\" \"$FILE\" && swappy -f \"$FILE\" -o \"$FILE\" && " .. media_helper .. " add-asset screenshot \"$FILE\""
+
+hl.bind("Print", hl.dsp.exec_cmd("sh -c '" .. save_register_ss .. "'"), {
     locked = true
 })
-hl.bind("Print", hl.dsp.exec_cmd("mkdir -p $(xdg-user-dir PICTURES)/Screenshots && " .. grimhyprctl ..
-                                     " $(xdg-user-dir PICTURES)/Screenshots/Screenshot_\"$(date '+%Y-%m-%d_%H.%M.%S')\".png"),
-    {
-        locked = true,
-        non_consuming = true
-    })
-hl.bind("Print", hl.dsp.exec_cmd(grimhyprctl .. " - | wl-copy"), {
-    locked = true,
-    non_consuming = true
-})
-
-local slurp_cmd = "slurp -b \\#1d2021b0 -c \\#d5c4a1ff -s \\#00000000"
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("sh -c 'grim -g \"$(" .. slurp_cmd .. ")\" - | swappy -f -'"))
-hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("sh -c 'grim -g \"$(" .. slurp_cmd .. ")\" - | wl-copy'"))
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("sh -c '" .. save_register_ss_region_swappy .. "'"))
+hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("sh -c '" .. save_register_ss_region .. "'"))
 hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd(
     "sh -c 'if ! command -v tesseract &> /dev/null; then notify-send -t 4000 -a \"OCR\" \"Tesseract not installed\" \"Please run: sudo pacman -S tesseract tesseract-data-eng\"; exit 1; fi; grim -g \"$(" ..
         slurp_cmd ..

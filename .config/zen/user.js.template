@@ -12,3 +12,10 @@ user_pref("devtools.debugger.remote-enabled", true);
 
 // Ensures userChrome.css is loaded (Zen 1.14+ defaults this to false)
 user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+
+// Enables Zen's per-domain Boost system. matugen-boosts.uc.js writes
+// our per-site customCSS into each domain's active Boost entry, and
+// Zen's built-in ZenBoostsChild actor handles the content-process
+// injection. With this off, the matugen-boosts bridge has no place
+// to put the userstyles.
+user_pref("zen.boosts.enabled", true);

@@ -784,7 +784,23 @@ fn main() {
     let _ = Command::new("hyprctl").arg("reload").status();
     let _ = Command::new("killall").arg("-USR2").arg("waybar").status();
     let _ = Command::new("makoctl").arg("reload").status();
-    let _ = Command::new("thunar").arg("-q").status();
+    if Command::new("pgrep")
+        .arg("-x")
+        .arg("thunar")
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false)
+    {
+        let _ = Command::new("thunar").arg("-q").status();
+        std::thread::sleep(std::time::Duration::from_millis(200));
+        let _ = Command::new("uwsm")
+            .arg("app")
+            .arg("--")
+            .arg("thunar")
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .spawn();
+    }
     let _ = Command::new("killall").arg("-USR2").arg("cava").status();
     let _ = Command::new("killall").arg("-USR1").arg("kitty").status();
 

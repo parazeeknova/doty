@@ -70,7 +70,6 @@ Scope {
         root.selectLastWallpaper();
     }
     Component.onCompleted: {
-        loadLastWallpaperProc.running = true;
         scanWallpapers();
     }
 
@@ -87,18 +86,15 @@ Scope {
         target: "wallpaper_switcher"
     }
 
-    Process {
-        id: loadLastWallpaperProc
+    FileView {
+        id: lastWallpaperWatcher
 
-        command: ["sh", "-c", "test -r " + root.homeDir + "/.cache/last_wallpaper && cat " + root.homeDir + "/.cache/last_wallpaper || true"]
-        running: false
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                root.setLastWallpaper(this.text.trim());
-            }
+        path: "file://" + root.homeDir + "/.cache/last_wallpaper"
+        watchChanges: true
+        onLoaded: {
+            root.setLastWallpaper(lastWallpaperWatcher.text().trim());
         }
-
+        onFileChanged: reload()
     }
 
     // Scan wallpapers using the rust helper watcher in print mode for maximum speed.

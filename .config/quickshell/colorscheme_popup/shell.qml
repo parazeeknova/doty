@@ -12,6 +12,7 @@ Scope {
     property string currentThemeMode: ""
     property string currentThemeValue: ""
     property bool glassEnabled: true
+    property bool customWebThemeEnabled: true
     property var wallpapers: []
     property var presets: []
     property string lastPresetsJson: ""
@@ -39,9 +40,12 @@ Scope {
     function applyWallpaper(path) {
         if (path === "")
             return ;
+        root.currentWallpaperPath = path;
+        root.currentThemeMode = "wallpaper";
         // awww first (sets the visible wallpaper), then theme_switcher (matugen from the same file).
         Quickshell.execDetached(["awww", "img", path]);
         Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "wallpaper", path]);
+        Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" > " + root.homeDir + "/.cache/last_wallpaper", "sh", path]);
     }
 
     Theme {
@@ -91,6 +95,17 @@ Scope {
         watchChanges: true
         onLoaded: {
             root.glassEnabled = (glassWatcher.text().trim() !== "false");
+        }
+        onFileChanged: reload()
+    }
+
+    FileView {
+        id: webThemeWatcher
+
+        path: "file://" + root.homeDir + "/.cache/quickshell/custom_web_theme_state"
+        watchChanges: true
+        onLoaded: {
+            root.customWebThemeEnabled = (webThemeWatcher.text().trim() !== "false");
         }
         onFileChanged: reload()
     }
@@ -444,7 +459,7 @@ Scope {
                             spacing: 4
 
                             Text {
-                                text: "Wallpapers"
+                                text: "Wallpapers (" + root.wallpapers.length + ")"
                                 color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
@@ -453,66 +468,140 @@ Scope {
                                 renderType: Text.NativeRendering
                             }
 
-                            ListView {
-                                id: wallpaperTimeline
-
+                            Rectangle {
                                 width: parent.width
                                 height: 32
-                                orientation: ListView.Horizontal
-                                spacing: 6
+                                radius: 4
                                 clip: true
-                                model: root.wallpapers
 
-                                delegate: Rectangle {
-                                    required property int index
-                                    required property var modelData
-                                    width: 32
-                                    height: 32
-                                    color: theme.bg_dark
-                                    border.width: (root.wallpaperFocusIndex === index) ? 2 : 1
-                                    border.color: (root.wallpaperFocusIndex === index || root.currentWallpaperPath === modelData.path) ? theme.accent : theme.bg_light
-                                    clip: true
+                                gradient: Gradient {
+                                    orientation: Gradient.Horizontal
+                                    GradientStop { position: 0.0; color: Qt.rgba(theme.bg_dark.r, theme.bg_dark.g, theme.bg_dark.b, 0.55) }
+                                    GradientStop { position: 0.5; color: Qt.rgba(theme.bg_light.r, theme.bg_light.g, theme.bg_light.b, 0.2) }
+                                    GradientStop { position: 1.0; color: Qt.rgba(theme.bg_dark.r, theme.bg_dark.g, theme.bg_dark.b, 0.55) }
+                                }
 
-                                    Image {
-                                        anchors.fill: parent
-                                        source: "file://" + modelData.thumb
-                                        fillMode: Image.PreserveAspectCrop
-                                        asynchronous: true
-                                    }
+                                Row {
+                                    anchors.fill: parent
+                                    spacing: 4
 
                                     Rectangle {
-                                        id: hoverOverlay
-
-                                        anchors.fill: parent
-                                        color: Qt.rgba(theme.bg.r, theme.bg.g, theme.bg.b, 0.75)
-                                        visible: hoverMouseArea.containsMouse
-
+                                        width: 12
+                                        height: 32
+                                        color: leftBtnMouse.containsMouse ? theme.bg_light : "transparent"
+                                        radius: 2
                                         Text {
                                             anchors.centerIn: parent
-                                            text: "󰸉"
-                                            color: theme.accent
+                                            text: ""
+                                            color: leftBtnMouse.containsMouse ? theme.accent : theme.fg_light
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 10
                                             renderType: Text.NativeRendering
                                         }
-
-                                    }
-
-                                    MouseArea {
-                                        id: hoverMouseArea
-
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        onClicked: {
-                                            root.wallpaperFocusIndex = index;
-                                            root.lastFocus = "wallpaper";
-                                            root.applyWallpaper(modelData.path);
-                                            win.closePopup();
+                                        MouseArea {
+                                            id: leftBtnMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            onClicked: {
+                                                wallpaperTimeline.contentX = Math.max(0, wallpaperTimeline.contentX - 100);
+                                            }
                                         }
                                     }
 
-                                }
+                                    ListView {
+                                        id: wallpaperTimeline
 
+                                        width: parent.width - 32
+                                        height: 32
+                                        orientation: ListView.Horizontal
+                                        spacing: 6
+                                        clip: true
+                                        model: root.wallpapers
+
+                                        Behavior on contentX {
+                                            NumberAnimation { duration: 180; easing.type: Easing.OutQuad }
+                                        }
+
+                                        delegate: Rectangle {
+                                            required property int index
+                                            required property var modelData
+                                            width: 32
+                                            height: 32
+                                            color: "transparent"
+                                            border.width: (root.wallpaperFocusIndex === index) ? 2 : 1
+                                            border.color: (root.wallpaperFocusIndex === index || root.currentWallpaperPath === modelData.path) ? theme.accent : theme.bg_light
+                                            clip: true
+                                            opacity: (root.currentWallpaperPath === modelData.path || hoverMouseArea.containsMouse || root.wallpaperFocusIndex === index) ? 1.0 : 0.7
+
+                                            Behavior on opacity {
+                                                NumberAnimation { duration: 150 }
+                                            }
+
+                                            Image {
+                                                anchors.fill: parent
+                                                source: "file://" + modelData.thumb
+                                                fillMode: Image.PreserveAspectCrop
+                                                asynchronous: true
+                                            }
+
+                                            Rectangle {
+                                                id: hoverOverlay
+
+                                                anchors.fill: parent
+                                                color: Qt.rgba(theme.bg.r, theme.bg.g, theme.bg.b, 0.75)
+                                                visible: hoverMouseArea.containsMouse
+
+                                                Text {
+                                                    anchors.centerIn: parent
+                                                    text: "󰸉"
+                                                    color: theme.accent
+                                                    font.family: "FiraCode Nerd Font"
+                                                    font.pixelSize: 10
+                                                    renderType: Text.NativeRendering
+                                                }
+
+                                            }
+
+                                            MouseArea {
+                                                id: hoverMouseArea
+
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                onClicked: {
+                                                    root.wallpaperFocusIndex = index;
+                                                    root.lastFocus = "wallpaper";
+                                                    root.applyWallpaper(modelData.path);
+                                                    win.closePopup();
+                                                }
+                                            }
+
+                                        }
+
+                                    }
+
+                                    Rectangle {
+                                        width: 12
+                                        height: 32
+                                        color: rightBtnMouse.containsMouse ? theme.bg_light : "transparent"
+                                        radius: 2
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: ""
+                                            color: rightBtnMouse.containsMouse ? theme.accent : theme.fg_light
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 10
+                                            renderType: Text.NativeRendering
+                                        }
+                                        MouseArea {
+                                            id: rightBtnMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            onClicked: {
+                                                wallpaperTimeline.contentX = Math.min(wallpaperTimeline.contentWidth - wallpaperTimeline.width, wallpaperTimeline.contentX + 100);
+                                            }
+                                        }
+                                    }
+                                }
                             }
 
                         }
@@ -523,7 +612,7 @@ Scope {
                             spacing: 6
 
                             Text {
-                                text: "Presets"
+                                text: "Presets (" + (root.presets.length + 1) + ")"
                                 color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
@@ -532,35 +621,50 @@ Scope {
                                 renderType: Text.NativeRendering
                             }
 
-                            Column {
+                            Item {
                                 width: parent.width
-                                spacing: 0
+                                height: Math.min(168, (root.presets.length + 1) * 14)
 
-                                // Auto (Wallpaper) row — first in list
-                                PresetRow {
-                                    width: parent.width
-                                    rowName: "Auto"
-                                    rowActive: (root.currentThemeMode === "wallpaper")
-                                    rowFocused: (root.presetFocusIndex === 0)
-                                    dotColors: [theme.bg, theme.bg_light, theme.fg, theme.accent, theme.secondary, theme.tertiary]
-                                    onTriggered: {
-                                        root.presetFocusIndex = 0;
-                                        root.lastFocus = "preset";
-                                        if (root.currentWallpaperPath !== "") {
-                                            root.applyWallpaper(root.currentWallpaperPath);
-                                            win.closePopup();
+                                ListView {
+                                    id: presetListView
+                                    anchors.fill: parent
+                                    anchors.rightMargin: scrollbar.visible ? 4 : 0
+                                    clip: true
+                                    model: root.presets
+                                    boundsBehavior: Flickable.StopAtBounds
+
+                                    Connections {
+                                        target: root
+                                        function onPresetFocusIndexChanged() {
+                                            if (root.presetFocusIndex === 0) {
+                                                presetListView.positionViewAtIndex(0, ListView.Beginning);
+                                            } else {
+                                                presetListView.positionViewAtIndex(root.presetFocusIndex - 1, ListView.Contain);
+                                            }
                                         }
                                     }
-                                }
 
-                                // Dynamic preset rows from .toml files
-                                Repeater {
-                                    model: root.presets
+                                    header: PresetRow {
+                                        width: presetListView.width
+                                        rowName: "Auto"
+                                        rowActive: (root.currentThemeMode === "wallpaper")
+                                        rowFocused: (root.presetFocusIndex === 0)
+                                        dotColors: [theme.bg, theme.bg_light, theme.fg, theme.accent, theme.secondary, theme.tertiary]
+                                        onTriggered: {
+                                            root.presetFocusIndex = 0;
+                                            root.lastFocus = "preset";
+                                            root.currentThemeMode = "wallpaper";
+                                            if (root.currentWallpaperPath !== "") {
+                                                root.applyWallpaper(root.currentWallpaperPath);
+                                                win.closePopup();
+                                            }
+                                        }
+                                    }
 
                                     delegate: PresetRow {
                                         required property var modelData
                                         required property int index
-                                        width: parent.width
+                                        width: presetListView.width
                                         rowName: modelData.name
                                         rowActive: (root.currentThemeMode === "preset" && root.currentThemeValue === modelData.name)
                                         rowFocused: (root.presetFocusIndex === index + 1)
@@ -568,11 +672,31 @@ Scope {
                                         onTriggered: {
                                             root.presetFocusIndex = index + 1;
                                             root.lastFocus = "preset";
+                                            root.currentThemeMode = "preset";
+                                            root.currentThemeValue = modelData.name;
                                             Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "preset", modelData.name]);
                                             win.closePopup();
                                         }
                                     }
+                                }
 
+                                Rectangle {
+                                    id: scrollbar
+                                    anchors.right: parent.right
+                                    anchors.top: parent.top
+                                    anchors.bottom: parent.bottom
+                                    width: 1
+                                    color: "transparent"
+                                    visible: presetListView.contentHeight > presetListView.height
+
+                                    Rectangle {
+                                        width: parent.width
+                                        height: Math.max(10, (presetListView.height / presetListView.contentHeight) * presetListView.height)
+                                        y: (presetListView.contentY / presetListView.contentHeight) * presetListView.height
+                                        color: theme.accent
+                                        opacity: 0.6
+                                        radius: 0.5
+                                    }
                                 }
 
                                 // Empty state hint
@@ -588,9 +712,7 @@ Scope {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     topPadding: 4
                                 }
-
                             }
-
                         }
 
                         // --- SECTION 4: GLASS BLUR TOGGLE ---
