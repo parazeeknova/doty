@@ -124,3 +124,7 @@ path = "src/bin/rofi/toggle_glass.rs"
 [[bin]]
 name = "rofi_wrap"
 path = "src/bin/rofi/rofi_wrap.rs"
+
+[[bin]]
+name = "battery_daemon"
+path = "src/bin/status/battery_daemon.rs"

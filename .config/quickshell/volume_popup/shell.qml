@@ -765,7 +765,7 @@ Scope {
                                 Text {
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
-                                    text: (root.defaultSink && root.defaultSink.is_bluetooth ? "󰋋" : "󰕾") + " Output: " + (root.defaultSink ? (root.defaultSink.muted ? "Muted" : root.defaultSink.volume + "%") : "0%")
+                                    text: (root.defaultSink ? (root.defaultSink.muted ? "󰝟" : (root.defaultSink.is_bluetooth ? "󰋋" : "󰕾")) : "󰝟") + " Output: " + (root.defaultSink ? (root.defaultSink.muted ? "Muted" : root.defaultSink.volume + "%") : "0%")
                                     color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
@@ -808,7 +808,8 @@ Scope {
                             // Master Output Horizontal Slider
                             Item {
                                 width: parent.width
-                                height: 8
+                                height: visible ? 8 : 0
+                                visible: root.defaultSink && !root.defaultSink.muted
 
                                 // Block-style Slider
                                 Row {
@@ -880,7 +881,7 @@ Scope {
                                 Text {
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
-                                    text: "󰍬 Input: " + (root.defaultSource ? (root.defaultSource.muted ? "Muted" : root.defaultSource.volume + "%") : "0%")
+                                    text: (root.defaultSource && root.defaultSource.muted ? "󰍭" : "󰍬") + " Input: " + (root.defaultSource ? (root.defaultSource.muted ? "Muted" : root.defaultSource.volume + "%") : "0%")
                                     color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
@@ -923,7 +924,8 @@ Scope {
                             // Mic Input Horizontal Slider
                             Item {
                                 width: parent.width
-                                height: 8
+                                height: visible ? 8 : 0
+                                visible: root.defaultSource && !root.defaultSource.muted
 
                                 // Block-style Slider
                                 Row {
@@ -1020,7 +1022,8 @@ Scope {
                                         // App Horizontal Slider
                                         Item {
                                             width: parent.width
-                                            height: 8
+                                            height: visible ? 8 : 0
+                                            visible: !modelData.muted
 
                                             // Block-style Slider
                                             Row {

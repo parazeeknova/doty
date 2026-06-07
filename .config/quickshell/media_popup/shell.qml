@@ -7,11 +7,15 @@ import Quickshell.Io
 import Quickshell.Wayland
 
 Scope {
+    // (pickColor logic inlined in MouseArea to avoid scope issues with win id)
+
     id: root
 
     property string homeDir: Quickshell.env("HOME")
     property string helperPath: homeDir + "/.config/quickshell/media_popup/get_media_status"
     property bool isRecording: false
+    property int monitorFps: 60
+    property var colors: []
     property string screenshotDir: ""
     property string recordingDir: ""
     property var history: []
@@ -25,17 +29,185 @@ Scope {
     property string tagDraft: ""
     property var tagSuggestions: []
     property int searchDebounce: 0
+    readonly property var recordCodecs: ["h264", "hevc", "vp9", "av1"]
+    readonly property var recordFpsOptions: ["native", 30, 60, 120]
+    readonly property var recordQualityOptions: ["low", "med", "high", "lossless"]
+    readonly property var recordPresetOptions: ["ultrafast", "superfast", "veryfast", "fast", "medium", "slow"]
 
     // Properties for popup behavior
     signal requestClose()
 
+    function syncColors() {
+        colorModel.clear();
+        for (var i = 0; i < root.colors.length; i++) {
+            colorModel.append(root.colors[i]);
+        }
+    }
+
     function updateStatus() {
-        statusProc.running = false;
+        if (statusProc.running)
+            return ;
+
         statusProc.running = true;
+    }
+
+    function basename(path) {
+        if (!path || path.indexOf("/") !== 0)
+            return path || "";
+
+        var idx = path.lastIndexOf("/");
+        return idx >= 0 ? path.substring(idx + 1) : path;
+    }
+
+    function qualityBitrate() {
+        switch (flagsAdapter.recordQuality) {
+        case "low":
+            return "2M";
+        case "med":
+            return "8M";
+        case "high":
+            return "20M";
+        case "lossless":
+            return "";
+        }
+        return "8M";
+    }
+
+    function effectiveFps() {
+        if (flagsAdapter.recordFps === "native")
+            return root.monitorFps;
+
+        return flagsAdapter.recordFps;
+    }
+
+    function recorderExtraArgs() {
+        var parts = [];
+        if (flagsAdapter.recordCodec)
+            parts.push("-c " + flagsAdapter.recordCodec);
+
+        var fps = effectiveFps();
+        if (fps)
+            parts.push("-r " + fps);
+
+        var b = qualityBitrate();
+        if (b)
+            parts.push("-b " + b);
+
+        if (flagsAdapter.recordPreset)
+            parts.push("-p " + flagsAdapter.recordPreset);
+
+        return parts.join(" ");
+    }
+
+    function filteredAssets() {
+        var result = [];
+        for (var i = 0; i < root.assets.length; i++) {
+            var a = root.assets[i];
+            if (root.activeTag !== "" && a.tags.indexOf(root.activeTag) === -1)
+                continue;
+
+            if (root.filterText !== "") {
+                var needle = root.filterText.toLowerCase();
+                var hay = (a.source_path + " " + a.tags.join(" ")).toLowerCase();
+                if (hay.indexOf(needle) === -1)
+                    continue;
+
+            }
+            result.push(a);
+        }
+        return result;
+    }
+
+    function refreshTagSuggestions() {
+        var q = root.tagDraft.toLowerCase();
+        var currentTags = [];
+        if (root.expandedAssetId >= 0) {
+            for (var i = 0; i < root.assets.length; i++) {
+                if (root.assets[i].id === root.expandedAssetId) {
+                    currentTags = root.assets[i].tags;
+                    break;
+                }
+            }
+        }
+        var out = [];
+        for (var j = 0; j < root.allTags.length; j++) {
+            var name = root.allTags[j].name;
+            if (currentTags.indexOf(name) !== -1)
+                continue;
+
+            if (q !== "" && name.toLowerCase().indexOf(q) === -1)
+                continue;
+
+            out.push(name);
+            if (out.length >= 5)
+                break;
+
+        }
+        root.tagSuggestions = out;
+    }
+
+    function assetById(id) {
+        for (var i = 0; i < root.assets.length; i++) {
+            if (root.assets[i].id === id)
+                return root.assets[i];
+
+        }
+        return null;
+    }
+
+    function closeEditor() {
+        root.expandedAssetId = -1;
+        root.tagDraft = "";
+        root.tagSuggestions = [];
+    }
+
+    function commitTagDraft(tagName) {
+        if (root.expandedAssetId < 0)
+            return ;
+
+        var asset = root.assetById(root.expandedAssetId);
+        if (!asset)
+            return ;
+
+        var name = (tagName || root.tagDraft).trim();
+        if (name === "")
+            return ;
+
+        var newTags = asset.tags.slice();
+        if (newTags.indexOf(name) === -1)
+            newTags.push(name);
+
+        Quickshell.execDetached([root.helperPath, "set-tags", asset.id.toString(), newTags.join(",")]);
+        root.tagDraft = "";
+        root.refreshTagSuggestions();
+        root.updateStatus();
+    }
+
+    function removeTagFromAsset(asset, tagName) {
+        var newTags = [];
+        for (var i = 0; i < asset.tags.length; i++) {
+            if (asset.tags[i] !== tagName)
+                newTags.push(asset.tags[i]);
+
+        }
+        Quickshell.execDetached([root.helperPath, "set-tags", asset.id.toString(), newTags.join(",")]);
+        root.updateStatus();
+    }
+
+    function purgeAsset(asset) {
+        Quickshell.execDetached([root.helperPath, "remove-asset", asset.id.toString()]);
+        if (root.expandedAssetId === asset.id)
+            root.closeEditor();
+
+        root.updateStatus();
     }
 
     Component.onCompleted: {
         updateStatus();
+    }
+
+    ListModel {
+        id: colorModel
     }
 
     Theme {
@@ -64,105 +236,12 @@ Scope {
 
             property bool recordAudio: false
             property bool recordMic: false
+            property string recordCodec: "h264"
+            property var recordFps: "native"
+            property string recordQuality: "med"
+            property string recordPreset: "fast"
         }
-    }
 
-    function basename(path) {
-        if (!path || path.indexOf("/") !== 0)
-            return path || "";
-        var idx = path.lastIndexOf("/");
-        return idx >= 0 ? path.substring(idx + 1) : path;
-    }
-
-    function filteredAssets() {
-        var result = [];
-        for (var i = 0; i < root.assets.length; i++) {
-            var a = root.assets[i];
-            if (root.activeTag !== "" && a.tags.indexOf(root.activeTag) === -1)
-                continue;
-            if (root.filterText !== "") {
-                var needle = root.filterText.toLowerCase();
-                var hay = (a.source_path + " " + a.tags.join(" ")).toLowerCase();
-                if (hay.indexOf(needle) === -1)
-                    continue;
-            }
-            result.push(a);
-        }
-        return result;
-    }
-
-    function refreshTagSuggestions() {
-        var q = root.tagDraft.toLowerCase();
-        var currentTags = [];
-        if (root.expandedAssetId >= 0) {
-            for (var i = 0; i < root.assets.length; i++) {
-                if (root.assets[i].id === root.expandedAssetId) {
-                    currentTags = root.assets[i].tags;
-                    break;
-                }
-            }
-        }
-        var out = [];
-        for (var j = 0; j < root.allTags.length; j++) {
-            var name = root.allTags[j].name;
-            if (currentTags.indexOf(name) !== -1)
-                continue;
-            if (q !== "" && name.toLowerCase().indexOf(q) === -1)
-                continue;
-            out.push(name);
-            if (out.length >= 5)
-                break;
-        }
-        root.tagSuggestions = out;
-    }
-
-    function assetById(id) {
-        for (var i = 0; i < root.assets.length; i++) {
-            if (root.assets[i].id === id)
-                return root.assets[i];
-        }
-        return null;
-    }
-
-    function closeEditor() {
-        root.expandedAssetId = -1;
-        root.tagDraft = "";
-        root.tagSuggestions = [];
-    }
-
-    function commitTagDraft(tagName) {
-        if (root.expandedAssetId < 0)
-            return;
-        var asset = root.assetById(root.expandedAssetId);
-        if (!asset)
-            return;
-        var name = (tagName || root.tagDraft).trim();
-        if (name === "")
-            return;
-        var newTags = asset.tags.slice();
-        if (newTags.indexOf(name) === -1)
-            newTags.push(name);
-        Quickshell.execDetached([root.helperPath, "set-tags", asset.id.toString(), newTags.join(",")]);
-        root.tagDraft = "";
-        root.refreshTagSuggestions();
-        root.updateStatus();
-    }
-
-    function removeTagFromAsset(asset, tagName) {
-        var newTags = [];
-        for (var i = 0; i < asset.tags.length; i++) {
-            if (asset.tags[i] !== tagName)
-                newTags.push(asset.tags[i]);
-        }
-        Quickshell.execDetached([root.helperPath, "set-tags", asset.id.toString(), newTags.join(",")]);
-        root.updateStatus();
-    }
-
-    function purgeAsset(asset) {
-        Quickshell.execDetached([root.helperPath, "remove-asset", asset.id.toString()]);
-        if (root.expandedAssetId === asset.id)
-            root.closeEditor();
-        root.updateStatus();
     }
 
     // Process to run the Rust helper and retrieve JSON status
@@ -186,6 +265,11 @@ Scope {
                     root.history = data.history || [];
                     root.assets = data.assets || [];
                     root.allTags = data.tags || [];
+                    root.colors = data.colors || [];
+                    root.syncColors();
+                    if (data.monitor_fps)
+                        root.monitorFps = data.monitor_fps;
+
                 } catch (e) {
                     console.log("Failed to parse media status JSON: " + e + " | Content: '" + txt + "'");
                 }
@@ -194,11 +278,20 @@ Scope {
 
     }
 
-    // Timer to poll status every 1.5 seconds (mainly for wf-recorder status and path updates)
+    // FileView watches a ping file; any change triggers an instant status refresh
+    FileView {
+        id: pingFile
+
+        path: root.homeDir + "/.config/quickshell/media_popup/ping.txt"
+        watchChanges: true
+        onFileChanged: updateStatus()
+    }
+
+    // Timer to poll status every 100ms — fast enough to feel instant, light on resources
     Timer {
         id: refreshTimer
 
-        interval: 1500
+        interval: 100
         repeat: true
         running: true
         triggeredOnStart: true
@@ -207,7 +300,7 @@ Scope {
         }
     }
 
-    // Process to browse directories
+    // Process to browse target directory
     Process {
         id: browseScreenshotProc
 
@@ -266,6 +359,8 @@ Scope {
 
         delegate: Component {
             PanelWindow {
+                // (Auto-close removed: popup stays open until Esc or close button.)
+
                 id: win
 
                 required property var modelData
@@ -281,6 +376,10 @@ Scope {
                     exitAnim.start();
                 }
 
+                Component.onCompleted: {
+                    root.updateStatus();
+                    introAnim.start();
+                }
                 screen: modelData
                 color: "transparent"
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
@@ -291,7 +390,6 @@ Scope {
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
                 implicitWidth: 240
                 implicitHeight: mainLayout.implicitHeight + 12
-                Component.onCompleted: introAnim.start()
 
                 Connections {
                     function onRequestClose() {
@@ -361,15 +459,6 @@ Scope {
 
                 }
 
-                // Auto-close on click outside
-                HyprlandFocusGrab {
-                    active: !win.isClosing
-                    windows: [win]
-                    onCleared: {
-                        win.closePopup();
-                    }
-                }
-
                 Rectangle {
                     anchors.fill: parent
                     opacity: win.animOpacity
@@ -386,6 +475,12 @@ Scope {
                     }
                     Component.onCompleted: {
                         forceActiveFocus();
+                    }
+
+                    HyprlandFocusGrab {
+                        active: !win.isClosing
+                        windows: [win]
+                        onCleared: win.closePopup()
                     }
 
                     Column {
@@ -407,6 +502,30 @@ Scope {
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
+                            }
+
+                            Item {
+                                width: parent.width - closeText.width - 4
+                                height: 1
+                            }
+
+                            Text {
+                                id: closeText
+
+                                text: "✕"
+                                color: "#a89984"
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 10
+                            }
+
+                            MouseArea {
+                                anchors.fill: closeText
+                                anchors.margins: -4
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onEntered: closeText.color = theme.error
+                                onExited: closeText.color = "#a89984"
+                                onClicked: win.closePopup()
                             }
 
                         }
@@ -665,7 +784,7 @@ Scope {
                                                     audioArgs = "-a\"$(pactl get-default-sink).monitor\"";
                                                 else if (flagsAdapter.recordMic)
                                                     audioArgs = "-a\"$(pactl get-default-source)\"";
-                                                Quickshell.execDetached(["sh", "-c", "GEOM=$(slurp) && if [ ! -z \"$GEOM\" ]; then " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Recording Started\" \"bad\" 1200 && mkdir -p \"" + root.recordingDir + "\" && FILE=\"" + root.recordingDir + "/Recording_$(date '+%Y-%m-%d_%H.%M.%S').mp4\" && (wf-recorder " + audioArgs + " -g \"$GEOM\" -f \"$FILE\" ; \"" + root.helperPath + "\" add-asset recording \"$FILE\") ; fi"]);
+                                                Quickshell.execDetached(["sh", "-c", "GEOM=$(slurp) && if [ ! -z \"$GEOM\" ]; then " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Recording Started\" \"bad\" 1200 && mkdir -p \"" + root.recordingDir + "\" && FILE=\"" + root.recordingDir + "/Recording_$(date '+%Y-%m-%d_%H.%M.%S').mp4\" && (wf-recorder " + audioArgs + " " + root.recorderExtraArgs() + " -g \"$GEOM\" -f \"$FILE\" ; \"" + root.helperPath + "\" add-asset recording \"$FILE\") ; fi"]);
                                             }
                                         }
                                     }
@@ -703,7 +822,7 @@ Scope {
                                                 audioArgs = "-a\"$(pactl get-default-sink).monitor\"";
                                             else if (flagsAdapter.recordMic)
                                                 audioArgs = "-a\"$(pactl get-default-source)\"";
-                                            Quickshell.execDetached(["sh", "-c", root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Recording Started\" \"bad\" 1200 && mkdir -p \"" + root.recordingDir + "\" && FILE=\"" + root.recordingDir + "/Recording_$(date '+%Y-%m-%d_%H.%M.%S').mp4\" && (wf-recorder " + audioArgs + " -f \"$FILE\" ; \"" + root.helperPath + "\" add-asset recording \"$FILE\")"]);
+                                            Quickshell.execDetached(["sh", "-c", root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Recording Started\" \"bad\" 1200 && mkdir -p \"" + root.recordingDir + "\" && FILE=\"" + root.recordingDir + "/Recording_$(date '+%Y-%m-%d_%H.%M.%S').mp4\" && (wf-recorder " + audioArgs + " " + root.recorderExtraArgs() + " -f \"$FILE\" ; \"" + root.helperPath + "\" add-asset recording \"$FILE\")"]);
                                         }
                                     }
 
@@ -755,6 +874,312 @@ Scope {
 
                                 }
 
+                            }
+
+                            // Recording options: 2x2 grid
+                            GridLayout {
+                                width: parent.width
+                                columns: 2
+                                columnSpacing: 6
+                                rowSpacing: 2
+                                visible: !root.isRecording
+
+                                Item {
+                                    Layout.preferredWidth: fpsText.implicitWidth
+                                    Layout.preferredHeight: 14
+                                    Layout.alignment: Qt.AlignLeft
+
+                                    Text {
+                                        id: fpsText
+
+                                        anchors.centerIn: parent
+                                        text: "󰈐 FPS: " + (flagsAdapter.recordFps === "native" ? "native (" + root.monitorFps + ")" : flagsAdapter.recordFps)
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            var arr = root.recordFpsOptions;
+                                            var i = arr.indexOf(flagsAdapter.recordFps);
+                                            flagsAdapter.recordFps = arr[(i + 1) % arr.length];
+                                        }
+                                    }
+
+                                }
+
+                                Item {
+                                    Layout.preferredWidth: qualityText.implicitWidth
+                                    Layout.preferredHeight: 14
+                                    Layout.alignment: Qt.AlignLeft
+
+                                    Text {
+                                        id: qualityText
+
+                                        anchors.centerIn: parent
+                                        text: "󰊢 Quality: " + flagsAdapter.recordQuality
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            var arr = root.recordQualityOptions;
+                                            var i = arr.indexOf(flagsAdapter.recordQuality);
+                                            flagsAdapter.recordQuality = arr[(i + 1) % arr.length];
+                                        }
+                                    }
+
+                                }
+
+                                Item {
+                                    Layout.preferredWidth: codecText.implicitWidth
+                                    Layout.preferredHeight: 14
+                                    Layout.alignment: Qt.AlignLeft
+
+                                    Text {
+                                        id: codecText
+
+                                        anchors.centerIn: parent
+                                        text: "󰈙 Codec: " + flagsAdapter.recordCodec
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            var arr = root.recordCodecs;
+                                            var i = arr.indexOf(flagsAdapter.recordCodec);
+                                            flagsAdapter.recordCodec = arr[(i + 1) % arr.length];
+                                        }
+                                    }
+
+                                }
+
+                                Item {
+                                    Layout.preferredWidth: presetText.implicitWidth
+                                    Layout.preferredHeight: 14
+                                    Layout.alignment: Qt.AlignLeft
+
+                                    Text {
+                                        id: presetText
+
+                                        anchors.centerIn: parent
+                                        text: "󰓣 Preset: " + flagsAdapter.recordPreset
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            var arr = root.recordPresetOptions;
+                                            var i = arr.indexOf(flagsAdapter.recordPreset);
+                                            flagsAdapter.recordPreset = arr[(i + 1) % arr.length];
+                                        }
+                                    }
+
+                                }
+
+                            }
+
+                            // Pick Color button
+                            Rectangle {
+                                width: parent.width
+                                height: 18
+                                color: theme.bg_light
+                                border.width: 1
+                                border.color: "#504945"
+                                visible: !root.isRecording
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "󰏘 Pick Color"
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onEntered: parent.border.color = theme.accent
+                                    onExited: parent.border.color = "#504945"
+                                    onClicked: {
+                                        root.requestClose();
+                                        Quickshell.execDetached([root.helperPath, "pick-color"]);
+                                    }
+                                }
+
+                            }
+
+                        }
+
+                        // COLOR HISTORY SECTION
+                        Column {
+                            width: parent.width
+                            spacing: 3
+
+                            RowLayout {
+                                width: parent.width
+                                spacing: 4
+
+                                Text {
+                                    text: "Color History"
+                                    color: "#a89984"
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                    font.bold: true
+                                    Layout.alignment: Qt.AlignVCenter
+                                }
+
+                                Item {
+                                    Layout.fillWidth: true
+                                    height: 1
+                                }
+
+                                Item {
+                                    id: refreshBtn
+
+                                    implicitWidth: refreshText.implicitWidth + 6
+                                    implicitHeight: refreshText.implicitHeight + 4
+                                    Layout.alignment: Qt.AlignVCenter
+
+                                    Text {
+                                        id: refreshText
+
+                                        anchors.centerIn: parent
+                                        text: "↻"
+                                        color: "#928374"
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 9
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onEntered: refreshText.color = theme.accent
+                                        onExited: refreshText.color = "#928374"
+                                        onClicked: {
+                                            root.updateStatus();
+                                        }
+                                    }
+
+                                }
+
+                                Item {
+                                    id: clearBtn
+
+                                    visible: root.colors.length > 0
+                                    implicitWidth: clearText.implicitWidth + 6
+                                    implicitHeight: clearText.implicitHeight + 4
+                                    Layout.alignment: Qt.AlignVCenter
+
+                                    Text {
+                                        id: clearText
+
+                                        anchors.centerIn: parent
+                                        text: "clear"
+                                        color: "#928374"
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 7
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onEntered: clearText.color = theme.error
+                                        onExited: clearText.color = "#928374"
+                                        onClicked: {
+                                            Quickshell.execDetached([root.helperPath, "clear-colors"]);
+                                            root.updateStatus();
+                                        }
+                                    }
+
+                                }
+
+                            }
+
+                            ListView {
+                                width: parent.width
+                                height: 18
+                                orientation: ListView.Horizontal
+                                spacing: 4
+                                clip: true
+                                interactive: false
+                                model: colorModel
+
+                                delegate: Item {
+                                    id: colorDelegate
+
+                                    required property var modelData
+                                    property string hex: modelData ? modelData.hex : ""
+                                    property int colorId: modelData ? modelData.id : -1
+
+                                    width: 18
+                                    height: 18
+
+                                    Rectangle {
+                                        id: swatch
+
+                                        anchors.fill: parent
+                                        radius: 2
+                                        color: colorDelegate.hex
+                                        border.width: 1
+                                        border.color: "#504945"
+                                    }
+
+                                    Rectangle {
+                                        id: hoverRing
+
+                                        anchors.fill: swatch
+                                        anchors.margins: -2
+                                        color: "transparent"
+                                        border.width: 1
+                                        border.color: "transparent"
+                                        radius: 3
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onEntered: hoverRing.border.color = theme.accent
+                                        onExited: hoverRing.border.color = "transparent"
+                                        onClicked: {
+                                            Quickshell.execDetached(["wl-copy", colorDelegate.hex]);
+                                        }
+                                        onPressAndHold: {
+                                            Quickshell.execDetached([root.helperPath, "remove-color", String(colorDelegate.colorId)]);
+                                            root.updateStatus();
+                                        }
+                                    }
+
+                                }
+
+                            }
+
+                            Text {
+                                visible: root.colors.length === 0
+                                text: "no colors picked yet"
+                                color: "#928374"
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 7
+                                font.italic: true
                             }
 
                         }
@@ -843,124 +1268,280 @@ Scope {
                             width: parent.width
                             spacing: 3
 
-                            Text {
-                                text: "Target Directories"
-                                color: "#a89984"
-                                font.family: "FiraCode Nerd Font"
-                                font.pixelSize: 8
-                                font.bold: true
-                            }
+                            Item {
+                                id: targetDirHeader
 
-                            // Screenshot location
-                            Row {
+                                property bool expanded: false
+
                                 width: parent.width
-                                spacing: 4
+                                height: 14
 
-                                Rectangle {
-                                    width: parent.width - 24
-                                    height: 18
-                                    color: theme.bg_dark
-                                    border.width: 1
-                                    border.color: theme.bg_light
-
-                                    TextInput {
-                                        id: scrInput
-
-                                        anchors.fill: parent
-                                        anchors.leftMargin: 4
-                                        anchors.rightMargin: 4
-                                        verticalAlignment: TextInput.AlignVCenter
-                                        text: root.screenshotDir
-                                        color: theme.accent
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
-                                        selectByMouse: true
-                                        onAccepted: {
-                                            Quickshell.execDetached([root.helperPath, "set-screenshot-dir", text]);
-                                            focus = false;
-                                            root.updateStatus();
-                                        }
-                                    }
-
+                                Text {
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Target Directory  " + (targetDirHeader.expanded ? "v" : ">")
+                                    color: "#a89984"
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                    font.bold: true
                                 }
 
-                                // Browse button
-                                Rectangle {
-                                    width: 20
-                                    height: 18
-                                    color: theme.bg_light
-                                    border.width: 1
-                                    border.color: "#504945"
-
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "󰉋"
-                                        color: theme.accent
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
-                                    }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: browseScreenshotProc.running = true
-                                    }
-
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: targetDirHeader.expanded = !targetDirHeader.expanded
                                 }
 
                             }
 
-                            // Recording location
-                            Row {
+                            Column {
                                 width: parent.width
-                                spacing: 4
+                                spacing: 3
+                                clip: true
+                                height: targetDirHeader.expanded ? implicitHeight : 0
+                                opacity: targetDirHeader.expanded ? 1 : 0
 
-                                Rectangle {
-                                    width: parent.width - 24
-                                    height: 18
-                                    color: theme.bg_dark
-                                    border.width: 1
-                                    border.color: theme.bg_light
+                                // Screenshot location
+                                Row {
+                                    width: parent.width
+                                    spacing: 4
 
-                                    TextInput {
-                                        id: recInput
-
-                                        anchors.fill: parent
-                                        anchors.leftMargin: 4
-                                        anchors.rightMargin: 4
-                                        verticalAlignment: TextInput.AlignVCenter
-                                        text: root.recordingDir
-                                        color: theme.accent
+                                    Text {
+                                        text: "Screenshot:"
+                                        color: "#a89984"
                                         font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
-                                        selectByMouse: true
-                                        onAccepted: {
-                                            Quickshell.execDetached([root.helperPath, "set-recording-dir", text]);
-                                            focus = false;
-                                            root.updateStatus();
+                                        font.pixelSize: 7
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: 50
+                                    }
+
+                                    Rectangle {
+                                        id: scrBox
+
+                                        property bool editing: false
+                                        property alias editText: scrInput.text
+
+                                        width: parent.width - 74
+                                        height: 18
+                                        color: "transparent"
+
+                                        Text {
+                                            anchors.left: parent.left
+                                            anchors.right: parent.right
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.leftMargin: 2
+                                            anchors.rightMargin: 2
+                                            visible: !scrBox.editing
+                                            text: root.screenshotDir
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 7
+                                            elide: Text.ElideRight
+                                            verticalAlignment: Text.AlignVCenter
                                         }
+
+                                        TextInput {
+                                            id: scrInput
+
+                                            anchors.left: parent.left
+                                            anchors.right: parent.right
+                                            anchors.top: parent.top
+                                            anchors.bottom: parent.bottom
+                                            anchors.leftMargin: 2
+                                            anchors.rightMargin: 2
+                                            visible: scrBox.editing
+                                            verticalAlignment: TextInput.AlignVCenter
+                                            text: root.screenshotDir
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 7
+                                            selectByMouse: true
+                                            onAccepted: {
+                                                Quickshell.execDetached([root.helperPath, "set-screenshot-dir", text]);
+                                                scrBox.editing = false;
+                                                root.updateStatus();
+                                            }
+                                            onActiveFocusChanged: {
+                                                if (!activeFocus)
+                                                    scrBox.editing = false;
+
+                                            }
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            enabled: !scrBox.editing
+                                            cursorShape: Qt.IBeamCursor
+                                            onClicked: {
+                                                scrInput.text = root.screenshotDir;
+                                                scrBox.editing = true;
+                                                scrInput.forceActiveFocus();
+                                                scrInput.selectAll();
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            anchors.left: parent.left
+                                            anchors.right: parent.right
+                                            anchors.bottom: parent.bottom
+                                            height: 1
+                                            color: theme.bg_light
+                                        }
+
+                                    }
+
+                                    Rectangle {
+                                        width: 20
+                                        height: 18
+                                        color: "transparent"
+                                        border.width: 0
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "󰉋"
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: browseScreenshotProc.running = true
+                                        }
+
                                     }
 
                                 }
 
-                                // Browse button
-                                Rectangle {
-                                    width: 20
-                                    height: 18
-                                    color: theme.bg_light
-                                    border.width: 1
-                                    border.color: "#504945"
+                                // Recording location
+                                Row {
+                                    width: parent.width
+                                    spacing: 4
 
                                     Text {
-                                        anchors.centerIn: parent
-                                        text: "󰉋"
-                                        color: theme.accent
+                                        text: "Recording:"
+                                        color: "#a89984"
                                         font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
+                                        font.pixelSize: 7
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: 50
                                     }
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: browseRecordingProc.running = true
+                                    Rectangle {
+                                        id: recBox
+
+                                        property bool editing: false
+                                        property alias editText: recInput.text
+
+                                        width: parent.width - 74
+                                        height: 18
+                                        color: "transparent"
+
+                                        Text {
+                                            anchors.left: parent.left
+                                            anchors.right: parent.right
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.leftMargin: 2
+                                            anchors.rightMargin: 2
+                                            visible: !recBox.editing
+                                            text: root.recordingDir
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 7
+                                            elide: Text.ElideRight
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+
+                                        TextInput {
+                                            id: recInput
+
+                                            anchors.left: parent.left
+                                            anchors.right: parent.right
+                                            anchors.top: parent.top
+                                            anchors.bottom: parent.bottom
+                                            anchors.leftMargin: 2
+                                            anchors.rightMargin: 2
+                                            visible: recBox.editing
+                                            verticalAlignment: TextInput.AlignVCenter
+                                            text: root.recordingDir
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 7
+                                            selectByMouse: true
+                                            onAccepted: {
+                                                Quickshell.execDetached([root.helperPath, "set-recording-dir", text]);
+                                                recBox.editing = false;
+                                                root.updateStatus();
+                                            }
+                                            onActiveFocusChanged: {
+                                                if (!activeFocus)
+                                                    recBox.editing = false;
+
+                                            }
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            enabled: !recBox.editing
+                                            cursorShape: Qt.IBeamCursor
+                                            onClicked: {
+                                                recInput.text = root.recordingDir;
+                                                recBox.editing = true;
+                                                recInput.forceActiveFocus();
+                                                recInput.selectAll();
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            anchors.left: parent.left
+                                            anchors.right: parent.right
+                                            anchors.bottom: parent.bottom
+                                            height: 1
+                                            color: theme.bg_light
+                                        }
+
+                                    }
+
+                                    Rectangle {
+                                        width: 20
+                                        height: 18
+                                        color: "transparent"
+                                        border.width: 0
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "󰉋"
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: browseRecordingProc.running = true
+                                        }
+
+                                    }
+
+                                }
+
+                                Behavior on height {
+                                    NumberAnimation {
+                                        duration: 180
+                                        easing.type: Easing.InOutQuad
+                                    }
+
+                                }
+
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: 180
+                                        easing.type: Easing.InOutQuad
                                     }
 
                                 }
@@ -1061,28 +1642,38 @@ Scope {
                                     Rectangle {
                                         width: parent.width
                                         height: 16
-                                        color: theme.bg_dark
-                                        border.width: 1
-                                        border.color: theme.bg_light
+                                        color: "transparent"
 
                                         TextField {
                                             id: searchField
 
-                                            anchors.fill: parent
-                                            anchors.leftMargin: 4
-                                            anchors.rightMargin: 4
+                                            anchors.left: parent.left
+                                            anchors.right: parent.right
+                                            anchors.top: parent.top
+                                            anchors.bottom: parent.bottom
+                                            anchors.leftMargin: 2
+                                            anchors.rightMargin: 2
                                             background: null
                                             color: theme.accent
                                             placeholderText: "search filename or tag"
                                             placeholderTextColor: "#928374"
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
+                                            verticalAlignment: TextInput.AlignVCenter
                                             text: root.filterText
                                             onTextChanged: root.filterText = text
                                             Keys.onEscapePressed: {
                                                 text = "";
                                                 root.filterText = "";
                                             }
+                                        }
+
+                                        Rectangle {
+                                            anchors.left: parent.left
+                                            anchors.right: parent.right
+                                            anchors.bottom: parent.bottom
+                                            height: 1
+                                            color: theme.bg_light
                                         }
 
                                     }
@@ -1162,21 +1753,25 @@ Scope {
 
                                         delegate: Column {
                                             id: tileCol
+
                                             property var asset: modelData
+
                                             width: (mainLayout.width - 12) / 4
                                             spacing: 2
 
                                             Rectangle {
                                                 id: tileBox
+
                                                 width: parent.width
                                                 height: parent.width
                                                 color: theme.bg_dark
                                                 border.width: 1
                                                 border.color: tileMouse.containsMouse ? theme.accent : theme.bg_light
-                                                opacity: modelData.deleted ? 0.4 : 1.0
+                                                opacity: modelData.deleted ? 0.4 : 1
 
                                                 Image {
                                                     id: tileImage
+
                                                     anchors.fill: parent
                                                     anchors.margins: 1
                                                     source: modelData.deleted ? "" : ("file://" + modelData.thumbnail_path)
@@ -1228,6 +1823,7 @@ Scope {
                                                 // Tag strip on hover
                                                 Rectangle {
                                                     id: tagStrip
+
                                                     visible: tileMouse.containsMouse && modelData.tags.length > 0
                                                     anchors.left: parent.left
                                                     anchors.right: parent.right
@@ -1252,6 +1848,7 @@ Scope {
 
                                                                 Text {
                                                                     id: tstripText
+
                                                                     anchors.centerIn: parent
                                                                     text: modelData
                                                                     color: theme.bg
@@ -1277,6 +1874,7 @@ Scope {
 
                                                 MouseArea {
                                                     id: tileMouse
+
                                                     anchors.fill: parent
                                                     hoverEnabled: true
                                                     acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -1289,15 +1887,15 @@ Scope {
                                                                 root.tagDraft = "";
                                                                 root.refreshTagSuggestions();
                                                             }
-                                                            return;
+                                                            return ;
                                                         }
                                                         if (modelData.deleted)
-                                                            return;
-                                                        if (modelData.type === "screenshot") {
+                                                            return ;
+
+                                                        if (modelData.type === "screenshot")
                                                             Quickshell.execDetached(["sh", "-c", "wl-copy < '" + modelData.source_path + "' && notify-send -t 1000 -a 'Screenshot' 'Copied image'"]);
-                                                        } else if (modelData.type === "recording") {
+                                                        else if (modelData.type === "recording")
                                                             Quickshell.execDetached(["mpv", modelData.source_path]);
-                                                        }
                                                     }
                                                 }
 
@@ -1333,6 +1931,9 @@ Scope {
                             // Asset editor popup (right-click on a tile)
                             Popup {
                                 id: assetEditor
+
+                                property var editorAsset: root.expandedAssetId >= 0 ? root.assetById(root.expandedAssetId) : null
+
                                 visible: root.expandedAssetId >= 0
                                 width: mainLayout.width - 16
                                 x: 8
@@ -1342,8 +1943,6 @@ Scope {
                                 focus: true
                                 closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
                                 onClosed: root.closeEditor()
-
-                                property var editorAsset: root.expandedAssetId >= 0 ? root.assetById(root.expandedAssetId) : null
 
                                 background: Rectangle {
                                     color: theme.bg
@@ -1392,6 +1991,7 @@ Scope {
 
                                                 Text {
                                                     id: tagInnerText
+
                                                     anchors.verticalCenter: parent.verticalCenter
                                                     anchors.left: parent.left
                                                     anchors.leftMargin: 4
@@ -1432,6 +2032,7 @@ Scope {
 
                                             Text {
                                                 id: addBtnText
+
                                                 anchors.centerIn: parent
                                                 text: "+ add tag"
                                                 color: theme.accent
@@ -1454,6 +2055,7 @@ Scope {
                                     // Tag input
                                     Rectangle {
                                         id: tagInputWrap
+
                                         width: parent.width
                                         height: tagInput.visible ? tagInput.implicitHeight + 4 : 0
                                         visible: tagInput.visible
@@ -1463,6 +2065,7 @@ Scope {
 
                                         TextField {
                                             id: tagInput
+
                                             anchors.fill: parent
                                             anchors.leftMargin: 3
                                             anchors.rightMargin: 3
@@ -1608,6 +2211,7 @@ Scope {
                                                 onClicked: {
                                                     if (assetEditor.editorAsset)
                                                         root.purgeAsset(assetEditor.editorAsset);
+
                                                 }
                                             }
 

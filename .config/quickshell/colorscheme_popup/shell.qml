@@ -12,7 +12,6 @@ Scope {
     property string currentThemeMode: ""
     property string currentThemeValue: ""
     property bool glassEnabled: true
-    property bool customWebThemeEnabled: true
     property var wallpapers: []
     property var presets: []
     property string lastPresetsJson: ""
@@ -99,16 +98,6 @@ Scope {
         onFileChanged: reload()
     }
 
-    FileView {
-        id: webThemeWatcher
-
-        path: "file://" + root.homeDir + "/.cache/quickshell/custom_web_theme_state"
-        watchChanges: true
-        onLoaded: {
-            root.customWebThemeEnabled = (webThemeWatcher.text().trim() !== "false");
-        }
-        onFileChanged: reload()
-    }
 
     // Watch presets dir for add/remove (directory mtime changes when entries change)
     FileView {
@@ -298,13 +287,13 @@ Scope {
                             return ;
                         }
                         if (event.key === Qt.Key_Right || event.key === Qt.Key_L) {
-                            if (root.wallpapers.length > 0) {
-                                root.wallpaperFocusIndex = Math.min(root.wallpaperFocusIndex + 1, root.wallpapers.length - 1);
+                            if (wallpaperTimeline.count > 0) {
+                                root.wallpaperFocusIndex = Math.min(root.wallpaperFocusIndex + 1, wallpaperTimeline.count - 1);
                                 root.lastFocus = "wallpaper";
                             }
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Left || event.key === Qt.Key_H) {
-                            if (root.wallpapers.length > 0) {
+                            if (wallpaperTimeline.count > 0) {
                                 root.wallpaperFocusIndex = Math.max(root.wallpaperFocusIndex - 1, 0);
                                 root.lastFocus = "wallpaper";
                             }
@@ -323,8 +312,8 @@ Scope {
                             }
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                            if (root.lastFocus === "wallpaper" && root.wallpapers.length > 0) {
-                                var wp = root.wallpapers[root.wallpaperFocusIndex];
+                            if (root.lastFocus === "wallpaper" && wallpaperTimeline.count > 0) {
+                                var wp = wallpaperTimeline.model[root.wallpaperFocusIndex];
                                 if (wp) {
                                     root.applyWallpaper(wp.path);
                                     win.closePopup();
@@ -360,95 +349,110 @@ Scope {
                         spacing: 12
 
                         // --- SECTION 1: ACTIVE WALLPAPER + COLOR PREVIEW ---
-                        Rectangle {
+                        Column {
                             width: parent.width
-                            height: 60
-                            color: theme.bg_dark
-                            border.width: 1
-                            border.color: (root.currentThemeMode === "wallpaper") ? theme.accent : theme.bg_light
-                            clip: true
+                            spacing: 4
 
-                            Image {
-                                anchors.fill: parent
-                                source: root.currentWallpaperPath !== "" ? ("file://" + root.currentWallpaperPath) : ""
-                                fillMode: Image.PreserveAspectCrop
-                                asynchronous: true
+                            Text {
+                                text: "Current Wallpaper"
+                                color: theme.accent
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 8
+                                font.bold: true
+                                opacity: 0.5
+                                renderType: Text.NativeRendering
                             }
 
                             Rectangle {
-                                anchors.bottom: parent.bottom
                                 width: parent.width
-                                height: 28
-                                border.width: 0
+                                height: 60
+                                color: theme.bg_dark
+                                border.width: 1
+                                border.color: (root.currentThemeMode === "wallpaper") ? theme.accent : theme.bg_light
+                                clip: true
 
-                                Row {
+                                Image {
                                     anchors.fill: parent
-                                    anchors.leftMargin: 6
-                                    anchors.rightMargin: 6
-                                    spacing: 8
+                                    source: root.currentWallpaperPath !== "" ? ("file://" + root.currentWallpaperPath) : ""
+                                    fillMode: Image.PreserveAspectCrop
+                                    asynchronous: true
+                                }
 
-                                    Text {
-                                        text: {
-                                            if (root.currentWallpaperPath === "")
-                                                return "No Wallpaper";
-
-                                            var parts = root.currentWallpaperPath.split("/");
-                                            return parts[parts.length - 1].replace(/\.[^/.]+$/, "");
-                                        }
-                                        color: theme.accent
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 7
-                                        font.bold: true
-                                        elide: Text.ElideRight
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        width: parent.width - 80
-                                        renderType: Text.NativeRendering
-                                    }
+                                Rectangle {
+                                    anchors.bottom: parent.bottom
+                                    width: parent.width
+                                    height: 28
+                                    border.width: 0
 
                                     Row {
-                                        spacing: 3
-                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.fill: parent
+                                        anchors.leftMargin: 6
+                                        anchors.rightMargin: 6
+                                        spacing: 8
 
-                                        Repeater {
-                                            model: [theme.bg, theme.bg_light, theme.fg, theme.accent, theme.secondary, theme.tertiary]
+                                        Text {
+                                            text: {
+                                                if (root.currentWallpaperPath === "")
+                                                    return "No Wallpaper";
 
-                                            delegate: Rectangle {
-                                                width: 8
-                                                height: 8
-                                                color: modelData
-                                                border.width: 1
-                                                border.color: theme.bg_dark
+                                                var parts = root.currentWallpaperPath.split("/");
+                                                return parts[parts.length - 1].replace(/\.[^/.]+$/, "");
+                                            }
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 7
+                                            font.bold: true
+                                            renderType: Text.NativeRendering
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            width: parent.width - 76
+                                        }
+
+                                        Row {
+                                            spacing: 4
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.right: parent.right
+
+                                            Repeater {
+                                                model: [theme.bg, theme.bg_light, theme.fg, theme.accent, theme.secondary, theme.tertiary]
+
+                                                delegate: Rectangle {
+                                                    width: 8
+                                                    height: 8
+                                                    color: modelData
+                                                }
+
                                             }
 
                                         }
 
                                     }
 
-                                }
+                                    gradient: Gradient {
 
-                                gradient: Gradient {
-                                    GradientStop {
-                                        position: 0
-                                        color: "transparent"
+                                        GradientStop {
+                                            position: 0
+                                            color: "transparent"
+                                        }
+
+                                        GradientStop {
+                                            position: 1
+                                            color: Qt.rgba(theme.bg.r, theme.bg.g, theme.bg.b, 0.85)
+                                        }
+
                                     }
 
-                                    GradientStop {
-                                        position: 1
-                                        color: Qt.rgba(theme.bg.r, theme.bg.g, theme.bg.b, 0.85)
-                                    }
-
                                 }
 
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    if (root.currentWallpaperPath !== "") {
-                                        root.applyWallpaper(root.currentWallpaperPath);
-                                        win.closePopup();
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        if (root.currentWallpaperPath !== "") {
+                                            root.applyWallpaper(root.currentWallpaperPath);
+                                            win.closePopup();
+                                        }
                                     }
                                 }
+
                             }
 
                         }
@@ -459,7 +463,7 @@ Scope {
                             spacing: 4
 
                             Text {
-                                text: "Wallpapers (" + root.wallpapers.length + ")"
+                                text: "Wallpapers (" + wallpaperTimeline.count + ")"
                                 color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
@@ -516,7 +520,7 @@ Scope {
                                         orientation: ListView.Horizontal
                                         spacing: 6
                                         clip: true
-                                        model: root.wallpapers
+                                        model: root.wallpapers.filter(function(wp) { return wp.path !== root.currentWallpaperPath; })
 
                                         Behavior on contentX {
                                             NumberAnimation { duration: 180; easing.type: Easing.OutQuad }
@@ -716,61 +720,170 @@ Scope {
                         }
 
                         // --- SECTION 4: GLASS BLUR TOGGLE ---
-                        MouseArea {
+                        Column {
                             width: parent.width
-                            height: 14
-                            onClicked: {
-                                Quickshell.execDetached([root.homeDir + "/doty/.config/rofi/scripts/toggle_glass"]);
+                            spacing: 6
+
+                            Text {
+                                text: "More Options"
+                                color: theme.accent
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 8
+                                font.bold: true
+                                opacity: 0.5
+                                renderType: Text.NativeRendering
                             }
 
-                            Row {
-                                anchors.fill: parent
-                                spacing: 8
-
-                                Text {
-                                    text: "Glass Blur Mode"
-                                    color: theme.accent
-                                    font.family: "FiraCode Nerd Font"
-                                    font.pixelSize: 8
-                                    font.bold: false
-                                    renderType: Text.NativeRendering
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: parent.width - 36
+                            MouseArea {
+                                width: parent.width
+                                height: 14
+                                onClicked: {
+                                    Quickshell.execDetached([root.homeDir + "/doty/.config/rofi/scripts/toggle_glass"]);
                                 }
 
-                                Rectangle {
-                                    width: 28
-                                    height: 12
-                                    color: root.glassEnabled ? theme.accent : theme.bg_light
-                                    border.color: theme.accent
-                                    border.width: 1
-                                    anchors.verticalCenter: parent.verticalCenter
+                                Row {
+                                    anchors.fill: parent
+                                    spacing: 8
+
+                                    Text {
+                                        text: "Glass Blur Mode"
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: false
+                                        renderType: Text.NativeRendering
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: parent.width - 36
+                                    }
 
                                     Rectangle {
-                                        width: 8
-                                        height: 8
-                                        color: root.glassEnabled ? theme.bg : theme.accent
+                                        width: 28
+                                        height: 12
+                                        color: root.glassEnabled ? theme.accent : theme.bg_light
+                                        border.color: theme.accent
+                                        border.width: 1
                                         anchors.verticalCenter: parent.verticalCenter
-                                        x: root.glassEnabled ? 18 : 2
 
-                                        Behavior on x {
-                                            NumberAnimation {
-                                                duration: 150
-                                                easing.type: Easing.OutQuad
+                                        Rectangle {
+                                            width: 8
+                                            height: 8
+                                            color: root.glassEnabled ? theme.bg : theme.accent
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            x: root.glassEnabled ? 18 : 2
+
+                                            Behavior on x {
+                                                NumberAnimation {
+                                                    duration: 150
+                                                    easing.type: Easing.OutQuad
+                                                }
+
                                             }
 
                                         }
 
-                                    }
-
-                                    Behavior on color {
-                                        ColorAnimation {
-                                            duration: 150
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 150
+                                            }
                                         }
+
                                     }
 
                                 }
 
+                            }
+
+                            Row {
+                                width: parent.width
+                                height: 16
+                                spacing: 6
+
+                                // Button 1: Wallpaper Switcher
+                                Rectangle {
+                                    width: (parent.width - 12) / 3
+                                    height: parent.height
+                                    color: wpBtnMouse.containsMouse ? theme.bg_light : theme.bg_dark
+                                    border.color: theme.accent
+                                    border.width: wpBtnMouse.containsMouse ? 1 : 0
+                                    radius: 2
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "󰸉 Switcher"
+                                        color: wpBtnMouse.containsMouse ? theme.accent : theme.fg_light
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 7
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    MouseArea {
+                                        id: wpBtnMouse
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        onClicked: {
+                                            Quickshell.execDetached(["quickshell", "--config", "wallpaper_switcher"]);
+                                            win.closePopup();
+                                        }
+                                    }
+                                }
+
+                                // Button 2: Brightness
+                                Rectangle {
+                                    width: (parent.width - 12) / 3
+                                    height: parent.height
+                                    color: brBtnMouse.containsMouse ? theme.bg_light : theme.bg_dark
+                                    border.color: theme.accent
+                                    border.width: brBtnMouse.containsMouse ? 1 : 0
+                                    radius: 2
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "󰃠 Brightness"
+                                        color: brBtnMouse.containsMouse ? theme.accent : theme.fg_light
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 7
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    MouseArea {
+                                        id: brBtnMouse
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        onClicked: {
+                                            Quickshell.execDetached(["quickshell", "--config", "brightness_popup"]);
+                                            win.closePopup();
+                                        }
+                                    }
+                                }
+
+                                // Button 3: Notifications
+                                Rectangle {
+                                    width: (parent.width - 12) / 3
+                                    height: parent.height
+                                    color: ntBtnMouse.containsMouse ? theme.bg_light : theme.bg_dark
+                                    border.color: theme.accent
+                                    border.width: ntBtnMouse.containsMouse ? 1 : 0
+                                    radius: 2
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "󰂚 Notifs"
+                                        color: ntBtnMouse.containsMouse ? theme.accent : theme.fg_light
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 7
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    MouseArea {
+                                        id: ntBtnMouse
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        onClicked: {
+                                            Quickshell.execDetached(["quickshell", "--config", "notif_popup"]);
+                                            win.closePopup();
+                                        }
+                                    }
+                                }
                             }
 
                         }

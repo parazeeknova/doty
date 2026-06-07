@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-pub const SCHEMA_VERSION: i32 = 1;
+pub const SCHEMA_VERSION: i32 = 2;
 pub const THUMB_SIZE: u32 = 256;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -138,8 +138,14 @@ fn init_schema(conn: &Connection) -> Result<(), rusqlite::Error> {
             tag_id   INTEGER NOT NULL REFERENCES tags(id)   ON DELETE CASCADE,
             PRIMARY KEY (asset_id, tag_id)
         );
+        CREATE TABLE IF NOT EXISTS colors (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            hex        TEXT    NOT NULL,
+            picked_at  INTEGER NOT NULL
+        );
         CREATE INDEX IF NOT EXISTS idx_assets_created_at ON assets(created_at DESC);
         CREATE INDEX IF NOT EXISTS idx_asset_tags_tag    ON asset_tags(tag_id);
+        CREATE INDEX IF NOT EXISTS idx_colors_picked_at  ON colors(picked_at DESC);
         "#,
     )?;
 
@@ -566,6 +572,61 @@ pub fn list_tags(conn: &Connection) -> Result<Vec<TagCount>, String> {
             Ok(TagCount {
                 name: r.get(0)?,
                 count: r.get(1)?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+    Ok(iter.flatten().collect())
+}
+
+#[derive(Serialize, Clone, Debug)]
+pub struct PickedColor {
+    pub id: i64,
+    pub hex: String,
+    pub picked_at: i64,
+}
+
+pub fn add_color(conn: &Connection, hex: &str) -> Result<i64, String> {
+    let hex = hex.trim().to_lowercase();
+    if !hex.starts_with('#') || (hex.len() != 7 && hex.len() != 9) {
+        return Err(format!("invalid hex color: {hex}"));
+    }
+    let now = now_millis();
+    conn.execute(
+        "INSERT INTO colors (hex, picked_at) VALUES (?1, ?2)",
+        params![hex, now],
+    )
+    .map_err(|e| e.to_string())?;
+    Ok(conn.last_insert_rowid())
+}
+
+pub fn remove_color(conn: &Connection, id: i64) -> Result<(), String> {
+    let rows = conn
+        .execute("DELETE FROM colors WHERE id = ?1", params![id])
+        .map_err(|e| e.to_string())?;
+    if rows == 0 {
+        return Err(format!("color id {id} not found"));
+    }
+    Ok(())
+}
+
+pub fn clear_colors(conn: &Connection) -> Result<(), String> {
+    conn.execute("DELETE FROM colors", [])
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+pub fn list_colors(conn: &Connection, limit: i64) -> Result<Vec<PickedColor>, String> {
+    let mut stmt = conn
+        .prepare(
+            "SELECT id, hex, picked_at FROM colors ORDER BY picked_at DESC LIMIT ?1",
+        )
+        .map_err(|e| e.to_string())?;
+    let iter = stmt
+        .query_map(params![limit], |r| {
+            Ok(PickedColor {
+                id: r.get(0)?,
+                hex: r.get(1)?,
+                picked_at: r.get(2)?,
             })
         })
         .map_err(|e| e.to_string())?;

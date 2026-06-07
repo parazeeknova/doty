@@ -194,8 +194,8 @@ hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/waybar/scripts/waybar_togg
 -- Lock screen
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock -c ~/.config/hypr/hyprlock.conf"))
 
--- Color picker
-hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprpicker -a -n"))
+-- Color picker (also registers the color in the media popup history)
+hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("$HOME/.config/quickshell/media_popup/get_media_status pick-color"))
 
 -- Power menu / Logout
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show power"))

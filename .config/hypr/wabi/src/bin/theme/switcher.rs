@@ -137,6 +137,33 @@ fn hex_to_rgb_tuple(hex: &str) -> Option<(u8, u8, u8)> {
     }
 }
 
+fn get_closest_cmatrix_color(hex: &str) -> String {
+    let (r, g, b) = hex_to_rgb_tuple(hex).unwrap_or((0, 255, 0));
+    let candidates = vec![
+        ("red", (255, 0, 0)),
+        ("green", (0, 255, 0)),
+        ("yellow", (255, 255, 0)),
+        ("blue", (0, 0, 255)),
+        ("magenta", (255, 0, 255)),
+        ("cyan", (0, 255, 255)),
+        ("white", (255, 255, 255)),
+        ("black", (0, 0, 0)),
+    ];
+    let mut best_name = "green".to_string();
+    let mut min_dist = f64::MAX;
+    for (name, rgb) in candidates {
+        let dr = (r as f64) - (rgb.0 as f64);
+        let dg = (g as f64) - (rgb.1 as f64);
+        let db = (b as f64) - (rgb.2 as f64);
+        let dist = dr*dr + dg*dg + db*db;
+        if dist < min_dist {
+            min_dist = dist;
+            best_name = name.to_string();
+        }
+    }
+    best_name
+}
+
 fn rgb_to_hex_string(r: u8, g: u8, b: u8) -> String {
     format!("#{:02x}{:02x}{:02x}", r, g, b)
 }
@@ -208,6 +235,9 @@ fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     vars.insert("tertiary_hex".to_string(), tertiary.replace("#", ""));
     vars.insert("error".to_string(), error.clone());
     vars.insert("error_hex".to_string(), error.replace("#", ""));
+
+    let cmatrix_color = get_closest_cmatrix_color(&accent);
+    vars.insert("cmatrix_color".to_string(), cmatrix_color);
 
     // RGBA helper function
     let hex_to_rgb = |hex: &str| -> String {
@@ -583,6 +613,14 @@ fn main() {
         (
             ".config/vim/colors/matugen.vim.template",
             ".config/vim/colors/matugen.vim",
+        ),
+        (
+            ".config/zathura/zathurarc.template",
+            ".config/zathura/zathurarc",
+        ),
+        (
+            ".config/mpv/mpv.conf.template",
+            ".config/mpv/mpv.conf",
         ),
     ];
 

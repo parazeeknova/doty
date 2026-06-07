@@ -4,6 +4,7 @@ use std::env;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct Settings {
@@ -28,6 +29,27 @@ struct MediaStatus {
     recording_dir: String,
     assets: Vec<media_db::Asset>,
     tags: Vec<media_db::TagCount>,
+    colors: Vec<media_db::PickedColor>,
+    monitor_fps: u32,
+}
+
+fn detect_monitor_fps() -> u32 {
+    let out = Command::new("hyprctl")
+        .args(["monitors", "-j"])
+        .output()
+        .ok()
+        .filter(|o| o.status.success())
+        .map(|o| String::from_utf8_lossy(&o.stdout).to_string())
+        .unwrap_or_default();
+
+    serde_json::from_str::<serde_json::Value>(&out)
+        .ok()
+        .and_then(|v| v.as_array().cloned())
+        .and_then(|arr| arr.into_iter().next())
+        .and_then(|first| first.get("refreshRate").and_then(|r| r.as_f64()))
+        .map(|rate| rate.round() as u32)
+        .filter(|n| *n > 0)
+        .unwrap_or(60)
 }
 
 fn get_settings_path() -> PathBuf {
@@ -186,6 +208,71 @@ fn run() -> i32 {
                 save_settings(&settings);
                 return 0;
             }
+            "add-color" => {
+                if args.len() < 3 {
+                    print_error("usage: add-color <hex>");
+                    return 1;
+                }
+                let conn = match media_db::open() {
+                    Ok(c) => c,
+                    Err(e) => {
+                        print_error(&format!("db open: {e}"));
+                        return 1;
+                    }
+                };
+                match media_db::add_color(&conn, &args[2]) {
+                    Ok(id) => {
+                        println!("{id}");
+                        return 0;
+                    }
+                    Err(e) => {
+                        print_error(&e);
+                        return 1;
+                    }
+                }
+            }
+            "remove-color" => {
+                if args.len() < 3 {
+                    print_error("usage: remove-color <id>");
+                    return 1;
+                }
+                let id: i64 = match args[2].parse() {
+                    Ok(v) => v,
+                    Err(_) => {
+                        print_error("invalid color id");
+                        return 1;
+                    }
+                };
+                let conn = match media_db::open() {
+                    Ok(c) => c,
+                    Err(e) => {
+                        print_error(&format!("db open: {e}"));
+                        return 1;
+                    }
+                };
+                if let Err(e) = media_db::remove_color(&conn, id) {
+                    print_error(&e);
+                    return 1;
+                }
+                return 0;
+            }
+            "pick-color" => {
+                return pick_color();
+            }
+            "clear-colors" => {
+                let conn = match media_db::open() {
+                    Ok(c) => c,
+                    Err(e) => {
+                        print_error(&format!("db open: {e}"));
+                        return 1;
+                    }
+                };
+                if let Err(e) = media_db::clear_colors(&conn) {
+                    print_error(&e);
+                    return 1;
+                }
+                return 0;
+            }
             _ => {
                 print_error(&format!("unknown subcommand: {}", args[1]));
                 return 1;
@@ -206,6 +293,7 @@ fn run() -> i32 {
 
     let assets = media_db::list_assets(&conn, None, None, 50).unwrap_or_default();
     let tags = media_db::list_tags(&conn).unwrap_or_default();
+    let colors = media_db::list_colors(&conn, 24).unwrap_or_default();
 
     let status = MediaStatus {
         is_recording,
@@ -213,12 +301,77 @@ fn run() -> i32 {
         recording_dir: settings.recording_dir,
         assets,
         tags,
+        colors,
+        monitor_fps: detect_monitor_fps(),
     };
 
     if let Ok(json) = serde_json::to_string(&status) {
         println!("{json}");
     }
     0
+}
+
+fn ping_path() -> PathBuf {
+    let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
+    PathBuf::from(home).join(".config/quickshell/media_popup/ping.txt")
+}
+
+fn pick_color() -> i32 {
+    let out = Command::new("hyprpicker")
+        .args(["-a", "-n"])
+        .output();
+
+    let out = match out {
+        Ok(o) => o,
+        Err(e) => {
+            print_error(&format!("hyprpicker spawn: {e}"));
+            return 1;
+        }
+    };
+
+    if !out.status.success() {
+        let stderr = String::from_utf8_lossy(&out.stderr);
+        print_error(&format!(
+            "hyprpicker rc={} stderr={}",
+            out.status.code().unwrap_or(-1),
+            stderr.trim()
+        ));
+        return 1;
+    }
+
+    let hex = String::from_utf8_lossy(&out.stdout).trim().to_string();
+    if !hex.starts_with('#') {
+        print_error(&format!("no hex from hyprpicker: '{}'", hex));
+        return 1;
+    }
+
+    let conn = match media_db::open() {
+        Ok(c) => c,
+        Err(e) => {
+            print_error(&format!("db open: {e}"));
+            return 1;
+        }
+    };
+
+    match media_db::add_color(&conn, &hex) {
+        Ok(id) => {
+            if let Some(parent) = ping_path().parent() {
+                let _ = fs::create_dir_all(parent);
+            }
+            if let Ok(ts) = SystemTime::now().duration_since(UNIX_EPOCH) {
+                let _ = fs::write(
+                    ping_path(),
+                    format!("{}.{}\n", ts.as_secs(), ts.subsec_nanos()),
+                );
+            }
+            println!("{id}");
+            0
+        }
+        Err(e) => {
+            print_error(&e);
+            1
+        }
+    }
 }
 
 fn main() {

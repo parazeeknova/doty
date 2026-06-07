@@ -18,6 +18,7 @@ install: build
 	mkdir -p ../../quickshell/battery_popup ../../quickshell/volume_popup ../../quickshell/osd/bin ../../quickshell/network_popup ../../quickshell/bluetooth_popup ../../quickshell/brightness_popup ../../quickshell/notif_popup ../../quickshell/sysmon_popup ../../quickshell/podman_popup ../../quickshell/media_popup ../../quickshell/vm_popup ../../rofi/scripts ../../quickshell/wallpaper_switcher ../../quickshell/github_graph ../../../scripts ../../waybar/scripts
 	cp target/release/get_battery_status ../../quickshell/battery_popup/get_battery_status
 	cp target/release/log_battery ../../quickshell/battery_popup/log_battery
+	cp target/release/battery_daemon ../../quickshell/battery_popup/battery_daemon
 	cp target/release/get_audio_status ../../quickshell/volume_popup/get_audio_status
 	cp target/release/osdctl ../../quickshell/osd/bin/osdctl
 	cp target/release/get_network_status ../../quickshell/network_popup/get_network_status

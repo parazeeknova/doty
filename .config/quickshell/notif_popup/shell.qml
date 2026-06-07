@@ -348,6 +348,9 @@ Scope {
                 }
 
                 Rectangle {
+                    id: popupBg
+                    property string hoveredButtonName: ""
+                    property var hoveredButton: null
                     anchors.fill: parent
                     opacity: win.animOpacity
                     color: theme.popupBgColor
@@ -917,10 +920,22 @@ Scope {
 
                             }
 
-                            Column {
+                            Item {
                                 width: parent.width
-                                spacing: 6
-                                visible: root.historyExpanded
+                                height: root.historyExpanded ? historyContent.implicitHeight : 0
+                                clip: true
+
+                                Behavior on height {
+                                    NumberAnimation {
+                                        duration: 180
+                                        easing.type: Easing.InOutQuad
+                                    }
+                                }
+
+                                Column {
+                                    id: historyContent
+                                    width: parent.width
+                                    spacing: 6
 
                                 Text {
                                     text: "No history"
@@ -939,8 +954,7 @@ Scope {
                                         width: parent.width
                                         height: histBoxCol.implicitHeight + 10
                                         color: theme.bg
-                                        border.width: 1
-                                        border.color: theme.bg_light
+                                        border.width: 0
 
                                         Column {
                                             id: histBoxCol
@@ -1052,6 +1066,8 @@ Scope {
 
                             }
 
+                            }
+
                         }
 
                         Rectangle {
@@ -1083,8 +1099,16 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnVol.color = theme.accent
-                                    onExited: btnVol.color = theme.accent
+                                    onEntered: {
+                                        popupBg.hoveredButtonName = "Volume (SUPER+SHIFT+M)";
+                                        popupBg.hoveredButton = parent;
+                                        btnVol.color = theme.accent;
+                                    }
+                                    onExited: {
+                                        popupBg.hoveredButtonName = "";
+                                        popupBg.hoveredButton = null;
+                                        btnVol.color = theme.accent;
+                                    }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "volume_popup"]);
                                         win.closePopup();
@@ -1112,8 +1136,16 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnNet.color = theme.accent
-                                    onExited: btnNet.color = theme.accent
+                                    onEntered: {
+                                        popupBg.hoveredButtonName = "Network (SUPER+SHIFT+W)";
+                                        popupBg.hoveredButton = parent;
+                                        btnNet.color = theme.accent;
+                                    }
+                                    onExited: {
+                                        popupBg.hoveredButtonName = "";
+                                        popupBg.hoveredButton = null;
+                                        btnNet.color = theme.accent;
+                                    }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "network_popup"]);
                                         win.closePopup();
@@ -1141,8 +1173,16 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnBt.color = theme.accent
-                                    onExited: btnBt.color = theme.accent
+                                    onEntered: {
+                                        popupBg.hoveredButtonName = "Bluetooth (SUPER+SHIFT+F)";
+                                        popupBg.hoveredButton = parent;
+                                        btnBt.color = theme.accent;
+                                    }
+                                    onExited: {
+                                        popupBg.hoveredButtonName = "";
+                                        popupBg.hoveredButton = null;
+                                        btnBt.color = theme.accent;
+                                    }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "bluetooth_popup"]);
                                         win.closePopup();
@@ -1170,8 +1210,16 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnBright.color = theme.accent
-                                    onExited: btnBright.color = theme.accent
+                                    onEntered: {
+                                        popupBg.hoveredButtonName = "Brightness (SUPER+SHIFT+B)";
+                                        popupBg.hoveredButton = parent;
+                                        btnBright.color = theme.accent;
+                                    }
+                                    onExited: {
+                                        popupBg.hoveredButtonName = "";
+                                        popupBg.hoveredButton = null;
+                                        btnBright.color = theme.accent;
+                                    }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "brightness_popup"]);
                                         win.closePopup();
@@ -1199,8 +1247,16 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnBat.color = theme.accent
-                                    onExited: btnBat.color = theme.accent
+                                    onEntered: {
+                                        popupBg.hoveredButtonName = "Battery";
+                                        popupBg.hoveredButton = parent;
+                                        btnBat.color = theme.accent;
+                                    }
+                                    onExited: {
+                                        popupBg.hoveredButtonName = "";
+                                        popupBg.hoveredButton = null;
+                                        btnBat.color = theme.accent;
+                                    }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "battery_popup"]);
                                         win.closePopup();
@@ -1228,8 +1284,16 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnSysmon.color = theme.accent
-                                    onExited: btnSysmon.color = theme.accent
+                                    onEntered: {
+                                        popupBg.hoveredButtonName = "System Monitor";
+                                        popupBg.hoveredButton = parent;
+                                        btnSysmon.color = theme.accent;
+                                    }
+                                    onExited: {
+                                        popupBg.hoveredButtonName = "";
+                                        popupBg.hoveredButton = null;
+                                        btnSysmon.color = theme.accent;
+                                    }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "sysmon_popup"]);
                                         win.closePopup();
@@ -1262,8 +1326,16 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnPodman.color = theme.accent
-                                    onExited: btnPodman.color = theme.accent
+                                    onEntered: {
+                                        popupBg.hoveredButtonName = "Podman (SUPER+ALT+/)";
+                                        popupBg.hoveredButton = parent;
+                                        btnPodman.color = theme.accent;
+                                    }
+                                    onExited: {
+                                        popupBg.hoveredButtonName = "";
+                                        popupBg.hoveredButton = null;
+                                        btnPodman.color = theme.accent;
+                                    }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "podman_popup"]);
                                         win.closePopup();
@@ -1291,8 +1363,16 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnEmoji.color = theme.accent
-                                    onExited: btnEmoji.color = theme.accent
+                                    onEntered: {
+                                        popupBg.hoveredButtonName = "Emoji (SUPER+,)";
+                                        popupBg.hoveredButton = parent;
+                                        btnEmoji.color = theme.accent;
+                                    }
+                                    onExited: {
+                                        popupBg.hoveredButtonName = "";
+                                        popupBg.hoveredButton = null;
+                                        btnEmoji.color = theme.accent;
+                                    }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "emoji_popup"]);
                                         win.closePopup();
@@ -1320,8 +1400,16 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnOcr.color = theme.accent
-                                    onExited: btnOcr.color = theme.accent
+                                    onEntered: {
+                                        popupBg.hoveredButtonName = "Media (SUPER+SHIFT+G)";
+                                        popupBg.hoveredButton = parent;
+                                        btnOcr.color = theme.accent;
+                                    }
+                                    onExited: {
+                                        popupBg.hoveredButtonName = "";
+                                        popupBg.hoveredButton = null;
+                                        btnOcr.color = theme.accent;
+                                    }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "media_popup"]);
                                         win.closePopup();
@@ -1349,8 +1437,16 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnVmm.color = theme.accent
-                                    onExited: btnVmm.color = theme.accent
+                                    onEntered: {
+                                        popupBg.hoveredButtonName = "Virtual Machine (SUPER+SHIFT+V)";
+                                        popupBg.hoveredButton = parent;
+                                        btnVmm.color = theme.accent;
+                                    }
+                                    onExited: {
+                                        popupBg.hoveredButtonName = "";
+                                        popupBg.hoveredButton = null;
+                                        btnVmm.color = theme.accent;
+                                    }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "vm_popup"]);
                                         win.closePopup();
@@ -1378,8 +1474,16 @@ Scope {
                                  MouseArea {
                                      anchors.fill: parent
                                      hoverEnabled: true
-                                     onEntered: btnColorscheme.opacity = 0.7
-                                     onExited: btnColorscheme.opacity = 1
+                                     onEntered: {
+                                         popupBg.hoveredButtonName = "Colorscheme (SUPER+ALT+C)";
+                                         popupBg.hoveredButton = parent;
+                                         btnColorscheme.opacity = 0.7;
+                                     }
+                                     onExited: {
+                                         popupBg.hoveredButtonName = "";
+                                         popupBg.hoveredButton = null;
+                                         btnColorscheme.opacity = 1;
+                                     }
                                      onClicked: {
                                          Quickshell.execDetached(["quickshell", "--config", "colorscheme_popup"]);
                                          win.closePopup();
@@ -1407,8 +1511,16 @@ Scope {
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: btnWallpaper.color = theme.accent
-                                    onExited: btnWallpaper.color = theme.accent
+                                    onEntered: {
+                                        popupBg.hoveredButtonName = "Wallpaper (SUPER+ALT+W)";
+                                        popupBg.hoveredButton = parent;
+                                        btnWallpaper.color = theme.accent;
+                                    }
+                                    onExited: {
+                                        popupBg.hoveredButtonName = "";
+                                        popupBg.hoveredButton = null;
+                                        btnWallpaper.color = theme.accent;
+                                    }
                                     onClicked: {
                                         Quickshell.execDetached(["quickshell", "--config", "wallpaper_switcher"]);
                                         win.closePopup();
@@ -1637,6 +1749,37 @@ Scope {
 
                         }
 
+                    }
+
+                    // Custom Tooltip Overlay for bottom buttons
+                    Rectangle {
+                        id: btnTooltip
+                        visible: opacity > 0
+                        opacity: popupBg.hoveredButtonName !== "" ? 1.0 : 0.0
+                        z: 100000
+                        x: popupBg.hoveredButton ? Math.min(Math.max(popupBg.hoveredButton.mapToItem(popupBg, 0, 0).x + (popupBg.hoveredButton.width - width) / 2, 8), popupBg.width - width - 8) : 0
+                        y: popupBg.hoveredButton ? (popupBg.hoveredButton.mapToItem(popupBg, 0, 0).y - height - 6) : 0
+                        width: tooltipText.implicitWidth + 12
+                        height: tooltipText.implicitHeight + 6
+                        color: theme.bg_dark
+                        border.width: 1
+                        border.color: theme.accent
+                        radius: 2
+
+                        Behavior on opacity {
+                            NumberAnimation { duration: 100 }
+                        }
+
+                        Text {
+                            id: tooltipText
+                            text: popupBg.hoveredButtonName
+                            color: theme.accent
+                            font.pixelSize: 9
+                            font.family: "FiraCode Nerd Font"
+                            font.bold: true
+                            anchors.centerIn: parent
+                            renderType: Text.NativeRendering
+                        }
                     }
 
                 }
