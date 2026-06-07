@@ -1,3 +1,4 @@
+import QtMultimedia
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
@@ -15,6 +16,7 @@ Scope {
     property int selectedIndex: -2
     property bool isReady: false
     property bool lastWallpaperLoaded: false
+    property bool allowVideoPreview: false
 
     signal requestClose()
 
@@ -55,11 +57,10 @@ Scope {
         // Cancel any pending preview awww call so it can't overwrite our confirmed path.
         applyTimer.stop();
         root.activeWallpaper = path;
-
-        // Set the actual wallpaper (awww) AND the color scheme (theme_switcher) atomically.
+        // Set the actual wallpaper (set_wallpaper) AND the color scheme (theme_switcher) atomically.
         // If we only run one, the screen and the colors drift apart — the preview path
-        // calls awww on a 260ms debounce, which is skipped when the user confirms fast.
-        Quickshell.execDetached(["awww", "img", path]);
+        // calls set_wallpaper on a 260ms debounce, which is skipped when the user confirms fast.
+        Quickshell.execDetached([root.homeDir + "/doty/scripts/set_wallpaper", path]);
         Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "wallpaper", path]);
         Quickshell.execDetached(["mkdir", "-p", root.homeDir + "/.cache"]);
         Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" > " + root.homeDir + "/.cache/last_wallpaper", "sh", path]);
@@ -73,6 +74,16 @@ Scope {
         scanWallpapers();
     }
 
+    Timer {
+        id: videoPreviewDelayTimer
+
+        interval: 200
+        repeat: false
+        running: true
+        onTriggered: {
+            root.allowVideoPreview = true;
+        }
+    }
 
     Theme {
         id: theme
@@ -134,9 +145,9 @@ Scope {
         repeat: false
         running: false
         onTriggered: {
-            if (root.activeWallpaper !== "") {
-                Quickshell.execDetached(["awww", "img", root.activeWallpaper]);
-            }
+            if (root.activeWallpaper !== "")
+                Quickshell.execDetached([root.homeDir + "/doty/scripts/set_wallpaper", root.activeWallpaper]);
+
         }
     }
 
@@ -158,6 +169,14 @@ Scope {
                         return ;
 
                     isClosing = true;
+
+                    if (root.activeWallpaper !== "") {
+                        Quickshell.execDetached([root.homeDir + "/doty/scripts/set_wallpaper", root.activeWallpaper]);
+                        Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "wallpaper", root.activeWallpaper]);
+                        Quickshell.execDetached(["mkdir", "-p", root.homeDir + "/.cache"]);
+                        Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" > " + root.homeDir + "/.cache/last_wallpaper", "sh", root.activeWallpaper]);
+                    }
+
                     exitAnim.start();
                 }
 
@@ -304,11 +323,10 @@ Scope {
                             listView.incrementCurrentIndex();
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
-                            if (listView.currentIndex >= 0 && listView.currentIndex < root.wallpapers.length) {
+                            if (listView.currentIndex >= 0 && listView.currentIndex < root.wallpapers.length)
                                 root.confirmWallpaper(root.wallpapers[listView.currentIndex].path);
-                            } else {
+                            else
                                 win.closePopup();
-                            }
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Escape) {
                             win.closePopup();
@@ -384,33 +402,7 @@ Scope {
                                 property real targetScale: Math.max(0.65, 1 - distance * 0.15)
                                 property real targetOpacity: Math.max(0.15, 1 - distance * 0.35)
                                 property real targetXOffset: -(distance * distance * 14)
-
                                 property var colorsList: ["#a9b665", "#7daea3", "#d8a657", "#cc241d", "#1d2021", "#ebdbb2"]
-
-                                FileView {
-                                    id: colorReader
-                                    path: "file://" + thumbnailPath.replace(/\.jpg$/, ".json")
-                                    onLoaded: {
-                                        try {
-                                            var textVal = colorReader.text().trim();
-                                            if (textVal.length === 0) return;
-                                            var data = JSON.parse(textVal);
-                                            if (data && data.colors) {
-                                                var c = data.colors;
-                                                delegateItem.colorsList = [
-                                                    c.primary ? c.primary.default.color : "#a9b665",
-                                                    c.secondary ? c.secondary.default.color : "#7daea3",
-                                                    c.tertiary ? c.tertiary.default.color : "#d8a657",
-                                                    c.error ? c.error.default.color : "#cc241d",
-                                                    c.surface ? c.surface.default.color : "#1d2021",
-                                                    c.on_surface ? c.on_surface.default.color : "#ebdbb2"
-                                                ];
-                                            }
-                                        } catch (e) {
-                                            // ignore
-                                        }
-                                    }
-                                }
 
                                 width: listView.width
                                 height: 136
@@ -418,8 +410,31 @@ Scope {
                                 opacity: targetOpacity
                                 x: targetXOffset
 
+                                FileView {
+                                    // ignore
+
+                                    id: colorReader
+
+                                    path: "file://" + thumbnailPath.replace(/\.jpg$/, ".json")
+                                    onLoaded: {
+                                        try {
+                                            var textVal = colorReader.text().trim();
+                                            if (textVal.length === 0)
+                                                return ;
+
+                                            var data = JSON.parse(textVal);
+                                            if (data && data.colors) {
+                                                var c = data.colors;
+                                                delegateItem.colorsList = [c.primary ? c.primary.default.color : "#a9b665", c.secondary ? c.secondary.default.color : "#7daea3", c.tertiary ? c.tertiary.default.color : "#d8a657", c.error ? c.error.default.color : "#cc241d", c.surface ? c.surface.default.color : "#1d2021", c.on_surface ? c.on_surface.default.color : "#ebdbb2"];
+                                            }
+                                        } catch (e) {
+                                        }
+                                    }
+                                }
+
                                 Rectangle {
                                     id: previewRect
+
                                     width: 212
                                     height: 124
                                     anchors.left: parent.left
@@ -443,9 +458,53 @@ Scope {
                                         anchors.fill: parent
                                         source: "file://" + thumbnailPath
                                         fillMode: Image.PreserveAspectCrop
-                                        asynchronous: false
+                                        asynchronous: true
                                         cache: true
                                         smooth: true
+                                    }
+
+                                    Loader {
+                                        id: videoLoader
+
+                                        anchors.fill: parent
+                                        active: root.allowVideoPreview && (delegateItem.wallpaperPath.endsWith(".mp4") || delegateItem.wallpaperPath.endsWith(".webm")) && (index === listView.currentIndex) && !listView.moving && !listView.flicking
+
+                                        sourceComponent: Video {
+                                            anchors.fill: parent
+                                            source: "file://" + thumbnailPath.replace(/\.jpg$/, ".mp4")
+                                            fillMode: VideoOutput.PreserveAspectCrop
+                                            muted: true
+                                            loops: MediaPlayer.Infinite
+                                            autoPlay: true
+                                        }
+
+                                    }
+
+                                    // Animated Video Indicator on Top Right
+                                    Rectangle {
+                                        id: videoIndicator
+
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: delegateItem.colorsList[4]
+                                        opacity: 0.85
+                                        border.width: 1
+                                        border.color: "#30ffffff"
+                                        anchors.right: parent.right
+                                        anchors.top: parent.top
+                                        anchors.margins: 6
+                                        z: 3
+                                        visible: delegateItem.wallpaperPath.endsWith(".mp4") || delegateItem.wallpaperPath.endsWith(".webm")
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "" // Nerd Font video camera icon
+                                            color: delegateItem.colorsList[5]
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                        }
+
                                     }
 
                                     // Wallpaper Name Overlay at the bottom
@@ -478,6 +537,7 @@ Scope {
 
                                 Column {
                                     id: colorColumn
+
                                     anchors.left: previewRect.right
                                     anchors.leftMargin: 8
                                     anchors.verticalCenter: parent.verticalCenter
@@ -485,6 +545,7 @@ Scope {
 
                                     Repeater {
                                         model: delegateItem.colorsList.slice(0, 5)
+
                                         delegate: Rectangle {
                                             width: 16
                                             height: 16
@@ -492,7 +553,9 @@ Scope {
                                             border.width: 1
                                             border.color: "#30ffffff"
                                         }
+
                                     }
+
                                 }
 
                                 MouseArea {

@@ -58,10 +58,26 @@ fn get_matugen_palette(wallpaper_path: &Path) -> Option<HashMap<String, String>>
     let json_content = if cache_path.exists() && cache_is_fresh {
         fs::read_to_string(cache_path).ok()?
     } else {
+        let is_video = wallpaper_path.extension()
+            .and_then(|ext| ext.to_str())
+            .map(|ext| {
+                matches!(
+                    ext.to_ascii_lowercase().as_str(),
+                    "mp4" | "webm"
+                )
+            })
+            .unwrap_or(false);
+
+        let matugen_input = if is_video {
+            cache_dir.join(format!("{}.jpg", hash))
+        } else {
+            wallpaper_path.to_path_buf()
+        };
+
         // Run matugen dynamically — either no cache or stale cache.
         let out = Command::new("matugen")
             .arg("image")
-            .arg(wallpaper_path)
+            .arg(&matugen_input)
             .arg("--json")
             .arg("hex")
             .arg("--source-color-index")
@@ -501,9 +517,32 @@ fn main() {
     let doty = home_dir().join("doty");
 
     if mode == "wallpaper" {
+        let path = Path::new(&value);
+        let is_video = path.extension()
+            .and_then(|ext| ext.to_str())
+            .map(|ext| {
+                matches!(
+                    ext.to_ascii_lowercase().as_str(),
+                    "mp4" | "webm"
+                )
+            })
+            .unwrap_or(false);
+
+        let matugen_input = if is_video {
+            let hash = stable_hash(path);
+            home_dir()
+                .join(".cache")
+                .join("quickshell")
+                .join("wallpaper_switcher")
+                .join("thumbs")
+                .join(format!("{}.jpg", hash))
+        } else {
+            path.to_path_buf()
+        };
+
         let _ = Command::new("matugen")
             .arg("image")
-            .arg(&value)
+            .arg(&matugen_input)
             .arg("--source-color-index")
             .arg("0")
             .status();

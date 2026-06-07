@@ -159,6 +159,8 @@ fn main() {
 
             if status_changed || low_crossed || last_status.is_none() {
                 if status == "Charging" || status == "Full" {
+                    let _ = Command::new("killall").args(["-CONT", "mpvpaper"]).status();
+
                     if last_status.as_ref().map_or(true, |s| s != "Charging" && s != "Full") {
                         set_profile(&settings.ac_profile);
                         set_keyboard_brightness(settings.ac_kbd_brightness);
@@ -173,6 +175,8 @@ fn main() {
                         );
                     }
                 } else {
+                    let _ = Command::new("killall").args(["-STOP", "mpvpaper"]).status();
+
                     if is_low {
                         if !was_low || status_changed || last_status.is_none() {
                             set_profile(&settings.low_profile);

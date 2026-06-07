@@ -14,9 +14,8 @@ hl.on("hyprland.start", function()
     hl.exec_cmd(
         "sh -lc 'if command -v quickshell >/dev/null 2>&1; then uwsm app -- quickshell --config workspace_overview; elif command -v qs >/dev/null 2>&1; then uwsm app -- qs --config workspace_overview; fi'")
     hl.exec_cmd("uwsm app -- waybar")
-    hl.exec_cmd("uwsm app -- awww-daemon")
     hl.exec_cmd(
-        "sh -c 'uwsm app -- awww img \"$(cat ~/.cache/last_wallpaper 2>/dev/null || echo \"$HOME/Pictures/Anime/grey_lain_wallpaper.jpg\")\"'")
+        "sh -c '~/doty/scripts/set_wallpaper \"$(cat ~/.cache/last_wallpaper 2>/dev/null || echo \"$HOME/Pictures/Anime/grey_lain_wallpaper.jpg\")\"'")
     hl.exec_cmd("uwsm app -- hyprsunset")
     hl.exec_cmd("uwsm app -- hypridle")
     hl.exec_cmd("uwsm app -- pypr")

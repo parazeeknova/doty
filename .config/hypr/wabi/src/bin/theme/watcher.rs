@@ -50,13 +50,25 @@ fn watch_dirs() -> Vec<PathBuf> {
     ]
 }
 
-fn is_image(path: &Path) -> bool {
+fn is_supported_wallpaper(path: &Path) -> bool {
     path.extension()
         .and_then(|ext| ext.to_str())
         .map(|ext| {
             matches!(
                 ext.to_ascii_lowercase().as_str(),
-                "jpg" | "jpeg" | "png" | "gif"
+                "jpg" | "jpeg" | "png" | "gif" | "mp4" | "webm"
+            )
+        })
+        .unwrap_or(false)
+}
+
+fn is_animated(path: &Path) -> bool {
+    path.extension()
+        .and_then(|ext| ext.to_str())
+        .map(|ext| {
+            matches!(
+                ext.to_ascii_lowercase().as_str(),
+                "gif" | "mp4" | "webm"
             )
         })
         .unwrap_or(false)
@@ -73,7 +85,7 @@ fn thumb_path(cache_dir: &Path, path: &Path) -> PathBuf {
 }
 
 fn resolve_image(entry_path: PathBuf) -> Option<Wallpaper> {
-    if !is_image(&entry_path) {
+    if !is_supported_wallpaper(&entry_path) {
         return None;
     }
 
@@ -144,9 +156,16 @@ fn generate_thumb(wallpaper: &Wallpaper, thumb: &Path) -> bool {
             return false;
         }
 
-    let tmp = thumb.with_extension("jpg.tmp");
+    let mut tmp = thumb.to_path_buf();
+    tmp.set_extension("tmp.jpg");
+    let input_arg = if is_animated(&wallpaper.path) {
+        format!("{}[0]", wallpaper.path.display())
+    } else {
+        wallpaper.path.to_string_lossy().into_owned()
+    };
+
     let status = Command::new("magick")
-        .arg(&wallpaper.path)
+        .arg(&input_arg)
         .arg("-auto-orient")
         .arg("-thumbnail")
         .arg(format!("{PREVIEW_SIZE}^"))
@@ -194,9 +213,25 @@ fn generate_colors(wallpaper: &Wallpaper, cache_dir: &Path) {
         return;
     }
 
+    let is_video = wallpaper.path.extension()
+        .and_then(|ext| ext.to_str())
+        .map(|ext| {
+            matches!(
+                ext.to_ascii_lowercase().as_str(),
+                "mp4" | "webm"
+            )
+        })
+        .unwrap_or(false);
+
+    let matugen_input = if is_video {
+        thumb_path(cache_dir, &wallpaper.path)
+    } else {
+        wallpaper.path.clone()
+    };
+
     let output = Command::new("matugen")
         .arg("image")
-        .arg(&wallpaper.path)
+        .arg(&matugen_input)
         .arg("--json")
         .arg("hex")
         .arg("--source-color-index")
@@ -228,6 +263,70 @@ fn generate_colors(wallpaper: &Wallpaper, cache_dir: &Path) {
     }
 }
 
+fn generate_video_preview(wallpaper: &Wallpaper, cache_dir: &Path) -> bool {
+    let hash = stable_hash(&wallpaper.path);
+    let preview_mp4 = cache_dir.join(format!("{}.mp4", hash));
+
+    let needs_preview_regen = match fs::metadata(&preview_mp4) {
+        Ok(meta) => {
+            if meta.len() == 0 {
+                true
+            } else {
+                meta.modified()
+                    .map(|modified| wallpaper.modified > modified)
+                    .unwrap_or(true)
+            }
+        }
+        Err(_) => true,
+    };
+
+    if !needs_preview_regen {
+        return false;
+    }
+
+    let tmp = preview_mp4.with_extension("tmp.mp4");
+    let status = Command::new("ffmpeg")
+        .arg("-y")
+        .arg("-i")
+        .arg(&wallpaper.path)
+        .arg("-vf")
+        .arg("scale=440:248:force_original_aspect_ratio=increase,crop=440:248")
+        .arg("-an")
+        .arg("-c:v")
+        .arg("libx264")
+        .arg("-pix_fmt")
+        .arg("yuv420p")
+        .arg("-preset")
+        .arg("fast")
+        .arg("-crf")
+        .arg("28")
+        .arg(&tmp)
+        .status();
+
+    let Ok(status) = status else {
+        eprintln!("ffmpeg is not available; cannot generate video previews");
+        return false;
+    };
+    if !status.success() {
+        eprintln!(
+            "failed to generate video preview for {}",
+            wallpaper.path.display()
+        );
+        let _ = fs::remove_file(&tmp);
+        return false;
+    }
+
+    if let Err(err) = fs::rename(&tmp, &preview_mp4) {
+        eprintln!(
+            "failed to move preview video into place {}: {err}",
+            preview_mp4.display()
+        );
+        let _ = fs::remove_file(&tmp);
+        return false;
+    }
+    true
+}
+
 fn cleanup_stale(cache_dir: &Path, live_thumbs: &BTreeSet<PathBuf>) {
     let Ok(entries) = fs::read_dir(cache_dir) else {
         return;
@@ -237,12 +336,17 @@ fn cleanup_stale(cache_dir: &Path, live_thumbs: &BTreeSet<PathBuf>) {
         let path = entry.path();
         if path.extension().and_then(|ext| ext.to_str()) != Some("jpg")
             && path.extension().and_then(|ext| ext.to_str()) != Some("json")
+            && path.extension().and_then(|ext| ext.to_str()) != Some("mp4")
         {
             continue;
         }
-        // Also keep live JSONs
+        // Also keep live JSONs and MP4s
         let is_stale = if path.extension().and_then(|ext| ext.to_str()) == Some("jpg") {
             !live_thumbs.contains(&path)
+        } else if path.extension().and_then(|ext| ext.to_str()) == Some("mp4") {
+            let stem = path.file_stem().and_then(|s| s.to_str()).unwrap_or("");
+            let corresponding_jpg = cache_dir.join(format!("{}.jpg", stem));
+            !live_thumbs.contains(&corresponding_jpg)
         } else {
             // It's a json color cache. Reconstruct corresponding jpg path to check if live
             let stem = path.file_stem().and_then(|s| s.to_str()).unwrap_or("");
@@ -270,7 +374,7 @@ fn link_anime_wallpapers() {
 
     for entry in entries.flatten() {
         let path = entry.path();
-        if !is_image(&path) {
+        if !is_supported_wallpaper(&path) {
             continue;
         }
         let Some(file_name) = path.file_name() else {
@@ -314,6 +418,14 @@ fn sync_once(dirs: &[PathBuf], cache_dir: &Path, clean: bool) {
         live_thumbs.insert(thumb.clone());
         generate_thumb(wallpaper, &thumb);
         generate_colors(wallpaper, cache_dir);
+
+        let is_video = wallpaper.path.extension()
+            .and_then(|ext| ext.to_str())
+            .map(|ext| matches!(ext.to_ascii_lowercase().as_str(), "mp4" | "webm"))
+            .unwrap_or(false);
+        if is_video {
+            generate_video_preview(wallpaper, cache_dir);
+        }
     }
 
     if clean {

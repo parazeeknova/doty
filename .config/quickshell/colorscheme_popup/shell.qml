@@ -41,10 +41,23 @@ Scope {
             return ;
         root.currentWallpaperPath = path;
         root.currentThemeMode = "wallpaper";
-        // awww first (sets the visible wallpaper), then theme_switcher (matugen from the same file).
-        Quickshell.execDetached(["awww", "img", path]);
+        // set_wallpaper first (sets the visible wallpaper), then theme_switcher (matugen from the same file).
+        Quickshell.execDetached([root.homeDir + "/doty/scripts/set_wallpaper", path]);
         Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "wallpaper", path]);
         Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" > " + root.homeDir + "/.cache/last_wallpaper", "sh", path]);
+    }
+
+    function getWallpaperThumb(path) {
+        if (path === "") return "";
+        var isVideo = path.endsWith(".mp4") || path.endsWith(".webm");
+        if (!isVideo) return path;
+
+        for (var i = 0; i < root.wallpapers.length; i++) {
+            if (root.wallpapers[i].path === path) {
+                return root.wallpapers[i].thumb;
+            }
+        }
+        return "";
     }
 
     Theme {
@@ -373,7 +386,7 @@ Scope {
 
                                 Image {
                                     anchors.fill: parent
-                                    source: root.currentWallpaperPath !== "" ? ("file://" + root.currentWallpaperPath) : ""
+                                    source: (root.currentWallpaperPath !== "" && root.getWallpaperThumb(root.currentWallpaperPath) !== "") ? ("file://" + root.getWallpaperThumb(root.currentWallpaperPath)) : ""
                                     fillMode: Image.PreserveAspectCrop
                                     asynchronous: true
                                 }
@@ -546,6 +559,50 @@ Scope {
                                                 source: "file://" + modelData.thumb
                                                 fillMode: Image.PreserveAspectCrop
                                                 asynchronous: true
+                                            }
+
+                                            // Animated Video Indicator on Top Right
+                                            Rectangle {
+                                                width: 8
+                                                height: 8
+                                                radius: 4
+                                                color: theme.bg
+                                                opacity: 0.85
+                                                anchors.right: parent.right
+                                                anchors.top: parent.top
+                                                anchors.margins: 1
+                                                z: 3
+                                                visible: modelData.path.endsWith(".mp4") || modelData.path.endsWith(".webm")
+
+                                                Text {
+                                                    anchors.centerIn: parent
+                                                    text: "" // Nerd Font video camera icon
+                                                    color: theme.accent
+                                                    font.family: "FiraCode Nerd Font"
+                                                    font.pixelSize: 5
+                                                }
+                                            }
+
+                                            // Animated Video Indicator on Top Right (Tiny Square version)
+                                            Rectangle {
+                                                width: 8
+                                                height: 8
+                                                radius: 4
+                                                color: theme.bg
+                                                opacity: 0.85
+                                                anchors.right: parent.right
+                                                anchors.top: parent.top
+                                                anchors.margins: 1
+                                                z: 3
+                                                visible: modelData.path.endsWith(".mp4") || modelData.path.endsWith(".webm")
+
+                                                Text {
+                                                    anchors.centerIn: parent
+                                                    text: "" // Nerd Font video camera icon
+                                                    color: theme.accent
+                                                    font.family: "FiraCode Nerd Font"
+                                                    font.pixelSize: 5
+                                                }
                                             }
 
                                             Rectangle {
