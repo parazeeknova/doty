@@ -28,7 +28,6 @@ Scope {
         id: theme
     }
 
-
     IpcHandler {
         function close() {
             root.requestClose();

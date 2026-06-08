@@ -74,6 +74,11 @@ name = "tray_count"
 path = "src/bin/utils/tray_count.rs"
 
 [[bin]]
+name = "parse_binds"
+path = "src/bin/utils/parse_binds.rs"
+
+
+[[bin]]
 name = "theme_switcher"
 path = "src/bin/theme/switcher.rs"
 
@@ -128,3 +133,8 @@ path = "src/bin/rofi/rofi_wrap.rs"
 [[bin]]
 name = "battery_daemon"
 path = "src/bin/status/battery_daemon.rs"
+
+[[bin]]
+name = "set_wallpaper"
+path = "src/bin/theme/set_wallpaper.rs"
+

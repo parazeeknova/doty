@@ -337,6 +337,7 @@ const UNIVERSAL_BOOST_OPTIONS = {
 };
 
 let universalBoostedDomains = new Set();
+let lastSyncedAccent = null;
 
 // Iterate over all open browser tabs. For any tab whose hostname
 // doesn't yet have a registered boost, create one with the
@@ -726,14 +727,16 @@ function rgbToHsl(r, g, b) {
 }
 
 function syncWorkspaceTheme(data) {
-  logInfo(`syncWorkspaceTheme: called with accent=${data?.accent}`);
+  const accentHex = data?.accent;
+  if (!accentHex) return;
+  if (accentHex === lastSyncedAccent) return;
+  logInfo(`syncWorkspaceTheme: called with accent=${accentHex}`);
   try {
     const win = Services.wm.getMostRecentWindow("navigator:browser");
     if (!win) {
       logWarn("syncWorkspaceTheme: no browser window");
       return;
     }
-    const accentHex = data.accent;
     const accentRgb = hexToRgb01(accentHex);
     if (!accentRgb) {
       logWarn(`syncWorkspaceTheme: bad accent ${accentHex}`);
@@ -752,20 +755,28 @@ function syncWorkspaceTheme(data) {
     if (win.gZenWorkspaces) {
       const ws = win.gZenWorkspaces.getActiveWorkspace();
       if (ws && ws.theme) {
-        const gradientColors = [{ c: accentRgb, isPrimary: true }];
         const bgDark = hexToRgb01(data["bg-dark"]);
-        if (bgDark) gradientColors.push({ c: bgDark });
         const bgLight = hexToRgb01(data["bg-light"]);
+        const gradientColors = [{ c: accentRgb, isPrimary: true }];
+        if (bgDark) gradientColors.push({ c: bgDark });
         if (bgLight) gradientColors.push({ c: bgLight });
         ws.theme.gradientColors = gradientColors;
         ws.theme.type = "gradient";
         ws.theme.opacity = ws.theme.opacity ?? 0.5;
         ws.theme.texture = ws.theme.texture ?? 0;
         win.gZenWorkspaces.saveWorkspace(ws);
-        Services.obs.notifyObservers(null, "zen-space-gradient-update");
+        // Verify the gradient was persisted
+        const wsAfter = win.gZenWorkspaces.getActiveWorkspace();
+        const gAfter = wsAfter?.theme?.gradientColors;
+        const match = gAfter && gAfter[0] && gAfter[0].c &&
+          Math.abs(gAfter[0].c[0] - accentRgb[0]) < 0.01 &&
+          Math.abs(gAfter[0].c[1] - accentRgb[1]) < 0.01 &&
+          Math.abs(gAfter[0].c[2] - accentRgb[2]) < 0.01;
         logInfo(
-          `Synced workspace gradient: ${gradientColors.length} color(s) from accent ${accentHex}`,
+          `Synced workspace gradient: ${gradientColors.length} color(s) from accent ${accentHex} (verified=${!!match})`,
         );
+        Services.obs.notifyObservers(null, "zen-space-gradient-update");
+        lastSyncedAccent = accentHex;
         return;
       }
       logInfo(
@@ -787,13 +798,16 @@ function syncWorkspaceTheme(data) {
       return;
     }
     let updated = 0;
+    let failed = 0;
     for (const domain of universalBoostedDomains) {
       try {
         const boost = boostsManager.loadActiveBoostFromStore(domain);
-        if (!boost) continue;
+        if (!boost) {
+          failed++;
+          logWarn(`HSL fallback: no active boost for ${domain}`);
+          continue;
+        }
         const { boostData } = boost.boostEntry;
-        // Use the workspace gradient path — set autoTheme: false and
-        // explicit HSL on the dot picker. light 0.1..0.9 -> brightness 0..1.
         boostData.autoTheme = false;
         boostData.dotAngleDeg = h;
         boostData.saturation = 1 - s;
@@ -803,10 +817,12 @@ function syncWorkspaceTheme(data) {
         boostsManager.updateBoost(boost);
         updated++;
       } catch (e) {
+        failed++;
         logError(`update boost[${domain}] HSL: ${e.message}`);
       }
     }
-    logInfo(`Updated ${updated} boost(s) with HSL from accent ${accentHex}`);
+    logInfo(`HSL fallback: updated ${updated} boost(s), failed ${failed}, from accent ${accentHex}`);
+    if (updated > 0) lastSyncedAccent = accentHex;
   } catch (e) {
     logError(`syncWorkspaceTheme: ${e.message}\n${e.stack || ""}`);
   }

@@ -108,7 +108,7 @@ Scope {
 
                 required property var modelData
                 property bool isClosing: false
-                property real animOffsetX: -550
+                property real animOffsetY: -350
                 property real animOpacity: 0
 
                 function closePopup() {
@@ -147,8 +147,8 @@ Scope {
                 }
 
                 margins {
-                    top: 4
-                    left: win.animOffsetX
+                    top: win.animOffsetY
+                    left: 32
                 }
 
                 ParallelAnimation {
@@ -156,9 +156,9 @@ Scope {
 
                     NumberAnimation {
                         target: win
-                        property: "animOffsetX"
-                        from: -550
-                        to: 32
+                        property: "animOffsetY"
+                        from: -350
+                        to: 4
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
@@ -181,9 +181,9 @@ Scope {
 
                     NumberAnimation {
                         target: win
-                        property: "animOffsetX"
-                        from: 32
-                        to: -550
+                        property: "animOffsetY"
+                        from: 4
+                        to: -350
                         duration: 120
                         easing.type: Easing.OutCubic
                     }

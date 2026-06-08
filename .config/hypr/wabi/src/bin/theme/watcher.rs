@@ -408,12 +408,127 @@ fn link_anime_wallpapers() {
     }
 }
 
+fn auto_optimize_video(path: &Path) {
+    let Some(ext) = path.extension().and_then(|e| e.to_str()) else { return; };
+    let ext_lower = ext.to_ascii_lowercase();
+    if ext_lower != "mp4" && ext_lower != "webm" {
+        return;
+    }
+
+    if path.to_string_lossy().contains(".tmp_opt.") {
+        return;
+    }
+
+    let output = Command::new("ffprobe")
+        .args([
+            "-v", "error",
+            "-select_streams", "v:0",
+            "-show_entries", "stream=width,height,r_frame_rate",
+            "-of", "csv=p=0",
+            &path.to_string_lossy(),
+        ])
+        .output();
+
+    let Ok(out) = output else {
+        return;
+    };
+
+    if !out.status.success() {
+        return;
+    }
+
+    let info_str = String::from_utf8_lossy(&out.stdout);
+    let parts: Vec<&str> = info_str.trim().split(',').collect();
+    if parts.len() < 3 {
+        return;
+    }
+
+    let width: u32 = parts[0].trim().parse().unwrap_or(0);
+    let height: u32 = parts[1].trim().parse().unwrap_or(0);
+
+    let fps_parts: Vec<&str> = parts[2].trim().split('/').collect();
+    let fps: f64 = if fps_parts.len() == 2 {
+        let num: f64 = fps_parts[0].trim().parse().unwrap_or(0.0);
+        let den: f64 = fps_parts[1].trim().parse().unwrap_or(1.0);
+        if den > 0.0 { num / den } else { 0.0 }
+    } else {
+        parts[2].trim().parse().unwrap_or(0.0)
+    };
+
+    if width > 1920 || height > 1080 || fps > 30.1 {
+        let file_name = path.file_name().and_then(|n| n.to_str()).unwrap_or("video");
+        let message = format!("Optimizing {} ({}x{} @ {:.1}fps -> 1080p @ 30fps)...", file_name, width, height, fps);
+        println!("{}", message);
+        let _ = Command::new("notify-send")
+            .arg("Wallpaper Watcher")
+            .arg(message)
+            .arg("-i")
+            .arg("video-x-generic")
+            .status();
+
+        let tmp_output = path.with_extension(format!("tmp_opt.{}", ext_lower));
+
+        let ffmpeg_status = Command::new("ffmpeg")
+            .arg("-y")
+            .arg("-i")
+            .arg(path)
+            .arg("-vf")
+            .arg("scale=1920:1080,fps=30")
+            .arg("-c:v")
+            .arg("libx264")
+            .arg("-crf")
+            .arg("22")
+            .arg("-preset")
+            .arg("fast")
+            .arg("-an")
+            .arg(&tmp_output)
+            .status();
+
+        match ffmpeg_status {
+            Ok(status) if status.success() => {
+                if let Err(e) = fs::rename(&tmp_output, path) {
+                    eprintln!("Failed to replace original video file with optimized one: {}", e);
+                    let _ = fs::remove_file(&tmp_output);
+                } else {
+                    let success_msg = format!("Successfully optimized {}", file_name);
+                    println!("{}", success_msg);
+                    let _ = Command::new("notify-send")
+                        .arg("Wallpaper Watcher")
+                        .arg(success_msg)
+                        .arg("-i")
+                        .arg("video-x-generic")
+                        .status();
+
+                    // Reload the wallpaper if it is the currently active wallpaper
+                    let last_wall_path = home_dir().join(".cache").join("last_wallpaper");
+                    if let Ok(active_wall) = fs::read_to_string(&last_wall_path) {
+                        let active_wall_trimmed = active_wall.trim();
+                        if Path::new(active_wall_trimmed) == path {
+                            println!("Reloading active optimized wallpaper...");
+                            let _ = Command::new("sh")
+                                .arg("-c")
+                                .arg(format!("~/doty/scripts/set_wallpaper '{}'", path.display()))
+                                .status();
+                        }
+                    }
+                }
+            }
+            _ => {
+                eprintln!("ffmpeg optimization failed for {}", path.display());
+                let _ = fs::remove_file(&tmp_output);
+            }
+        }
+    }
+}
+
 fn sync_once(dirs: &[PathBuf], cache_dir: &Path, clean: bool) {
     link_anime_wallpapers();
     let wallpapers = scan_wallpapers(dirs);
     let mut live_thumbs = BTreeSet::new();
 
     for wallpaper in wallpapers.values() {
+        auto_optimize_video(&wallpaper.path);
+
         let thumb = thumb_path(cache_dir, &wallpaper.path);
         live_thumbs.insert(thumb.clone());
         generate_thumb(wallpaper, &thumb);
