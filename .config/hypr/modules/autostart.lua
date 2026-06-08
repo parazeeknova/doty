@@ -24,6 +24,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("uwsm app -- ~/doty/scripts/theme_switcher restore")
     hl.exec_cmd("uwsm app -- ~/.config/quickshell/wallpaper_switcher/wallpaper_thumb_watcher")
     hl.exec_cmd("uwsm app -- ~/.config/quickshell/battery_popup/battery_daemon")
+    hl.exec_cmd("uwsm app -- ~/.local/bin/screentime_daemon")
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
     hl.exec_cmd(
         "systemctl --user start ssh-agent.service && sh -c 'sleep 3 && env SSH_ASKPASS=/usr/lib/seahorse/ssh-askpass ssh-add ~/.ssh/id_ed25519 < /dev/null'")

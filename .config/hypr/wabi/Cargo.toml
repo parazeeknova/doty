@@ -138,3 +138,12 @@ path = "src/bin/status/battery_daemon.rs"
 name = "set_wallpaper"
 path = "src/bin/theme/set_wallpaper.rs"
 
+[[bin]]
+name = "screentime_daemon"
+path = "src/bin/status/screentime_daemon.rs"
+
+[[bin]]
+name = "get_screentime_status"
+path = "src/bin/status/get_screentime_status.rs"
+
+

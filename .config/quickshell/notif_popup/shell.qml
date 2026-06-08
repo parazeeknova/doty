@@ -25,6 +25,14 @@ Scope {
     })
     // Pomodoro properties
     property bool pomoActive: false
+    // Screentime properties
+    property int screentimeOffset: 0
+    property string screentimeLabel: "Today"
+    property string screentimeTotal: "0m"
+    property string screentimeIdle: "0m"
+    property var screentimeHourly: []
+    property var screentimeApps: []
+    property string screentimeTrend: ""
     property double pomoEndTime: 0
     property int pomoDuration: 1500
     property bool pomoPaused: false
@@ -70,11 +78,77 @@ Scope {
         return days;
     }
 
+    function iconExists(iconName) {
+        if (!iconName)
+            return false;
+
+        var path = Quickshell.iconPath(iconName, true);
+        return path && path.length > 0 && !String(path).includes("image-missing");
+    }
+
+    function iconFromString(value) {
+        if (!value)
+            return "";
+
+        var name = String(value);
+        var entry = DesktopEntries.byId(name);
+        if (entry && entry.icon && root.iconExists(entry.icon))
+            return entry.icon;
+
+        var substitutions = {
+            "code": "visual-studio-code",
+            "code-url-handler": "visual-studio-code",
+            "code-insiders": "visual-studio-code-insiders",
+            "codium": "vscodium",
+            "footclient": "foot",
+            "ghostty": "com.mitchellh.ghostty",
+            "google-chrome": "google-chrome",
+            "kitty": "kitty",
+            "org.wezfurlong.wezterm": "org.wezfurlong.wezterm",
+            "steam": "steam",
+            "thunar": "org.xfce.thunar",
+            "vesktop": "vesktop",
+            "wezterm": "org.wezfurlong.wezterm",
+            "zen": "zen-browser"
+        };
+        var lower = name.toLowerCase();
+        if (substitutions[name] && root.iconExists(substitutions[name]))
+            return substitutions[name];
+
+        if (substitutions[lower] && root.iconExists(substitutions[lower]))
+            return substitutions[lower];
+
+        if (root.iconExists(name))
+            return name;
+
+        if (root.iconExists(lower))
+            return lower;
+
+        var lastDomainPart = name.split(".").pop();
+        if (root.iconExists(lastDomainPart))
+            return lastDomainPart;
+
+        if (root.iconExists(lastDomainPart.toLowerCase()))
+            return lastDomainPart.toLowerCase();
+
+        var kebab = lower.replace(/\s+/g, "-").replace(/_/g, "-");
+        if (root.iconExists(kebab))
+            return kebab;
+
+        var heuristicEntry = DesktopEntries.heuristicLookup(name);
+        if (heuristicEntry && heuristicEntry.icon && root.iconExists(heuristicEntry.icon))
+            return heuristicEntry.icon;
+
+        return "";
+    }
+
     function triggerRefresh() {
         checkNotifsProc.running = false;
         checkNotifsProc.running = true;
         checkGlassProc.running = false;
         checkGlassProc.running = true;
+        checkScreentimeProc.running = false;
+        checkScreentimeProc.running = true;
     }
 
     function savePomoState() {
@@ -97,6 +171,10 @@ Scope {
         return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
     }
 
+    onScreentimeOffsetChanged: {
+        checkScreentimeProc.running = false;
+        checkScreentimeProc.running = true;
+    }
     Component.onCompleted: {
         triggerRefresh();
     }
@@ -184,6 +262,30 @@ Scope {
                     root.glassEnabled = data.bool || false;
                 } catch (e) {
                     console.log("Failed to parse glass status: " + e);
+                }
+            }
+        }
+
+    }
+
+    Process {
+        id: checkScreentimeProc
+
+        command: [root.homeDir + "/.local/bin/get_screentime_status", String(root.screentimeOffset)]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    var data = JSON.parse(this.text);
+                    root.screentimeLabel = data.label || "";
+                    root.screentimeTotal = data.total_active_time || "0m";
+                    root.screentimeIdle = data.idle_time || "0m";
+                    root.screentimeHourly = data.hourly_chart || [];
+                    root.screentimeApps = data.top_apps || [];
+                    root.screentimeTrend = data.trend_label || "";
+                } catch (e) {
+                    console.log("Failed to parse screentime: " + e);
                 }
             }
         }
@@ -389,6 +491,515 @@ Scope {
                         anchors.right: parent.right
                         anchors.margins: 10
                         spacing: 10
+
+                        // --- SECTION 0.1: SCREENTIME TRACKER ---
+                        Column {
+                            id: screentimeCol
+
+                            function getMaxHourly(hourlyArray) {
+                                if (!hourlyArray || hourlyArray.length === 0)
+                                    return 3600;
+
+                                var max = 0;
+                                for (var i = 0; i < hourlyArray.length; i++) {
+                                    if (hourlyArray[i] > max)
+                                        max = hourlyArray[i];
+
+                                }
+                                return max > 0 ? max : 3600;
+                            }
+
+                            width: parent.width
+                            spacing: 6
+
+                            // Header switcher + Refresh
+                            Row {
+                                width: parent.width
+                                height: 16
+
+                                Text {
+                                    text: "Screen Time"
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 9
+                                    font.bold: true
+                                    opacity: 0.6
+                                    renderType: Text.NativeRendering
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                Row {
+                                    anchors.right: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 12
+
+                                    // Switcher (text-only)
+                                    Row {
+                                        spacing: 6
+                                        anchors.verticalCenter: parent.verticalCenter
+
+                                        Text {
+                                            id: prevBtn
+
+                                            text: "<"
+                                            color: prevMouse.containsMouse ? theme.fg : theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                            font.bold: true
+                                            renderType: Text.NativeRendering
+
+                                            MouseArea {
+                                                id: prevMouse
+
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                onClicked: root.screentimeOffset -= 1
+                                            }
+
+                                        }
+
+                                        Text {
+                                            text: root.screentimeLabel
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                            font.bold: false
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                        Text {
+                                            id: nextBtn
+
+                                            text: ">"
+                                            color: nextMouse.containsMouse ? theme.fg : theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                            font.bold: true
+                                            renderType: Text.NativeRendering
+
+                                            MouseArea {
+                                                id: nextMouse
+
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                onClicked: root.screentimeOffset += 1
+                                            }
+
+                                        }
+
+                                    }
+
+                                    // Refresh (text-only)
+                                    Text {
+                                        id: refreshBtn
+
+                                        text: "Refresh"
+                                        color: refreshMouse.containsMouse ? theme.fg : theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: false
+                                        renderType: Text.NativeRendering
+                                        anchors.verticalCenter: parent.verticalCenter
+
+                                        MouseArea {
+                                            id: refreshMouse
+
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            onClicked: root.triggerRefresh()
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                            // Time Labels row (active & idle - one on left, one on right)
+                            Item {
+                                width: parent.width
+                                height: 22
+
+                                Column {
+                                    anchors.left: parent.left
+                                    spacing: 1
+
+                                    Text {
+                                        text: "Active"
+                                        color: theme.fg_light
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 7
+                                        opacity: 0.6
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    Text {
+                                        text: root.screentimeTotal
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 13
+                                        font.bold: true
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                }
+
+                                Column {
+                                    anchors.right: parent.right
+                                    spacing: 1
+
+                                    Text {
+                                        text: "Idle"
+                                        color: theme.fg_light
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 7
+                                        opacity: 0.6
+                                        renderType: Text.NativeRendering
+                                        anchors.right: parent.right
+                                    }
+
+                                    Text {
+                                        text: root.screentimeIdle
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 13
+                                        font.bold: true
+                                        renderType: Text.NativeRendering
+                                        anchors.right: parent.right
+                                    }
+
+                                }
+
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.bottom: parent.bottom
+                                    anchors.bottomMargin: 2
+                                    text: root.screentimeTrend
+                                    color: {
+                                        if (text.indexOf("v") !== -1)
+                                            return "#a6e3a1";
+
+                                        // soft green for decrease
+                                        if (text.indexOf("^") !== -1)
+                                            return "#f38ba8";
+
+                                        // soft red for increase
+                                        return theme.fg_light;
+                                    }
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                    font.bold: true
+                                    opacity: 0.8
+                                    renderType: Text.NativeRendering
+                                }
+
+                            }
+
+                            // Minimal Chart with faded horizontal grid lines and timeline labels
+                            Item {
+                                property int maxVal: screentimeCol.getMaxHourly(root.screentimeHourly)
+
+                                function formatLabel(seconds) {
+                                    if (seconds <= 0)
+                                        return "0";
+
+                                    var m = Math.round(seconds / 60);
+                                    if (m >= 60) {
+                                        var h = Math.floor(m / 60);
+                                        var remM = m % 60;
+                                        return remM > 0 ? h + "h " + remM + "m" : h + "h";
+                                    }
+                                    return m + "m";
+                                }
+
+                                width: parent.width
+                                height: 62
+
+                                // Faded Grid Lines & Labels in background
+                                Column {
+                                    anchors.fill: parent
+                                    anchors.bottom: parent.bottom
+                                    anchors.bottomMargin: 16
+                                    spacing: 16
+
+                                    // Top Line
+                                    Item {
+                                        width: parent.width
+                                        height: 1
+
+                                        Rectangle {
+                                            width: parent.width - 24
+                                            height: 1
+                                            color: theme.fg_light
+                                            opacity: 0.08
+                                        }
+
+                                        Text {
+                                            anchors.right: parent.right
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: parent.parent.parent.formatLabel(parent.parent.parent.maxVal)
+                                            color: theme.fg_light
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 6
+                                            opacity: 0.4
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                    }
+
+                                    // Middle Line
+                                    Item {
+                                        width: parent.width
+                                        height: 1
+
+                                        Rectangle {
+                                            width: parent.width - 24
+                                            height: 1
+                                            color: theme.fg_light
+                                            opacity: 0.08
+                                        }
+
+                                        Text {
+                                            anchors.right: parent.right
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: parent.parent.parent.formatLabel(parent.parent.parent.maxVal / 2)
+                                            color: theme.fg_light
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 6
+                                            opacity: 0.4
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                    }
+
+                                    // Baseline
+                                    Item {
+                                        width: parent.width
+                                        height: 1
+
+                                        Rectangle {
+                                            width: parent.width - 24
+                                            height: 1
+                                            color: theme.fg_light
+                                            opacity: 0.08
+                                        }
+
+                                        Text {
+                                            anchors.right: parent.right
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: "0"
+                                            color: theme.fg_light
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 6
+                                            opacity: 0.4
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                    }
+
+                                }
+
+                                Row {
+                                    id: chartRow
+
+                                    anchors.bottom: parent.bottom
+                                    anchors.bottomMargin: 16
+                                    anchors.left: parent.left
+                                    width: parent.width - 24
+                                    spacing: (width - (24 * 7)) / 23
+
+                                    Repeater {
+                                        model: root.screentimeHourly
+
+                                        delegate: Item {
+                                            width: 7
+                                            height: 33
+
+                                            Rectangle {
+                                                anchors.bottom: parent.bottom
+                                                width: parent.width
+                                                height: Math.max(1, (modelData / Math.max(1, parent.parent.parent.maxVal)) * 32)
+                                                color: theme.accent
+                                                radius: 1
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                                // Timeline Labels Row (perfectly aligned under each hour)
+                                Row {
+                                    anchors.top: chartRow.bottom
+                                    anchors.topMargin: 2
+                                    anchors.left: chartRow.left
+                                    width: chartRow.width
+                                    spacing: chartRow.spacing
+
+                                    Repeater {
+                                        model: 24
+
+                                        delegate: Item {
+                                            width: 7
+                                            height: 10
+
+                                            Text {
+                                                anchors.horizontalCenter: parent.horizontalCenter
+                                                text: {
+                                                    if (index === 0)
+                                                        return "12 AM";
+
+                                                    if (index === 3)
+                                                        return "3 AM";
+
+                                                    if (index === 6)
+                                                        return "6 AM";
+
+                                                    if (index === 9)
+                                                        return "9 AM";
+
+                                                    if (index === 12)
+                                                        return "12 PM";
+
+                                                    if (index === 15)
+                                                        return "3 PM";
+
+                                                    if (index === 18)
+                                                        return "6 PM";
+
+                                                    if (index === 21)
+                                                        return "9 PM";
+
+                                                    return "";
+                                                }
+                                                color: theme.fg_light
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 6
+                                                opacity: 0.5
+                                                renderType: Text.NativeRendering
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                            // Top Apps list
+                            Flickable {
+                                id: flickableApps
+
+                                width: parent.width
+                                height: Math.min(86, contentHeight)
+                                contentHeight: appsColumn.height
+                                clip: true
+                                boundsBehavior: Flickable.StopAtBounds
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onWheel: (wheel) => {
+                                        flickableApps.contentY = Math.max(0, Math.min(flickableApps.contentHeight - flickableApps.height, flickableApps.contentY - wheel.angleDelta.y));
+                                    }
+                                }
+
+                                Column {
+                                    id: appsColumn
+
+                                    width: parent.width
+                                    spacing: 4
+
+                                    Repeater {
+                                        model: root.screentimeApps
+
+                                        delegate: Item {
+                                            width: parent.width
+                                            height: 14
+
+                                            // Progress Track (Background)
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                color: theme.bg_light
+                                                opacity: 0.05
+                                            }
+
+                                            // Progress Fill (Accent color bg)
+                                            Rectangle {
+                                                anchors.left: parent.left
+                                                anchors.top: parent.top
+                                                anchors.bottom: parent.bottom
+                                                width: parent.width * (modelData.percentage / 100)
+                                                color: theme.accent
+                                                opacity: 0.15
+                                            }
+
+                                            // Icon
+                                            Image {
+                                                id: appIcon
+
+                                                width: 10
+                                                height: 10
+                                                anchors.left: parent.left
+                                                anchors.leftMargin: 6
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                source: {
+                                                    var iconName = root.iconFromString(modelData.class);
+                                                    return iconName ? "image://icon/" + iconName : "image://icon/unknown";
+                                                }
+                                                fillMode: Image.PreserveAspectFit
+                                                asynchronous: true
+                                                onStatusChanged: {
+                                                    if (status === Image.Error)
+                                                        source = "image://icon/unknown";
+
+                                                }
+                                            }
+
+                                            // App Class Name
+                                            Text {
+                                                id: appName
+
+                                                anchors.left: appIcon.right
+                                                anchors.leftMargin: 6
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text: modelData.class
+                                                color: theme.fg
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 8
+                                                font.bold: true
+                                                renderType: Text.NativeRendering
+                                            }
+
+                                            // App Time and Percentage
+                                            Text {
+                                                anchors.right: parent.right
+                                                anchors.rightMargin: 6
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text: modelData.time + " (" + modelData.percentage + "%)"
+                                                color: theme.fg_light
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 7
+                                                renderType: Text.NativeRendering
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                        Rectangle {
+                            width: parent.width
+                            height: 1
+                            color: theme.accent
+                            opacity: 0.15
+                        }
 
                         // --- SECTION 0: CLOCK & CALENDAR ---
                         Row {
@@ -618,13 +1229,6 @@ Scope {
 
                             }
 
-                        }
-
-                        Rectangle {
-                            width: parent.width
-                            height: 1
-                            color: theme.accent
-                            opacity: 0.15
                         }
 
                         // --- SECTION 1 & 2: NOTIFICATIONS HEADER & LIST ---
