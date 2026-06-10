@@ -8,8 +8,7 @@ use std::process::Command;
 use wabi::print_json;
 
 fn ipc_socket_path() -> String {
-    let runtime_dir = env::var("XDG_RUNTIME_DIR")
-        .unwrap_or_else(|_| "/tmp".to_string());
+    let runtime_dir = env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/tmp".to_string());
     format!("{}/wabi_screentime.sock", runtime_dir)
 }
 
@@ -69,8 +68,7 @@ fn get_active_seconds(conn: &Connection, start: i64, end: i64) -> i64 {
     if let Ok(mut stmt) = conn.prepare(
         "SELECT app_class, start_time, end_time FROM sessions
          WHERE end_time > ?1 AND start_time < ?2;",
-    )
-    && let Ok(rows) = stmt.query_map([start, end], |row| {
+    ) && let Ok(rows) = stmt.query_map([start, end], |row| {
         Ok((
             row.get::<_, String>(0)?,
             row.get::<_, i64>(1)?,
@@ -184,19 +182,18 @@ fn main() {
     if let Ok(mut stmt) = conn.prepare(
         "SELECT app_class, title, start_time, end_time FROM sessions
          WHERE end_time > ?1 AND start_time < ?2;",
-    )
-        && let Ok(rows) = stmt.query_map([day_start, day_end], |row| {
-            Ok(SessionRecord {
-                class: row.get(0)?,
-                _title: row.get(1)?,
-                start_time: row.get(2)?,
-                end_time: row.get(3)?,
-            })
-        }) {
-            for row in rows.flatten() {
-                sessions.push(row);
-            }
+    ) && let Ok(rows) = stmt.query_map([day_start, day_end], |row| {
+        Ok(SessionRecord {
+            class: row.get(0)?,
+            _title: row.get(1)?,
+            start_time: row.get(2)?,
+            end_time: row.get(3)?,
+        })
+    }) {
+        for row in rows.flatten() {
+            sessions.push(row);
         }
+    }
 
     let mut total_active_seconds = 0i64;
     let mut idle_seconds = 0i64;
@@ -284,4 +281,167 @@ fn main() {
     };
 
     print_json(&result);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rusqlite::params;
+
+    fn setup_test_db() -> Connection {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.execute_batch(
+            "CREATE TABLE sessions (
+                app_class TEXT NOT NULL,
+                title TEXT NOT NULL,
+                start_time INTEGER NOT NULL,
+                end_time INTEGER NOT NULL,
+                duration INTEGER NOT NULL DEFAULT 0
+            );
+            CREATE INDEX idx_sessions_start ON sessions(start_time);
+            CREATE INDEX idx_sessions_end ON sessions(end_time);",
+        )
+        .unwrap();
+        conn
+    }
+
+    fn insert_session(conn: &Connection, class: &str, start: i64, end: i64) {
+        conn.execute(
+            "INSERT INTO sessions (app_class, title, start_time, end_time, duration) VALUES (?1, 'test', ?2, ?3, ?3 - ?2)",
+            params![class, start, end],
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn format_duration_outputs_correctly() {
+        assert_eq!(format_duration(0), "0m");
+        assert_eq!(format_duration(30), "30s");
+        assert_eq!(format_duration(90), "1m");
+        assert_eq!(format_duration(3600), "1h");
+        assert_eq!(format_duration(3660), "1h 1m");
+        assert_eq!(format_duration(7200), "2h");
+        assert_eq!(format_duration(7260), "2h 1m");
+    }
+
+    #[test]
+    fn overlap_math_session_fully_inside_window() {
+        let conn = setup_test_db();
+        // day_start=1000, day_end=1000+86400. Session is from 2000-5000.
+        insert_session(&conn, "firefox", 2000, 5000);
+        let active = get_active_seconds(&conn, 1000, 1000 + 86400);
+        assert_eq!(active, 3000);
+    }
+
+    #[test]
+    fn overlap_math_session_partially_before_window() {
+        let conn = setup_test_db();
+        // Session starts before window, ends inside it
+        insert_session(&conn, "terminal", 500, 3000);
+        let active = get_active_seconds(&conn, 1000, 1000 + 86400);
+        assert_eq!(active, 2000); // only 2000-3000 overlaps
+    }
+
+    #[test]
+    fn overlap_math_session_partially_after_window() {
+        let conn = setup_test_db();
+        // Session starts inside window, ends after it
+        insert_session(&conn, "code", 86000, 87000);
+        let active = get_active_seconds(&conn, 0, 86400);
+        assert_eq!(active, 400); // only 86000-86400 overlaps
+    }
+
+    #[test]
+    fn overlap_math_session_spanning_entire_window() {
+        let conn = setup_test_db();
+        // Session encloses the entire window
+        insert_session(&conn, "browser", 0, 200000);
+        let active = get_active_seconds(&conn, 10000, 96400);
+        assert_eq!(active, 86400);
+    }
+
+    #[test]
+    fn overlap_math_session_completely_outside_window() {
+        let conn = setup_test_db();
+        // Session is before the window
+        insert_session(&conn, "editor", 100, 500);
+        let active = get_active_seconds(&conn, 1000, 1000 + 86400);
+        assert_eq!(active, 0);
+    }
+
+    #[test]
+    fn overlap_math_idle_sessions_excluded() {
+        let conn = setup_test_db();
+        insert_session(&conn, "idle", 1000, 5000);
+        insert_session(&conn, "firefox", 2000, 7000);
+        let active = get_active_seconds(&conn, 0, 10000);
+        assert_eq!(active, 5000); // idle excluded, only firefox counts
+    }
+
+    #[test]
+    fn overlap_math_empty_class_excluded() {
+        let conn = setup_test_db();
+        insert_session(&conn, "", 1000, 5000);
+        let active = get_active_seconds(&conn, 0, 10000);
+        assert_eq!(active, 0);
+    }
+
+    #[test]
+    fn overlap_math_multiple_sessions_sum_correctly() {
+        let conn = setup_test_db();
+        insert_session(&conn, "firefox", 1000, 3000);
+        insert_session(&conn, "terminal", 4000, 7000);
+        insert_session(&conn, "code", 6000, 8000);
+        let active = get_active_seconds(&conn, 0, 10000);
+        // firefox: 1000-3000 → 2000s, terminal: 4000-7000 → 3000s, code: 6000-8000 → 2000s
+        assert_eq!(active, 7000);
+    }
+
+    #[test]
+    fn hourly_chart_logic_distributes_correctly() {
+        // Test the hourly distribution inline: a 2-hour session across hours 10-12
+        let day_start: i64 = 0;
+        let overlap_start: i64 = 10 * 3600;
+        let overlap_end: i64 = 12 * 3600;
+        let mut hourly = [0i64; 24];
+
+        for hour in 0..24 {
+            let hour_start = day_start + hour * 3600;
+            let hour_end = hour_start + 3600;
+            let h_start = std::cmp::max(overlap_start, hour_start);
+            let h_end = std::cmp::min(overlap_end, hour_end);
+            let h_duration = std::cmp::max(0, h_end - h_start);
+            if h_duration > 0 {
+                hourly[hour as usize] += h_duration;
+            }
+        }
+
+        assert_eq!(hourly[9], 0);
+        assert_eq!(hourly[10], 3600);
+        assert_eq!(hourly[11], 3600);
+        assert_eq!(hourly[12], 0);
+    }
+
+    #[test]
+    fn hourly_chart_partial_hours_distributed_correctly() {
+        // 10:30 to 11:45 = 1h 15m → hour 10 gets 1800s, hour 11 gets 2700s
+        let day_start: i64 = 0;
+        let overlap_start: i64 = 10 * 3600 + 1800; // 10:30
+        let overlap_end: i64 = 11 * 3600 + 2700; // 11:45
+        let mut hourly = [0i64; 24];
+
+        for hour in 0..24 {
+            let hour_start = day_start + hour * 3600;
+            let hour_end = hour_start + 3600;
+            let h_start = std::cmp::max(overlap_start, hour_start);
+            let h_end = std::cmp::min(overlap_end, hour_end);
+            let h_duration = std::cmp::max(0, h_end - h_start);
+            if h_duration > 0 {
+                hourly[hour as usize] += h_duration;
+            }
+        }
+
+        assert_eq!(hourly[10], 1800);
+        assert_eq!(hourly[11], 2700);
+    }
 }

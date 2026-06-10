@@ -45,10 +45,7 @@ fn get_matugen_palette(wallpaper_path: &Path) -> Option<HashMap<String, String>>
     // Treat the cache as stale when it's older than the wallpaper itself — a user may
     // have overwritten the file in place, leaving the path unchanged but the content new.
     let cache_is_fresh = match (fs::metadata(&cache_path), fs::metadata(wallpaper_path)) {
-        (Ok(cache_meta), Ok(wall_meta)) => match (
-            cache_meta.modified(),
-            wall_meta.modified(),
-        ) {
+        (Ok(cache_meta), Ok(wall_meta)) => match (cache_meta.modified(), wall_meta.modified()) {
             (Ok(c), Ok(w)) => c >= w,
             _ => false,
         },
@@ -58,14 +55,10 @@ fn get_matugen_palette(wallpaper_path: &Path) -> Option<HashMap<String, String>>
     let json_content = if cache_path.exists() && cache_is_fresh {
         fs::read_to_string(cache_path).ok()?
     } else {
-        let is_video = wallpaper_path.extension()
+        let is_video = wallpaper_path
+            .extension()
             .and_then(|ext| ext.to_str())
-            .map(|ext| {
-                matches!(
-                    ext.to_ascii_lowercase().as_str(),
-                    "mp4" | "webm"
-                )
-            })
+            .map(|ext| matches!(ext.to_ascii_lowercase().as_str(), "mp4" | "webm"))
             .unwrap_or(false);
 
         let matugen_input = if is_video {
@@ -171,7 +164,7 @@ fn get_closest_cmatrix_color(hex: &str) -> String {
         let dr = (r as f64) - (rgb.0 as f64);
         let dg = (g as f64) - (rgb.1 as f64);
         let db = (b as f64) - (rgb.2 as f64);
-        let dist = dr*dr + dg*dg + db*db;
+        let dist = dr * dr + dg * dg + db * db;
         if dist < min_dist {
             min_dist = dist;
             best_name = name.to_string();
@@ -465,13 +458,14 @@ fn main() {
 
     if args.len() < 2 || args[1] == "restore" {
         if cache_theme_path.exists()
-            && let Ok(content) = fs::read_to_string(&cache_theme_path) {
-                let parts: Vec<&str> = content.trim().splitn(2, ' ').collect();
-                if parts.len() == 2 {
-                    mode = parts[0].to_string();
-                    value = parts[1].to_string();
-                }
+            && let Ok(content) = fs::read_to_string(&cache_theme_path)
+        {
+            let parts: Vec<&str> = content.trim().splitn(2, ' ').collect();
+            if parts.len() == 2 {
+                mode = parts[0].to_string();
+                value = parts[1].to_string();
             }
+        }
         if mode.is_empty() {
             mode = "preset".to_string();
             value = "gruvbox".to_string();
@@ -518,14 +512,10 @@ fn main() {
 
     if mode == "wallpaper" {
         let path = Path::new(&value);
-        let is_video = path.extension()
+        let is_video = path
+            .extension()
             .and_then(|ext| ext.to_str())
-            .map(|ext| {
-                matches!(
-                    ext.to_ascii_lowercase().as_str(),
-                    "mp4" | "webm"
-                )
-            })
+            .map(|ext| matches!(ext.to_ascii_lowercase().as_str(), "mp4" | "webm"))
             .unwrap_or(false);
 
         let matugen_input = if is_video {
@@ -657,19 +647,15 @@ fn main() {
             ".config/zathura/zathurarc.template",
             ".config/zathura/zathurarc",
         ),
-        (
-            ".config/mpv/mpv.conf.template",
-            ".config/mpv/mpv.conf",
-        ),
+        (".config/mpv/mpv.conf.template", ".config/mpv/mpv.conf"),
     ];
 
     for (tmpl, dest) in mappings {
         let t_path = doty.join(tmpl);
         let d_path = doty.join(dest);
-        if t_path.exists()
-            && render_template(&t_path, &d_path, &vars) {
-                println!("Rendered: {}", dest);
-            }
+        if t_path.exists() && render_template(&t_path, &d_path, &vars) {
+            println!("Rendered: {}", dest);
+        }
     }
 
     // Render Colors.qml to cache folder to prevent QuickShell file watcher reload
@@ -677,10 +663,9 @@ fn main() {
     let _ = fs::create_dir_all(&cache_colors_dir);
     let colors_tmpl = doty.join(".config/quickshell/colors.qml.template");
     let colors_dest = cache_colors_dir.join("Colors.qml");
-    if colors_tmpl.exists()
-        && render_template(&colors_tmpl, &colors_dest, &vars) {
-            println!("Rendered cache Colors.qml");
-        }
+    if colors_tmpl.exists() && render_template(&colors_tmpl, &colors_dest, &vars) {
+        println!("Rendered cache Colors.qml");
+    }
 
     // Patch Kvantum SVG
     let svg_tmpl = doty.join(".config/Kvantum/wabi/wabi.svg.template");
@@ -702,23 +687,22 @@ fn main() {
 
         let css_tmpl = doty.join(".config/zen/userChrome.css.template");
         let css_dest = chrome_dir.join("userChrome.css");
-        if css_tmpl.exists()
-            && render_template(&css_tmpl, &css_dest, &vars) {
-                println!(
-                    "Rendered Zen Browser userChrome.css for {:?}",
-                    zen_profile.file_name().unwrap_or_default()
-                );
-            }
+        if css_tmpl.exists() && render_template(&css_tmpl, &css_dest, &vars) {
+            println!(
+                "Rendered Zen Browser userChrome.css for {:?}",
+                zen_profile.file_name().unwrap_or_default()
+            );
+        }
 
         let content_css_tmpl = doty.join(".config/zen/userContent.css.template");
         let content_css_dest = chrome_dir.join("userContent.css");
-        if content_css_tmpl.exists()
-            && render_template(&content_css_tmpl, &content_css_dest, &vars) {
-                println!(
-                    "Rendered Zen Browser userContent.css for {:?}",
-                    zen_profile.file_name().unwrap_or_default()
-                );
-            }
+        if content_css_tmpl.exists() && render_template(&content_css_tmpl, &content_css_dest, &vars)
+        {
+            println!(
+                "Rendered Zen Browser userContent.css for {:?}",
+                zen_profile.file_name().unwrap_or_default()
+            );
+        }
 
         // Also render to matugen-userstyles.css, which the
         // matugen-bridge.uc.js reads at runtime and injects into
@@ -728,13 +712,13 @@ fn main() {
         // toolkit.legacyUserProfileCustomizations.stylesheets and
         // doesn't always work in Zen's Fission mode).
         let userstyles_dest = chrome_dir.join("matugen-userstyles.css");
-        if content_css_tmpl.exists()
-            && render_template(&content_css_tmpl, &userstyles_dest, &vars) {
-                println!(
-                    "Rendered Zen Browser matugen-userstyles.css for {:?}",
-                    zen_profile.file_name().unwrap_or_default()
-                );
-            }
+        if content_css_tmpl.exists() && render_template(&content_css_tmpl, &userstyles_dest, &vars)
+        {
+            println!(
+                "Rendered Zen Browser matugen-userstyles.css for {:?}",
+                zen_profile.file_name().unwrap_or_default()
+            );
+        }
 
         // Per-site userstyles (e.g. github). The bridge reads each
         // matugen-userstyles-<host>.css file and the actor child
@@ -744,13 +728,12 @@ fn main() {
         // injected at runtime (they only work in userContent.css).
         let github_tmpl = doty.join(".config/zen/userContent.github.template");
         let github_dest = chrome_dir.join("matugen-userstyles-github.css");
-        if github_tmpl.exists()
-            && render_template(&github_tmpl, &github_dest, &vars) {
-                println!(
-                    "Rendered Zen Browser matugen-userstyles-github.css for {:?}",
-                    zen_profile.file_name().unwrap_or_default()
-                );
-            }
+        if github_tmpl.exists() && render_template(&github_tmpl, &github_dest, &vars) {
+            println!(
+                "Rendered Zen Browser matugen-userstyles-github.css for {:?}",
+                zen_profile.file_name().unwrap_or_default()
+            );
+        }
 
         let js_src = doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/matugen-bridge.uc.js");
         let js_dest = chrome_dir.join("JS").join("matugen-bridge.uc.js");
@@ -764,15 +747,23 @@ fn main() {
             }
         }
 
-        let actor_parent_src = doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/Matugen/MatugenParent.sys.mjs");
-        let actor_parent_dest = chrome_dir.join("JS").join("Matugen").join("MatugenParent.sys.mjs");
+        let actor_parent_src =
+            doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/Matugen/MatugenParent.sys.mjs");
+        let actor_parent_dest = chrome_dir
+            .join("JS")
+            .join("Matugen")
+            .join("MatugenParent.sys.mjs");
         if actor_parent_src.exists() {
             let _ = fs::create_dir_all(chrome_dir.join("JS").join("Matugen"));
             let _ = fs::copy(&actor_parent_src, &actor_parent_dest);
         }
 
-        let actor_child_src = doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/Matugen/MatugenChild.sys.mjs");
-        let actor_child_dest = chrome_dir.join("JS").join("Matugen").join("MatugenChild.sys.mjs");
+        let actor_child_src =
+            doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/Matugen/MatugenChild.sys.mjs");
+        let actor_child_dest = chrome_dir
+            .join("JS")
+            .join("Matugen")
+            .join("MatugenChild.sys.mjs");
         if actor_child_src.exists() {
             let _ = fs::create_dir_all(chrome_dir.join("JS").join("Matugen"));
             let _ = fs::copy(&actor_child_src, &actor_child_dest);
@@ -799,7 +790,12 @@ fn main() {
             "tertiary": vars.get("tertiary").cloned().unwrap_or_else(|| "#d8a657".into()),
         });
         let json_dest = chrome_dir.join("matugen-vars.json");
-        if fs::write(&json_dest, serde_json::to_string_pretty(&json).unwrap_or_default()).is_ok() {
+        if fs::write(
+            &json_dest,
+            serde_json::to_string_pretty(&json).unwrap_or_default(),
+        )
+        .is_ok()
+        {
             println!(
                 "Wrote matugen-vars.json for {:?}",
                 zen_profile.file_name().unwrap_or_default()
@@ -833,13 +829,12 @@ fn main() {
 
         let userjs_tmpl = doty.join(".config/zen/user.js.template");
         let userjs_dest = zen_profile.join("user.js");
-        if userjs_tmpl.exists()
-            && render_template(&userjs_tmpl, &userjs_dest, &vars) {
-                println!(
-                    "Rendered Zen Browser user.js for {:?}",
-                    zen_profile.file_name().unwrap_or_default()
-                );
-            }
+        if userjs_tmpl.exists() && render_template(&userjs_tmpl, &userjs_dest, &vars) {
+            println!(
+                "Rendered Zen Browser user.js for {:?}",
+                zen_profile.file_name().unwrap_or_default()
+            );
+        }
     }
 
     // Sync files
@@ -926,16 +921,17 @@ fn main() {
 
     // Generate and write custom vtrgb file to ~/.config/vtrgb
     if let Some(accent_hex) = vars.get("accent_hex")
-        && let Some((r, g, b)) = hex_to_rgb_tuple(accent_hex) {
-            let vtrgb_content = format!(
-                "0,170,0,170,0,170,0,{},85,255,85,255,85,255,85,{}\n\
+        && let Some((r, g, b)) = hex_to_rgb_tuple(accent_hex)
+    {
+        let vtrgb_content = format!(
+            "0,170,0,170,0,170,0,{},85,255,85,255,85,255,85,{}\n\
                  0,0,170,85,0,0,170,{},85,85,255,255,85,85,255,{}\n\
                  0,0,0,0,170,170,170,{},85,85,85,85,255,255,255,{}\n",
-                r, r, g, g, b, b
-            );
-            let vtrgb_path = home_dir().join(".config").join("vtrgb");
-            let _ = fs::write(vtrgb_path, vtrgb_content);
-        }
+            r, r, g, g, b, b
+        );
+        let vtrgb_path = home_dir().join(".config").join("vtrgb");
+        let _ = fs::write(vtrgb_path, vtrgb_content);
+    }
 
     // Restore glass state after template rendering
     apply_glass_state();
@@ -971,9 +967,7 @@ fn toggle_hex_alpha_lines(content: &str, key: &str, line_suffix: &str, want_alph
             };
             let tail = &after_hash[hex_end..];
             let mut rebuilt = format!("{}#{}{}", &line[..hash_idx], new_hex, tail);
-            if !line_suffix.is_empty()
-                && !rebuilt.trim_end().ends_with(line_suffix)
-            {
+            if !line_suffix.is_empty() && !rebuilt.trim_end().ends_with(line_suffix) {
                 rebuilt.push_str(line_suffix);
             }
             rebuilt
@@ -986,7 +980,7 @@ fn toggle_hex_alpha_lines(content: &str, key: &str, line_suffix: &str, want_alph
 fn apply_glass_state() {
     let home = home_dir();
     let state_file = home.join(".cache").join("quickshell").join("glass_state");
-    
+
     let glass_enabled = fs::read_to_string(&state_file)
         .map(|s| s.trim().to_string())
         .unwrap_or_else(|_| "true".to_string())
@@ -1035,7 +1029,10 @@ fn apply_glass_state() {
     );
     let _ = Command::new("hyprctl").args(["eval", &hypr_eval]).status();
 
-    println!("Glass state restored: {}", if glass_enabled { "enabled" } else { "disabled" });
+    println!(
+        "Glass state restored: {}",
+        if glass_enabled { "enabled" } else { "disabled" }
+    );
 }
 
 fn rgb_to_hsl(r: f64, g: f64, b: f64) -> (f64, f64, f64) {
@@ -1163,9 +1160,10 @@ fn find_zen_profiles() -> Vec<PathBuf> {
             let path = entry.path();
             if path.is_dir()
                 && let Some(name) = path.file_name().map(|n| n.to_string_lossy())
-                    && (name.contains("Default") || name.contains("default")) {
-                        profiles.push(path);
-                    }
+                && (name.contains("Default") || name.contains("default"))
+            {
+                profiles.push(path);
+            }
         }
     }
     profiles
@@ -1212,4 +1210,99 @@ fn hsl_to_rgb(h: f64, s: f64, l: f64) -> (u8, u8, u8) {
         (g * 255.0).round() as u8,
         (b * 255.0).round() as u8,
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn hex_to_rgb_valid_and_invalid() {
+        assert_eq!(hex_to_rgb_tuple("#ff0000"), Some((255, 0, 0)));
+        assert_eq!(hex_to_rgb_tuple("#00ff00"), Some((0, 255, 0)));
+        assert_eq!(hex_to_rgb_tuple("#0000ff"), Some((0, 0, 255)));
+        assert_eq!(hex_to_rgb_tuple("#1d2021"), Some((29, 32, 33)));
+        assert_eq!(hex_to_rgb_tuple("ff0000"), Some((255, 0, 0)));
+        assert_eq!(hex_to_rgb_tuple("#xyz123"), None);
+        assert_eq!(hex_to_rgb_tuple("#123"), None);
+        assert_eq!(hex_to_rgb_tuple("#1234567"), None);
+    }
+
+    #[test]
+    fn closest_cmatrix_color_finds_exact() {
+        assert_eq!(get_closest_cmatrix_color("#ff0000"), "red");
+        assert_eq!(get_closest_cmatrix_color("#00ff00"), "green");
+        assert_eq!(get_closest_cmatrix_color("#ffffff"), "white");
+        assert_eq!(get_closest_cmatrix_color("#000000"), "black");
+    }
+
+    #[test]
+    fn closest_cmatrix_color_finds_nearest() {
+        // Near-red should resolve to red
+        assert_eq!(get_closest_cmatrix_color("#ee1122"), "red");
+        // Near-blue resolves to blue
+        assert_eq!(get_closest_cmatrix_color("#1122ee"), "blue");
+    }
+
+    #[test]
+    fn rgb_to_hex_correct() {
+        assert_eq!(rgb_to_hex_string(255, 0, 0), "#ff0000");
+        assert_eq!(rgb_to_hex_string(0, 255, 0), "#00ff00");
+        assert_eq!(rgb_to_hex_string(0, 0, 0), "#000000");
+        assert_eq!(rgb_to_hex_string(255, 255, 255), "#ffffff");
+    }
+
+    #[test]
+    fn render_template_replaces_variables() {
+        let dir = tempfile::tempdir().unwrap();
+        let tmpl = dir.path().join("test.template");
+        let out = dir.path().join("test.out");
+        fs::write(&tmpl, "color: {{bg}}; accent: {{accent_hex}};").unwrap();
+
+        let mut vars = HashMap::new();
+        vars.insert("bg".to_string(), "#1d2021".to_string());
+        vars.insert("accent_hex".to_string(), "d79921".to_string());
+
+        assert!(render_template(&tmpl, &out, &vars));
+        let result = fs::read_to_string(&out).unwrap();
+        assert_eq!(result, "color: #1d2021; accent: d79921;");
+    }
+
+    #[test]
+    fn render_template_static_text_unchanged() {
+        let dir = tempfile::tempdir().unwrap();
+        let tmpl = dir.path().join("static.template");
+        let out = dir.path().join("static.out");
+        fs::write(&tmpl, "return {\n  enabled = true\n}").unwrap();
+
+        let vars = HashMap::new();
+        assert!(render_template(&tmpl, &out, &vars));
+        assert_eq!(
+            fs::read_to_string(&out).unwrap(),
+            "return {\n  enabled = true\n}"
+        );
+    }
+
+    #[test]
+    fn render_template_nonexistent_input() {
+        let out = PathBuf::from("/tmp/should-not-exist-switcher-test.out");
+        assert!(!render_template(
+            Path::new("/tmp/no-such-template-nonexistent"),
+            &out,
+            &HashMap::new()
+        ));
+    }
+
+    #[test]
+    fn interpolate_color_produces_gradient() {
+        // Midpoint of red and blue should be purple-ish
+        let mid = interpolate_color("#ff0000", "#0000ff", 0.5);
+        assert!(mid.contains("7f") || mid.contains("80"));
+
+        // Factor 0 returns color1
+        assert_eq!(interpolate_color("#ff0000", "#0000ff", 0.0), "#ff0000");
+
+        // Factor 1 returns color2
+        assert_eq!(interpolate_color("#ff0000", "#00ff00", 1.0), "#00ff00");
+    }
 }

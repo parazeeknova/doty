@@ -32,10 +32,14 @@ fn strip_lua_comments(line: &str) -> String {
             if !in_single {
                 in_double = !in_double;
             }
-        } else if char == '-' && k < chars.len() - 1 && chars[k + 1] == '-'
-            && !in_single && !in_double {
-                return line[..k].trim().to_string();
-            }
+        } else if char == '-'
+            && k < chars.len() - 1
+            && chars[k + 1] == '-'
+            && !in_single
+            && !in_double
+        {
+            return line[..k].trim().to_string();
+        }
         k += 1;
     }
     line.trim().to_string()
@@ -80,10 +84,9 @@ fn parse_balanced_args(text: &str) -> Option<Vec<String>> {
             if !in_double_quote {
                 in_single_quote = !in_single_quote;
             }
-        } else if char == '"' && (j == 0 || inner_chars[j - 1] != '\\')
-            && !in_single_quote {
-                in_double_quote = !in_double_quote;
-            }
+        } else if char == '"' && (j == 0 || inner_chars[j - 1] != '\\') && !in_single_quote {
+            in_double_quote = !in_double_quote;
+        }
 
         if !in_single_quote && !in_double_quote {
             match char {
@@ -129,10 +132,9 @@ fn evaluate_lua_expr(expr: &str, variables: &HashMap<String, String>) -> String 
             if !in_double {
                 in_single = !in_single;
             }
-        } else if char == '"' && (k == 0 || chars[k - 1] != '\\')
-            && !in_single {
-                in_double = !in_double;
-            }
+        } else if char == '"' && (k == 0 || chars[k - 1] != '\\') && !in_single {
+            in_double = !in_double;
+        }
 
         if !in_single && !in_double && k < chars.len() - 1 && chars[k] == '.' && chars[k + 1] == '.'
         {
@@ -555,14 +557,15 @@ pub fn parse_binds<P: AsRef<Path>>(filepath: P) -> io::Result<Vec<Category>> {
 
         // Parse local variables
         if line.starts_with("local ")
-            && let Some(eq_idx) = line.find('=') {
-                let name = line[6..eq_idx].trim().to_string();
-                let expr = &line[eq_idx + 1..].trim();
-                let val = evaluate_lua_expr(expr, &variables);
-                variables.insert(name, val);
-                i += 1;
-                continue;
-            }
+            && let Some(eq_idx) = line.find('=')
+        {
+            let name = line[6..eq_idx].trim().to_string();
+            let expr = &line[eq_idx + 1..].trim();
+            let val = evaluate_lua_expr(expr, &variables);
+            variables.insert(name, val);
+            i += 1;
+            continue;
+        }
 
         // Handle workspaces loop
         if line.contains("for i = 1, 10 do") {
@@ -652,5 +655,191 @@ fn main() {
             eprintln!("Failed to parse keybindings: {}", e);
             std::process::exit(1);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+
+    fn write_temp_lua(content: &str) -> tempfile::NamedTempFile {
+        let mut f = tempfile::NamedTempFile::new().unwrap();
+        f.write_all(content.as_bytes()).unwrap();
+        f
+    }
+
+    #[test]
+    fn strip_comments_removes_line_comment() {
+        assert_eq!(strip_lua_comments("\"hello\" -- world"), "\"hello\"");
+        assert_eq!(
+            strip_lua_comments("  key = 'val'  -- explanation"),
+            "key = 'val'"
+        );
+    }
+
+    #[test]
+    fn strip_comments_preserves_strings_with_dashes() {
+        assert_eq!(strip_lua_comments("'hello--world'"), "'hello--world'");
+        assert_eq!(strip_lua_comments("\"hello--world\""), "\"hello--world\"");
+    }
+
+    #[test]
+    fn strip_comments_no_comment_returns_trimmed() {
+        assert_eq!(strip_lua_comments("  just a value  "), "just a value");
+        assert_eq!(strip_lua_comments(" 'quoted' "), "'quoted'");
+    }
+
+    #[test]
+    fn strip_comments_preserves_strings_with_escaped_quotes() {
+        assert_eq!(strip_lua_comments("'o\\'clock' -- time"), "'o\\'clock'");
+    }
+
+    #[test]
+    fn evaluate_lua_expr_resolves_string_literals() {
+        let vars = HashMap::new();
+        assert_eq!(evaluate_lua_expr("'hello'", &vars), "hello");
+        assert_eq!(evaluate_lua_expr("\"world\"", &vars), "world");
+    }
+
+    #[test]
+    fn evaluate_lua_expr_resolves_variable_concatenation() {
+        let mut vars = HashMap::new();
+        vars.insert("mainMod".to_string(), "SUPER".to_string());
+        vars.insert("terminal".to_string(), "uwsm app -- ghostty".to_string());
+        assert_eq!(
+            evaluate_lua_expr("mainMod .. ' + RETURN'", &vars),
+            "SUPER + RETURN"
+        );
+        assert_eq!(
+            evaluate_lua_expr("\"uwsm app -- \" .. terminal", &vars),
+            "uwsm app -- uwsm app -- ghostty"
+        );
+    }
+
+    #[test]
+    fn evaluate_lua_expr_handles_empty_parts() {
+        let vars = HashMap::new();
+        assert_eq!(evaluate_lua_expr("", &vars), "");
+        assert_eq!(evaluate_lua_expr("'x' .. 'y'", &vars), "xy");
+    }
+
+    #[test]
+    fn parse_binds_parses_categories_and_keys() {
+        let f = write_temp_lua(
+            "local mainMod = 'SUPER'\n\
+             ---------------------\n\
+             ---  Applications ---\n\
+             ---------------------\n\
+             hl.bind(mainMod .. ' + RETURN', hl.dsp.exec_cmd('uwsm app -- ghostty'))\n\
+             hl.bind(mainMod .. ' + T', hl.dsp.exec_cmd('uwsm app -- kitty'))\n\
+             ---------------------\n\
+             ---    Windows    ---\n\
+             ---------------------\n\
+             hl.bind(mainMod .. ' + Q', hl.dsp.window.close())\n",
+        );
+
+        let result = parse_binds(f.path()).unwrap();
+        assert_eq!(result.len(), 2);
+
+        let apps = &result[0];
+        assert_eq!(apps.category, "Applications");
+        assert_eq!(apps.binds.len(), 2);
+        assert_eq!(apps.binds[0].keys, "SUPER + RETURN");
+        assert!(apps.binds[0].cmd.contains("ghostty"));
+        assert_eq!(apps.binds[1].keys, "SUPER + T");
+        assert!(apps.binds[1].cmd.contains("kitty"));
+
+        let windows = &result[1];
+        assert_eq!(windows.category, "Windows");
+        assert_eq!(windows.binds.len(), 1);
+        assert_eq!(windows.binds[0].keys, "SUPER + Q");
+    }
+
+    #[test]
+    fn parse_binds_expands_workspaces_loop() {
+        let f = write_temp_lua(
+            "---------------------\n\
+             ---  Workspaces   ---\n\
+             ---------------------\n\
+             local mainMod = 'SUPER'\n\
+             for i = 1, 10 do\n\
+               local key = i % 10\n\
+               hl.bind(mainMod .. ' + ' .. key, hl.dsp.focus({workspace = i}))\n\
+             end\n",
+        );
+
+        let result = parse_binds(f.path()).unwrap();
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0].binds.len(), 10);
+        assert_eq!(result[0].binds[0].keys, "SUPER + 1");
+        assert_eq!(result[0].binds[9].keys, "SUPER + 0");
+    }
+
+    #[test]
+    fn parse_binds_skips_keybindings_header() {
+        let f = write_temp_lua(
+            "---------------------\n\
+             ---- Keybindings ----\n\
+             ---------------------\n\
+             local mainMod = 'SUPER'\n\
+             hl.bind(mainMod .. ' + X', hl.dsp.exec_cmd('cmd'))\n",
+        );
+
+        let result = parse_binds(f.path()).unwrap();
+        // "Keybindings" header should be skipped, bind goes to "General"
+        assert_eq!(result[0].category, "General");
+        assert_eq!(result[0].binds.len(), 1);
+    }
+
+    #[test]
+    fn parse_binds_handles_empty_file() {
+        let f = write_temp_lua("");
+        let result = parse_binds(f.path()).unwrap();
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn parse_binds_handles_missing_file() {
+        assert!(parse_binds("/tmp/no-such-binds-file-nonexistent.lua").is_err());
+    }
+
+    #[test]
+    fn parse_balanced_args_splits_arguments() {
+        let args =
+            parse_balanced_args("hl.bind(mainMod .. ' + K', hl.dsp.exec_cmd(terminal))").unwrap();
+        assert_eq!(args.len(), 2);
+        assert!(args[0].contains("mainMod"));
+        assert!(args[1].contains("exec_cmd"));
+    }
+
+    #[test]
+    fn parse_balanced_args_handles_nested_braces() {
+        let args = parse_balanced_args(
+            "hl.bind(SUPER .. ' + F', hl.dsp.window.move({workspace = 'special:magic'}))",
+        )
+        .unwrap();
+        assert_eq!(args.len(), 2);
+        assert!(args[1].contains("workspace"));
+    }
+
+    #[test]
+    fn parse_balanced_args_handles_release_modifier() {
+        let args = parse_balanced_args(
+            "hl.bind('SUPER_L', hl.dsp.exec_cmd('cmd'), {release = true, ignore_mods = true})",
+        )
+        .unwrap();
+        assert_eq!(args.len(), 3);
+    }
+
+    #[test]
+    fn parse_balanced_args_none_for_non_bind() {
+        assert!(parse_balanced_args("  -- just a comment").is_none());
+    }
+
+    #[test]
+    fn evaluate_lua_expr_handles_unknown_variable_as_is() {
+        let vars = HashMap::new();
+        assert_eq!(evaluate_lua_expr("unknownVar", &vars), "unknownVar");
     }
 }

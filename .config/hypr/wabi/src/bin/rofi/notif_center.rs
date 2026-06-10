@@ -51,68 +51,72 @@ fn shorten(text: &str) -> String {
 
 fn emit_items(source: &str, tag: &str, json_str: &str) {
     if let Ok(v) = serde_json::from_str::<Value>(json_str)
-        && let Some(arr) = v.as_array() {
-            for item in arr {
-                let id = get_field(item, "id");
-                let mut app = get_field(item, "app-name");
-                if app.is_empty() {
-                    app = "mako".to_string();
-                }
-                let mut summary = get_field(item, "summary");
-                if summary.is_empty() {
-                    summary = get_field(item, "body");
-                }
-                if summary.is_empty() {
-                    summary = "(no summary)".to_string();
-                }
-                let summary_short = shorten(&summary);
-                if source == "active" {
-                    println!(
-                        "[{}] {} — {}\0info\x1fdismiss:{}",
-                        tag, app, summary_short, id
-                    );
-                } else {
-                    println!(
-                        "[{}] {} — {}\0info\x1frestore:{}",
-                        tag, app, summary_short, id
-                    );
-                }
+        && let Some(arr) = v.as_array()
+    {
+        for item in arr {
+            let id = get_field(item, "id");
+            let mut app = get_field(item, "app-name");
+            if app.is_empty() {
+                app = "mako".to_string();
+            }
+            let mut summary = get_field(item, "summary");
+            if summary.is_empty() {
+                summary = get_field(item, "body");
+            }
+            if summary.is_empty() {
+                summary = "(no summary)".to_string();
+            }
+            let summary_short = shorten(&summary);
+            if source == "active" {
+                println!(
+                    "[{}] {} — {}\0info\x1fdismiss:{}",
+                    tag, app, summary_short, id
+                );
+            } else {
+                println!(
+                    "[{}] {} — {}\0info\x1frestore:{}",
+                    tag, app, summary_short, id
+                );
             }
         }
+    }
 }
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 {
         if let Ok(rofi_info) = env::var("ROFI_INFO")
-            && !rofi_info.is_empty() {
-                if rofi_info.starts_with("dismiss:") {
-                    let id = rofi_info.trim_start_matches("dismiss:");
-                    let _ = Command::new("makoctl").args(["dismiss", "-n", id]).status();
-                } else if rofi_info == "restore" || rofi_info.starts_with("restore:") {
-                    let _ = Command::new("makoctl").arg("restore").status();
-                } else if rofi_info == "clear-all" {
-                    let _ = Command::new("makoctl").args(["dismiss", "-a"]).status();
-                }
+            && !rofi_info.is_empty()
+        {
+            if rofi_info.starts_with("dismiss:") {
+                let id = rofi_info.trim_start_matches("dismiss:");
+                let _ = Command::new("makoctl").args(["dismiss", "-n", id]).status();
+            } else if rofi_info == "restore" || rofi_info.starts_with("restore:") {
+                let _ = Command::new("makoctl").arg("restore").status();
+            } else if rofi_info == "clear-all" {
+                let _ = Command::new("makoctl").args(["dismiss", "-a"]).status();
             }
+        }
         std::process::exit(0);
     }
 
     // Active
     let active_out = Command::new("makoctl").args(["list", "-j"]).output();
     if let Ok(out) = active_out
-        && out.status.success() {
-            let json_str = String::from_utf8_lossy(&out.stdout);
-            emit_items("active", "live", &json_str);
-        }
+        && out.status.success()
+    {
+        let json_str = String::from_utf8_lossy(&out.stdout);
+        emit_items("active", "live", &json_str);
+    }
 
     // History
     let history_out = Command::new("makoctl").args(["history", "-j"]).output();
     if let Ok(out) = history_out
-        && out.status.success() {
-            let json_str = String::from_utf8_lossy(&out.stdout);
-            emit_items("history", "hist", &json_str);
-        }
+        && out.status.success()
+    {
+        let json_str = String::from_utf8_lossy(&out.stdout);
+        emit_items("history", "hist", &json_str);
+    }
 
     println!("clear all\0info\x1fclear-all");
     println!("\0message\x1fnotifications");

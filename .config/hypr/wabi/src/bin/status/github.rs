@@ -83,10 +83,11 @@ fn main() {
     // Fallback to cache if network fetch failed
     if !fetch_success {
         if cache_path.exists()
-            && let Ok(cached_data) = std::fs::read_to_string(cache_path) {
-                println!("{cached_data}");
-                return;
-            }
+            && let Ok(cached_data) = std::fs::read_to_string(cache_path)
+        {
+            println!("{cached_data}");
+            return;
+        }
         eprintln!("Failed to fetch contributions and no local cache is available.");
         std::process::exit(1);
     }
@@ -169,9 +170,10 @@ fn parse_contributions(html: &str) -> Vec<ContributionDay> {
                 if let Some(level_idx) = td_tag.find("data-level=\"") {
                     let s = level_idx + 12;
                     if let Some(e) = td_tag[s..].find("\"")
-                        && let Ok(l) = td_tag[s..s + e].parse::<u32>() {
-                            level = l;
-                        }
+                        && let Ok(l) = td_tag[s..s + e].parse::<u32>()
+                    {
+                        level = l;
+                    }
                 }
 
                 if let Some(id_idx) = td_tag.find("id=\"") {
@@ -227,9 +229,10 @@ fn get_local_commit_count(repo_name: &str) -> Option<u32> {
         if path.join(".git").exists()
             && let Some(output) =
                 wabi::run_cmd("git", &["-C", &path_str, "rev-list", "--count", "HEAD"])
-                && let Ok(count) = output.trim().parse::<u32>() {
-                    return Some(count);
-                }
+            && let Ok(count) = output.trim().parse::<u32>()
+        {
+            return Some(count);
+        }
     }
     None
 }
@@ -265,16 +268,16 @@ fn parse_activity(json_str: &str) -> Vec<ActivityItem> {
     for item in raw_items {
         if let Some(last) = aggregated.last_mut()
             && last.event_type == item.event_type
-                && last.repo == item.repo
-                && last.description == item.description
-            {
-                last.count += 1;
-                // Accumulate unique times
-                if !last.times.contains(&item.time) {
-                    last.times.push(item.time);
-                }
-                continue;
+            && last.repo == item.repo
+            && last.description == item.description
+        {
+            last.count += 1;
+            // Accumulate unique times
+            if !last.times.contains(&item.time) {
+                last.times.push(item.time);
             }
+            continue;
+        }
         aggregated.push(item);
     }
 

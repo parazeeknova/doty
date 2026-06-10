@@ -25,7 +25,10 @@ fn grab_int(text: &str, key: &str) -> Option<i32> {
 }
 
 fn get_rofi_bounds() -> Option<Rect> {
-    let out = Command::new("hyprctl").args(["layers", "-j"]).output().ok()?;
+    let out = Command::new("hyprctl")
+        .args(["layers", "-j"])
+        .output()
+        .ok()?;
     let text = String::from_utf8_lossy(&out.stdout);
     let pos = text.find("\"namespace\": \"rofi\"")?;
     let start = pos.saturating_sub(400);
@@ -150,9 +153,7 @@ fn main() {
 
             consecutive_outside += 1;
             if consecutive_outside >= outside_threshold {
-                let _ = Command::new("kill")
-                    .arg(rofi_pid.to_string())
-                    .status();
+                let _ = Command::new("kill").arg(rofi_pid.to_string()).status();
                 break;
             }
         }

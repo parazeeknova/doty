@@ -7,6 +7,8 @@ node_modules
 fish_variables
 .config/tmux/.tmux/plugins/tpm
 .commandcode
+.codex
+.agents
 __pycache__
 .antigravitycli
 .config/systemd/system/getty@tty1.service.d/autologin.conf

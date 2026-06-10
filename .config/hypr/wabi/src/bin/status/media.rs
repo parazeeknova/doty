@@ -1,10 +1,10 @@
-use wabi::media_db;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
+use wabi::media_db;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct Settings {
@@ -60,9 +60,10 @@ fn get_settings_path() -> PathBuf {
 fn load_settings() -> Settings {
     let path = get_settings_path();
     if let Ok(content) = fs::read_to_string(&path)
-        && let Ok(settings) = serde_json::from_str(&content) {
-            return settings;
-        }
+        && let Ok(settings) = serde_json::from_str(&content)
+    {
+        return settings;
+    }
     Settings::default()
 }
 
@@ -309,6 +310,13 @@ fn run() -> i32 {
                 trigger_ping();
                 return 0;
             }
+            "recording-status" => {
+                let status = serde_json::json!({ "is_recording": is_wf_recorder_running() });
+                if let Ok(json) = serde_json::to_string(&status) {
+                    println!("{json}");
+                }
+                return 0;
+            }
             _ => {
                 print_error(&format!("unknown subcommand: {}", args[1]));
                 return 1;
@@ -370,9 +378,7 @@ fn trigger_ping() {
 }
 
 fn pick_color() -> i32 {
-    let out = Command::new("hyprpicker")
-        .args(["-a", "-n"])
-        .output();
+    let out = Command::new("hyprpicker").args(["-a", "-n"]).output();
 
     let out = match out {
         Ok(o) => o,

@@ -6,13 +6,12 @@ use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::{UnixListener, UnixStream};
 use std::path::Path;
 use std::process::Command;
-use std::sync::mpsc::{channel, Sender};
+use std::sync::mpsc::{Sender, channel};
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 fn ipc_socket_path() -> String {
-    let runtime_dir = env::var("XDG_RUNTIME_DIR")
-        .unwrap_or_else(|_| "/tmp".to_string());
+    let runtime_dir = env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/tmp".to_string());
     format!("{}/wabi_screentime.sock", runtime_dir)
 }
 
@@ -120,19 +119,21 @@ fn query_current_active_window() -> Option<(String, String)> {
 }
 
 fn start_hyprland_listener(tx: Sender<Message>) {
-    thread::spawn(move || loop {
-        if let Ok(sig) = env::var("HYPRLAND_INSTANCE_SIGNATURE") {
-            let runtime_dir =
-                env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/run/user/1000".to_string());
-            let socket_path = format!("{}/hypr/{}/.socket2.sock", runtime_dir, sig);
-            let socket_path = if Path::new(&socket_path).exists() {
-                socket_path
-            } else {
-                format!("/tmp/hypr/{}/.socket2.sock", sig)
-            };
+    thread::spawn(move || {
+        loop {
+            if let Ok(sig) = env::var("HYPRLAND_INSTANCE_SIGNATURE") {
+                let runtime_dir =
+                    env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/run/user/1000".to_string());
+                let socket_path = format!("{}/hypr/{}/.socket2.sock", runtime_dir, sig);
+                let socket_path = if Path::new(&socket_path).exists() {
+                    socket_path
+                } else {
+                    format!("/tmp/hypr/{}/.socket2.sock", sig)
+                };
 
-            if Path::new(&socket_path).exists()
-                && let Ok(stream) = UnixStream::connect(&socket_path) {
+                if Path::new(&socket_path).exists()
+                    && let Ok(stream) = UnixStream::connect(&socket_path)
+                {
                     let reader = BufReader::new(stream);
                     for line in reader.lines() {
                         if let Ok(l) = line {
@@ -145,8 +146,9 @@ fn start_hyprland_listener(tx: Sender<Message>) {
                         }
                     }
                 }
+            }
+            thread::sleep(Duration::from_secs(2));
         }
-        thread::sleep(Duration::from_secs(2));
     });
 }
 

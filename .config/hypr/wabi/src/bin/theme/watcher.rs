@@ -65,12 +65,7 @@ fn is_supported_wallpaper(path: &Path) -> bool {
 fn is_animated(path: &Path) -> bool {
     path.extension()
         .and_then(|ext| ext.to_str())
-        .map(|ext| {
-            matches!(
-                ext.to_ascii_lowercase().as_str(),
-                "gif" | "mp4" | "webm"
-            )
-        })
+        .map(|ext| matches!(ext.to_ascii_lowercase().as_str(), "gif" | "mp4" | "webm"))
         .unwrap_or(false)
 }
 
@@ -148,13 +143,14 @@ fn generate_thumb(wallpaper: &Wallpaper, thumb: &Path) -> bool {
     }
 
     if let Some(parent) = thumb.parent()
-        && let Err(err) = fs::create_dir_all(parent) {
-            eprintln!(
-                "failed to create thumbnail cache {}: {err}",
-                parent.display()
-            );
-            return false;
-        }
+        && let Err(err) = fs::create_dir_all(parent)
+    {
+        eprintln!(
+            "failed to create thumbnail cache {}: {err}",
+            parent.display()
+        );
+        return false;
+    }
 
     let mut tmp = thumb.to_path_buf();
     tmp.set_extension("tmp.jpg");
@@ -213,14 +209,11 @@ fn generate_colors(wallpaper: &Wallpaper, cache_dir: &Path) {
         return;
     }
 
-    let is_video = wallpaper.path.extension()
+    let is_video = wallpaper
+        .path
+        .extension()
         .and_then(|ext| ext.to_str())
-        .map(|ext| {
-            matches!(
-                ext.to_ascii_lowercase().as_str(),
-                "mp4" | "webm"
-            )
-        })
+        .map(|ext| matches!(ext.to_ascii_lowercase().as_str(), "mp4" | "webm"))
         .unwrap_or(false);
 
     let matugen_input = if is_video {
@@ -409,7 +402,9 @@ fn link_anime_wallpapers() {
 }
 
 fn auto_optimize_video(path: &Path) {
-    let Some(ext) = path.extension().and_then(|e| e.to_str()) else { return; };
+    let Some(ext) = path.extension().and_then(|e| e.to_str()) else {
+        return;
+    };
     let ext_lower = ext.to_ascii_lowercase();
     if ext_lower != "mp4" && ext_lower != "webm" {
         return;
@@ -421,10 +416,14 @@ fn auto_optimize_video(path: &Path) {
 
     let output = Command::new("ffprobe")
         .args([
-            "-v", "error",
-            "-select_streams", "v:0",
-            "-show_entries", "stream=width,height,r_frame_rate",
-            "-of", "csv=p=0",
+            "-v",
+            "error",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=width,height,r_frame_rate",
+            "-of",
+            "csv=p=0",
             &path.to_string_lossy(),
         ])
         .output();
@@ -457,7 +456,10 @@ fn auto_optimize_video(path: &Path) {
 
     if width > 1920 || height > 1080 || fps > 30.1 {
         let file_name = path.file_name().and_then(|n| n.to_str()).unwrap_or("video");
-        let message = format!("Optimizing {} ({}x{} @ {:.1}fps -> 1080p @ 30fps)...", file_name, width, height, fps);
+        let message = format!(
+            "Optimizing {} ({}x{} @ {:.1}fps -> 1080p @ 30fps)...",
+            file_name, width, height, fps
+        );
         println!("{}", message);
         let _ = Command::new("notify-send")
             .arg("Wallpaper Watcher")
@@ -487,7 +489,10 @@ fn auto_optimize_video(path: &Path) {
         match ffmpeg_status {
             Ok(status) if status.success() => {
                 if let Err(e) = fs::rename(&tmp_output, path) {
-                    eprintln!("Failed to replace original video file with optimized one: {}", e);
+                    eprintln!(
+                        "Failed to replace original video file with optimized one: {}",
+                        e
+                    );
                     let _ = fs::remove_file(&tmp_output);
                 } else {
                     let success_msg = format!("Successfully optimized {}", file_name);
@@ -534,7 +539,9 @@ fn sync_once(dirs: &[PathBuf], cache_dir: &Path, clean: bool) {
         generate_thumb(wallpaper, &thumb);
         generate_colors(wallpaper, cache_dir);
 
-        let is_video = wallpaper.path.extension()
+        let is_video = wallpaper
+            .path
+            .extension()
             .and_then(|ext| ext.to_str())
             .map(|ext| matches!(ext.to_ascii_lowercase().as_str(), "mp4" | "webm"))
             .unwrap_or(false);

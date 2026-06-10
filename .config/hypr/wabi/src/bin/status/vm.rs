@@ -305,15 +305,16 @@ fn get_snapshots(vmx: &Path) -> VmSnapshotInfo {
             if path.is_file() && path.extension().and_then(|e| e.to_str()) == Some("vmsn") {
                 count += 1;
                 if let Ok(meta) = fs::metadata(&path)
-                    && let Ok(mod_time) = meta.modified() {
-                        if let Some(latest) = latest_modified {
-                            if mod_time > latest {
-                                latest_modified = Some(mod_time);
-                            }
-                        } else {
+                    && let Ok(mod_time) = meta.modified()
+                {
+                    if let Some(latest) = latest_modified {
+                        if mod_time > latest {
                             latest_modified = Some(mod_time);
                         }
+                    } else {
+                        latest_modified = Some(mod_time);
                     }
+                }
             }
         }
     }
@@ -369,14 +370,14 @@ fn build_vm_info(vmx: &Path, running: &[String]) -> Option<VmInfo> {
     let mut guest_os = read_vmx_field(vmx, "guestOS").unwrap_or_default();
     if guest_os.is_empty()
         && let Some(detailed_data) = read_vmx_field(vmx, "guestInfo.detailed.data")
-            && detailed_data.contains("prettyName='")
-                && let Some(pretty) = detailed_data
-                    .split("prettyName='")
-                    .nth(1)
-                    .and_then(|s| s.split('\'').next())
-                {
-                    guest_os = pretty.to_string();
-                }
+        && detailed_data.contains("prettyName='")
+        && let Some(pretty) = detailed_data
+            .split("prettyName='")
+            .nth(1)
+            .and_then(|s| s.split('\'').next())
+    {
+        guest_os = pretty.to_string();
+    }
 
     let mut cpus = read_vmx_field(vmx, "numvcpus")
         .map(|s| parse_vmx_size(&s))
@@ -389,35 +390,40 @@ fn build_vm_info(vmx: &Path, running: &[String]) -> Option<VmInfo> {
         .parent()
         .unwrap_or_else(|| Path::new("."))
         .join("vmware.log");
-    if (cpus == 0 || ram_mb == 0) && log_path.exists()
-        && let Ok(log_text) = fs::read_to_string(&log_path) {
-            let mut total_ram = 0;
-            for line in log_text.lines() {
-                if cpus == 0 && line.contains("NumVCPUs ")
-                    && let Some(n) = line
-                        .split("NumVCPUs ")
-                        .nth(1)
-                        .and_then(|s| s.split_whitespace().next())
-                    {
-                        cpus = n.parse().unwrap_or(0);
-                    }
-                if line.contains("memoryHotplug: Node ") && line.contains("Present: ")
-                    && let Some(n) = line
-                        .split("Present: ")
-                        .nth(1)
-                        .and_then(|s| s.split_whitespace().next())
-                        && let Ok(val) = n.parse::<i64>() {
-                            total_ram += val;
-                        }
+    if (cpus == 0 || ram_mb == 0)
+        && log_path.exists()
+        && let Ok(log_text) = fs::read_to_string(&log_path)
+    {
+        let mut total_ram = 0;
+        for line in log_text.lines() {
+            if cpus == 0
+                && line.contains("NumVCPUs ")
+                && let Some(n) = line
+                    .split("NumVCPUs ")
+                    .nth(1)
+                    .and_then(|s| s.split_whitespace().next())
+            {
+                cpus = n.parse().unwrap_or(0);
             }
-            if ram_mb == 0 && total_ram > 0 {
-                if (total_ram + 1) % 1024 == 0 {
-                    ram_mb = total_ram + 1;
-                } else {
-                    ram_mb = total_ram;
-                }
+            if line.contains("memoryHotplug: Node ")
+                && line.contains("Present: ")
+                && let Some(n) = line
+                    .split("Present: ")
+                    .nth(1)
+                    .and_then(|s| s.split_whitespace().next())
+                && let Ok(val) = n.parse::<i64>()
+            {
+                total_ram += val;
             }
         }
+        if ram_mb == 0 && total_ram > 0 {
+            if (total_ram + 1) % 1024 == 0 {
+                ram_mb = total_ram + 1;
+            } else {
+                ram_mb = total_ram;
+            }
+        }
+    }
 
     let encrypted = read_vmx_field(vmx, "vmx.encryptionType").is_some()
         || read_vmx_field(vmx, "encryption.keySafe").is_some();
@@ -566,9 +572,10 @@ fn qemu_domain_storage(name: &str) -> u64 {
         }
         let parts: Vec<&str> = trimmed.split_whitespace().collect();
         if parts.len() >= 2
-            && let Ok(bytes) = parts[1].parse::<u64>() {
-                total_bytes += bytes;
-            }
+            && let Ok(bytes) = parts[1].parse::<u64>()
+        {
+            total_bytes += bytes;
+        }
     }
     total_bytes
 }
@@ -864,9 +871,177 @@ fn handle_qemu_delete(args: &[String]) {
         .output();
 
     if let Ok(out) = output
-        && !out.status.success() {
-            let stderr = String::from_utf8_lossy(&out.stderr);
-            eprintln!("Failed to delete QEMU VM: {}", stderr.trim());
-            std::process::exit(1);
+        && !out.status.success()
+    {
+        let stderr = String::from_utf8_lossy(&out.stderr);
+        eprintln!("Failed to delete QEMU VM: {}", stderr.trim());
+        std::process::exit(1);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+
+    fn write_temp_vmx(content: &str) -> tempfile::NamedTempFile {
+        let mut f = tempfile::NamedTempFile::new().unwrap();
+        f.write_all(content.as_bytes()).unwrap();
+        f
+    }
+
+    #[test]
+    fn reads_simple_vmx_field() {
+        let vmx =
+            write_temp_vmx("displayName = \"Windows 11\"\nmemsize = \"8192\"\nnumvcpus = \"4\"\n");
+        assert_eq!(
+            read_vmx_field(vmx.path(), "displayName").as_deref(),
+            Some("Windows 11")
+        );
+        assert_eq!(
+            read_vmx_field(vmx.path(), "memsize").as_deref(),
+            Some("8192")
+        );
+        assert_eq!(read_vmx_field(vmx.path(), "numvcpus").as_deref(), Some("4"));
+    }
+
+    #[test]
+    fn reads_field_without_quotes() {
+        let vmx = write_temp_vmx("guestOS = darwin22-64\n");
+        assert_eq!(
+            read_vmx_field(vmx.path(), "guestOS").as_deref(),
+            Some("darwin22-64")
+        );
+    }
+
+    #[test]
+    fn returns_none_for_missing_field() {
+        let vmx = write_temp_vmx("displayName = \"Test\"\n");
+        assert!(read_vmx_field(vmx.path(), "encryption.keySafe").is_none());
+    }
+
+    #[test]
+    fn returns_none_for_nonexistent_file() {
+        assert!(
+            read_vmx_field(Path::new("/tmp/no-such-vmx-nonexistent.vmx"), "displayName").is_none()
+        );
+    }
+
+    #[test]
+    fn parses_vmx_size_values() {
+        assert_eq!(parse_vmx_size("8192"), 8192);
+        assert_eq!(parse_vmx_size("4"), 4);
+        assert_eq!(parse_vmx_size(""), 0);
+        assert_eq!(parse_vmx_size("abc"), 0);
+    }
+
+    #[test]
+    fn resolve_vm_icon_detects_os_correctly() {
+        // Note: "win" check precedes "darwin" — darwin strings containing "win" match Windows icon
+        assert_eq!(resolve_vm_icon("windows11-64"), "\u{e70f}");
+        assert_eq!(resolve_vm_icon("ubuntu-64"), "\u{f31b}");
+        assert_eq!(resolve_vm_icon("arch-64"), "\u{f303}");
+        assert_eq!(resolve_vm_icon("debian-64"), "\u{f306}");
+        assert_eq!(resolve_vm_icon("other64Guest"), "\u{f45c}");
+        assert_eq!(resolve_vm_icon("winXP"), "\u{e70f}");
+        assert_eq!(resolve_vm_icon("linux-generic"), "\u{f31c}");
+        assert_eq!(resolve_vm_icon("freebsd-64"), "\u{f30c}");
+        assert_eq!(resolve_vm_icon("fedora-64"), "\u{f30a}");
+    }
+
+    #[test]
+    fn resolve_disk_paths_parses_scsi_nvme_sata_ide() {
+        let dir = tempfile::tempdir().unwrap();
+        let vmx_path = dir.path().join("test.vmx");
+        let vmdk1 = dir.path().join("virtual-disk.vmdk");
+        let vmdk2 = dir.path().join("nvme-disk.vmdk");
+        fs::write(&vmdk1, b"fake-disk").unwrap();
+        fs::write(&vmdk2, b"fake-disk").unwrap();
+
+        let vmx_content = format!(
+            "scsi0:0.fileName = \"{}\"\nnvme0:0.fileName = \"{}\"\n",
+            vmdk1.to_string_lossy(),
+            vmdk2.to_string_lossy(),
+        );
+        fs::write(&vmx_path, vmx_content).unwrap();
+
+        let disks = resolve_disk_paths(&vmx_path);
+        assert_eq!(disks.len(), 2);
+        assert!(disks.contains(&vmdk1));
+        assert!(disks.contains(&vmdk2));
+    }
+
+    #[test]
+    fn resolve_disk_paths_skips_iso_and_cdrom() {
+        let dir = tempfile::tempdir().unwrap();
+        let vmx_path = dir.path().join("test.vmx");
+        let vmdk = dir.path().join("real.vmdk");
+        fs::write(&vmdk, b"fake-disk").unwrap();
+
+        let vmx_content = format!(
+            "sata0:0.fileName = \"{}\"\nsata0:1.fileName = \"installer.iso\"\n",
+            vmdk.to_string_lossy(),
+        );
+        fs::write(&vmx_path, vmx_content).unwrap();
+
+        let disks = resolve_disk_paths(&vmx_path);
+        assert_eq!(disks.len(), 1);
+        assert!(disks.contains(&vmdk));
+    }
+
+    #[test]
+    fn resolve_disk_paths_skips_higher_controller_slots() {
+        let dir = tempfile::tempdir().unwrap();
+        let vmx_path = dir.path().join("test.vmx");
+        let disk0 = dir.path().join("slot0.vmdk");
+        fs::write(&disk0, b"fake-disk").unwrap();
+
+        let vmx_content = format!(
+            "sata0:0.fileName = \"{}\"\nsata0:1.fileName = \"not-a-disk.iso\"\n",
+            disk0.to_string_lossy(),
+        );
+        fs::write(&vmx_path, vmx_content).unwrap();
+
+        let disks = resolve_disk_paths(&vmx_path);
+        // sata0:1 is skipped because it's a higher slot (likely CD-ROM)
+        assert_eq!(disks.len(), 1);
+    }
+
+    #[test]
+    fn delete_safety_blocks_path_outside_scan_root() {
+        let dir = tempfile::tempdir().unwrap();
+        let outside = dir.path().join("outside.vmx");
+        fs::write(&outside, "fake").unwrap();
+
+        // Verify the safety logic inline: an external path is rejected
+        let saved = std::env::var("WABI_VM_SCAN_ROOT").ok();
+        unsafe {
+            std::env::set_var("WABI_VM_SCAN_ROOT", "/tmp/no-such-vm-root");
         }
+        let root = get_vm_scan_root();
+        let parent_canonical = outside
+            .parent()
+            .unwrap()
+            .canonicalize()
+            .unwrap_or_else(|_| outside.parent().unwrap().to_path_buf());
+        let root_canonical = Path::new(&root)
+            .canonicalize()
+            .unwrap_or_else(|_| PathBuf::from(&root));
+        let safe =
+            parent_canonical.starts_with(&root_canonical) && parent_canonical != root_canonical;
+        assert!(
+            !safe,
+            "delete should be blocked when VM is outside scan root"
+        );
+        if let Some(v) = saved {
+            unsafe {
+                std::env::set_var("WABI_VM_SCAN_ROOT", v);
+            }
+        }
+    }
+
+    #[test]
+    fn disk_size_handles_nonexistent_files() {
+        assert_eq!(disk_size(Path::new("/tmp/does-not-exist-anywhere.vmdk")), 0);
+    }
 }

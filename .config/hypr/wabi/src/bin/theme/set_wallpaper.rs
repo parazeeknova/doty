@@ -5,9 +5,7 @@ use std::thread;
 use std::time::Duration;
 
 fn kill_mpvpaper() {
-    let _ = Command::new("killall")
-        .args(["-9", "mpvpaper"])
-        .status();
+    let _ = Command::new("killall").args(["-9", "mpvpaper"]).status();
 }
 
 fn main() {
@@ -44,14 +42,10 @@ fn main() {
             path_str
         );
         println!("Spawning via bash: {}", cmd);
-        match Command::new("bash")
-            .args(["-c", &cmd])
-            .spawn()
-        {
+        match Command::new("bash").args(["-c", &cmd]).spawn() {
             Ok(_) => println!("Successfully spawned uwsm app mpvpaper via bash"),
             Err(e) => eprintln!("Error spawning mpvpaper: {}", e),
         }
-
     } else {
         // Kill mpvpaper
         kill_mpvpaper();
@@ -71,8 +65,6 @@ fn main() {
         }
 
         // Set wallpaper via awww img
-        let _ = Command::new("awww")
-            .args(["img", &path_str])
-            .status();
+        let _ = Command::new("awww").args(["img", &path_str]).status();
     }
 }

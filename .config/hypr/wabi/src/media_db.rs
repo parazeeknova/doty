@@ -1,4 +1,4 @@
-use rusqlite::{params, Connection, OptionalExtension};
+use rusqlite::{Connection, OptionalExtension, params};
 use serde::Serialize;
 use std::fs;
 use std::os::unix::fs as unixfs;
@@ -148,7 +148,9 @@ fn init_schema(conn: &Connection) -> Result<(), rusqlite::Error> {
     )?;
 
     let version: Option<i32> = conn
-        .query_row("SELECT version FROM schema_version LIMIT 1", [], |r| r.get(0))
+        .query_row("SELECT version FROM schema_version LIMIT 1", [], |r| {
+            r.get(0)
+        })
         .optional()?;
     let needs_migration = version.is_none() || version.unwrap_or(0) < SCHEMA_VERSION;
 
@@ -201,11 +203,7 @@ pub fn thumbnail_path_for(id: i64) -> PathBuf {
 fn probe(source: &Path) -> ProbeResult {
     let mut result = ProbeResult::default();
     let output = Command::new("ffprobe")
-        .args([
-            "-v", "quiet",
-            "-print_format", "json",
-            "-show_streams",
-        ])
+        .args(["-v", "quiet", "-print_format", "json", "-show_streams"])
         .arg(source)
         .output();
     let Ok(out) = output else {
@@ -234,19 +232,16 @@ fn probe(source: &Path) -> ProbeResult {
             .and_then(|v| v.as_i64())
             .map(|v| v as i32);
         if let Some(dur) = stream.get("duration").and_then(|v| v.as_str())
-            && let Ok(secs) = dur.parse::<f64>() {
-                result.duration_ms = Some((secs * 1000.0) as i32);
-            }
+            && let Ok(secs) = dur.parse::<f64>()
+        {
+            result.duration_ms = Some((secs * 1000.0) as i32);
+        }
         break;
     }
     result
 }
 
-pub fn add_asset(
-    conn: &Connection,
-    asset_type_str: &str,
-    source: &str,
-) -> Result<i64, String> {
+pub fn add_asset(conn: &Connection, asset_type_str: &str, source: &str) -> Result<i64, String> {
     let asset_type = AssetType::parse(asset_type_str)
         .ok_or_else(|| format!("invalid asset type: {asset_type_str}"))?;
     let source_path = PathBuf::from(source);
@@ -332,18 +327,9 @@ fn ensure_thumbnail(source: &Path, id: i64, asset_type: AssetType) {
             }
             let scale = format!("scale={THUMB_SIZE}:-2");
             let _ = Command::new("ffmpeg")
-                .args([
-                    "-y",
-                    "-hide_banner",
-                    "-loglevel", "error",
-                    "-i",
-                ])
+                .args(["-y", "-hide_banner", "-loglevel", "error", "-i"])
                 .arg(source)
-                .args([
-                    "-ss", "00:00:00.500",
-                    "-vframes", "1",
-                    "-vf", &scale,
-                ])
+                .args(["-ss", "00:00:00.500", "-vframes", "1", "-vf", &scale])
                 .arg(&thumb)
                 .output();
         }
@@ -441,10 +427,13 @@ pub fn list_assets(
 
     if let Some(s) = search.filter(|s| !s.is_empty()) {
         let idx = binds.len() + 1;
-        conditions.push(format!(
-            "a.source_path LIKE ?{idx} ESCAPE '\\'"
-        ));
-        let pattern = format!("%{}%", s.replace('\\', "\\\\").replace('%', "\\%").replace('_', "\\_"));
+        conditions.push(format!("a.source_path LIKE ?{idx} ESCAPE '\\'"));
+        let pattern = format!(
+            "%{}%",
+            s.replace('\\', "\\\\")
+                .replace('%', "\\%")
+                .replace('_', "\\_")
+        );
         binds.push(Box::new(pattern));
     }
 
@@ -482,8 +471,18 @@ pub fn list_assets(
 
     let mut assets: Vec<Asset> = Vec::new();
     for row in asset_iter {
-        let (id, asset_type, source_path, thumbnail_path, created_at, deleted_at, file_size, width, height, duration_ms) =
-            row.map_err(|e| e.to_string())?;
+        let (
+            id,
+            asset_type,
+            source_path,
+            thumbnail_path,
+            created_at,
+            deleted_at,
+            file_size,
+            width,
+            height,
+            duration_ms,
+        ) = row.map_err(|e| e.to_string())?;
         let asset = Asset {
             id,
             asset_type,
@@ -540,9 +539,7 @@ pub fn clear_colors(conn: &Connection) -> Result<(), String> {
 
 pub fn list_colors(conn: &Connection, limit: i64) -> Result<Vec<PickedColor>, String> {
     let mut stmt = conn
-        .prepare(
-            "SELECT id, hex, picked_at FROM colors ORDER BY picked_at DESC LIMIT ?1",
-        )
+        .prepare("SELECT id, hex, picked_at FROM colors ORDER BY picked_at DESC LIMIT ?1")
         .map_err(|e| e.to_string())?;
     let iter = stmt
         .query_map(params![limit], |r| {
@@ -568,9 +565,7 @@ pub fn add_ocr(conn: &Connection, detail: &str) -> Result<i64, String> {
 
 pub fn list_ocr(conn: &Connection, limit: i64) -> Result<Vec<OcrItem>, String> {
     let mut stmt = conn
-        .prepare(
-            "SELECT id, detail, created_at FROM ocr_history ORDER BY created_at DESC LIMIT ?1",
-        )
+        .prepare("SELECT id, detail, created_at FROM ocr_history ORDER BY created_at DESC LIMIT ?1")
         .map_err(|e| e.to_string())?;
     let iter = stmt
         .query_map(params![limit], |r| {
@@ -589,4 +584,197 @@ pub fn clear_ocr(conn: &Connection) -> Result<(), String> {
     conn.execute("DELETE FROM ocr_history", [])
         .map_err(|e| e.to_string())?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rusqlite::Connection;
+
+    fn open_mem() -> Connection {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.pragma_update(None, "foreign_keys", "ON").unwrap();
+        conn.pragma_update(None, "temp_store", "MEMORY").unwrap();
+        conn
+    }
+
+    #[test]
+    fn asset_type_parse_roundtrip() {
+        assert_eq!(AssetType::parse("screenshot"), Some(AssetType::Screenshot));
+        assert_eq!(AssetType::parse("recording"), Some(AssetType::Recording));
+        assert_eq!(AssetType::parse("unknown"), None);
+        assert_eq!(AssetType::parse(""), None);
+        assert_eq!(AssetType::Screenshot.as_str(), "screenshot");
+        assert_eq!(AssetType::Recording.as_str(), "recording");
+    }
+
+    #[test]
+    fn schema_creates_all_tables_and_indexes() {
+        let conn = open_mem();
+        init_schema(&conn).unwrap();
+
+        // Verify tables exist by inserting/querying
+        conn.execute(
+            "INSERT INTO assets (asset_type, source_path, thumbnail_path, created_at) VALUES ('screenshot', '/tmp/test.png', '', 1000)",
+            [],
+        ).unwrap();
+
+        conn.execute(
+            "INSERT INTO colors (hex, picked_at) VALUES ('#ff0000', 2000)",
+            [],
+        )
+        .unwrap();
+
+        conn.execute(
+            "INSERT INTO ocr_history (detail, created_at) VALUES ('test ocr', 3000)",
+            [],
+        )
+        .unwrap();
+
+        let asset_count: i64 = conn
+            .query_row("SELECT COUNT(*) FROM assets", [], |r| r.get(0))
+            .unwrap();
+        let color_count: i64 = conn
+            .query_row("SELECT COUNT(*) FROM colors", [], |r| r.get(0))
+            .unwrap();
+        let ocr_count: i64 = conn
+            .query_row("SELECT COUNT(*) FROM ocr_history", [], |r| r.get(0))
+            .unwrap();
+
+        assert_eq!(asset_count, 1);
+        assert_eq!(color_count, 1);
+        assert_eq!(ocr_count, 1);
+
+        let version: i32 = conn
+            .query_row("SELECT version FROM schema_version", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(version, SCHEMA_VERSION);
+    }
+
+    #[test]
+    fn schema_sets_version_correctly() {
+        let conn = open_mem();
+        init_schema(&conn).unwrap();
+
+        let version: i32 = conn
+            .query_row("SELECT version FROM schema_version LIMIT 1", [], |r| {
+                r.get(0)
+            })
+            .unwrap();
+        assert_eq!(version, SCHEMA_VERSION);
+    }
+
+    #[test]
+    fn schema_null_dates_need_migration() {
+        let conn = open_mem();
+        // Create table manually without schema_version to simulate fresh DB
+        conn.execute_batch(
+            "CREATE TABLE IF NOT EXISTS assets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                asset_type TEXT NOT NULL,
+                source_path TEXT NOT NULL,
+                thumbnail_path TEXT NOT NULL,
+                created_at INTEGER NOT NULL
+            );",
+        )
+        .unwrap();
+
+        // init_schema should add schema_version and migrate
+        init_schema(&conn).unwrap();
+
+        let version: i32 = conn
+            .query_row("SELECT version FROM schema_version LIMIT 1", [], |r| {
+                r.get(0)
+            })
+            .unwrap();
+        assert_eq!(version, SCHEMA_VERSION);
+    }
+
+    #[test]
+    fn add_color_validates_hex_format() {
+        let conn = open_mem();
+        init_schema(&conn).unwrap();
+
+        assert!(add_color(&conn, "#ff0000").is_ok());
+        assert!(add_color(&conn, "#FF00FF").is_ok());
+        assert!(add_color(&conn, "#12345678").is_ok());
+        assert!(add_color(&conn, "ff0000").is_err());
+        assert!(add_color(&conn, "#12345").is_err());
+        assert!(add_color(&conn, "").is_err());
+    }
+
+    #[test]
+    fn add_color_handles_whitespace() {
+        let conn = open_mem();
+        init_schema(&conn).unwrap();
+
+        let id = add_color(&conn, "  #ff0000  ").unwrap();
+        let color = list_colors(&conn, 1).unwrap();
+        assert_eq!(color[0].hex, "#ff0000");
+        assert_eq!(color[0].id, id);
+    }
+
+    #[test]
+    fn remove_color_errors_on_nonexistent() {
+        let conn = open_mem();
+        init_schema(&conn).unwrap();
+
+        assert!(remove_color(&conn, 999).is_err());
+        assert!(remove_color(&conn, 0).is_err());
+    }
+
+    #[test]
+    fn list_colors_returns_empty_for_new_db() {
+        let conn = open_mem();
+        init_schema(&conn).unwrap();
+
+        let colors = list_colors(&conn, 10).unwrap();
+        assert!(colors.is_empty());
+    }
+
+    #[test]
+    fn add_and_list_ocr_roundtrip() {
+        let conn = open_mem();
+        init_schema(&conn).unwrap();
+
+        let id = add_ocr(&conn, "Hello from image").unwrap();
+        let items = list_ocr(&conn, 10).unwrap();
+        assert_eq!(items.len(), 1);
+        assert_eq!(items[0].id, id);
+        assert_eq!(items[0].detail, "Hello from image");
+        assert_eq!(items[0].item_type, "ocr");
+    }
+
+    #[test]
+    fn check_deleted_updates_deleted_at() {
+        let conn = open_mem();
+        init_schema(&conn).unwrap();
+
+        // Add an asset pointing to a file that doesn't exist
+        conn.execute(
+            "INSERT INTO assets (asset_type, source_path, thumbnail_path, created_at) VALUES ('screenshot', '/tmp/certainly-not-a-real-file.png', '', 1000)",
+            [],
+        ).unwrap();
+
+        check_deleted(&conn).unwrap();
+
+        let deleted_at: Option<i64> = conn
+            .query_row("SELECT deleted_at FROM assets WHERE source_path = '/tmp/certainly-not-a-real-file.png'", [], |r| r.get(0))
+            .unwrap();
+        assert!(deleted_at.is_some());
+    }
+
+    #[test]
+    fn thumbnail_path_for_uses_correct_path() {
+        let path = thumbnail_path_for(42);
+        assert!(path.to_string_lossy().contains("42"));
+        assert!(path.to_string_lossy().ends_with(".png"));
+        assert!(path.to_string_lossy().contains("thumbnails"));
+    }
+
+    #[test]
+    fn database_path_has_correct_extension() {
+        let path = db_path();
+        assert!(path.to_string_lossy().ends_with("assets.db"));
+    }
 }

@@ -69,20 +69,21 @@ fn get_cpu_name() -> String {
         let reader = BufReader::new(file);
         for line in reader.lines().map_while(Result::ok) {
             if line.starts_with("model name")
-                && let Some(pos) = line.find(':') {
-                    let model = line[pos + 1..].trim();
-                    if model.contains("i7-12700H") {
-                        return "i7-12700H".to_string();
-                    }
-                    return model
-                        .replace("Intel(R) Core(TM)", "")
-                        .replace("12th Gen", "")
-                        .replace("AMD", "")
-                        .replace("Ryzen", "")
-                        .replace("Processor", "")
-                        .trim()
-                        .to_string();
+                && let Some(pos) = line.find(':')
+            {
+                let model = line[pos + 1..].trim();
+                if model.contains("i7-12700H") {
+                    return "i7-12700H".to_string();
                 }
+                return model
+                    .replace("Intel(R) Core(TM)", "")
+                    .replace("12th Gen", "")
+                    .replace("AMD", "")
+                    .replace("Ryzen", "")
+                    .replace("Processor", "")
+                    .trim()
+                    .to_string();
+            }
         }
     }
     "CPU".to_string()
@@ -107,7 +108,8 @@ fn get_cpu_temp() -> i32 {
     for entry in std::fs::read_dir("/sys/class/thermal")
         .ok()
         .into_iter()
-        .flatten().flatten()
+        .flatten()
+        .flatten()
     {
         let path = entry.path();
         if path
@@ -121,16 +123,18 @@ fn get_cpu_temp() -> i32 {
                 let type_str = type_str.trim();
                 if (type_str == "x86_pkg_temp" || type_str == "TCPU")
                     && let Ok(temp_str) = std::fs::read_to_string(temp_path)
-                        && let Ok(temp_raw) = temp_str.trim().parse::<i32>() {
-                            return temp_raw / 1000;
-                        }
+                    && let Ok(temp_raw) = temp_str.trim().parse::<i32>()
+                {
+                    return temp_raw / 1000;
+                }
             }
         }
     }
     if let Ok(temp_str) = std::fs::read_to_string("/sys/class/thermal/thermal_zone0/temp")
-        && let Ok(temp_raw) = temp_str.trim().parse::<i32>() {
-            return temp_raw / 1000;
-        }
+        && let Ok(temp_raw) = temp_str.trim().parse::<i32>()
+    {
+        return temp_raw / 1000;
+    }
     0
 }
 
@@ -142,10 +146,11 @@ fn get_cpu_freq() -> f64 {
         for line in reader.lines().map_while(Result::ok) {
             if line.starts_with("cpu MHz")
                 && let Some(pos) = line.find(':')
-                    && let Ok(mhz) = line[pos + 1..].trim().parse::<f64>() {
-                        sum += mhz;
-                        count += 1;
-                    }
+                && let Ok(mhz) = line[pos + 1..].trim().parse::<f64>()
+            {
+                sum += mhz;
+                count += 1;
+            }
         }
     }
     if count > 0 {
@@ -256,18 +261,20 @@ fn get_static_ram_info() -> (String, String) {
     let mut speed = "N/A".to_string();
     for line in out.lines() {
         if line.contains("type:")
-            && let Some(pos) = line.find("type:") {
-                let rest = &line[pos + 5..];
-                if let Some(space_pos) = rest.trim().find(' ') {
-                    ram_type = rest.trim()[..space_pos].trim().to_string();
-                } else {
-                    ram_type = rest.trim().to_string();
-                }
+            && let Some(pos) = line.find("type:")
+        {
+            let rest = &line[pos + 5..];
+            if let Some(space_pos) = rest.trim().find(' ') {
+                ram_type = rest.trim()[..space_pos].trim().to_string();
+            } else {
+                ram_type = rest.trim().to_string();
             }
+        }
         if line.contains("speed:")
-            && let Some(pos) = line.find("speed:") {
-                speed = line[pos + 6..].trim().to_string();
-            }
+            && let Some(pos) = line.find("speed:")
+        {
+            speed = line[pos + 6..].trim().to_string();
+        }
     }
     (ram_type, speed)
 }

@@ -14,9 +14,10 @@ fn run_podman_json(args: &[&str]) -> Value {
 
     if let Ok(out) = output
         && out.status.success()
-            && let Ok(val) = serde_json::from_slice(&out.stdout) {
-                return val;
-            }
+        && let Ok(val) = serde_json::from_slice(&out.stdout)
+    {
+        return val;
+    }
     Value::Array(vec![])
 }
 

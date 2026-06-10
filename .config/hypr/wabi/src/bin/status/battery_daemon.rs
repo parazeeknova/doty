@@ -29,17 +29,39 @@ struct Settings {
     low_kbd_brightness: i32,
 }
 
-fn default_true() -> bool { true }
-fn default_threshold() -> i32 { 25 }
-fn default_low_profile() -> String { "Quiet".to_string() }
-fn default_bat_profile() -> String { "Balanced".to_string() }
-fn default_ac_profile() -> String { "Performance".to_string() }
-fn default_bat_screen() -> i32 { 70 }
-fn default_bat_kbd() -> i32 { 33 }
-fn default_ac_screen() -> i32 { 100 }
-fn default_ac_kbd() -> i32 { 90 }
-fn default_low_screen() -> i32 { 30 }
-fn default_low_kbd() -> i32 { 0 }
+fn default_true() -> bool {
+    true
+}
+fn default_threshold() -> i32 {
+    25
+}
+fn default_low_profile() -> String {
+    "Quiet".to_string()
+}
+fn default_bat_profile() -> String {
+    "Balanced".to_string()
+}
+fn default_ac_profile() -> String {
+    "Performance".to_string()
+}
+fn default_bat_screen() -> i32 {
+    70
+}
+fn default_bat_kbd() -> i32 {
+    33
+}
+fn default_ac_screen() -> i32 {
+    100
+}
+fn default_ac_kbd() -> i32 {
+    90
+}
+fn default_low_screen() -> i32 {
+    30
+}
+fn default_low_kbd() -> i32 {
+    0
+}
 
 fn load_settings(path: &Path) -> Settings {
     let default_settings = Settings {
@@ -102,14 +124,17 @@ fn set_brightness(percent: i32) {
 
 fn set_keyboard_brightness(percent: i32) {
     if let Some(dev) = wabi::find_kbd_backlight_device() {
-        let max_path = Path::new("/sys/class/leds").join(&dev).join("max_brightness");
+        let max_path = Path::new("/sys/class/leds")
+            .join(&dev)
+            .join("max_brightness");
         if let Ok(content) = fs::read_to_string(&max_path)
-            && let Ok(max_val) = content.trim().parse::<f64>() {
-                let val = ((percent as f64 / 100.0) * max_val).round() as i32;
-                let _ = Command::new("brightnessctl")
-                    .args(["-d", &dev, "set", &val.to_string()])
-                    .status();
-            }
+            && let Ok(max_val) = content.trim().parse::<f64>()
+        {
+            let val = ((percent as f64 / 100.0) * max_val).round() as i32;
+            let _ = Command::new("brightnessctl")
+                .args(["-d", &dev, "set", &val.to_string()])
+                .status();
+        }
     }
 }
 
@@ -132,10 +157,11 @@ fn main() {
         // Read file modification time
         if let Ok(metadata) = fs::metadata(&settings_path)
             && let Ok(mtime) = metadata.modified()
-                && last_mtime.is_none_or(|last| mtime > last) {
-                    settings = load_settings(&settings_path);
-                    last_mtime = Some(mtime);
-                }
+            && last_mtime.is_none_or(|last| mtime > last)
+        {
+            settings = load_settings(&settings_path);
+            last_mtime = Some(mtime);
+        }
 
         // Read battery state
         let status = fs::read_to_string(bat_dir.join("status"))
@@ -156,7 +182,10 @@ fn main() {
 
             if status_changed || low_crossed || last_status.is_none() {
                 if status == "Charging" || status == "Full" {
-                    if last_status.as_ref().is_none_or(|s| s != "Charging" && s != "Full") {
+                    if last_status
+                        .as_ref()
+                        .is_none_or(|s| s != "Charging" && s != "Full")
+                    {
                         set_profile(&settings.ac_profile);
                         set_keyboard_brightness(settings.ac_kbd_brightness);
                         set_brightness(settings.ac_screen_brightness);
@@ -164,7 +193,9 @@ fn main() {
                             "Battery Automations",
                             &format!(
                                 "AC connected. Profile: {}. Keyboard: {}%. Brightness: {}%",
-                                settings.ac_profile, settings.ac_kbd_brightness, settings.ac_screen_brightness
+                                settings.ac_profile,
+                                settings.ac_kbd_brightness,
+                                settings.ac_screen_brightness
                             ),
                             "battery-charging",
                         );
@@ -179,7 +210,10 @@ fn main() {
                                 "Battery Automations",
                                 &format!(
                                     "Low Battery ({}%). Profile: {}. Keyboard: {}%. Brightness: {}%",
-                                    capacity, settings.low_profile, settings.low_kbd_brightness, settings.low_screen_brightness
+                                    capacity,
+                                    settings.low_profile,
+                                    settings.low_kbd_brightness,
+                                    settings.low_screen_brightness
                                 ),
                                 "battery-low",
                             );
@@ -193,7 +227,10 @@ fn main() {
                                 "Battery Automations",
                                 &format!(
                                     "On Battery ({}%). Profile: {}. Keyboard: {}%. Brightness: {}%",
-                                    capacity, settings.bat_profile, settings.bat_kbd_brightness, settings.bat_screen_brightness
+                                    capacity,
+                                    settings.bat_profile,
+                                    settings.bat_kbd_brightness,
+                                    settings.bat_screen_brightness
                                 ),
                                 "battery",
                             );

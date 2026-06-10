@@ -1,5 +1,5 @@
-use std::process::Command;
 use std::env;
+use std::process::Command;
 
 struct Daemon {
     name: &'static str,
@@ -18,10 +18,10 @@ fn is_process_running(process_name: &str) -> bool {
 
 fn start_daemon(daemon: &Daemon) -> bool {
     let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
-    
+
     // Replace ~ with actual home directory
     let command = daemon.start_command.replace("~", &home);
-    
+
     // Execute via bash to handle complex commands
     Command::new("bash")
         .arg("-c")
@@ -39,7 +39,11 @@ fn send_notification(restarted: &[String]) {
     let message = if restarted.len() == 1 {
         format!("Restarted: {}", restarted[0])
     } else {
-        format!("Restarted {} daemons:\n{}", restarted.len(), restarted.join(", "))
+        format!(
+            "Restarted {} daemons:\n{}",
+            restarted.len(),
+            restarted.join(", ")
+        )
     };
 
     let _ = Command::new("notify-send")

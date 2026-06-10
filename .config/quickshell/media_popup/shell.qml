@@ -287,16 +287,37 @@ Scope {
         onFileChanged: updateStatus()
     }
 
-    // Timer to poll status every 100ms — fast enough to feel instant, light on resources
+    // Lightweight recording-status poller (pgrep only, no DB)
+    Process {
+        id: recordingStatusProc
+
+        command: [root.helperPath, "recording-status"]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var txt = this.text.trim();
+                if (txt === "")
+                    return ;
+                try {
+                    var data = JSON.parse(txt);
+                    if (data.is_recording !== undefined)
+                        root.isRecording = data.is_recording;
+                } catch (e) {}
+            }
+        }
+    }
+
     Timer {
         id: refreshTimer
 
-        interval: 100
+        interval: 1000
         repeat: true
         running: true
         triggeredOnStart: true
         onTriggered: {
-            updateStatus();
+            if (!recordingStatusProc.running)
+                recordingStatusProc.running = true;
         }
     }
 
