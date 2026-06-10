@@ -149,8 +149,6 @@ Scope {
         checkScreentimeProc.launchedOffset = root.screentimeOffset;
         checkScreentimeProc.command = [root.homeDir + "/.local/bin/get_screentime_status", String(root.screentimeOffset)];
         checkScreentimeProc.running = true;
-        checkDaemonsProc.running = false;
-        checkDaemonsProc.running = true;
     }
 
     function savePomoState() {

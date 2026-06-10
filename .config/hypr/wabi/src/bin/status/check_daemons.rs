@@ -1,6 +1,4 @@
 use std::env;
-use std::os::unix::net::UnixStream;
-use std::path::Path;
 use std::process::Command;
 
 struct Daemon {
@@ -19,10 +17,6 @@ fn is_process_running(process_name: &str) -> bool {
         .unwrap_or(false)
 }
 
-fn is_daemon_responsive(socket_path: &str) -> bool {
-    Path::new(socket_path).exists() && UnixStream::connect(socket_path).is_ok()
-}
-
 fn start_daemon(daemon: &Daemon) -> bool {
     let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
 
@@ -38,28 +32,38 @@ fn start_daemon(daemon: &Daemon) -> bool {
         .unwrap_or(false)
 }
 
-fn send_notification(restarted: &[String]) {
-    if restarted.is_empty() {
+fn send_notification(started: &[String], restarted: &[String]) {
+    if started.is_empty() && restarted.is_empty() {
         return;
     }
 
-    let message = if restarted.len() == 1 {
-        format!("Restarted: {}", restarted[0])
-    } else {
-        format!(
-            "Restarted {} daemons:\n{}",
-            restarted.len(),
-            restarted.join(", ")
-        )
-    };
+    let mut parts = Vec::new();
+    if !started.is_empty() {
+        if started.len() == 1 {
+            parts.push(format!("Started: {}", started[0]));
+        } else {
+            parts.push(format!("Started {} daemons:\n{}", started.len(), started.join(", ")));
+        }
+    }
+    if !restarted.is_empty() {
+        if restarted.len() == 1 {
+            parts.push(format!("Restarted: {}", restarted[0]));
+        } else {
+            parts.push(format!(
+                "Restarted {} daemons:\n{}",
+                restarted.len(),
+                restarted.join(", ")
+            ));
+        }
+    }
 
     let _ = Command::new("notify-send")
         .arg("-i")
-        .arg("dialog-warning")
+        .arg("dialog-information")
         .arg("-t")
         .arg("5000")
         .arg("Daemon Watchdog")
-        .arg(&message)
+        .arg(parts.join("\n"))
         .status();
 }
 
@@ -124,31 +128,35 @@ fn main() {
         },
     ];
 
-    let mut restarted = Vec::new();
+    let mut started = Vec::new();
 
     for daemon in daemons {
-        // For daemons with IPC sockets, check responsiveness instead of just process existence
-        let needs_restart = if let Some(socket_name) = daemon.ipc_socket {
-            let socket_path = format!("{}/{}", runtime_dir, socket_name);
-            !is_daemon_responsive(&socket_path)
+        let needs_start = if let Some(socket_name) = daemon.ipc_socket {
+            if is_process_running(daemon.process_name) {
+                false
+            } else {
+                let socket_path = format!("{}/{}", runtime_dir, socket_name);
+                let _ = std::fs::remove_file(&socket_path);
+                true
+            }
         } else {
             !is_process_running(daemon.process_name)
         };
 
-        if needs_restart {
-            eprintln!("{} not running, restarting...", daemon.name);
+        if needs_start {
+            eprintln!("{} not running, starting...", daemon.name);
             if start_daemon(&daemon) {
-                restarted.push(daemon.name.to_string());
-                eprintln!("{} restarted successfully", daemon.name);
+                started.push(daemon.name.to_string());
+                eprintln!("{} started successfully", daemon.name);
             } else {
-                eprintln!("Failed to restart {}", daemon.name);
+                eprintln!("Failed to start {}", daemon.name);
             }
         }
     }
 
-    send_notification(&restarted);
+    send_notification(&started, &[]);
 
-    if !restarted.is_empty() {
-        println!("Restarted {} daemon(s)", restarted.len());
+    if !started.is_empty() {
+        println!("Started {} daemon(s)", started.len());
     }
 }

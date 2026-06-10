@@ -12,45 +12,41 @@ fn ipc_socket_path() -> String {
     format!("{}/wabi_screentime.sock", runtime_dir)
 }
 
-fn ensure_daemon_running() {
+fn ensure_daemon_running() -> bool {
     let socket = ipc_socket_path();
-    // Check if daemon is responding via IPC socket
-    let socket_exists = Path::new(&socket).exists();
-    let daemon_responsive = if socket_exists {
-        UnixStream::connect(&socket).is_ok()
-    } else {
-        false
-    };
 
-    if !daemon_responsive {
-        // Daemon is not running or not responsive, restart it
-        eprintln!("Screentime daemon not responding, restarting...");
-
-        // Clean up stale socket if it exists
-        if socket_exists {
-            let _ = std::fs::remove_file(&socket);
-        }
-
-        // Spawn the daemon in the background
-        let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
-        let daemon_path = format!("{}/.local/bin/screentime_daemon", home);
-
-        if let Err(e) = Command::new(&daemon_path).spawn() {
-            eprintln!("Failed to restart screentime daemon: {}", e);
-            return;
-        }
-        eprintln!("Screentime daemon restarted, waiting for init...");
-
-        // Wait for the daemon to initialize and bind its socket
-        for _ in 0..10 {
-            std::thread::sleep(std::time::Duration::from_millis(200));
-            if Path::new(&socket).exists() && UnixStream::connect(&socket).is_ok() {
-                eprintln!("Screentime daemon is now responsive.");
-                return;
-            }
-        }
-        eprintln!("Screentime daemon still not responsive after restart.");
+    // Fast path: daemon is alive and responding
+    if Path::new(&socket).exists() && UnixStream::connect(&socket).is_ok() {
+        return true;
     }
+
+    // Socket stale or missing — clean up and start fresh
+    if Path::new(&socket).exists() {
+        let _ = std::fs::remove_file(&socket);
+    }
+
+    eprintln!("Screentime daemon not running, starting...");
+    let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
+    let daemon_path = format!("{}/.local/bin/screentime_daemon", home);
+
+    if let Err(e) = Command::new(&daemon_path)
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+    {
+        eprintln!("Failed to start screentime daemon: {}", e);
+        return false;
+    }
+
+    // Wait for the daemon to initialize and bind its socket
+    for _ in 0..10 {
+        std::thread::sleep(std::time::Duration::from_millis(200));
+        if Path::new(&socket).exists() && UnixStream::connect(&socket).is_ok() {
+            return false;
+        }
+    }
+    eprintln!("Screentime daemon still not ready after start.");
+    false
 }
 
 #[derive(Serialize)]
@@ -136,7 +132,12 @@ fn main() {
         .unwrap_or(0);
 
     // Ensure daemon is running before querying
-    ensure_daemon_running();
+    let was_already_running = ensure_daemon_running();
+
+    // If daemon was just started, give it time to write the first session to DB
+    if !was_already_running {
+        std::thread::sleep(std::time::Duration::from_millis(500));
+    }
 
     let db_path = wabi::quickshell_dir().join("screentime.db");
     let conn = match Connection::open(db_path) {
