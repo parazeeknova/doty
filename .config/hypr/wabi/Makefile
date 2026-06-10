@@ -15,6 +15,11 @@ build:
 	cargo build --release
 
 install: build
+	@echo "==> Stopping running daemons before install..."
+	-pkill -f battery_daemon 2>/dev/null || true
+	-pkill -f wallpaper_thumb_watcher 2>/dev/null || true
+	-pkill -f screentime_daemon 2>/dev/null || true
+	@sleep 0.5
 	mkdir -p ../../quickshell/battery_popup ../../quickshell/volume_popup ../../quickshell/osd/bin ../../quickshell/network_popup ../../quickshell/bluetooth_popup ../../quickshell/brightness_popup ../../quickshell/notif_popup ../../quickshell/sysmon_popup ../../quickshell/podman_popup ../../quickshell/media_popup ../../quickshell/vm_popup ../../rofi/scripts ../../quickshell/wallpaper_switcher ../../quickshell/github_graph ../../../scripts ../../waybar/scripts
 	cp target/release/get_battery_status ../../quickshell/battery_popup/get_battery_status
 	cp target/release/log_battery ../../quickshell/battery_popup/log_battery
@@ -49,6 +54,9 @@ install: build
 	mkdir -p $(HOME)/.local/bin
 	cp target/release/screentime_daemon $(HOME)/.local/bin/screentime_daemon
 	cp target/release/get_screentime_status $(HOME)/.local/bin/get_screentime_status
-
-
-
+	cp target/release/check_daemons $(HOME)/.local/bin/check_daemons
+	@echo "==> Restarting daemons..."
+	@uwsm app -- ~/.config/quickshell/battery_popup/battery_daemon >/dev/null 2>&1 &
+	@uwsm app -- ~/.config/quickshell/wallpaper_switcher/wallpaper_thumb_watcher >/dev/null 2>&1 &
+	@uwsm app -- ~/.local/bin/screentime_daemon >/dev/null 2>&1 &
+	@echo "==> Install complete."

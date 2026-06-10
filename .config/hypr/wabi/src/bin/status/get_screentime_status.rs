@@ -64,17 +64,16 @@ fn get_active_seconds(conn: &Connection, start: i64, end: i64) -> i64 {
     if let Ok(mut stmt) = conn.prepare(
         "SELECT app_class, start_time, end_time FROM sessions
          WHERE end_time > ?1 AND start_time < ?2;",
-    ) {
-        if let Ok(rows) = stmt.query_map([start, end], |row| {
-            Ok((
-                row.get::<_, String>(0)?,
-                row.get::<_, i64>(1)?,
-                row.get::<_, i64>(2)?,
-            ))
-        }) {
-            for row in rows.flatten() {
-                sessions.push(row);
-            }
+    )
+    && let Ok(rows) = stmt.query_map([start, end], |row| {
+        Ok((
+            row.get::<_, String>(0)?,
+            row.get::<_, i64>(1)?,
+            row.get::<_, i64>(2)?,
+        ))
+    }) {
+        for row in rows.flatten() {
+            sessions.push(row);
         }
     }
 
@@ -180,8 +179,8 @@ fn main() {
     if let Ok(mut stmt) = conn.prepare(
         "SELECT app_class, title, start_time, end_time FROM sessions
          WHERE end_time > ?1 AND start_time < ?2;",
-    ) {
-        if let Ok(rows) = stmt.query_map([day_start, day_end], |row| {
+    )
+        && let Ok(rows) = stmt.query_map([day_start, day_end], |row| {
             Ok(SessionRecord {
                 class: row.get(0)?,
                 _title: row.get(1)?,
@@ -193,7 +192,6 @@ fn main() {
                 sessions.push(row);
             }
         }
-    }
 
     let mut total_active_seconds = 0i64;
     let mut idle_seconds = 0i64;
@@ -248,7 +246,7 @@ fn main() {
         });
     }
 
-    top_apps.sort_by(|a, b| b.seconds.cmp(&a.seconds));
+    top_apps.sort_by_key(|b| std::cmp::Reverse(b.seconds));
 
     let prev_active_seconds = get_active_seconds(&conn, day_start - 24 * 3600, day_start);
     let trend_label = if prev_active_seconds == 0 {

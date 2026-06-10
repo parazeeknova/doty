@@ -4,7 +4,7 @@ use std::env;
 use std::fs;
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::{UnixListener, UnixStream};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::Command;
 use std::sync::mpsc::{channel, Sender};
 use std::thread;
@@ -16,7 +16,7 @@ const IPC_SOCKET_PATH: &str = "/tmp/screentime_daemon.sock";
 struct ActiveWindow {
     class: String,
     title: String,
-    start_time: i64,
+    _start_time: i64,
 }
 
 enum Message {
@@ -127,8 +127,8 @@ fn start_hyprland_listener(tx: Sender<Message>) {
                 format!("/tmp/hypr/{}/.socket2.sock", sig)
             };
 
-            if Path::new(&socket_path).exists() {
-                if let Ok(stream) = UnixStream::connect(&socket_path) {
+            if Path::new(&socket_path).exists()
+                && let Ok(stream) = UnixStream::connect(&socket_path) {
                     let reader = BufReader::new(stream);
                     for line in reader.lines() {
                         if let Ok(l) = line {
@@ -141,7 +141,6 @@ fn start_hyprland_listener(tx: Sender<Message>) {
                         }
                     }
                 }
-            }
         }
         thread::sleep(Duration::from_secs(2));
     });
@@ -151,22 +150,20 @@ fn start_ipc_listener(tx: Sender<Message>) {
     let _ = fs::remove_file(IPC_SOCKET_PATH);
     let listener = UnixListener::bind(IPC_SOCKET_PATH).expect("Failed to bind IPC socket");
     thread::spawn(move || {
-        for stream in listener.incoming() {
-            if let Ok(mut stream) = stream {
-                let reader = BufReader::new(&stream);
-                if let Some(Ok(line)) = reader.lines().next() {
-                    match line.trim() {
-                        "idle" => {
-                            let _ = tx.send(Message::Idle);
-                            let _ = stream.write_all(b"ok\n");
-                        }
-                        "resume" => {
-                            let _ = tx.send(Message::Resume);
-                            let _ = stream.write_all(b"ok\n");
-                        }
-                        _ => {
-                            let _ = stream.write_all(b"unknown command\n");
-                        }
+        for mut stream in listener.incoming().flatten() {
+            let reader = BufReader::new(&stream);
+            if let Some(Ok(line)) = reader.lines().next() {
+                match line.trim() {
+                    "idle" => {
+                        let _ = tx.send(Message::Idle);
+                        let _ = stream.write_all(b"ok\n");
+                    }
+                    "resume" => {
+                        let _ = tx.send(Message::Resume);
+                        let _ = stream.write_all(b"ok\n");
+                    }
+                    _ => {
+                        let _ = stream.write_all(b"unknown command\n");
                     }
                 }
             }
@@ -236,7 +233,7 @@ fn main() {
             current_window = Some(ActiveWindow {
                 class: class.clone(),
                 title: title.clone(),
-                start_time: now,
+                _start_time: now,
             });
             match save_session(&conn, &class, &title, now, now) {
                 Ok(id) => {
@@ -280,7 +277,7 @@ fn main() {
                         current_window = Some(ActiveWindow {
                             class: "idle".to_string(),
                             title: "Idle".to_string(),
-                            start_time: now,
+                            _start_time: now,
                         });
                         if let Ok(id) = save_session(&conn, "idle", "Idle", now, now) {
                             current_session_id = Some(id);
@@ -298,7 +295,7 @@ fn main() {
                                 current_window = Some(ActiveWindow {
                                     class: class.clone(),
                                     title: title.clone(),
-                                    start_time: now,
+                                    _start_time: now,
                                 });
                                 if let Ok(id) = save_session(&conn, &class, &title, now, now) {
                                     current_session_id = Some(id);
@@ -349,7 +346,7 @@ fn main() {
                             current_window = Some(ActiveWindow {
                                 class: class.clone(),
                                 title: title.clone(),
-                                start_time: now,
+                                _start_time: now,
                             });
                             if let Ok(id) = save_session(&conn, &class, &title, now, now) {
                                 current_session_id = Some(id);

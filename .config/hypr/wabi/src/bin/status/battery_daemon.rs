@@ -103,14 +103,13 @@ fn set_brightness(percent: i32) {
 fn set_keyboard_brightness(percent: i32) {
     if let Some(dev) = wabi::find_kbd_backlight_device() {
         let max_path = Path::new("/sys/class/leds").join(&dev).join("max_brightness");
-        if let Ok(content) = fs::read_to_string(&max_path) {
-            if let Ok(max_val) = content.trim().parse::<f64>() {
+        if let Ok(content) = fs::read_to_string(&max_path)
+            && let Ok(max_val) = content.trim().parse::<f64>() {
                 let val = ((percent as f64 / 100.0) * max_val).round() as i32;
                 let _ = Command::new("brightnessctl")
                     .args(["-d", &dev, "set", &val.to_string()])
                     .status();
             }
-        }
     }
 }
 
@@ -131,14 +130,12 @@ fn main() {
 
     loop {
         // Read file modification time
-        if let Ok(metadata) = fs::metadata(&settings_path) {
-            if let Ok(mtime) = metadata.modified() {
-                if last_mtime.map_or(true, |last| mtime > last) {
+        if let Ok(metadata) = fs::metadata(&settings_path)
+            && let Ok(mtime) = metadata.modified()
+                && last_mtime.is_none_or(|last| mtime > last) {
                     settings = load_settings(&settings_path);
                     last_mtime = Some(mtime);
                 }
-            }
-        }
 
         // Read battery state
         let status = fs::read_to_string(bat_dir.join("status"))
@@ -152,14 +149,14 @@ fn main() {
 
         if settings.automation_enabled {
             let is_low = capacity < settings.low_battery_threshold;
-            let was_low = last_capacity.map_or(false, |c| c < settings.low_battery_threshold);
+            let was_low = last_capacity.is_some_and(|c| c < settings.low_battery_threshold);
 
-            let status_changed = last_status.as_ref().map_or(true, |s| s != &status);
+            let status_changed = last_status.as_ref() != Some(&status);
             let low_crossed = is_low != was_low;
 
             if status_changed || low_crossed || last_status.is_none() {
                 if status == "Charging" || status == "Full" {
-                    if last_status.as_ref().map_or(true, |s| s != "Charging" && s != "Full") {
+                    if last_status.as_ref().is_none_or(|s| s != "Charging" && s != "Full") {
                         set_profile(&settings.ac_profile);
                         set_keyboard_brightness(settings.ac_kbd_brightness);
                         set_brightness(settings.ac_screen_brightness);

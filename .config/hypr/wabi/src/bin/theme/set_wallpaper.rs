@@ -1,22 +1,8 @@
 use std::env;
 use std::fs;
-use std::path::Path;
 use std::process::Command;
 use std::thread;
 use std::time::Duration;
-
-fn check_on_battery() -> bool {
-    if let Ok(entries) = fs::read_dir("/sys/class/power_supply") {
-        for entry in entries.flatten() {
-            if let Ok(online) = fs::read_to_string(entry.path().join("online")) {
-                if online.trim() == "0" {
-                    return true;
-                }
-            }
-        }
-    }
-    false
-}
 
 fn kill_mpvpaper() {
     let _ = Command::new("killall")

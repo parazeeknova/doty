@@ -12,7 +12,7 @@ struct Bind {
 }
 
 #[derive(Serialize, Clone, Debug)]
-struct Category {
+pub struct Category {
     category: String,
     binds: Vec<Bind>,
 }
@@ -32,11 +32,10 @@ fn strip_lua_comments(line: &str) -> String {
             if !in_single {
                 in_double = !in_double;
             }
-        } else if char == '-' && k < chars.len() - 1 && chars[k + 1] == '-' {
-            if !in_single && !in_double {
+        } else if char == '-' && k < chars.len() - 1 && chars[k + 1] == '-'
+            && !in_single && !in_double {
                 return line[..k].trim().to_string();
             }
-        }
         k += 1;
     }
     line.trim().to_string()
@@ -81,11 +80,10 @@ fn parse_balanced_args(text: &str) -> Option<Vec<String>> {
             if !in_double_quote {
                 in_single_quote = !in_single_quote;
             }
-        } else if char == '"' && (j == 0 || inner_chars[j - 1] != '\\') {
-            if !in_single_quote {
+        } else if char == '"' && (j == 0 || inner_chars[j - 1] != '\\')
+            && !in_single_quote {
                 in_double_quote = !in_double_quote;
             }
-        }
 
         if !in_single_quote && !in_double_quote {
             match char {
@@ -131,11 +129,10 @@ fn evaluate_lua_expr(expr: &str, variables: &HashMap<String, String>) -> String 
             if !in_double {
                 in_single = !in_single;
             }
-        } else if char == '"' && (k == 0 || chars[k - 1] != '\\') {
-            if !in_single {
+        } else if char == '"' && (k == 0 || chars[k - 1] != '\\')
+            && !in_single {
                 in_double = !in_double;
             }
-        }
 
         if !in_single && !in_double && k < chars.len() - 1 && chars[k] == '.' && chars[k + 1] == '.'
         {
@@ -320,7 +317,7 @@ fn parse_single_bind(
     let action_expr = &args[1];
 
     let mut inline_comment = String::new();
-    if let Some(comment_idx) = bind_line.find(" --") {
+    if let Some(_comment_idx) = bind_line.find(" --") {
         let cleaned = strip_lua_comments(bind_line);
         if cleaned.len() < bind_line.len() {
             inline_comment = bind_line[cleaned.len()..]
@@ -557,8 +554,8 @@ pub fn parse_binds<P: AsRef<Path>>(filepath: P) -> io::Result<Vec<Category>> {
         }
 
         // Parse local variables
-        if line.starts_with("local ") {
-            if let Some(eq_idx) = line.find('=') {
+        if line.starts_with("local ")
+            && let Some(eq_idx) = line.find('=') {
                 let name = line[6..eq_idx].trim().to_string();
                 let expr = &line[eq_idx + 1..].trim();
                 let val = evaluate_lua_expr(expr, &variables);
@@ -566,7 +563,6 @@ pub fn parse_binds<P: AsRef<Path>>(filepath: P) -> io::Result<Vec<Category>> {
                 i += 1;
                 continue;
             }
-        }
 
         // Handle workspaces loop
         if line.contains("for i = 1, 10 do") {
