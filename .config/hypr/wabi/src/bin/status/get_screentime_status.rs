@@ -37,9 +37,19 @@ fn ensure_daemon_running() {
 
         if let Err(e) = Command::new(&daemon_path).spawn() {
             eprintln!("Failed to restart screentime daemon: {}", e);
-        } else {
-            eprintln!("Screentime daemon restarted");
+            return;
         }
+        eprintln!("Screentime daemon restarted, waiting for init...");
+
+        // Wait for the daemon to initialize and bind its socket
+        for _ in 0..10 {
+            std::thread::sleep(std::time::Duration::from_millis(200));
+            if Path::new(&socket).exists() && UnixStream::connect(&socket).is_ok() {
+                eprintln!("Screentime daemon is now responsive.");
+                return;
+            }
+        }
+        eprintln!("Screentime daemon still not responsive after restart.");
     }
 }
 

@@ -44,9 +44,14 @@ fn toggle_hex_alpha_lines(content: &str, key: &str, line_suffix: &str, want_alph
 
 fn main() {
     let home = env::var("HOME").unwrap_or_default();
-    let state_file = "/tmp/quickshell_glass_state".to_string();
+    let persistent_state = format!("{}/.cache/quickshell/glass_state", home);
+    let tmpfs_state = "/tmp/quickshell_glass_state".to_string();
 
-    let current_state = fs::read_to_string(&state_file)
+    let _ = fs::create_dir_all(format!("{}/.cache/quickshell", home));
+
+    // Read from persistent path first, fallback to tmpfs, then default to "true"
+    let current_state = fs::read_to_string(&persistent_state)
+        .or_else(|_| fs::read_to_string(&tmpfs_state))
         .map(|s| s.trim().to_string())
         .unwrap_or_else(|_| "true".to_string());
 
@@ -96,7 +101,8 @@ fn main() {
     );
     let _ = Command::new("hyprctl").args(["eval", &hypr_eval]).status();
 
-    let _ = fs::write(state_file, new_state);
+    let _ = fs::write(&persistent_state, new_state);
+    let _ = fs::write(&tmpfs_state, new_state);
 
     let osdctl = format!("{}/.config/quickshell/osd/bin/osdctl", home);
     let _ = Command::new(&osdctl)
