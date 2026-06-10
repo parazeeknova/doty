@@ -42,31 +42,10 @@ fn toggle_hex_alpha_lines(content: &str, key: &str, line_suffix: &str, want_alph
         + if content.ends_with('\n') { "\n" } else { "" }
 }
 
-fn main() {
-    let home = env::var("HOME").unwrap_or_default();
-    let persistent_state = format!("{}/.cache/quickshell/glass_state", home);
-    let tmpfs_state = "/tmp/quickshell_glass_state".to_string();
-
-    let _ = fs::create_dir_all(format!("{}/.cache/quickshell", home));
-
-    // Read from persistent path first, fallback to tmpfs, then default to "true"
-    let current_state = fs::read_to_string(&persistent_state)
-        .or_else(|_| fs::read_to_string(&tmpfs_state))
-        .map(|s| s.trim().to_string())
-        .unwrap_or_else(|_| "true".to_string());
-
-    let waybar_css = format!("{}/.config/waybar/style.css", home);
-    let rofi_colors = format!("{}/.config/rofi/colors.rasi", home);
-    let mako_config = format!("{}/.config/mako/config", home);
-
-    let (new_state, opacity, inactive_opacity, blur, osd_status, osd_color) =
-        if current_state == "true" {
-            ("false", "1.0", "1.0", "false", "Off", "bad")
-        } else {
-            ("true", "0.85", "0.75", "true", "On", "good")
-        };
-
-    let want_alpha = new_state == "true";
+fn apply_glass_state(home: &str, want_alpha: bool, opacity: &str, inactive_opacity: &str, blur: &str) {
+    let waybar_css = format!("{home}/.config/waybar/style.css");
+    let rofi_colors = format!("{home}/.config/rofi/colors.rasi");
+    let mako_config = format!("{home}/.config/mako/config");
 
     if let Ok(content) = fs::read_to_string(&waybar_css) {
         let updated = if want_alpha {
@@ -96,23 +75,64 @@ fn main() {
     let _ = Command::new("makoctl").arg("reload").status();
 
     let hypr_eval = format!(
-        "hl.config({{ decoration = {{ active_opacity = {}, inactive_opacity = {}, blur = {{ enabled = {} }} }} }})",
-        opacity, inactive_opacity, blur
+        "hl.config({{ decoration = {{ active_opacity = {opacity}, inactive_opacity = {inactive_opacity}, blur = {{ enabled = {blur} }} }} }})"
     );
     let _ = Command::new("hyprctl").args(["eval", &hypr_eval]).status();
+}
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    let home = env::var("HOME").unwrap_or_default();
+    let persistent_state = format!("{home}/.cache/quickshell/glass_state");
+    let tmpfs_state = "/tmp/quickshell_glass_state".to_string();
+
+    let _ = fs::create_dir_all(format!("{home}/.cache/quickshell"));
+
+    let is_restore = args.len() > 1 && args[1] == "restore";
+
+    let state = fs::read_to_string(&persistent_state)
+        .or_else(|_| fs::read_to_string(&tmpfs_state))
+        .map(|s| s.trim().to_string())
+        .unwrap_or_else(|_| "true".to_string());
+
+    let (new_state, opacity, inactive_opacity, blur) = if state == "true" {
+        if is_restore {
+            ("true", "0.85", "0.75", "true")
+        } else {
+            ("false", "1.0", "1.0", "false")
+        }
+    } else {
+        if is_restore {
+            ("false", "1.0", "1.0", "false")
+        } else {
+            ("true", "0.85", "0.75", "true")
+        }
+    };
+
+    apply_glass_state(&home, new_state == "true", opacity, inactive_opacity, blur);
 
     let _ = fs::write(&persistent_state, new_state);
     let _ = fs::write(&tmpfs_state, new_state);
 
-    let osdctl = format!("{}/.config/quickshell/osd/bin/osdctl", home);
-    let _ = Command::new(&osdctl)
-        .args(["show", &format!("Glass: {}", osd_status), osd_color, "1200"])
-        .status();
+    if !is_restore {
+        let osd_status = if new_state == "true" { "On" } else { "Off" };
+        let osd_color = if new_state == "true" { "good" } else { "bad" };
+        let osdctl = format!("{home}/.config/quickshell/osd/bin/osdctl");
+        let _ = Command::new(&osdctl)
+            .args(["show", &format!("Glass: {osd_status}"), osd_color, "1200"])
+            .status();
 
-    let _ = Command::new("pkill").args(["-x", "waybar"]).status();
-    thread::sleep(Duration::from_millis(100));
-    let _ = Command::new("waybar")
-        .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
-        .spawn();
+        let widgets_state = fs::read_to_string("/tmp/quickshell_widgets_state")
+            .map(|s| s.trim().to_string())
+            .unwrap_or_else(|_| "true".to_string());
+
+        let _ = Command::new("pkill").args(["-x", "waybar"]).status();
+        if widgets_state != "false" {
+            thread::sleep(Duration::from_millis(100));
+            let _ = Command::new("waybar")
+                .stdout(std::process::Stdio::null())
+                .stderr(std::process::Stdio::null())
+                .spawn();
+        }
+    }
 }

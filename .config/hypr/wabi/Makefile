@@ -45,6 +45,7 @@ install: build
 	cp target/release/toggle_glass ../../rofi/scripts/toggle_glass
 	cp target/release/rofi_wrap ../../rofi/scripts/rofi_wrap
 	cp target/release/waybar_toggle ../../waybar/scripts/waybar_toggle
+	cp target/release/toggle_widgets ../../waybar/scripts/toggle_widgets
 	cp target/release/tray_count ../../waybar/scripts/tray_count
 	cp target/release/wallpaper_thumb_watcher ../../quickshell/wallpaper_switcher/wallpaper_thumb_watcher
 	cp target/release/get_github_graph ../../quickshell/github_graph/get_github_graph

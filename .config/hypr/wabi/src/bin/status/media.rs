@@ -78,12 +78,18 @@ fn save_settings(settings: &Settings) {
 }
 
 fn is_wf_recorder_running() -> bool {
-    let output = Command::new("pgrep").arg("-x").arg("wf-recorder").output();
-    if let Ok(out) = output {
-        out.status.success()
-    } else {
-        false
+    if let Ok(entries) = fs::read_dir("/proc") {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            let comm_path = path.join("comm");
+            if let Ok(comm) = fs::read_to_string(comm_path) {
+                if comm.trim() == "wf-recorder" {
+                    return true;
+                }
+            }
+        }
     }
+    false
 }
 
 fn print_error(msg: &str) {
@@ -324,6 +330,8 @@ fn run() -> i32 {
         }
     }
 
+    let fps_thread = std::thread::spawn(|| detect_monitor_fps());
+
     let conn = match media_db::open() {
         Ok(c) => c,
         Err(e) => {
@@ -344,6 +352,8 @@ fn run() -> i32 {
     let history = media_db::list_ocr(&conn, 50).unwrap_or_default();
     let colors = media_db::list_colors(&conn, 24).unwrap_or_default();
 
+    let monitor_fps = fps_thread.join().unwrap_or(60);
+
     let status = MediaStatus {
         is_recording,
         screenshot_dir: settings.screenshot_dir,
@@ -351,7 +361,7 @@ fn run() -> i32 {
         assets,
         history,
         colors,
-        monitor_fps: detect_monitor_fps(),
+        monitor_fps,
     };
 
     if let Ok(json) = serde_json::to_string(&status) {

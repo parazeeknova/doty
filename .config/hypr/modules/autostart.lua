@@ -12,6 +12,7 @@ hl.on("hyprland.start", function()
     -- Restore glass state from persistent cache to tmpfs
     hl.exec_cmd(
         "sh -c 'cat ~/.cache/quickshell/glass_state 2>/dev/null > /tmp/quickshell_glass_state || printf true > /tmp/quickshell_glass_state'")
+    hl.exec_cmd("~/.config/rofi/scripts/toggle_glass restore")
     hl.exec_cmd(
         "sh -lc 'if command -v quickshell >/dev/null 2>&1; then uwsm app -- quickshell --config osd; elif command -v qs >/dev/null 2>&1; then uwsm app -- qs --config osd; fi'")
     hl.exec_cmd(
@@ -20,7 +21,12 @@ hl.on("hyprland.start", function()
         "sh -lc 'if command -v quickshell >/dev/null 2>&1; then uwsm app -- quickshell --config workspace_overview; elif command -v qs >/dev/null 2>&1; then uwsm app -- qs --config workspace_overview; fi'")
     hl.exec_cmd("uwsm app -- waybar")
     hl.exec_cmd(
-        "sh -c '" .. dotfiles .. "/scripts/set_wallpaper \"$(cat ~/.cache/last_wallpaper 2>/dev/null || echo \"$HOME/Pictures/Anime/grey_lain_wallpaper.jpg\")\"'")
+        "sh -c 'cat ~/.cache/quickshell/widgets_state 2>/dev/null > /tmp/quickshell_widgets_state || printf true > /tmp/quickshell_widgets_state'")
+    hl.exec_cmd("sh -c 'sleep 2 && " .. dotfiles .. "/.config/waybar/scripts/toggle_widgets restore'")
+    hl.exec_cmd(
+        "sh -c '" ..
+        dotfiles ..
+        "/scripts/set_wallpaper \"$(cat ~/.cache/last_wallpaper 2>/dev/null || echo \"$HOME/Pictures/Anime/grey_lain_wallpaper.jpg\")\"'")
     hl.exec_cmd("uwsm app -- hyprsunset")
     hl.exec_cmd("uwsm app -- hypridle")
     hl.exec_cmd("uwsm app -- pypr")

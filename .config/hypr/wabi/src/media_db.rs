@@ -385,31 +385,57 @@ pub fn clear_all(conn: &Connection) -> Result<(), String> {
 
 pub fn check_deleted(conn: &Connection) -> Result<(), String> {
     let now = now_millis();
-    let mut stmt = conn
-        .prepare("SELECT id, source_path, deleted_at FROM assets")
-        .map_err(|e| e.to_string())?;
-    let rows: Vec<(i64, String, Option<i64>)> = stmt
-        .query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))
-        .map_err(|e| e.to_string())?
-        .filter_map(|r| r.ok())
-        .collect();
+    let limit_24h = now - 24 * 3600 * 1000;
+
+    conn.execute("BEGIN TRANSACTION", []).map_err(|e| e.to_string())?;
+
+    if let Err(e) = conn.execute(
+        "DELETE FROM assets WHERE deleted_at IS NOT NULL AND deleted_at < ?1",
+        params![limit_24h],
+    ) {
+        let _ = conn.execute("ROLLBACK", []);
+        return Err(e.to_string());
+    }
+
+    let mut stmt = match conn.prepare("SELECT id, source_path, deleted_at FROM assets") {
+        Ok(s) => s,
+        Err(e) => {
+            let _ = conn.execute("ROLLBACK", []);
+            return Err(e.to_string());
+        }
+    };
+    let rows: Vec<(i64, String, Option<i64>)> = match stmt
+        .query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?))) {
+            Ok(iter) => iter.filter_map(|r| r.ok()).collect(),
+            Err(e) => {
+                let _ = conn.execute("ROLLBACK", []);
+                return Err(e.to_string());
+            }
+        };
     drop(stmt);
+
     for (id, source, deleted_at) in rows {
         let exists = PathBuf::from(&source).exists();
         if exists && deleted_at.is_some() {
-            conn.execute(
+            if let Err(e) = conn.execute(
                 "UPDATE assets SET deleted_at = NULL WHERE id = ?1",
                 params![id],
-            )
-            .map_err(|e| e.to_string())?;
+            ) {
+                let _ = conn.execute("ROLLBACK", []);
+                return Err(e.to_string());
+            }
         } else if !exists && deleted_at.is_none() {
-            conn.execute(
+            if let Err(e) = conn.execute(
                 "UPDATE assets SET deleted_at = ?1 WHERE id = ?2",
                 params![now, id],
-            )
-            .map_err(|e| e.to_string())?;
+            ) {
+                let _ = conn.execute("ROLLBACK", []);
+                return Err(e.to_string());
+            }
         }
     }
+
+    conn.execute("COMMIT", []).map_err(|e| e.to_string())?;
     Ok(())
 }
 

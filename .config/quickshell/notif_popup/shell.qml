@@ -2030,7 +2030,7 @@ Scope {
                                     hoverEnabled: true
                                     onEntered: {
                                         tooltipHideTimer.stop();
-                                        popupBg.hoveredButtonName = "Media (SUPER+SHIFT+G)";
+                                        popupBg.hoveredButtonName = "Media (SUPER+G)";
                                         popupBg.hoveredButton = parent;
                                         btnOcr.opacity = 0.7;
                                     }

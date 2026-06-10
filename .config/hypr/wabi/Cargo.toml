@@ -73,6 +73,10 @@ name = "waybar_toggle"
 path = "src/bin/utils/waybar_toggle.rs"
 
 [[bin]]
+name = "toggle_widgets"
+path = "src/bin/utils/toggle_widgets.rs"
+
+[[bin]]
 name = "tray_count"
 path = "src/bin/utils/tray_count.rs"
 

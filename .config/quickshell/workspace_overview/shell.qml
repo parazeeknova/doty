@@ -8,6 +8,7 @@ import Quickshell.Wayland
 Scope {
     id: root
 
+    property bool isVisible: true
     // Hyprland states
     property var windowList: []
     property var windowByAddress: ({
@@ -41,7 +42,6 @@ Scope {
     readonly property color colorThemeLight: theme.fg
     readonly property string fontName: "FiraCode Nerd Font"
 
-    // Update Hyprland info
     function updateAll() {
         getClients.running = true;
         getMonitors.running = true;
@@ -243,6 +243,18 @@ Scope {
     }
 
     IpcHandler {
+        function onShow() {
+            root.isVisible = true;
+        }
+
+        function onHide() {
+            root.isVisible = false;
+        }
+
+        function onToggle() {
+            root.isVisible = !root.isVisible;
+        }
+
         target: "workspace_overview"
     }
 
@@ -369,6 +381,7 @@ Scope {
                 WlrLayershell.namespace: "workspace-overview"
                 WlrLayershell.layer: WlrLayer.Bottom
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+                visible: root.isVisible
 
                 // Centered at the bottom edge of the screen
                 anchors {
@@ -746,4 +759,3 @@ Scope {
     }
 
 }
-

@@ -7,6 +7,7 @@ import Quickshell.Wayland
 Scope {
     id: root
 
+    property bool isVisible: true
     property string homeDir: Quickshell.env("HOME")
     property string username: "parazeeknova"
     property int totalContributions: 0
@@ -20,6 +21,22 @@ Scope {
 
     Theme {
         id: theme
+    }
+
+    IpcHandler {
+        function onShow() {
+            root.isVisible = true;
+        }
+
+        function onHide() {
+            root.isVisible = false;
+        }
+
+        function onToggle() {
+            root.isVisible = !root.isVisible;
+        }
+
+        target: "github_graph"
     }
 
     // Process to run the Rust helper
@@ -80,6 +97,7 @@ Scope {
                 WlrLayershell.namespace: "github-graph"
                 WlrLayershell.layer: WlrLayer.Bottom
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+                visible: root.isVisible
 
                 Rectangle {
                     anchors.fill: parent
@@ -91,6 +109,8 @@ Scope {
                     ColumnLayout {
                         id: layout
 
+                        spacing: 10
+
                         anchors {
                             left: parent.left
                             right: parent.right
@@ -99,7 +119,6 @@ Scope {
                             rightMargin: 12
                             topMargin: 10
                         }
-                        spacing: 10
 
                         // Header Row
                         RowLayout {
@@ -337,72 +356,72 @@ Scope {
                                     spacing: 6
 
                                     Text {
-                                         text: getEventIcon(modelData.event_type)
-                                         color: theme.accent
-                                         font.family: "FiraCode Nerd Font"
-                                         font.pixelSize: 10
-                                         renderType: Text.NativeRendering
-                                         Layout.minimumWidth: 12
-                                     }
+                                        text: getEventIcon(modelData.event_type)
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 10
+                                        renderType: Text.NativeRendering
+                                        Layout.minimumWidth: 12
+                                    }
 
-                                     Text {
-                                         text: modelData.description + (modelData.count > 1 ? " +" + (modelData.count - 1) : "") + " in "
-                                         color: root.textMuted
-                                         font.family: "FiraCode Nerd Font"
-                                         font.pixelSize: 8
-                                         renderType: Text.NativeRendering
-                                     }
+                                    Text {
+                                        text: modelData.description + (modelData.count > 1 ? " +" + (modelData.count - 1) : "") + " in "
+                                        color: root.textMuted
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        renderType: Text.NativeRendering
+                                    }
 
-                                     Text {
-                                         text: ""
-                                         color: theme.accent
-                                         font.family: "FiraCode Nerd Font"
-                                         font.pixelSize: 8
-                                         renderType: Text.NativeRendering
-                                     }
+                                    Text {
+                                        text: ""
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        renderType: Text.NativeRendering
+                                    }
 
-                                     Text {
-                                         text: modelData.repo
-                                         color: theme.secondary
-                                         font.family: "FiraCode Nerd Font"
-                                         font.pixelSize: 8
-                                         font.bold: true
-                                         renderType: Text.NativeRendering
-                                     }
+                                    Text {
+                                        text: modelData.repo
+                                        color: theme.secondary
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: true
+                                        renderType: Text.NativeRendering
+                                    }
 
-                                     Text {
-                                         visible: modelData.total_commits !== undefined
-                                         text: ""
-                                         color: theme.secondary
-                                         font.family: "FiraCode Nerd Font"
-                                         font.pixelSize: 8
-                                         renderType: Text.NativeRendering
-                                     }
+                                    Text {
+                                        visible: modelData.total_commits !== undefined
+                                        text: ""
+                                        color: theme.secondary
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        renderType: Text.NativeRendering
+                                    }
 
-                                     Text {
-                                         visible: modelData.total_commits !== undefined
-                                         text: modelData.total_commits !== undefined ? modelData.total_commits + (modelData.total_commits === 1 ? " commit" : " commits") : ""
-                                         color: theme.secondary
-                                         font.family: "FiraCode Nerd Font"
-                                         font.pixelSize: 8
-                                         font.underline: true
-                                         renderType: Text.NativeRendering
-                                     }
+                                    Text {
+                                        visible: modelData.total_commits !== undefined
+                                        text: modelData.total_commits !== undefined ? modelData.total_commits + (modelData.total_commits === 1 ? " commit" : " commits") : ""
+                                        color: theme.secondary
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.underline: true
+                                        renderType: Text.NativeRendering
+                                    }
 
-                                     Item {
-                                         Layout.fillWidth: true
-                                     }
+                                    Item {
+                                        Layout.fillWidth: true
+                                    }
 
-                                     Text {
-                                         text: " " + modelData.time
-                                         color: theme.secondary
-                                         font.family: "FiraCode Nerd Font"
-                                         font.pixelSize: 8
-                                         renderType: Text.NativeRendering
-                                         horizontalAlignment: Text.AlignRight
-                                         elide: Text.ElideRight
-                                         Layout.maximumWidth: 260
-                                     }
+                                    Text {
+                                        text: " " + modelData.time
+                                        color: theme.secondary
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        renderType: Text.NativeRendering
+                                        horizontalAlignment: Text.AlignRight
+                                        elide: Text.ElideRight
+                                        Layout.maximumWidth: 260
+                                    }
 
                                 }
 

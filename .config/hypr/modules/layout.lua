@@ -3,8 +3,14 @@ hl.config({
     general = {
         layout = "dwindle"
     },
+    scrolling = {
+        column_width = 1.0,
+        follow_focus = true,
+        direction = "down"
+    },
     dwindle = {
-        preserve_split = true -- You probably want this
+        preserve_split = true,
+        smart_split = true
     }
 })
 

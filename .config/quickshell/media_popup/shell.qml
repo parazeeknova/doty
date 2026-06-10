@@ -26,6 +26,9 @@ Scope {
     property string filterText: ""
     property string activeTag: ""
     property int expandedAssetId: -1
+    property var previewAsset: null
+    property string previewOcrText: ""
+    property int currentPage: 0
     property string tagDraft: ""
     property var tagSuggestions: []
     property int searchDebounce: 0
@@ -161,6 +164,11 @@ Scope {
         root.tagSuggestions = [];
     }
 
+    function closePreview() {
+        root.previewAsset = null;
+        root.previewOcrText = "";
+    }
+
     function commitTagDraft(tagName) {
         if (root.expandedAssetId < 0)
             return ;
@@ -202,6 +210,18 @@ Scope {
         root.updateStatus();
     }
 
+    onFilterTextChanged: {
+        currentPage = 0;
+        closePreview();
+    }
+    onActiveTagChanged: {
+        currentPage = 0;
+        closePreview();
+    }
+    onAssetsChanged: {
+        currentPage = 0;
+        closePreview();
+    }
     Component.onCompleted: {
         updateStatus();
     }
@@ -299,13 +319,17 @@ Scope {
                 var txt = this.text.trim();
                 if (txt === "")
                     return ;
+
                 try {
                     var data = JSON.parse(txt);
                     if (data.is_recording !== undefined)
                         root.isRecording = data.is_recording;
-                } catch (e) {}
+
+                } catch (e) {
+                }
             }
         }
+
     }
 
     Timer {
@@ -318,6 +342,7 @@ Scope {
         onTriggered: {
             if (!recordingStatusProc.running)
                 recordingStatusProc.running = true;
+
         }
     }
 
@@ -485,7 +510,7 @@ Scope {
                     opacity: win.animOpacity
                     color: theme.popupBgColor // Matching background color of other popups
                     border.width: 1
-                    border.color: theme.accent
+                    border.color: (root.previewAsset !== null || root.previewOcrText !== "") ? "#504945" : theme.accent
                     radius: 0
                     antialiasing: false
                     focus: true
@@ -498,15 +523,25 @@ Scope {
                         forceActiveFocus();
                     }
 
+                    MouseArea {
+                        anchors.fill: parent
+                        propagateComposedEvents: true
+                        onPressed: function(mouse) {
+                            root.closePreview();
+                            mouse.accepted = false;
+                        }
+                    }
+
                     HyprlandFocusGrab {
                         active: !win.isClosing
-                        windows: [win]
+                        windows: (root.previewAsset !== null || root.previewOcrText !== "") && previewLoader.item ? [win, previewLoader.item] : [win]
                         onCleared: win.closePopup()
                     }
 
                     Column {
                         id: mainLayout
 
+                        opacity: (root.previewAsset !== null || root.previewOcrText !== "") ? 0.65 : 1
                         anchors.top: parent.top
                         anchors.left: parent.left
                         anchors.right: parent.right
@@ -1790,7 +1825,7 @@ Scope {
                                     spacing: 4
 
                                     Repeater {
-                                        model: root.filteredAssets().slice(0, 4)
+                                        model: root.filteredAssets().slice(root.currentPage * 20, (root.currentPage + 1) * 20)
 
                                         delegate: Column {
                                             id: tileCol
@@ -1816,6 +1851,8 @@ Scope {
                                                     anchors.fill: parent
                                                     anchors.margins: 1
                                                     source: modelData.deleted ? "" : ("file://" + modelData.thumbnail_path)
+                                                    sourceSize.width: 120
+                                                    sourceSize.height: 120
                                                     fillMode: Image.PreserveAspectCrop
                                                     asynchronous: true
                                                     cache: true
@@ -1921,22 +1958,15 @@ Scope {
                                                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                                                     onClicked: function(mouse) {
                                                         if (mouse.button === Qt.RightButton) {
-                                                            if (root.expandedAssetId === modelData.id) {
-                                                                root.closeEditor();
-                                                            } else {
-                                                                root.expandedAssetId = modelData.id;
-                                                                root.tagDraft = "";
-                                                                root.refreshTagSuggestions();
-                                                            }
+                                                            root.previewAsset = modelData;
                                                             return ;
                                                         }
                                                         if (modelData.deleted)
                                                             return ;
 
-                                                        if (modelData.type === "screenshot")
-                                                            Quickshell.execDetached(["sh", "-c", "wl-copy < '" + modelData.source_path + "' && notify-send -t 1000 -a 'Screenshot' 'Copied image'"]);
-                                                        else if (modelData.type === "recording")
-                                                            Quickshell.execDetached(["mpv", modelData.source_path]);
+                                                        Quickshell.execDetached(["sh", "-c", "echo -n '" + modelData.source_path + "' | wl-copy && notify-send -t 1000 -a 'Media' 'Copied path to clipboard'"]);
+                                                        root.closePreview();
+                                                        win.closePopup();
                                                     }
                                                 }
 
@@ -1958,10 +1988,61 @@ Scope {
 
                                 }
 
+                                // Pagination controls
+                                Row {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: 12
+                                    visible: root.filteredAssets().length > 20
+
+                                    Text {
+                                        text: "◀ Prev"
+                                        color: root.currentPage > 0 ? theme.accent : "#504945"
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: true
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            enabled: root.currentPage > 0
+                                            onClicked: {
+                                                root.currentPage--;
+                                                root.closePreview();
+                                            }
+                                        }
+
+                                    }
+
+                                    Text {
+                                        text: "Page " + (root.currentPage + 1) + " of " + Math.ceil(root.filteredAssets().length / 20)
+                                        color: "#928374"
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                    }
+
+                                    Text {
+                                        text: "Next ▶"
+                                        color: (root.currentPage + 1) * 20 < root.filteredAssets().length ? theme.accent : "#504945"
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: true
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            enabled: (root.currentPage + 1) * 20 < root.filteredAssets().length
+                                            onClicked: {
+                                                root.currentPage++;
+                                                root.closePreview();
+                                            }
+                                        }
+
+                                    }
+
+                                }
+
                                 // "Showing N of M" footer
                                 Text {
-                                    visible: root.filterText !== "" || root.activeTag !== ""
-                                    text: "showing " + Math.min(4, root.filteredAssets().length) + " of " + root.filteredAssets().length
+                                    visible: root.filteredAssets().length > 0
+                                    text: "showing " + (root.filteredAssets().length === 0 ? "0" : ((root.currentPage * 20 + 1) + "-" + Math.min((root.currentPage + 1) * 20, root.filteredAssets().length))) + " of " + root.filteredAssets().length
                                     color: "#928374"
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 7
@@ -2327,7 +2408,12 @@ Scope {
 
                                             MouseArea {
                                                 anchors.fill: parent
-                                                onClicked: {
+                                                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                                onClicked: function(mouse) {
+                                                    if (mouse.button === Qt.RightButton) {
+                                                        root.previewOcrText = modelData.detail;
+                                                        return ;
+                                                    }
                                                     if (root.expandedOcrIndex === index)
                                                         root.expandedOcrIndex = -1;
                                                     else
@@ -2439,6 +2525,18 @@ Scope {
 
                     }
 
+                }
+
+                Loader {
+                    id: previewLoader
+
+                    active: root.previewAsset !== null || root.previewOcrText !== ""
+                    source: "PreviewWindow.qml"
+                    onLoaded: {
+                        item.rootObj = root;
+                        item.winObj = win;
+                        item.themeObj = theme;
+                    }
                 }
 
             }
