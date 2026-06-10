@@ -33,7 +33,7 @@ Scope {
             onStreamFinished: {
                 try {
                     var data = JSON.parse(this.text);
-                    root.username = data.username || "parazeeknova";
+                    root.username = data.username || (Quickshell.env("WABI_GITHUB_USER") || "");
                     root.totalContributions = data.total_contributions || 0;
                     root.contributionDays = data.days || [];
                     root.contributionActivities = data.activity || [];

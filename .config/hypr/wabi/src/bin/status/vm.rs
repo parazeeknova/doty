@@ -7,7 +7,8 @@ use wabi::{print_json, quickshell_dir};
 
 fn get_vm_scan_root() -> String {
     env::var("WABI_VM_SCAN_ROOT").unwrap_or_else(|_| {
-        String::from("/run/media/parazeeknova/clips/VM")
+        let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
+        format!("{home}/VMs")
     })
 }
 

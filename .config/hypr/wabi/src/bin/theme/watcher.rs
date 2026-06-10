@@ -507,7 +507,7 @@ fn auto_optimize_video(path: &Path) {
                             println!("Reloading active optimized wallpaper...");
                             let _ = Command::new("sh")
                                 .arg("-c")
-                                .arg(format!("~/doty/scripts/set_wallpaper '{}'", path.display()))
+                                .arg(format!("$HOME/.config/quickshell/wallpaper_switcher/set_wallpaper '{}'", path.display()))
                                 .status();
                         }
                     }

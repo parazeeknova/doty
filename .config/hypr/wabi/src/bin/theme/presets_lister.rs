@@ -22,7 +22,7 @@ fn presets_dir() -> PathBuf {
     if let Ok(value) = env::var("WABI_PRESETS_DIR") {
         return PathBuf::from(value);
     }
-    home_dir().join("doty/.config/hypr/wabi/presets")
+    home_dir().join(".config/hypr/wabi/presets")
 }
 
 fn parse_preset(path: &Path) -> Option<PresetEntry> {

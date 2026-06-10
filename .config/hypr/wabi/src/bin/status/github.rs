@@ -45,7 +45,11 @@ struct Repo {
 }
 
 fn main() {
-    let username = "parazeeknova";
+    let username = std::env::var("WABI_GITHUB_USER").unwrap_or_else(|_| String::new());
+    if username.is_empty() {
+        eprintln!("WABI_GITHUB_USER is not set");
+        std::process::exit(1);
+    }
     let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
     let cache_path_str = format!("{home}/.cache/quickshell_github_graph.json");
     let cache_path = std::path::Path::new(&cache_path_str);

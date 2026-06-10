@@ -492,7 +492,7 @@ fn main() {
     let palette = match mode.as_str() {
         "preset" => load_preset_palette(&value).unwrap_or_else(|| {
             eprintln!(
-                "Unknown preset '{}': no file at ~/doty/.config/hypr/wabi/presets/{}.toml",
+                "Unknown preset '{}': no file at ~/.config/hypr/wabi/presets/{}.toml",
                 value, value
             );
             std::process::exit(1);

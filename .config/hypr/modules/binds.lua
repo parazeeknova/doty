@@ -4,7 +4,8 @@
 local mainMod = "SUPER"
 local terminal = "uwsm app -- ghostty"
 local fileManager = "uwsm app -- thunar"
-local osdctl = "~/doty/.config/quickshell/osd/bin/osdctl"
+local dotfiles = os.getenv("WABI_DOTFILES_DIR") or (os.getenv("HOME") .. "/doty")
+local osdctl = dotfiles .. "/.config/quickshell/osd/bin/osdctl"
 
 ---------------------
 ---  Applications ---

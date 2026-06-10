@@ -9,6 +9,7 @@ fish_variables
 .commandcode
 __pycache__
 .antigravitycli
+.config/systemd/system/getty@tty1.service.d/autologin.conf
 .config/quickshell/osd/state.json
 .config/quickshell/battery_popup/history.json
 .config/quickshell/battery_popup/settings.json

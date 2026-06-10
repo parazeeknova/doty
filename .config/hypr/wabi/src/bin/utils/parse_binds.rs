@@ -630,8 +630,11 @@ pub fn parse_binds<P: AsRef<Path>>(filepath: P) -> io::Result<Vec<Category>> {
 }
 
 fn main() {
-    let home = std::env::var("HOME").unwrap_or_else(|_| "/home/parazeeknova".to_string());
-    let binds_file = format!("{}/doty/.config/hypr/modules/binds.lua", home);
+    let dotfiles = std::env::var("WABI_DOTFILES_DIR").unwrap_or_else(|_| {
+        let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
+        format!("{home}/doty")
+    });
+    let binds_file = format!("{dotfiles}/.config/hypr/modules/binds.lua");
     let args: Vec<String> = std::env::args().collect();
     let filepath = if args.len() > 1 {
         &args[1]
