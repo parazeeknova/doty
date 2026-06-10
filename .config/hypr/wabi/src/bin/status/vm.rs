@@ -5,7 +5,11 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use wabi::{print_json, quickshell_dir};
 
-const VM_SCAN_ROOT: &str = "/run/media/parazeeknova/clips/VM";
+fn get_vm_scan_root() -> String {
+    env::var("WABI_VM_SCAN_ROOT").unwrap_or_else(|_| {
+        String::from("/run/media/parazeeknova/clips/VM")
+    })
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 struct VmDisk {
@@ -204,7 +208,8 @@ fn get_process_cpu_usage(search_pattern: &str) -> f32 {
 fn scan_vms() -> Vec<VmInfo> {
     let mut vms = Vec::new();
     let running = running_vms();
-    let scan_root = Path::new(VM_SCAN_ROOT);
+    let vm_scan_root = get_vm_scan_root();
+    let scan_root = Path::new(&vm_scan_root);
 
     if !scan_root.exists() {
         return vms;
@@ -819,9 +824,10 @@ fn handle_delete(args: &[String]) {
         let parent_canonical = parent
             .canonicalize()
             .unwrap_or_else(|_| parent.to_path_buf());
-        let root_canonical = Path::new(VM_SCAN_ROOT)
+        let vm_root = get_vm_scan_root();
+        let root_canonical = Path::new(&vm_root)
             .canonicalize()
-            .unwrap_or_else(|_| PathBuf::from(VM_SCAN_ROOT));
+            .unwrap_or_else(|_| PathBuf::from(&vm_root));
         if parent_canonical.starts_with(&root_canonical) && parent_canonical != root_canonical {
             if let Err(e) = fs::remove_dir_all(&parent_canonical) {
                 eprintln!("Failed to delete VM directory: {}", e);

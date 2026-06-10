@@ -7,13 +7,18 @@ use std::path::Path;
 use std::process::Command;
 use wabi::print_json;
 
-const IPC_SOCKET_PATH: &str = "/tmp/screentime_daemon.sock";
+fn ipc_socket_path() -> String {
+    let runtime_dir = env::var("XDG_RUNTIME_DIR")
+        .unwrap_or_else(|_| "/tmp".to_string());
+    format!("{}/wabi_screentime.sock", runtime_dir)
+}
 
 fn ensure_daemon_running() {
+    let socket = ipc_socket_path();
     // Check if daemon is responding via IPC socket
-    let socket_exists = Path::new(IPC_SOCKET_PATH).exists();
+    let socket_exists = Path::new(&socket).exists();
     let daemon_responsive = if socket_exists {
-        UnixStream::connect(IPC_SOCKET_PATH).is_ok()
+        UnixStream::connect(&socket).is_ok()
     } else {
         false
     };
@@ -24,7 +29,7 @@ fn ensure_daemon_running() {
 
         // Clean up stale socket if it exists
         if socket_exists {
-            let _ = std::fs::remove_file(IPC_SOCKET_PATH);
+            let _ = std::fs::remove_file(&socket);
         }
 
         // Spawn the daemon in the background

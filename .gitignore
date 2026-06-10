@@ -11,6 +11,14 @@ __pycache__
 .antigravitycli
 .config/quickshell/osd/state.json
 .config/quickshell/battery_popup/history.json
+.config/quickshell/battery_popup/settings.json
+.config/quickshell/media_popup/assets.db
+.config/quickshell/media_popup/flags.json
+.config/quickshell/media_popup/ping.txt
+.config/quickshell/media_popup/settings.json
+.config/quickshell/screentime.db
+.config/quickshell/screentime.db-shm
+.config/quickshell/screentime.db-wal
 .config/gtk-3.0/bookmarks
 ref/
 vm_password

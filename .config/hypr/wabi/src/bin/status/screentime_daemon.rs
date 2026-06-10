@@ -10,7 +10,11 @@ use std::sync::mpsc::{channel, Sender};
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-const IPC_SOCKET_PATH: &str = "/tmp/screentime_daemon.sock";
+fn ipc_socket_path() -> String {
+    let runtime_dir = env::var("XDG_RUNTIME_DIR")
+        .unwrap_or_else(|_| "/tmp".to_string());
+    format!("{}/wabi_screentime.sock", runtime_dir)
+}
 
 #[derive(Debug)]
 struct ActiveWindow {
@@ -147,8 +151,9 @@ fn start_hyprland_listener(tx: Sender<Message>) {
 }
 
 fn start_ipc_listener(tx: Sender<Message>) {
-    let _ = fs::remove_file(IPC_SOCKET_PATH);
-    let listener = UnixListener::bind(IPC_SOCKET_PATH).expect("Failed to bind IPC socket");
+    let socket_path = ipc_socket_path();
+    let _ = fs::remove_file(&socket_path);
+    let listener = UnixListener::bind(&socket_path).expect("Failed to bind IPC socket");
     thread::spawn(move || {
         for mut stream in listener.incoming().flatten() {
             let reader = BufReader::new(&stream);
@@ -172,7 +177,7 @@ fn start_ipc_listener(tx: Sender<Message>) {
 }
 
 fn client_send(cmd: &str) {
-    if let Ok(mut stream) = UnixStream::connect(IPC_SOCKET_PATH) {
+    if let Ok(mut stream) = UnixStream::connect(ipc_socket_path()) {
         let _ = stream.write_all(format!("{}\n", cmd).as_bytes());
         let mut response = String::new();
         let mut reader = BufReader::new(stream);
@@ -204,7 +209,7 @@ fn main() {
     }
 
     // Check if another daemon instance is already running
-    if UnixStream::connect(IPC_SOCKET_PATH).is_ok() {
+    if UnixStream::connect(ipc_socket_path()).is_ok() {
         eprintln!("screentime_daemon is already running.");
         std::process::exit(1);
     }
