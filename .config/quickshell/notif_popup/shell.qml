@@ -145,8 +145,6 @@ Scope {
     function triggerRefresh() {
         checkNotifsProc.running = false;
         checkNotifsProc.running = true;
-        checkGlassProc.running = false;
-        checkGlassProc.running = true;
         checkScreentimeProc.running = false;
         checkScreentimeProc.launchedOffset = root.screentimeOffset;
         checkScreentimeProc.command = [root.homeDir + "/.local/bin/get_screentime_status", String(root.screentimeOffset)];
@@ -249,25 +247,6 @@ Scope {
                     root.uptimeStr = data.uptime || "";
                 } catch (e) {
                     console.log("Failed to parse notifications: " + e);
-                }
-            }
-        }
-
-    }
-
-    Process {
-        id: checkGlassProc
-
-        command: ["hyprctl", "getoption", "decoration:blur:enabled", "-j"]
-        running: false
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    var data = JSON.parse(this.text);
-                    root.glassEnabled = data.bool || false;
-                } catch (e) {
-                    console.log("Failed to parse glass status: " + e);
                 }
             }
         }

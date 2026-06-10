@@ -44,9 +44,7 @@ fn toggle_hex_alpha_lines(content: &str, key: &str, line_suffix: &str, want_alph
 
 fn main() {
     let home = env::var("HOME").unwrap_or_default();
-    let cache_dir = format!("{}/.cache/quickshell", home);
-    let _ = fs::create_dir_all(&cache_dir);
-    let state_file = format!("{}/glass_state", cache_dir);
+    let state_file = "/tmp/quickshell_glass_state".to_string();
 
     let current_state = fs::read_to_string(&state_file)
         .map(|s| s.trim().to_string())
