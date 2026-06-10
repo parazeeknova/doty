@@ -32,9 +32,7 @@ fn toggle_hex_alpha_lines(content: &str, key: &str, line_suffix: &str, want_alph
             };
             let tail = &after_hash[hex_end..];
             let mut rebuilt = format!("{}#{}{}", &line[..hash_idx], new_hex, tail);
-            if !line_suffix.is_empty()
-                && !rebuilt.trim_end().ends_with(line_suffix)
-            {
+            if !line_suffix.is_empty() && !rebuilt.trim_end().ends_with(line_suffix) {
                 rebuilt.push_str(line_suffix);
             }
             rebuilt
@@ -45,12 +43,15 @@ fn toggle_hex_alpha_lines(content: &str, key: &str, line_suffix: &str, want_alph
 }
 
 fn main() {
-    let state_file = "/tmp/quickshell_glass_state";
-    let current_state = fs::read_to_string(state_file)
+    let home = env::var("HOME").unwrap_or_default();
+    let cache_dir = format!("{}/.cache/quickshell", home);
+    let _ = fs::create_dir_all(&cache_dir);
+    let state_file = format!("{}/glass_state", cache_dir);
+
+    let current_state = fs::read_to_string(&state_file)
         .map(|s| s.trim().to_string())
         .unwrap_or_else(|_| "true".to_string());
 
-    let home = env::var("HOME").unwrap_or_default();
     let waybar_css = format!("{}/.config/waybar/style.css", home);
     let rofi_colors = format!("{}/.config/rofi/colors.rasi", home);
     let mako_config = format!("{}/.config/mako/config", home);

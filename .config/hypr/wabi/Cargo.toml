@@ -146,4 +146,8 @@ path = "src/bin/status/screentime_daemon.rs"
 name = "get_screentime_status"
 path = "src/bin/status/get_screentime_status.rs"
 
+[[bin]]
+name = "check_daemons"
+path = "src/bin/status/check_daemons.rs"
+
 

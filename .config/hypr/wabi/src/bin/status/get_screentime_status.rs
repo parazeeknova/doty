@@ -2,7 +2,42 @@ use rusqlite::Connection;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::env;
+use std::os::unix::net::UnixStream;
+use std::path::Path;
+use std::process::Command;
 use wabi::print_json;
+
+const IPC_SOCKET_PATH: &str = "/tmp/screentime_daemon.sock";
+
+fn ensure_daemon_running() {
+    // Check if daemon is responding via IPC socket
+    let socket_exists = Path::new(IPC_SOCKET_PATH).exists();
+    let daemon_responsive = if socket_exists {
+        UnixStream::connect(IPC_SOCKET_PATH).is_ok()
+    } else {
+        false
+    };
+
+    if !daemon_responsive {
+        // Daemon is not running or not responsive, restart it
+        eprintln!("Screentime daemon not responding, restarting...");
+
+        // Clean up stale socket if it exists
+        if socket_exists {
+            let _ = std::fs::remove_file(IPC_SOCKET_PATH);
+        }
+
+        // Spawn the daemon in the background
+        let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
+        let daemon_path = format!("{}/.local/bin/screentime_daemon", home);
+
+        if let Err(e) = Command::new(&daemon_path).spawn() {
+            eprintln!("Failed to restart screentime daemon: {}", e);
+        } else {
+            eprintln!("Screentime daemon restarted");
+        }
+    }
+}
 
 #[derive(Serialize)]
 struct TopAppItem {
@@ -87,6 +122,9 @@ fn main() {
         .nth(1)
         .and_then(|s| s.parse::<i32>().ok())
         .unwrap_or(0);
+
+    // Ensure daemon is running before querying
+    ensure_daemon_running();
 
     let db_path = wabi::quickshell_dir().join("screentime.db");
     let conn = match Connection::open(db_path) {

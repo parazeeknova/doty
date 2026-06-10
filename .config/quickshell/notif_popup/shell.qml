@@ -148,7 +148,11 @@ Scope {
         checkGlassProc.running = false;
         checkGlassProc.running = true;
         checkScreentimeProc.running = false;
+        checkScreentimeProc.launchedOffset = root.screentimeOffset;
+        checkScreentimeProc.command = [root.homeDir + "/.local/bin/get_screentime_status", String(root.screentimeOffset)];
         checkScreentimeProc.running = true;
+        checkDaemonsProc.running = false;
+        checkDaemonsProc.running = true;
     }
 
     function savePomoState() {
@@ -173,6 +177,8 @@ Scope {
 
     onScreentimeOffsetChanged: {
         checkScreentimeProc.running = false;
+        checkScreentimeProc.launchedOffset = root.screentimeOffset;
+        checkScreentimeProc.command = [root.homeDir + "/.local/bin/get_screentime_status", String(root.screentimeOffset)];
         checkScreentimeProc.running = true;
     }
     Component.onCompleted: {
@@ -271,11 +277,16 @@ Scope {
     Process {
         id: checkScreentimeProc
 
-        command: [root.homeDir + "/.local/bin/get_screentime_status", String(root.screentimeOffset)]
+        property int launchedOffset: 0
+
         running: false
 
         stdout: StdioCollector {
             onStreamFinished: {
+                // Ignore stale results from old processes
+                if (checkScreentimeProc.launchedOffset !== root.screentimeOffset) {
+                    return;
+                }
                 try {
                     var data = JSON.parse(this.text);
                     root.screentimeLabel = data.label || "";
@@ -287,6 +298,21 @@ Scope {
                 } catch (e) {
                     console.log("Failed to parse screentime: " + e);
                 }
+            }
+        }
+
+    }
+
+    Process {
+        id: checkDaemonsProc
+
+        command: [root.homeDir + "/.local/bin/check_daemons"]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                // Daemon watchdog runs silently - notifications are sent by the binary itself
+                console.log("Daemon watchdog check completed");
             }
         }
 
@@ -571,7 +597,8 @@ Scope {
                                             id: nextBtn
 
                                             text: ">"
-                                            color: nextMouse.containsMouse ? theme.fg : theme.accent
+                                            color: root.screentimeOffset === 0 ? theme.fg_light : (nextMouse.containsMouse ? theme.fg : theme.accent)
+                                            opacity: root.screentimeOffset === 0 ? 0.4 : 1.0
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             font.bold: true
@@ -581,8 +608,13 @@ Scope {
                                                 id: nextMouse
 
                                                 anchors.fill: parent
-                                                hoverEnabled: true
-                                                onClicked: root.screentimeOffset += 1
+                                                hoverEnabled: root.screentimeOffset !== 0
+                                                enabled: root.screentimeOffset !== 0
+                                                onClicked: {
+                                                    if (root.screentimeOffset !== 0) {
+                                                        root.screentimeOffset += 1
+                                                    }
+                                                }
                                             }
 
                                         }

@@ -1,7 +1,7 @@
 # Parazeeknova's configuration
 theme = theme
 font-size = 9
-font-family = FiraCode Nerd Font Mono
+font-family = FiraCode Nerd Font Mono Bold
 font-feature = calt
 font-feature = liga
 #background-blur-radius = 20

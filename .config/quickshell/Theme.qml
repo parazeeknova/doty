@@ -38,7 +38,7 @@ QtObject {
     property FileView glassState
 
     glassState: FileView {
-        path: "file:///tmp/quickshell_glass_state"
+        path: "file:///home/parazeeknova/.cache/quickshell/glass_state"
         watchChanges: true
         onLoaded: {
             var val = glassState.text().trim();
