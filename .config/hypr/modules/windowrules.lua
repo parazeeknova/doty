@@ -1,9 +1,7 @@
 --------------------------------
 ---- WINDOWS AND WORKSPACES ----
 --------------------------------
--- See https://wiki.hypr.land/Configuring/Basics/Window-Rules/
--- and https://wiki.hypr.land/Configuring/Basics/Workspace-Rules/
--- Example window rules that are useful
+
 hl.window_rule({
     -- Ignore maximize requests from all apps. You'll probably like this.
     name = "suppress-maximize-events",
@@ -55,7 +53,7 @@ hl.window_rule({
         class = "satty"
     },
     float = true,
-    size = {800, 400},
+    size = { 800, 400 },
     center = true
 })
 
@@ -66,7 +64,7 @@ hl.window_rule({
         initial_title = ".* - Thunar$"
     },
     float = true,
-    size = {1000, 600},
+    size = { 1000, 600 },
     center = true
 })
 
@@ -87,7 +85,7 @@ hl.window_rule({
         title = ".+"
     },
     float = true,
-    size = {1000, 600},
+    size = { 1000, 600 },
     center = true
 })
 
@@ -160,13 +158,14 @@ hl.layer_rule({
 
 -- Workspace assignments for specific applications using exact class names (anchored regex)
 local workspace_assignments = {
-    ["1"] = {"^zen$"},
-    ["2"] = {"^Code$", "^code-insiders$", "^dev\\.warp\\.Warp$"},
-    ["3"] = {"^thunar$"},
-    ["4"] = {"^com\\.mitchellh\\.ghostty$"},
-    ["5"] = {"^vesktop$", "^TelegramDesktop$", "^brave-origin-nightly$"},
-    ["9"] = {"^virt-manager$", "^qemu.*$", "^Qemu.*$"},
-    ["10"] = {"^[Vv]mware.*$"}
+    ["1"] = { "^zen$", "^[Vv]ivaldi.*$", "^brave-origin-nightly$" },
+    ["2"] = { "^code-insiders$", "^dev\\.warp\\.Warp$" },
+    ["3"] = { "^thunar$", "^Code$", "^code$" },
+    ["4"] = { "^com\\.mitchellh\\.ghostty$" },
+    ["5"] = { "^[Ss]potify$" },
+    ["6"] = { "^vesktop$", "^TelegramDesktop$" },
+    ["9"] = { "^virt-manager$", "^qemu.*$", "^Qemu.*$" },
+    ["10"] = { "^[Vv]mware.*$" }
 }
 
 for ws, classes in pairs(workspace_assignments) do
@@ -188,7 +187,7 @@ hl.window_rule({
     },
     workspace = "special:gitkraken",
     float = true,
-    size = {1200, 800},
+    size = { 1200, 800 },
     center = true
 })
 
@@ -199,7 +198,7 @@ hl.window_rule({
     },
     workspace = "special:helium",
     float = true,
-    size = {1200, 800},
+    size = { 1200, 800 },
     center = true
 })
 
@@ -230,4 +229,29 @@ hl.window_rule({
         class = "^(virt-manager|[Qq]emu.*)$"
     },
     opacity = "1.0 override 1.0 override"
+})
+
+-- Set starting width for browsers in scrolling layout
+hl.window_rule({
+    name = "zen-starting-width",
+    match = {
+        class = "^zen$"
+    },
+    scrolling_width = 0.7
+})
+
+hl.window_rule({
+    name = "vivaldi-starting-width",
+    match = {
+        class = "^[Vv]ivaldi.*$"
+    },
+    scrolling_width = 0.7
+})
+
+hl.window_rule({
+    name = "brave-starting-width",
+    match = {
+        class = "^brave-origin-nightly$"
+    },
+    scrolling_width = 0.7
 })

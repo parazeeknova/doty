@@ -57,3 +57,11 @@ if status is-interactive
     end
 
 end
+
+# mimocode
+fish_add_path /home/parazeeknova/.mimocode/bin
+
+# Added by LM Studio CLI (lms)
+set -gx PATH $PATH /home/parazeeknova/.lmstudio/bin
+# End of LM Studio CLI section
+

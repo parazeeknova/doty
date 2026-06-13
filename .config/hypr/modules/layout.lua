@@ -1,29 +1,44 @@
--- See https://wiki.hypr.land/Configuring/Layouts/Dwindle-Layout/ for more
 hl.config({
     general = {
-        layout = "dwindle"
+        layout = "scrolling"
     },
     scrolling = {
-        column_width = 1.0,
+        column_width = 0.6,
         follow_focus = true,
-        direction = "down"
+        direction = "right",
+        fullscreen_on_one_column = true,
+        wrap_focus = false,
+        wrap_swapcol = false
     },
     dwindle = {
         preserve_split = true,
-        smart_split = true
-    }
+    },
 })
 
--- See https://wiki.hypr.land/Configuring/Layouts/Master-Layout/ for more
-hl.config({
-    master = {
-        new_status = "master"
+local colors = {}
+local colors_status, c = pcall(require, 'modules.colors')
+if colors_status then
+    colors = c
+else
+    colors = {
+        shadow_color = "0xee1a1a1a"
     }
-})
+end
 
--- See https://wiki.hypr.land/Configuring/Layouts/Scrolling-Layout/ for more
-hl.config({
-    scrolling = {
-        fullscreen_on_one_column = true
-    }
-})
+-- This requires https://github.com/yayuuu/hyprland-scroll-overview plugin
+-- hyprpm add https://github.com/yayuuu/hyprland-scroll-overview.git && hyprpm update
+if hl.plugin and hl.plugin.scrolloverview then
+    hl.plugin.scrolloverview.configure({
+        gesture_distance = 300,
+        scale = 0.6,
+        workspace_gap = 10,
+        wallpaper = 0,
+        blur = true,
+        shadow = {
+            enabled = false,
+            range = 6,
+            render_power = 2,
+            color = tonumber(colors.shadow_color) or 0xee1a1a1a,
+        },
+    })
+end

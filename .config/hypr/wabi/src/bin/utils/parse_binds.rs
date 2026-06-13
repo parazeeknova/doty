@@ -362,6 +362,27 @@ fn parse_single_bind(
                 description = format!("Run: {}", cmd);
             }
         }
+    } else if action_expr.contains("window.cycle_next") {
+        let noloop = action_expr.contains("noloop");
+        if action_expr.contains("prev") {
+            cmd = if noloop {
+                "hyprctl dispatch cyclenext prev noloop".to_string()
+            } else {
+                "hyprctl dispatch cyclenext prev".to_string()
+            };
+            if description.is_empty() {
+                description = "Focus previous window".to_string();
+            }
+        } else {
+            cmd = if noloop {
+                "hyprctl dispatch cyclenext noloop".to_string()
+            } else {
+                "hyprctl dispatch cyclenext".to_string()
+            };
+            if description.is_empty() {
+                description = "Focus next window".to_string();
+            }
+        }
     } else if action_expr.contains("window.close") {
         cmd = "hyprctl dispatch closewindow active".to_string();
         if description.is_empty() {
@@ -382,7 +403,22 @@ fn parse_single_bind(
             description = "Drag window (mouse)".to_string();
         }
     } else if action_expr.contains("window.resize") {
-        if description.is_empty() {
+        if action_expr.contains("x =") || action_expr.contains("y =") {
+            let mut x_val = "0";
+            let mut y_val = "0";
+            if let Some(x_idx) = action_expr.find("x =") {
+                let s = &action_expr[x_idx + 3..];
+                x_val = s.split(',').next().unwrap_or("0").trim().trim_end_matches('}').trim();
+            }
+            if let Some(y_idx) = action_expr.find("y =") {
+                let s = &action_expr[y_idx + 3..];
+                y_val = s.split(',').next().unwrap_or("0").trim().trim_end_matches('}').trim();
+            }
+            cmd = format!("hyprctl dispatch resizeactive {} {}", x_val, y_val);
+            if description.is_empty() {
+                description = format!("Resize window by {}, {}", x_val, y_val);
+            }
+        } else if description.is_empty() {
             description = "Resize window (mouse)".to_string();
         }
     } else if action_expr.contains("focus") {

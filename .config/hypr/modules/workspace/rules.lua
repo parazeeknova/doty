@@ -15,6 +15,11 @@
 --     border_size = 0,
 --     rounding    = 0,
 -- })
+
+-- Scrolling
+-- hl.workspace_rule({ workspace = "9", layout_opts = { direction = "down" } })
+-- hl.workspace_rule({ workspace = "10", layout_opts = { direction = "down" } })
+
 -- Disable blur for xwayland context menus
 hl.window_rule({
     match = {
@@ -163,13 +168,13 @@ hl.window_rule({
     match = {
         title = "^([Pp]icture[-\\s]?[Ii]n[-\\s]?[Pp]icture)(.*)$"
     },
-    move = {"(monitor_w*0.73)", "(monitor_h*0.72)"}
+    move = { "(monitor_w*0.73)", "(monitor_h*0.72)" }
 })
 hl.window_rule({
     match = {
         title = "^([Pp]icture[-\\s]?[Ii]n[-\\s]?[Pp]icture)(.*)$"
     },
-    size = {"(monitor_w*0.25)", "(monitor_h*0.25)"}
+    size = { "(monitor_w*0.25)", "(monitor_h*0.25)" }
 })
 hl.window_rule({
     match = {
@@ -201,6 +206,5 @@ hl.window_rule({
     match = {
         title = ".*is sharing (a window|your screen).*"
     },
-    move = {"(monitor_w*.5-window_w*.5)", "(monitor_h-window_h-12)"}
+    move = { "(monitor_w*.5-window_w*.5)", "(monitor_h-window_h-12)" }
 })
-

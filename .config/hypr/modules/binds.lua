@@ -26,6 +26,12 @@ hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(
 -- Editors
 hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd(
     'hyprctl clients | grep -q "class: code-insiders" && hyprctl dispatch \'hl.dsp.focus({ window = "class:code-insiders" })\' || uwsm app -- code-insiders'))
+hl.bind(mainMod .. " + ALT + semicolon", hl.dsp.exec_cmd(
+    'hyprctl clients | grep -q "class: code$" && hyprctl dispatch \'hl.dsp.focus({ window = "class:code" })\' || uwsm app -- code'))
+
+-- Music
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(
+    'hyprctl clients | grep -i -q "class: spotify" && hyprctl dispatch \'hl.dsp.focus({ window = "class:spotify" })\' || uwsm app -- spotify'))
 
 ---------------------
 ---    Windows    ---
@@ -45,6 +51,12 @@ hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), {
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), {
     mouse = true
 })
+
+-- Resize with keyboard (Arrow keys)
+hl.bind(mainMod .. " + SHIFT + left", hl.dsp.window.resize({ x = -50, y = 0, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.resize({ x = 50, y = 0, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + up", hl.dsp.window.resize({ x = 0, y = -50, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + down", hl.dsp.window.resize({ x = 0, y = 50, relative = true }), { repeating = true })
 
 ---------------------
 ---    Layout     ---
@@ -81,19 +93,35 @@ for i = 1, 10 do
     }))
 end
 
--- -- Scroll through workspaces
-hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({
-    workspace = "e+1"
-}))
-hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({
-    workspace = "e-1"
-}))
--- hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({
---     direction = "down"
--- }))
--- hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({
---     direction = "up"
--- }))
+-- Scroll through windows
+hl.bind(mainMod .. " + mouse_down", hl.dsp.window.cycle_next())
+hl.bind(mainMod .. " + mouse_up", hl.dsp.window.cycle_next({ prev = true }))
+
+hl.bind("ALT + TAB", function()
+    if hl.plugin and hl.plugin.scrolloverview then
+        hl.plugin.scrolloverview.overview("toggle")
+    end
+end)
+
+hl.bind(mainMod .. " + backslash", function()
+    local ws = hl.get_active_workspace()
+    if not ws then return end
+    local current = hl.get_config("scrolling.column_width")
+    local target = 0.5
+    if current == 0.5 then
+        target = 0.6
+    end
+    hl.config({ scrolling = { column_width = target } })
+    local windows = hl.get_workspace_windows(ws.id)
+    local active = hl.get_active_window()
+    for _, win in ipairs(windows) do
+        hl.dispatch(hl.dsp.focus({ window = "address:" .. win.address }))
+        hl.dispatch(hl.dsp.layout("colresize " .. tostring(target)))
+    end
+    if active then
+        hl.dispatch(hl.dsp.focus({ window = "address:" .. active.address }))
+    end
+end)
 
 -- Special workspaces (scratchpads)
 hl.bind(mainMod .. " + A", hl.dsp.workspace.toggle_special("magic"))
@@ -127,7 +155,6 @@ hl.bind("XF86Launch3", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show p
 ---------------------
 ---   Pyprland    ---
 ---------------------
-hl.bind("ALT + TAB", hl.dsp.exec_cmd("pypr expose"))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("pypr layout_center toggle"))
 hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("pypr toggle term"))
 
@@ -140,7 +167,7 @@ hl.bind(mainMod .. " + SHIFT + M",
     hl.dsp.exec_cmd("quickshell -c volume_popup ipc call volume_popup close || quickshell --config volume_popup"))
 hl.bind(mainMod .. " + SHIFT + V",
     hl.dsp.exec_cmd("quickshell -c vm_popup ipc call vm_popup close || quickshell --config vm_popup"))
-hl.bind(mainMod .. " + SHIFT + W", hl.dsp
+hl.bind(mainMod .. " + ALT + W", hl.dsp
     .exec_cmd("quickshell -c network_popup ipc call network_popup close || quickshell --config network_popup"))
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp
     .exec_cmd("quickshell -c bluetooth_popup ipc call bluetooth_popup close || quickshell --config bluetooth_popup"))
@@ -158,7 +185,7 @@ hl.bind(mainMod .. " + ALT + slash",
     hl.dsp.exec_cmd("quickshell -c podman_popup ipc call podman_popup close || quickshell --config podman_popup"))
 hl.bind(mainMod .. " + G",
     hl.dsp.exec_cmd("quickshell -c media_popup ipc call media_popup close || quickshell --config media_popup"))
-hl.bind(mainMod .. " + ALT + W", hl.dsp.exec_cmd(
+hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd(
     "quickshell -c wallpaper_switcher ipc call wallpaper_switcher close || quickshell --config wallpaper_switcher"))
 hl.bind(mainMod .. " + ALT + C", hl.dsp.exec_cmd(
     "quickshell -c colorscheme_popup ipc call colorscheme_popup close || quickshell --config colorscheme_popup"))

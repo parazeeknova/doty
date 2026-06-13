@@ -75,7 +75,7 @@ fn apply_glass_state(home: &str, want_alpha: bool, opacity: &str, inactive_opaci
     let _ = Command::new("makoctl").arg("reload").status();
 
     let hypr_eval = format!(
-        "hl.config({{ decoration = {{ active_opacity = {opacity}, inactive_opacity = {inactive_opacity}, blur = {{ enabled = {blur} }} }} }})"
+        "hl.config({{ decoration = {{ active_opacity = {opacity}, inactive_opacity = {inactive_opacity}, blur = {{ enabled = {blur} }} }} }}); if hl.plugin and hl.plugin.scrolloverview then hl.plugin.scrolloverview.configure({{ blur = {blur} }}) end"
     );
     let _ = Command::new("hyprctl").args(["eval", &hypr_eval]).status();
 }

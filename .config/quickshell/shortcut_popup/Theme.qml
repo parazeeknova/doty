@@ -1,23 +1,11 @@
 import QtQuick
 import Quickshell.Io
+import "file:///home/parazeeknova/.cache/quickshell" as ThemeCache
 
 QtObject {
     id: theme
 
-    property string homeDir: Quickshell.env("HOME")
-    property string cacheDir: homeDir + "/.cache/quickshell"
-
-    property QtObject c: QtObject {
-        property color bg: "#1d2021"
-        property color bg_dark: "#18191a"
-        property color bg_light: "#282a2e"
-        property color fg: "#ebdbb2"
-        property color fg_light: "#fbf1c7"
-        property color accent: "#d79921"
-        property color secondary: "#b8bb26"
-        property color tertiary: "#928374"
-        property color error: "#fb4934"
-    }
+    property ThemeCache.Colors c: ThemeCache.Colors {}
 
     property color bg: c.bg
     Behavior on bg { ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
@@ -47,8 +35,8 @@ QtObject {
 
     property color trayBgColor: glassEnabled ? Qt.rgba(bg.r, bg.g, bg.b, 0.95) : bg
     Behavior on trayBgColor { ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
-
     property FileView glassState
+
     glassState: FileView {
         path: "file:///tmp/quickshell_glass_state"
         watchChanges: true
@@ -60,8 +48,9 @@ QtObject {
     }
 
     property FileView colorsWatcher
+
     colorsWatcher: FileView {
-        path: "file://" + cacheDir + "/colors.json"
+        path: "file:///home/parazeeknova/.cache/quickshell/colors.json"
         watchChanges: true
         onLoaded: {
             try {
@@ -83,4 +72,5 @@ QtObject {
         }
         onFileChanged: reload()
     }
+
 }

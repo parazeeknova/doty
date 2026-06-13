@@ -9,6 +9,7 @@ local dotfiles = os.getenv("WABI_DOTFILES_DIR") or (os.getenv("HOME") .. "/doty"
 
 hl.on("hyprland.start", function()
     -- System Startups
+    hl.exec_cmd("hyprpm reload -n")
     -- Restore glass state from persistent cache to tmpfs
     hl.exec_cmd(
         "sh -c 'cat ~/.cache/quickshell/glass_state 2>/dev/null > /tmp/quickshell_glass_state || printf true > /tmp/quickshell_glass_state'")

@@ -9,7 +9,8 @@ if colors_status then
 else
     colors = {
         active_border = "rgba(ddc7a1ee)",
-        inactive_border = "rgba(595959aa)"
+        inactive_border = "rgba(595959aa)",
+        shadow_color = "0xee1a1a1a"
     }
 end
 
@@ -22,7 +23,7 @@ hl.config({
 
         col = {
             active_border = {
-                colors = {colors.active_border}
+                colors = { colors.active_border }
             },
             inactive_border = colors.inactive_border
         },
@@ -47,9 +48,9 @@ hl.config({
 
         shadow = {
             enabled = false,
-            range = 0,
-            render_power = 0,
-            color = 0xee1a1a1a
+            range = 6,
+            render_power = 2,
+            color = tonumber(colors.shadow_color) or 0xee1a1a1a
         },
 
         blur = {
@@ -73,39 +74,39 @@ hl.config({
 -- Curves
 hl.curve("expressiveFastSpatial", {
     type = "bezier",
-    points = {{0.42, 1.67}, {0.21, 0.90}}
+    points = { { 0.42, 1.67 }, { 0.21, 0.90 } }
 })
 hl.curve("expressiveSlowSpatial", {
     type = "bezier",
-    points = {{0.39, 1.29}, {0.35, 0.98}}
+    points = { { 0.39, 1.29 }, { 0.35, 0.98 } }
 })
 hl.curve("expressiveDefaultSpatial", {
     type = "bezier",
-    points = {{0.38, 1.21}, {0.22, 1.00}}
+    points = { { 0.38, 1.21 }, { 0.22, 1.00 } }
 })
 hl.curve("emphasizedDecel", {
     type = "bezier",
-    points = {{0.05, 0.7}, {0.1, 1}}
+    points = { { 0.05, 0.7 }, { 0.1, 1 } }
 })
 hl.curve("emphasizedAccel", {
     type = "bezier",
-    points = {{0.3, 0}, {0.8, 0.15}}
+    points = { { 0.3, 0 }, { 0.8, 0.15 } }
 })
 hl.curve("standardDecel", {
     type = "bezier",
-    points = {{0, 0}, {0, 1}}
+    points = { { 0, 0 }, { 0, 1 } }
 })
 hl.curve("menu_decel", {
     type = "bezier",
-    points = {{0.1, 1}, {0, 1}}
+    points = { { 0.1, 1 }, { 0, 1 } }
 })
 hl.curve("menu_accel", {
     type = "bezier",
-    points = {{0.52, 0.03}, {0.72, 0.08}}
+    points = { { 0.52, 0.03 }, { 0.72, 0.08 } }
 })
 hl.curve("stall", {
     type = "bezier",
-    points = {{1, -0.1}, {0.7, 0.85}}
+    points = { { 1, -0.1 }, { 0.7, 0.85 } }
 })
 -- Configs
 -- windows

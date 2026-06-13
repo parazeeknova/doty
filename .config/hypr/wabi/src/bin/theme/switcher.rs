@@ -876,39 +876,6 @@ fn main() {
     let _ = Command::new("killall").arg("-USR2").arg("cava").status();
     let _ = Command::new("killall").arg("-USR1").arg("kitty").status();
 
-    // Apply keyboard backlight using asusctl aura static colour
-    // Convert to HSL and force high saturation (90%) and darker lightness (40%)
-    // to match the rich spectrum of F56C31 so it doesn't look whitish or washed out on LEDs.
-    if let Some(accent_hex) = vars.get("accent_hex") {
-        let mut final_hex = accent_hex.to_uppercase();
-        if let Some((r, g, b)) = hex_to_rgb_tuple(&final_hex) {
-            let (h, _, _) = rgb_to_hsl(r as f64, g as f64, b as f64);
-            let (dr, dg, db) = hsl_to_rgb(h, 0.90, 0.40);
-            final_hex = format!("{:02X}{:02X}{:02X}", dr, dg, db);
-        }
-        let status = Command::new("asusctl")
-            .arg("aura")
-            .arg("effect")
-            .arg("static")
-            .arg("--colour")
-            .arg(&final_hex)
-            .status();
-
-        if status.is_ok() {
-            let _ = Command::new("notify-send")
-                .arg("-t")
-                .arg("2000")
-                .arg("-h")
-                .arg("string:x-canonical-private-synchronous:keyboard-backlight-notify")
-                .arg("-a")
-                .arg("Keyboard Backlight")
-                .arg("-i")
-                .arg("keyboard")
-                .arg("Backlight Color Updated")
-                .arg(format!("Set to #{}", final_hex))
-                .status();
-        }
-    }
 
     // Rebuild bat's theme cache so the rendered tmTheme is picked up
     let _ = Command::new("bat").arg("cache").arg("--build").status();
