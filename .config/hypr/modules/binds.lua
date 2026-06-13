@@ -22,6 +22,10 @@ hl.bind(mainMod .. " + SHIFT + E", hl.dsp
 -- Browsers
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(
     'hyprctl clients | grep -q "class: zen" && hyprctl dispatch \'hl.dsp.focus({ window = "class:zen" })\' || uwsm app -- zen-browser'))
+hl.bind(mainMod .. " + ALT + B", hl.dsp.exec_cmd(
+    'hyprctl clients | grep -i -q "class: vivaldi" && hyprctl dispatch \'hl.dsp.focus({ window = "class:vivaldi-stable" })\' || uwsm app -- vivaldi-stable'))
+hl.bind(mainMod .. " + CTRL + B", hl.dsp.exec_cmd(
+    'hyprctl clients | grep -i -q "class: brave-origin-nightly" && hyprctl dispatch \'hl.dsp.focus({ window = "class:brave-origin-nightly" })\' || uwsm app -- brave-origin-nightly'))
 
 -- Editors
 hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd(
@@ -31,7 +35,7 @@ hl.bind(mainMod .. " + ALT + semicolon", hl.dsp.exec_cmd(
 
 -- Music
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(
-    'hyprctl clients | grep -i -q "class: spotify" && hyprctl dispatch \'hl.dsp.focus({ window = "class:spotify" })\' || uwsm app -- spotify'))
+    'hyprctl clients | grep -i -q "class: spotify" && hyprctl dispatch \'hl.dsp.focus({ window = "class:Spotify" })\' || uwsm app -- spotify'))
 
 ---------------------
 ---    Windows    ---
@@ -62,7 +66,7 @@ hl.bind(mainMod .. " + SHIFT + down", hl.dsp.window.resize({ x = 0, y = 50, rela
 ---    Layout     ---
 ---------------------
 
-hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- dwindle only
+hl.bind(mainMod .. " + J", hl.dsp.layout("promote")) -- promote window to its own column in scrolling layout
 
 -- Focus with arrow keys
 hl.bind(mainMod .. " + left", hl.dsp.focus({
@@ -77,6 +81,10 @@ hl.bind(mainMod .. " + up", hl.dsp.focus({
 hl.bind(mainMod .. " + down", hl.dsp.focus({
     direction = "down"
 }))
+
+-- Swap columns
+hl.bind(mainMod .. " + CTRL + left", hl.dsp.layout("swapcol l"))
+hl.bind(mainMod .. " + CTRL + right", hl.dsp.layout("swapcol r"))
 
 ---------------------
 ---  Workspaces   ---
