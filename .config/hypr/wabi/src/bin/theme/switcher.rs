@@ -508,6 +508,15 @@ fn main() {
     };
 
     let vars = build_vars(&palette);
+    let mut colors_vars = vars.clone();
+    let last_wall_path = home_dir().join(".cache").join("last_wallpaper");
+    if last_wall_path.exists() {
+        if let Ok(active_wall) = fs::read_to_string(&last_wall_path) {
+            if let Some(mp) = get_matugen_palette(Path::new(active_wall.trim())) {
+                colors_vars = build_vars(&mp);
+            }
+        }
+    }
     let doty = home_dir().join("doty");
 
     if mode == "wallpaper" {
@@ -653,7 +662,12 @@ fn main() {
     for (tmpl, dest) in mappings {
         let t_path = doty.join(tmpl);
         let d_path = doty.join(dest);
-        if t_path.exists() && render_template(&t_path, &d_path, &vars) {
+        let current_vars = if tmpl.contains("colors.lua.template") {
+            &colors_vars
+        } else {
+            &vars
+        };
+        if t_path.exists() && render_template(&t_path, &d_path, current_vars) {
             println!("Rendered: {}", dest);
         }
     }

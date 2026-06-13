@@ -2,9 +2,11 @@
 plugins = ["scratchpads", "layout_center", "expose"]
 
 [scratchpads.term]
-command = "ghostty --class=ghostty.pypr"
-class = "ghostty.pypr"
-size = "75% 60%"
+command = "kitty --class=kitty.pypr"
+class = "kitty.pypr"
+size = "30% 90%"
+position = "1% 5%"
+animation = "fromLeft"
 lazy = true
 
 [layout_center]

@@ -22,6 +22,8 @@ __pycache__
 .config/quickshell/screentime.db
 .config/quickshell/screentime.db-shm
 .config/quickshell/screentime.db-wal
+.config/quickshell/media_popup/assets.db-wal
+.config/quickshell/media_popup/assets.db-shm
 .config/gtk-3.0/bookmarks
 ref/
 vm_password

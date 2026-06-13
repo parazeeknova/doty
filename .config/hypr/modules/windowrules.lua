@@ -202,15 +202,21 @@ hl.window_rule({
     center = true
 })
 
+local colors = {}
+local colors_status, c = pcall(require, 'modules.colors')
+if colors_status then
+    colors = c
+end
+
 -- Pyprland Scratchpads
 hl.window_rule({
     name = "pypr-term-scratchpad",
     match = {
-        class = "^ghostty\\.pypr$"
+        class = "^kitty\\.pypr$"
     },
     float = true,
     animation = "slide",
-    border_color = "rgb(a9b665)"
+    border_color = colors.border_color or "rgb(a9b665)"
 })
 
 -- Force full opacity for VMware Workstation
