@@ -25,6 +25,11 @@ __pycache__
 .config/quickshell/media_popup/assets.db-wal
 .config/quickshell/media_popup/assets.db-shm
 .config/gtk-3.0/bookmarks
+.config/zen/Profile Groups/
+.config/zen/dbfqf3xb.Default (release)/
+.config/zen/bpw2kdav.Default Profile/
+.config/zen/installs.ini
+.config/zen/profiles.ini
 ref/
 vm_password
 vm_guest_credentials

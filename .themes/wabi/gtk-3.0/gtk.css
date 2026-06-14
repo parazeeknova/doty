@@ -784,16 +784,16 @@ window.dialog button:hover {
 paned.horizontal > separator,
 paned.vertical > separator,
 paned > separator {
-  min-width: 1px !important;
-  min-height: 1px !important;
-  width: 1px !important;
-  height: 1px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background-image: none !important;
-  background-color: @border_color !important;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+  min-width: 1px;
+  min-height: 1px;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  background-image: none;
+  background-color: @border_color;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 

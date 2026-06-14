@@ -508,16 +508,21 @@ fn main() {
     };
 
     let vars = build_vars(&palette);
-    let mut colors_vars = vars.clone();
-    let last_wall_path = home_dir().join(".cache").join("last_wallpaper");
-    if last_wall_path.exists() {
-        if let Ok(active_wall) = fs::read_to_string(&last_wall_path) {
-            if let Some(mp) = get_matugen_palette(Path::new(active_wall.trim())) {
-                colors_vars = build_vars(&mp);
-            }
-        }
-    }
     let doty = home_dir().join("doty");
+
+    // Write colors.json and Colors.qml early so QuickShell picks up new colors
+    // immediately, before slow operations (papirus-folders, make sync, bat cache).
+    let cache_colors_dir = home_dir().join(".cache").join("quickshell");
+    let _ = fs::create_dir_all(&cache_colors_dir);
+    let colors_json_dest = cache_colors_dir.join("colors.json");
+    if let Ok(json_str) = serde_json::to_string(&vars) {
+        let _ = fs::write(colors_json_dest, json_str);
+    }
+    let colors_tmpl = doty.join(".config/quickshell/colors.qml.template");
+    let colors_dest = cache_colors_dir.join("Colors.qml");
+    if colors_tmpl.exists() && render_template(&colors_tmpl, &colors_dest, &vars) {
+        println!("Rendered cache Colors.qml (early)");
+    }
 
     if mode == "wallpaper" {
         let path = Path::new(&value);
@@ -544,7 +549,7 @@ fn main() {
             .arg(&matugen_input)
             .arg("--source-color-index")
             .arg("0")
-            .status();
+            .spawn();
     }
 
     // Define all templates and their destinations
@@ -613,7 +618,7 @@ fn main() {
         ),
         (
             ".config/gtk-4.0/colors.css.template",
-            ".config/gtk-4.0/colors.css",
+            ".themes/wabi/gtk-4.0/colors.css",
         ),
         (
             ".config/qt5ct/style-colors.conf.template",
@@ -662,23 +667,9 @@ fn main() {
     for (tmpl, dest) in mappings {
         let t_path = doty.join(tmpl);
         let d_path = doty.join(dest);
-        let current_vars = if tmpl.contains("colors.lua.template") {
-            &colors_vars
-        } else {
-            &vars
-        };
-        if t_path.exists() && render_template(&t_path, &d_path, current_vars) {
+        if t_path.exists() && render_template(&t_path, &d_path, &vars) {
             println!("Rendered: {}", dest);
         }
-    }
-
-    // Render Colors.qml to cache folder to prevent QuickShell file watcher reload
-    let cache_colors_dir = home_dir().join(".cache").join("quickshell");
-    let _ = fs::create_dir_all(&cache_colors_dir);
-    let colors_tmpl = doty.join(".config/quickshell/colors.qml.template");
-    let colors_dest = cache_colors_dir.join("Colors.qml");
-    if colors_tmpl.exists() && render_template(&colors_tmpl, &colors_dest, &vars) {
-        println!("Rendered cache Colors.qml");
     }
 
     // Patch Kvantum SVG
@@ -851,8 +842,12 @@ fn main() {
         }
     }
 
-    // Sync files
-    let _ = Command::new("make").arg("sync").current_dir(&doty).status();
+    // Sync symlinks only (no cargo rebuild or daemon restart — not needed for color changes)
+    let _ = Command::new("stow")
+        .arg(".")
+        .arg("--ignore=.antigravitycli")
+        .current_dir(&doty)
+        .status();
 
     // Reload services
     let _ = Command::new("gsettings")
@@ -878,7 +873,6 @@ fn main() {
         .unwrap_or(false)
     {
         let _ = Command::new("thunar").arg("-q").status();
-        std::thread::sleep(std::time::Duration::from_millis(200));
         let _ = Command::new("uwsm")
             .arg("app")
             .arg("--")
@@ -891,14 +885,8 @@ fn main() {
     let _ = Command::new("killall").arg("-USR1").arg("kitty").status();
 
 
-    // Rebuild bat's theme cache so the rendered tmTheme is picked up
-    let _ = Command::new("bat").arg("cache").arg("--build").status();
-
-    // Write colors.json to cache folder for dynamic color switching in QuickShell
-    let colors_json_dest = cache_colors_dir.join("colors.json");
-    if let Ok(json_str) = serde_json::to_string(&vars) {
-        let _ = fs::write(colors_json_dest, json_str);
-    }
+    // Rebuild bat's theme cache (non-blocking, picks up on next launch)
+    let _ = Command::new("bat").arg("cache").arg("--build").spawn();
 
     // Generate and write custom vtrgb file to ~/.config/vtrgb
     if let Some(accent_hex) = vars.get("accent_hex")
@@ -1089,10 +1077,14 @@ fn apply_papirus_folders(accent_hex: &str) {
     // If accent is very desaturated, use grey
     if accent_s < 0.15 {
         println!("Setting Papirus folders to: grey (desaturated accent)");
-        let _ = Command::new("papirus-folders")
+        let _ = Command::new("sudo")
+            .arg("papirus-folders")
+            .arg("-t")
+            .arg("Papirus-Dark")
             .arg("-C")
             .arg("grey")
-            .status();
+            .arg("-u")
+            .spawn();
         return;
     }
 
@@ -1124,10 +1116,14 @@ fn apply_papirus_folders(accent_hex: &str) {
     }
 
     println!("Setting Papirus folders to: {}", best_color);
-    let _ = Command::new("papirus-folders")
+    let _ = Command::new("sudo")
+        .arg("papirus-folders")
+        .arg("-t")
+        .arg("Papirus-Dark")
         .arg("-C")
         .arg(best_color)
-        .status();
+        .arg("-u")
+        .spawn();
 }
 
 fn find_zen_profiles() -> Vec<PathBuf> {
@@ -1150,48 +1146,7 @@ fn find_zen_profiles() -> Vec<PathBuf> {
     profiles
 }
 
-fn hue_to_rgb(p: f64, q: f64, mut t: f64) -> f64 {
-    if t < 0.0 {
-        t += 1.0;
-    }
-    if t > 1.0 {
-        t -= 1.0;
-    }
-    if t < 1.0 / 6.0 {
-        return p + (q - p) * 6.0 * t;
-    }
-    if t < 1.0 / 2.0 {
-        return q;
-    }
-    if t < 2.0 / 3.0 {
-        return p + (q - p) * (2.0 / 3.0 - t) * 6.0;
-    }
-    p
-}
 
-fn hsl_to_rgb(h: f64, s: f64, l: f64) -> (u8, u8, u8) {
-    let h = h / 360.0;
-    let (r, g, b) = if s == 0.0 {
-        (l, l, l)
-    } else {
-        let q = if l < 0.5 {
-            l * (1.0 + s)
-        } else {
-            l + s - l * s
-        };
-        let p = 2.0 * l - q;
-        (
-            hue_to_rgb(p, q, h + 1.0 / 3.0),
-            hue_to_rgb(p, q, h),
-            hue_to_rgb(p, q, h - 1.0 / 3.0),
-        )
-    };
-    (
-        (r * 255.0).round() as u8,
-        (g * 255.0).round() as u8,
-        (b * 255.0).round() as u8,
-    )
-}
 
 #[cfg(test)]
 mod tests {

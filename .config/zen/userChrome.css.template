@@ -83,6 +83,8 @@ zen-folder,
  * 1. ROOT VARIABLES (caelestia-aligned Zen token mapping)
  * ============================================================ */
 :root {
+  font-family: "FiraCode Nerd Font", monospace !important;
+
   --zen-primary-color: var(--matugen-bg-light);
   --zen-colors-primary: var(--matugen-accent);
   --zen-colors-secondary: var(--matugen-bg-light);

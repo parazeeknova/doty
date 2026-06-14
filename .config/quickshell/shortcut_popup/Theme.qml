@@ -1,29 +1,26 @@
 import QtQuick
 import Quickshell.Io
-import "file:///home/parazeeknova/.cache/quickshell" as ThemeCache
 
 QtObject {
     id: theme
 
-    property ThemeCache.Colors c: ThemeCache.Colors {}
-
-    property color bg: c.bg
+    property color bg: "#19120c"
     Behavior on bg { ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
-    property color bg_dark: c.bg_dark
+    property color bg_dark: "#261e18"
     Behavior on bg_dark { ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
-    property color bg_light: c.bg_light
+    property color bg_light: "#50453a"
     Behavior on bg_light { ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
-    property color fg: c.fg
+    property color fg: "#eee0d5"
     Behavior on fg { ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
-    property color fg_light: c.fg_light
+    property color fg_light: "#d5c3b5"
     Behavior on fg_light { ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
-    property color accent: c.accent
+    property color accent: "#fcb974"
     Behavior on accent { ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
-    property color secondary: c.secondary
+    property color secondary: "#e1c1a3"
     Behavior on secondary { ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
-    property color tertiary: c.tertiary
+    property color tertiary: "#bfcc9b"
     Behavior on tertiary { ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
-    property color error: c.error
+    property color error: "#ffb4ab"
     Behavior on error { ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
 
     property bool glassEnabled: true
@@ -47,10 +44,11 @@ QtObject {
         onFileChanged: reload()
     }
 
+    property string cacheDir: Quickshell.env("HOME") + "/.cache/quickshell"
     property FileView colorsWatcher
 
     colorsWatcher: FileView {
-        path: "file:///home/parazeeknova/.cache/quickshell/colors.json"
+        path: "file://" + theme.cacheDir + "/colors.json"
         watchChanges: true
         onLoaded: {
             try {

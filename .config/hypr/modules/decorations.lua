@@ -190,7 +190,7 @@ hl.animation({
     enabled = true,
     speed = 7,
     bezier = "menu_decel",
-    style = "slide"
+    style = "fade"
 })
 -- specialWorkspace
 hl.animation({
