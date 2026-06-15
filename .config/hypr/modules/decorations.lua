@@ -108,46 +108,49 @@ hl.curve("stall", {
     type = "bezier",
     points = { { 1, -0.1 }, { 0.7, 0.85 } }
 })
+hl.curve("wobbly", {
+    type = "bezier",
+    points = { { 0.2, 1.1 }, { 0.2, 1.0 } }
+})
 -- Configs
 -- windows
 hl.animation({
     leaf = "windowsIn",
     enabled = true,
-    speed = 3,
-    bezier = "emphasizedDecel",
-    style = "popin 80%"
+    speed = 5,
+    bezier = "wobbly",
+    style = "popin 85%"
 })
 hl.animation({
     leaf = "fadeIn",
     enabled = true,
-    speed = 3,
+    speed = 4,
     bezier = "emphasizedDecel"
 })
 hl.animation({
     leaf = "windowsOut",
     enabled = true,
-    speed = 2,
-    bezier = "emphasizedDecel",
+    speed = 4,
+    bezier = "wobbly",
     style = "popin 90%"
 })
 hl.animation({
     leaf = "fadeOut",
     enabled = true,
-    speed = 2,
+    speed = 3,
     bezier = "emphasizedDecel"
 })
 hl.animation({
     leaf = "fade",
     enabled = true,
-    speed = 3.5,
+    speed = 4,
     bezier = "emphasizedDecel"
 })
 hl.animation({
     leaf = "windowsMove",
     enabled = true,
-    speed = 3,
-    bezier = "emphasizedDecel",
-    style = "slide"
+    speed = 5,
+    bezier = "wobbly",
 })
 hl.animation({
     leaf = "border",
@@ -188,9 +191,9 @@ hl.animation({
 hl.animation({
     leaf = "workspaces",
     enabled = true,
-    speed = 7,
-    bezier = "menu_decel",
-    style = "fade"
+    speed = 5.5,
+    bezier = "expressiveDefaultSpatial",
+    style = "slidefade 20%"
 })
 -- specialWorkspace
 hl.animation({

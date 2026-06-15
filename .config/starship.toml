@@ -234,6 +234,6 @@ style = "yellow"
 ignore_timeout = true
 
 [bun]
-symbol = " "
+symbol = " "
 style = "peach"
 format = '[ $symbol($version) ]($style)'

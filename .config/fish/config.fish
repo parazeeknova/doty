@@ -65,3 +65,5 @@ fish_add_path /home/parazeeknova/.mimocode/bin
 set -gx PATH $PATH /home/parazeeknova/.lmstudio/bin
 # End of LM Studio CLI section
 
+# Added by Antigravity CLI installer
+set -gx PATH "/home/parazeeknova/.local/bin" $PATH
