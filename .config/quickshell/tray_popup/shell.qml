@@ -1,14 +1,28 @@
 //@ pragma UseQApplication
 import QtQuick
 import Quickshell
+import Quickshell.Io
+import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Services.SystemTray
 
 Scope {
     id: root
 
+    property var openWindows: []
+
     Component.onCompleted: {
         SystemTray.isService = false;
+    }
+
+    IpcHandler {
+        target: "tray_popup"
+
+        function close(): void {
+            for (var i = 0; i < root.openWindows.length; i++) {
+                root.openWindows[i].closePopup();
+            }
+        }
     }
 
     Theme {
@@ -32,6 +46,18 @@ Scope {
                 property real menuAnimOpacity: 0
                 property real menuScale: 1.0
                 property bool suppressCloseHandler: false
+                property int selectedIconIndex: 0
+                property int selectedMenuItemIndex: -1
+
+                function nextMenuItemIndex(current, dir) {
+                    var next = current + dir;
+                    while (next >= 0 && next < menuOpener.children.values.length) {
+                        if (!menuOpener.children.values[next].isSeparator)
+                            return next;
+                        next += dir;
+                    }
+                    return current;
+                }
 
                 function openMenu(menu, x) {
                     suppressCloseHandler = true;
@@ -43,6 +69,7 @@ Scope {
                         menuAnimOpacity = 0;
                         menuScale = 0.92;
                         win.isMenuOpen = true;
+                        win.selectedMenuItemIndex = win.nextMenuItemIndex(-1, 1);
                         menuOpenAnim.start();
                     }
                 }
@@ -63,10 +90,31 @@ Scope {
                 screen: modelData
                 color: "transparent"
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
+                WlrLayershell.namespace: "quickshell"
+                WlrLayershell.layer: WlrLayer.Overlay
+                WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
                 focusable: true
-                implicitWidth: win.isMenuOpen ? Math.max(180 + 16, mainLayout.implicitWidth + 16) : Math.max(34, mainLayout.implicitWidth + 16)
-                implicitHeight: (win.isMenuOpen ? menuContent.implicitHeight + 8 : 0) + Math.max(34, mainLayout.implicitHeight + 16)
-                Component.onCompleted: introAnim.start()
+                implicitWidth: 300
+                implicitHeight: 300
+                Component.onCompleted: {
+                    introAnim.start();
+                    root.openWindows.push(win);
+                    keyHandler.forceActiveFocus();
+                }
+
+                onVisibleChanged: {
+                    if (visible)
+                        keyHandler.forceActiveFocus();
+                }
+
+
+                onIsClosingChanged: {
+                    if (isClosing) {
+                        var idx = root.openWindows.indexOf(win);
+                        if (idx !== -1)
+                            root.openWindows.splice(idx, 1);
+                    }
+                }
 
                 anchors {
                     bottom: true
@@ -183,6 +231,71 @@ Scope {
                     }
                 }
 
+
+
+                Item {
+                    id: keyHandler
+
+                    anchors.fill: parent
+                    focus: true
+                    activeFocusOnTab: true
+
+                    Keys.onPressed: (event) => {
+                        if (event.key === Qt.Key_Escape) {
+                            if (win.isMenuOpen) {
+                                win.closeMenu();
+                            } else {
+                                win.closePopup();
+                            }
+                            event.accepted = true;
+                        } else if (win.isMenuOpen) {
+                            if (event.key === Qt.Key_Up) {
+                                win.selectedMenuItemIndex = win.nextMenuItemIndex(win.selectedMenuItemIndex, -1);
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Down) {
+                                win.selectedMenuItemIndex = win.nextMenuItemIndex(win.selectedMenuItemIndex, 1);
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+                                if (win.selectedMenuItemIndex >= 0 && win.selectedMenuItemIndex < menuOpener.children.values.length) {
+                                    var item = menuOpener.children.values[win.selectedMenuItemIndex];
+                                    if (item.enabled && !item.isSeparator) {
+                                        item.triggered();
+                                        win.closePopup();
+                                    }
+                                }
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Left || event.key === Qt.Key_Right) {
+                                win.closeMenu();
+                                if (event.key === Qt.Key_Left)
+                                    win.selectedIconIndex = Math.max(0, win.selectedIconIndex - 1);
+                                else
+                                    win.selectedIconIndex = Math.min(SystemTray.items.values.length - 1, win.selectedIconIndex + 1);
+                                event.accepted = true;
+                            }
+                        } else {
+                            if (event.key === Qt.Key_Left) {
+                                win.selectedIconIndex = Math.max(0, win.selectedIconIndex - 1);
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Right) {
+                                win.selectedIconIndex = Math.min(SystemTray.items.values.length - 1, win.selectedIconIndex + 1);
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+                                var trayItem = SystemTray.items.values[win.selectedIconIndex];
+                                if (trayItem) {
+                                    if (trayItem.hasMenu) {
+                                        var iconX = 8 + win.selectedIconIndex * 26;
+                                        win.openMenu(trayItem.menu, iconX);
+                                    } else {
+                                        trayItem.activate();
+                                        win.closePopup();
+                                    }
+                                }
+                                event.accepted = true;
+                            }
+                        }
+                    }
+                }
+
                 // Dismiss menu if user clicks in empty transparent area of window
                 MouseArea {
                     anchors.fill: parent
@@ -232,7 +345,7 @@ Scope {
                                 anchors.left: parent.left
                                 anchors.right: parent.right
                                 height: modelData.isSeparator ? 5 : 16
-                                color: "transparent" // No hover background highlight
+                                color: (!modelData.isSeparator && index === win.selectedMenuItemIndex) ? "#30d5c4a1" : "transparent"
 
                                 Row {
                                     visible: !modelData.isSeparator
@@ -257,7 +370,7 @@ Scope {
                                         Text {
                                             anchors.centerIn: parent
                                             text: modelData.checkState === Qt.Checked ? "✓" : ""
-                                            color: mouseArea.containsMouse ? theme.accent : theme.fg
+                                            color: (mouseArea.containsMouse || index === win.selectedMenuItemIndex) ? theme.accent : theme.fg
                                             font.bold: true
                                             font.pixelSize: 8
                                             visible: modelData.buttonType === 1 || modelData.buttonType === 2
@@ -267,7 +380,7 @@ Scope {
 
                                     Text {
                                         text: modelData.text.replace(/&/g, "")
-                                        color: modelData.enabled ? (mouseArea.containsMouse ? theme.accent : theme.fg) : theme.secondary // Hover text only color shift
+                                        color: modelData.enabled ? ((mouseArea.containsMouse || index === win.selectedMenuItemIndex) ? theme.accent : theme.fg) : theme.secondary
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         renderType: Text.NativeRendering
@@ -285,7 +398,7 @@ Scope {
                                     onClicked: {
                                         if (modelData.enabled && !modelData.isSeparator) {
                                             modelData.triggered();
-                                            win.closeMenu();
+                                            win.closePopup();
                                         }
                                     }
                                 }
@@ -312,15 +425,6 @@ Scope {
                     border.color: theme.accent
                     radius: 0
                     antialiasing: false
-                    focus: true
-                    Keys.onPressed: (event) => {
-                        if (event.key === Qt.Key_Escape)
-                            win.closePopup();
-
-                    }
-                    Component.onCompleted: {
-                        forceActiveFocus();
-                    }
 
                     Row {
                         id: mainLayout
@@ -336,12 +440,12 @@ Scope {
                         Repeater {
                             model: SystemTray.items
 
-                            delegate: Rectangle {
+                            delegate:                                 Rectangle {
                                 id: trayIconItem
 
                                 width: 18
                                 height: 18
-                                color: "transparent"
+                                color: (index === win.selectedIconIndex || trayIconMouse.containsMouse) ? "#30d5c4a1" : "transparent"
                                 radius: 2
 
                                 Image {
@@ -352,11 +456,10 @@ Scope {
                                 }
 
                                 MouseArea {
+                                    id: trayIconMouse
                                     anchors.fill: parent
                                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                                     hoverEnabled: true
-                                    onEntered: parent.color = "#30d5c4a1"
-                                    onExited: parent.color = "transparent"
                                     onClicked: (mouse) => {
                                         if (mouse.button === Qt.RightButton) {
                                             if (modelData.hasMenu) {
@@ -367,6 +470,7 @@ Scope {
                                                 win.openMenu(modelData.menu, trayIconItem.mapToItem(win.contentItem, 0, 0).x);
                                             } else {
                                                 modelData.activate();
+                                                win.closePopup();
                                             }
                                         }
                                     }

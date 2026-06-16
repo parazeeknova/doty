@@ -209,6 +209,8 @@ hl.bind(mainMod .. " + ALT + C", hl.dsp.exec_cmd(
     "quickshell -c colorscheme_popup ipc call colorscheme_popup close || quickshell --config colorscheme_popup"))
 hl.bind(mainMod .. " + K", hl.dsp
     .exec_cmd("quickshell -c shortcut_popup ipc call shortcut_popup close || quickshell --config shortcut_popup"))
+hl.bind(mainMod .. " + ALT + X", hl.dsp
+    .exec_cmd("quickshell -c tray_popup ipc call tray_popup close || quickshell --config tray_popup"))
 hl.bind("SUPER_L", hl.dsp
     .exec_cmd("quickshell -c workspace_popup ipc call workspace_popup close || quickshell --config workspace_popup"), {
         release = true,

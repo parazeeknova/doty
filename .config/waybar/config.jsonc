@@ -25,7 +25,7 @@
     "return-type": "json",
     "exec": "~/.config/waybar/scripts/tray_count",
     "signal": 5,
-    "on-click": "quickshell --config tray_popup",
+    "on-click": "quickshell -c tray_popup ipc call tray_popup close || quickshell --config tray_popup",
     "tooltip": false
   },
   "network": {
