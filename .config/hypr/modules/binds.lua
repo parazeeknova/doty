@@ -18,7 +18,9 @@ local function focus_or_launch(class, launch_cmd)
             local windows = hl.get_workspace_windows(ws.id)
             for _, win in ipairs(windows) do
                 if win.class == class then
-                    hl.dispatch(hl.dsp.focus({ window = "address:" .. win.address }))
+                    hl.dispatch(hl.dsp.focus({
+                        window = "address:" .. win.address
+                    }))
                     return
                 end
             end
@@ -67,10 +69,34 @@ hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), {
 })
 
 -- Resize with keyboard (Arrow keys)
-hl.bind(mainMod .. " + SHIFT + left", hl.dsp.window.resize({ x = -50, y = 0, relative = true }), { repeating = true })
-hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.resize({ x = 50, y = 0, relative = true }), { repeating = true })
-hl.bind(mainMod .. " + SHIFT + up", hl.dsp.window.resize({ x = 0, y = -50, relative = true }), { repeating = true })
-hl.bind(mainMod .. " + SHIFT + down", hl.dsp.window.resize({ x = 0, y = 50, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + left", hl.dsp.window.resize({
+    x = -50,
+    y = 0,
+    relative = true
+}), {
+    repeating = true
+})
+hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.resize({
+    x = 50,
+    y = 0,
+    relative = true
+}), {
+    repeating = true
+})
+hl.bind(mainMod .. " + SHIFT + up", hl.dsp.window.resize({
+    x = 0,
+    y = -50,
+    relative = true
+}), {
+    repeating = true
+})
+hl.bind(mainMod .. " + SHIFT + down", hl.dsp.window.resize({
+    x = 0,
+    y = 50,
+    relative = true
+}), {
+    repeating = true
+})
 
 ---------------------
 ---    Layout     ---
@@ -113,7 +139,9 @@ end
 
 -- Scroll through windows
 hl.bind(mainMod .. " + mouse_down", hl.dsp.window.cycle_next())
-hl.bind(mainMod .. " + mouse_up", hl.dsp.window.cycle_next({ prev = true }))
+hl.bind(mainMod .. " + mouse_up", hl.dsp.window.cycle_next({
+    prev = true
+}))
 
 hl.bind("ALT + TAB", function()
     if hl.plugin and hl.plugin.scrolloverview then
@@ -123,21 +151,31 @@ end)
 
 hl.bind(mainMod .. " + backslash", function()
     local ws = hl.get_active_workspace()
-    if not ws then return end
+    if not ws then
+        return
+    end
     local current = hl.get_config("scrolling.column_width")
     local target = 0.5
     if current == 0.5 then
         target = 0.6
     end
-    hl.config({ scrolling = { column_width = target } })
+    hl.config({
+        scrolling = {
+            column_width = target
+        }
+    })
     local windows = hl.get_workspace_windows(ws.id)
     local active = hl.get_active_window()
     for _, win in ipairs(windows) do
-        hl.dispatch(hl.dsp.focus({ window = "address:" .. win.address }))
+        hl.dispatch(hl.dsp.focus({
+            window = "address:" .. win.address
+        }))
         hl.dispatch(hl.dsp.layout("colresize " .. tostring(target)))
     end
     if active then
-        hl.dispatch(hl.dsp.focus({ window = "address:" .. active.address }))
+        hl.dispatch(hl.dsp.focus({
+            window = "address:" .. active.address
+        }))
     end
 end)
 
@@ -191,8 +229,8 @@ hl.bind(mainMod .. " + SHIFT + F", hl.dsp
     .exec_cmd("quickshell -c bluetooth_popup ipc call bluetooth_popup close || quickshell --config bluetooth_popup"))
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(
     "quickshell -c brightness_popup ipc call brightness_popup close || quickshell --config brightness_popup"))
-hl.bind(mainMod .. " + SHIFT + N",
-    hl.dsp.exec_cmd("quickshell -c notif_popup ipc call notif_popup close || quickshell --config notif_popup"))
+hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd(
+    "quickshell -c notif_popup ipc call notif_popup close || env QS_KEYBOARD=1 quickshell --config notif_popup"))
 hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd("~/.config/rofi/scripts/toggle_glass"))
 hl.bind(mainMod .. " + O", hl.dsp.window.set_prop({
     prop = "opaque",
@@ -209,13 +247,13 @@ hl.bind(mainMod .. " + ALT + C", hl.dsp.exec_cmd(
     "quickshell -c colorscheme_popup ipc call colorscheme_popup close || quickshell --config colorscheme_popup"))
 hl.bind(mainMod .. " + K", hl.dsp
     .exec_cmd("quickshell -c shortcut_popup ipc call shortcut_popup close || quickshell --config shortcut_popup"))
-hl.bind(mainMod .. " + ALT + X", hl.dsp
-    .exec_cmd("quickshell -c tray_popup ipc call tray_popup close || quickshell --config tray_popup"))
+hl.bind(mainMod .. " + ALT + X",
+    hl.dsp.exec_cmd("quickshell -c tray_popup ipc call tray_popup close || quickshell --config tray_popup"))
 hl.bind("SUPER_L", hl.dsp
     .exec_cmd("quickshell -c workspace_popup ipc call workspace_popup close || quickshell --config workspace_popup"), {
-        release = true,
-        ignore_mods = true
-    })
+    release = true,
+    ignore_mods = true
+})
 
 ---------------------
 ---   Screenshots ---
@@ -228,14 +266,14 @@ local grimhyprctl = "grim -o \"$(hyprctl activeworkspace -j | jq -r '.monitor')\
 local slurp_cmd = "slurp -b \\#1d2021b0 -c \\#d5c4a1ff -s \\#00000000"
 
 local save_register_ss = "mkdir -p " .. ss_dir .. " && FILE=" .. ss_path .. " && " .. grimhyprctl ..
-    " \"$FILE\" && wl-copy < \"$FILE\" && " .. media_helper ..
-    " add-asset screenshot \"$FILE\""
+                             " \"$FILE\" && wl-copy < \"$FILE\" && " .. media_helper ..
+                             " add-asset screenshot \"$FILE\""
 local save_register_ss_region = "mkdir -p " .. ss_dir .. " && FILE=" .. ss_path .. " && grim -g \"$(" .. slurp_cmd ..
-    ")\" \"$FILE\" && wl-copy < \"$FILE\" && " .. media_helper ..
-    " add-asset screenshot \"$FILE\""
+                                    ")\" \"$FILE\" && wl-copy < \"$FILE\" && " .. media_helper ..
+                                    " add-asset screenshot \"$FILE\""
 local save_register_ss_region_swappy = "mkdir -p " .. ss_dir .. " && FILE=" .. ss_path .. " && grim -g \"$(" ..
-    slurp_cmd .. ")\" \"$FILE\" && swappy -f \"$FILE\" -o \"$FILE\" && " ..
-    media_helper .. " add-asset screenshot \"$FILE\""
+                                           slurp_cmd .. ")\" \"$FILE\" && swappy -f \"$FILE\" -o \"$FILE\" && " ..
+                                           media_helper .. " add-asset screenshot \"$FILE\""
 
 hl.bind("Print", hl.dsp.exec_cmd("sh -c '" .. save_register_ss .. "'"), {
     locked = true
@@ -244,10 +282,10 @@ hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("sh -c '" .. save_register_ss
 hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("sh -c '" .. save_register_ss_region .. "'"))
 hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd(
     "sh -c 'if ! command -v tesseract &> /dev/null; then notify-send -t 4000 -a \"OCR\" \"Tesseract not installed\" \"Please run: sudo pacman -S tesseract tesseract-data-eng\"; exit 1; fi; grim -g \"$(" ..
-    slurp_cmd ..
-    ")\" /tmp/ocr_image.png && TEXT=$(tesseract /tmp/ocr_image.png stdout 2>/dev/null) && rm /tmp/ocr_image.png && if [ ! -z \"$TEXT\" ]; then echo -n \"$TEXT\" | wl-copy && " ..
-    media_helper ..
-    " add ocr \"$TEXT\" && notify-send -t 1500 -h string:x-canonical-private-synchronous:ocr-notify -a \"OCR\" \"Extracted text copied to clipboard\"; else notify-send -t 1500 -a \"OCR\" \"No text found\"; fi'"))
+        slurp_cmd ..
+        ")\" /tmp/ocr_image.png && TEXT=$(tesseract /tmp/ocr_image.png stdout 2>/dev/null) && rm /tmp/ocr_image.png && if [ ! -z \"$TEXT\" ]; then echo -n \"$TEXT\" | wl-copy && " ..
+        media_helper ..
+        " add ocr \"$TEXT\" && notify-send -t 1500 -h string:x-canonical-private-synchronous:ocr-notify -a \"OCR\" \"Extracted text copied to clipboard\"; else notify-send -t 1500 -a \"OCR\" \"No text found\"; fi'"))
 
 ---------------------
 ---    System     ---

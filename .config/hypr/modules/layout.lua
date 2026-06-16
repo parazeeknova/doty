@@ -11,8 +11,8 @@ hl.config({
         wrap_swapcol = false
     },
     dwindle = {
-        preserve_split = true,
-    },
+        preserve_split = true
+    }
 })
 
 local colors = {}
@@ -38,7 +38,7 @@ if hl.plugin and hl.plugin.scrolloverview then
             enabled = false,
             range = 6,
             render_power = 2,
-            color = tonumber(colors.shadow_color) or 0xee1a1a1a,
-        },
+            color = tonumber(colors.shadow_color) or 0xee1a1a1a
+        }
     })
 end

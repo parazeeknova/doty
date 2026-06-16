@@ -37,7 +37,9 @@ Scope {
     property int pomoDuration: 1500
     property bool pomoPaused: false
     property int pomoPausedTimeLeft: 0
-    property int pomoTimeLeft: 0
+    property int lastActiveSection: 0
+    property int lastActiveSubIndex: 0
+    property bool isKeyboardTriggered: Quickshell.env("QS_KEYBOARD") === "1"
 
     signal requestClose()
 
@@ -149,6 +151,7 @@ Scope {
         checkScreentimeProc.launchedOffset = root.screentimeOffset;
         checkScreentimeProc.command = [root.homeDir + "/.local/bin/get_screentime_status", String(root.screentimeOffset)];
         checkScreentimeProc.running = true;
+        focusStateFile.reload();
     }
 
     function savePomoState() {
@@ -169,6 +172,17 @@ Scope {
         var m = Math.floor(secs / 60);
         var s = secs % 60;
         return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }
+
+    function saveFocusState(sec, sub) {
+        var state = {
+            "activeSection": sec,
+            "activeSubIndex": sub
+        };
+        var stateStr = JSON.stringify(state);
+        saveFocusProc.command = ["sh", "-c", "mkdir -p " + root.homeDir + "/.cache && echo '" + stateStr + "' > " + root.homeDir + "/.cache/quickshell_notif_focus.json"];
+        saveFocusProc.running = false;
+        saveFocusProc.running = true;
     }
 
     onScreentimeOffsetChanged: {
@@ -261,9 +275,9 @@ Scope {
         stdout: StdioCollector {
             onStreamFinished: {
                 // Ignore stale results from old processes
-                if (checkScreentimeProc.launchedOffset !== root.screentimeOffset) {
-                    return;
-                }
+                if (checkScreentimeProc.launchedOffset !== root.screentimeOffset)
+                    return ;
+
                 try {
                     var data = JSON.parse(this.text);
                     root.screentimeLabel = data.label || "";
@@ -349,6 +363,36 @@ Scope {
         running: false
     }
 
+    Process {
+        id: saveFocusProc
+
+        running: false
+    }
+
+    FileView {
+        id: focusStateFile
+
+        path: "file://" + root.homeDir + "/.cache/quickshell_notif_focus.json"
+        watchChanges: false
+        onLoaded: {
+            try {
+                var raw = focusStateFile.text().trim();
+                if (raw === "")
+                    return ;
+
+                var parsed = JSON.parse(raw);
+                if (parsed.activeSection !== undefined)
+                    root.lastActiveSection = parsed.activeSection;
+
+                if (parsed.activeSubIndex !== undefined)
+                    root.lastActiveSubIndex = parsed.activeSubIndex;
+
+            } catch (e) {
+                console.log("Failed to parse focus state: " + e);
+            }
+        }
+    }
+
     Variants {
         model: Quickshell.screens
 
@@ -360,6 +404,158 @@ Scope {
                 property bool isClosing: false
                 property real animLeftMargin: -260
                 property real animOpacity: 0
+                property int activeSection: root.lastActiveSection
+                property int activeSubIndex: root.lastActiveSubIndex
+                property bool isLoaded: false
+                property bool showFocusHighlight: root.isKeyboardTriggered
+                property string focusHighlightColor: showFocusHighlight ? "#30d5c4a1" : "transparent"
+
+                function navigateSubIndex(dir) {
+                    var maxItems = 0;
+                    if (win.activeSection === 0)
+                        maxItems = 3;
+                    else if (win.activeSection === 1)
+                        maxItems = 2;
+                    else if (win.activeSection === 2)
+                        maxItems = 1 + root.activeNotifs.length;
+                    else if (win.activeSection === 3)
+                        maxItems = 2;
+                    else if (win.activeSection === 4)
+                        maxItems = 12;
+                    else if (win.activeSection === 5)
+                        maxItems = root.pomoActive ? 2 : 6;
+                    if (maxItems > 0)
+                        win.activeSubIndex = (win.activeSubIndex + dir + maxItems) % maxItems;
+                    else
+                        win.activeSubIndex = 0;
+                }
+
+                function triggerActiveElement() {
+                    if (win.activeSection === 0) {
+                        if (win.activeSubIndex === 0) {
+                            root.screentimeOffset -= 1;
+                        } else if (win.activeSubIndex === 1) {
+                            if (root.screentimeOffset !== 0)
+                                root.screentimeOffset += 1;
+
+                        } else if (win.activeSubIndex === 2) {
+                            root.triggerRefresh();
+                        }
+                    } else if (win.activeSection === 1) {
+                        if (win.activeSubIndex === 0)
+                            root.calendarMonthOffset -= 1;
+                        else if (win.activeSubIndex === 1)
+                            root.calendarMonthOffset += 1;
+                    } else if (win.activeSection === 2) {
+                        if (win.activeSubIndex === 0) {
+                            Quickshell.execDetached(["makoctl", "dismiss", "-a"]);
+                            root.activeNotifs = [];
+                            root.triggerRefresh();
+                        } else {
+                            var idx = win.activeSubIndex - 1;
+                            if (idx >= 0 && idx < root.activeNotifs.length) {
+                                var notif = root.activeNotifs[idx];
+                                Quickshell.execDetached(["makoctl", "dismiss", "-n", String(notif.id)]);
+                                root.triggerRefresh();
+                            }
+                        }
+                    } else if (win.activeSection === 3) {
+                        if (win.activeSubIndex === 0) {
+                            root.historyExpanded = !root.historyExpanded;
+                        } else if (win.activeSubIndex === 1) {
+                            Quickshell.execDetached(["makoctl", "restore"]);
+                            root.triggerRefresh();
+                        }
+                    } else if (win.activeSection === 4) {
+                        if (win.activeSubIndex === 0) {
+                            Quickshell.execDetached(["quickshell", "--config", "volume_popup"]);
+                            win.closePopup();
+                        } else if (win.activeSubIndex === 1) {
+                            Quickshell.execDetached(["quickshell", "--config", "network_popup"]);
+                            win.closePopup();
+                        } else if (win.activeSubIndex === 2) {
+                            Quickshell.execDetached(["quickshell", "--config", "bluetooth_popup"]);
+                            win.closePopup();
+                        } else if (win.activeSubIndex === 3) {
+                            Quickshell.execDetached(["quickshell", "--config", "brightness_popup"]);
+                            win.closePopup();
+                        } else if (win.activeSubIndex === 4) {
+                            Quickshell.execDetached(["quickshell", "--config", "battery_popup"]);
+                            win.closePopup();
+                        } else if (win.activeSubIndex === 5) {
+                            Quickshell.execDetached(["quickshell", "--config", "sysmon_popup"]);
+                            win.closePopup();
+                        } else if (win.activeSubIndex === 6) {
+                            Quickshell.execDetached(["quickshell", "--config", "podman_popup"]);
+                            win.closePopup();
+                        } else if (win.activeSubIndex === 7) {
+                            Quickshell.execDetached(["quickshell", "--config", "emoji_popup"]);
+                            win.closePopup();
+                        } else if (win.activeSubIndex === 8) {
+                            Quickshell.execDetached(["quickshell", "--config", "media_popup"]);
+                            win.closePopup();
+                        } else if (win.activeSubIndex === 9) {
+                            Quickshell.execDetached(["quickshell", "--config", "vm_popup"]);
+                            win.closePopup();
+                        } else if (win.activeSubIndex === 10) {
+                            Quickshell.execDetached(["quickshell", "--config", "colorscheme_popup"]);
+                            win.closePopup();
+                        } else if (win.activeSubIndex === 11) {
+                            Quickshell.execDetached(["quickshell", "--config", "wallpaper_switcher"]);
+                            win.closePopup();
+                        }
+                    } else if (win.activeSection === 5) {
+                        if (!root.pomoActive) {
+                            if (win.activeSubIndex === 0) {
+                                var val = parseInt(pomoInput.text);
+                                if (!isNaN(val) && val > 0)
+                                    root.pomoDuration = val * 60;
+
+                                root.pomoActive = true;
+                                root.pomoPaused = false;
+                                root.pomoEndTime = Date.now() + root.pomoDuration * 1000;
+                                root.pomoTimeLeft = root.pomoDuration;
+                                root.savePomoState();
+                            } else if (win.activeSubIndex === 1) {
+                                root.pomoDuration = 5 * 60;
+                            } else if (win.activeSubIndex === 2) {
+                                root.pomoDuration = 10 * 60;
+                            } else if (win.activeSubIndex === 3) {
+                                root.pomoDuration = 25 * 60;
+                            } else if (win.activeSubIndex === 4) {
+                                root.pomoDuration = 50 * 60;
+                            } else if (win.activeSubIndex === 5) {
+                                var val = parseInt(pomoInput.text);
+                                if (!isNaN(val) && val > 0)
+                                    root.pomoDuration = val * 60;
+
+                                root.pomoActive = true;
+                                root.pomoPaused = false;
+                                root.pomoEndTime = Date.now() + root.pomoDuration * 1000;
+                                root.pomoTimeLeft = root.pomoDuration;
+                                root.savePomoState();
+                            }
+                        } else {
+                            if (win.activeSubIndex === 0) {
+                                if (root.pomoPaused) {
+                                    root.pomoPaused = false;
+                                    root.pomoEndTime = Date.now() + root.pomoPausedTimeLeft * 1000;
+                                    root.pomoTimeLeft = root.pomoPausedTimeLeft;
+                                } else {
+                                    root.pomoPaused = true;
+                                    root.pomoPausedTimeLeft = root.pomoTimeLeft;
+                                }
+                                root.savePomoState();
+                            } else if (win.activeSubIndex === 1) {
+                                root.pomoActive = false;
+                                root.pomoPaused = false;
+                                root.pomoTimeLeft = 0;
+                                root.pomoEndTime = 0;
+                                root.savePomoState();
+                            }
+                        }
+                    }
+                }
 
                 function closePopup() {
                     if (isClosing)
@@ -369,9 +565,22 @@ Scope {
                     exitAnim.start();
                 }
 
+                onActiveSectionChanged: {
+                    if (isLoaded)
+                        root.saveFocusState(activeSection, activeSubIndex);
+
+                }
+                onActiveSubIndexChanged: {
+                    if (isLoaded)
+                        root.saveFocusState(activeSection, activeSubIndex);
+
+                }
                 screen: modelData
                 color: "transparent"
-                Component.onCompleted: introAnim.start()
+                Component.onCompleted: {
+                    isLoaded = true;
+                    introAnim.start();
+                }
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
                 focusable: true
                 implicitWidth: 240
@@ -458,6 +667,53 @@ Scope {
                     property string hoveredButtonName: ""
                     property var hoveredButton: null
 
+                    function updateKeyboardTooltip() {
+                        if (win.activeSection === 4 && win.showFocusHighlight) {
+                            tooltipHideTimer.stop();
+                            if (win.activeSubIndex === 0) {
+                                popupBg.hoveredButtonName = "Volume (SUPER+SHIFT+M)";
+                                popupBg.hoveredButton = btnVol.parent;
+                            } else if (win.activeSubIndex === 1) {
+                                popupBg.hoveredButtonName = "Network (SUPER+SHIFT+W)";
+                                popupBg.hoveredButton = btnNet.parent;
+                            } else if (win.activeSubIndex === 2) {
+                                popupBg.hoveredButtonName = "Bluetooth (SUPER+SHIFT+F)";
+                                popupBg.hoveredButton = btnBt.parent;
+                            } else if (win.activeSubIndex === 3) {
+                                popupBg.hoveredButtonName = "Brightness (SUPER+SHIFT+B)";
+                                popupBg.hoveredButton = btnBright.parent;
+                            } else if (win.activeSubIndex === 4) {
+                                popupBg.hoveredButtonName = "Battery";
+                                popupBg.hoveredButton = btnBat.parent;
+                            } else if (win.activeSubIndex === 5) {
+                                popupBg.hoveredButtonName = "System Monitor";
+                                popupBg.hoveredButton = btnSysmon.parent;
+                            } else if (win.activeSubIndex === 6) {
+                                popupBg.hoveredButtonName = "Podman (SUPER+ALT+/)";
+                                popupBg.hoveredButton = btnPodman.parent;
+                            } else if (win.activeSubIndex === 7) {
+                                popupBg.hoveredButtonName = "Emoji (SUPER+,)";
+                                popupBg.hoveredButton = btnEmoji.parent;
+                            } else if (win.activeSubIndex === 8) {
+                                popupBg.hoveredButtonName = "Media (SUPER+G)";
+                                popupBg.hoveredButton = btnOcr.parent;
+                            } else if (win.activeSubIndex === 9) {
+                                popupBg.hoveredButtonName = "Virtual Machine (SUPER+SHIFT+V)";
+                                popupBg.hoveredButton = btnVmm.parent;
+                            } else if (win.activeSubIndex === 10) {
+                                popupBg.hoveredButtonName = "Colorscheme (SUPER+ALT+C)";
+                                popupBg.hoveredButton = btnColorscheme.parent;
+                            } else if (win.activeSubIndex === 11) {
+                                popupBg.hoveredButtonName = "Wallpaper (SUPER+ALT+W)";
+                                popupBg.hoveredButton = btnWallpaper.parent;
+                            }
+                        } else {
+                            if (popupBg.hoveredButtonName !== "" && !tooltipHideTimer.running)
+                                tooltipHideTimer.start();
+
+                        }
+                    }
+
                     anchors.fill: parent
                     opacity: win.animOpacity
                     color: theme.popupBgColor
@@ -467,12 +723,71 @@ Scope {
                     antialiasing: false
                     focus: true
                     Keys.onPressed: (event) => {
-                        if (event.key === Qt.Key_Escape)
+                        if (event.key === Qt.Key_Escape) {
                             win.closePopup();
-
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Tab) {
+                            if ((event.modifiers & Qt.ShiftModifier) || (event.modifiers & Qt.ControlModifier))
+                                win.activeSection = (win.activeSection + 5) % 6;
+                            else
+                                win.activeSection = (win.activeSection + 1) % 6;
+                            win.activeSubIndex = 0;
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Right) {
+                            win.navigateSubIndex(1);
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Left) {
+                            win.navigateSubIndex(-1);
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Down) {
+                            if (win.activeSection === 4) {
+                                win.navigateSubIndex(6);
+                            } else if (win.activeSection === 5 && win.activeSubIndex === 0 && !root.pomoActive) {
+                                var val = parseInt(pomoInput.text);
+                                if (!isNaN(val) && val > 1) {
+                                    pomoInput.text = String(val - 1);
+                                    root.pomoDuration = (val - 1) * 60;
+                                }
+                            } else {
+                                win.navigateSubIndex(1);
+                            }
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Up) {
+                            if (win.activeSection === 4) {
+                                win.navigateSubIndex(-6);
+                            } else if (win.activeSection === 5 && win.activeSubIndex === 0 && !root.pomoActive) {
+                                var val = parseInt(pomoInput.text);
+                                if (!isNaN(val)) {
+                                    pomoInput.text = String(val + 1);
+                                    root.pomoDuration = (val + 1) * 60;
+                                }
+                            } else {
+                                win.navigateSubIndex(-1);
+                            }
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+                            win.triggerActiveElement();
+                            event.accepted = true;
+                        }
                     }
                     Component.onCompleted: {
                         forceActiveFocus();
+                    }
+
+                    Connections {
+                        function onActiveSectionChanged() {
+                            popupBg.updateKeyboardTooltip();
+                        }
+
+                        function onActiveSubIndexChanged() {
+                            popupBg.updateKeyboardTooltip();
+                        }
+
+                        function onShowFocusHighlightChanged() {
+                            popupBg.updateKeyboardTooltip();
+                        }
+
+                        target: win
                     }
 
                     Timer {
@@ -559,6 +874,12 @@ Scope {
                                                 onClicked: root.screentimeOffset -= 1
                                             }
 
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                color: (win.activeSection === 0 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                                radius: 2
+                                            }
+
                                         }
 
                                         Text {
@@ -575,7 +896,7 @@ Scope {
 
                                             text: ">"
                                             color: root.screentimeOffset === 0 ? theme.fg_light : (nextMouse.containsMouse ? theme.fg : theme.accent)
-                                            opacity: root.screentimeOffset === 0 ? 0.4 : 1.0
+                                            opacity: root.screentimeOffset === 0 ? 0.4 : 1
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             font.bold: true
@@ -588,10 +909,16 @@ Scope {
                                                 hoverEnabled: root.screentimeOffset !== 0
                                                 enabled: root.screentimeOffset !== 0
                                                 onClicked: {
-                                                    if (root.screentimeOffset !== 0) {
-                                                        root.screentimeOffset += 1
-                                                    }
+                                                    if (root.screentimeOffset !== 0)
+                                                        root.screentimeOffset += 1;
+
                                                 }
+                                            }
+
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                color: (win.activeSection === 0 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
+                                                radius: 2
                                             }
 
                                         }
@@ -616,6 +943,12 @@ Scope {
                                             anchors.fill: parent
                                             hoverEnabled: true
                                             onClicked: root.triggerRefresh()
+                                        }
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            color: (win.activeSection === 0 && win.activeSubIndex === 2) ? win.focusHighlightColor : "transparent"
+                                            radius: 2
                                         }
 
                                     }
@@ -1129,6 +1462,12 @@ Scope {
                                         onClicked: root.calendarMonthOffset -= 1
                                     }
 
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: (win.activeSection === 1 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                        radius: 2
+                                    }
+
                                 }
 
                                 // Next Month Button (Bottom Right)
@@ -1149,6 +1488,12 @@ Scope {
                                     MouseArea {
                                         anchors.fill: parent
                                         onClicked: root.calendarMonthOffset += 1
+                                    }
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: (win.activeSection === 1 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
+                                        radius: 2
                                     }
 
                                 }
@@ -1285,6 +1630,12 @@ Scope {
                                         }
                                     }
 
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: (win.activeSection === 2 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                        radius: 2
+                                    }
+
                                 }
 
                             }
@@ -1365,20 +1716,6 @@ Scope {
                                                         height: 12
 
                                                         Text {
-                                                            text: modelData.summary
-                                                            color: theme.accent
-                                                            font.family: "FiraCode Nerd Font"
-                                                            font.pixelSize: 8
-                                                            font.bold: true
-                                                            elide: Text.ElideRight
-                                                            anchors.left: parent.left
-                                                            anchors.right: dismissBtn.left
-                                                            anchors.rightMargin: 5
-                                                            anchors.verticalCenter: parent.verticalCenter
-                                                            renderType: Text.NativeRendering
-                                                        }
-
-                                                        Text {
                                                             id: dismissBtn
 
                                                             anchors.right: parent.right
@@ -1401,6 +1738,26 @@ Scope {
                                                                 }
                                                             }
 
+                                                            Rectangle {
+                                                                anchors.fill: parent
+                                                                color: (win.activeSection === 2 && win.activeSubIndex === index + 1) ? win.focusHighlightColor : "transparent"
+                                                                radius: 2
+                                                            }
+
+                                                        }
+
+                                                        Text {
+                                                            text: modelData.summary
+                                                            color: theme.accent
+                                                            font.family: "FiraCode Nerd Font"
+                                                            font.pixelSize: 8
+                                                            font.bold: true
+                                                            elide: Text.ElideRight
+                                                            anchors.left: parent.left
+                                                            anchors.right: dismissBtn.left
+                                                            anchors.rightMargin: 5
+                                                            anchors.verticalCenter: parent.verticalCenter
+                                                            renderType: Text.NativeRendering
                                                         }
 
                                                     }
@@ -1510,6 +1867,12 @@ Scope {
                                         renderType: Text.NativeRendering
                                     }
 
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: (win.activeSection === 3 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                        radius: 2
+                                    }
+
                                 }
 
                                 MouseArea {
@@ -1540,6 +1903,12 @@ Scope {
                                             Quickshell.execDetached(["makoctl", "restore"]);
                                             root.triggerRefresh();
                                         }
+                                    }
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: (win.activeSection === 3 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
+                                        radius: 2
                                     }
 
                                 }
@@ -1713,6 +2082,12 @@ Scope {
                                 width: parent.width / 6
                                 height: 14
 
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 4 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                    radius: 2
+                                }
+
                                 Text {
                                     id: btnVol
 
@@ -1749,6 +2124,12 @@ Scope {
                             Item {
                                 width: parent.width / 6
                                 height: 14
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 4 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
+                                    radius: 2
+                                }
 
                                 Text {
                                     id: btnNet
@@ -1787,6 +2168,12 @@ Scope {
                                 width: parent.width / 6
                                 height: 14
 
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 4 && win.activeSubIndex === 2) ? win.focusHighlightColor : "transparent"
+                                    radius: 2
+                                }
+
                                 Text {
                                     id: btnBt
 
@@ -1823,6 +2210,12 @@ Scope {
                             Item {
                                 width: parent.width / 6
                                 height: 14
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 4 && win.activeSubIndex === 3) ? win.focusHighlightColor : "transparent"
+                                    radius: 2
+                                }
 
                                 Text {
                                     id: btnBright
@@ -1861,6 +2254,12 @@ Scope {
                                 width: parent.width / 6
                                 height: 14
 
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 4 && win.activeSubIndex === 4) ? win.focusHighlightColor : "transparent"
+                                    radius: 2
+                                }
+
                                 Text {
                                     id: btnBat
 
@@ -1897,6 +2296,12 @@ Scope {
                             Item {
                                 width: parent.width / 6
                                 height: 14
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 4 && win.activeSubIndex === 5) ? win.focusHighlightColor : "transparent"
+                                    radius: 2
+                                }
 
                                 Text {
                                     id: btnSysmon
@@ -1940,6 +2345,12 @@ Scope {
                                 width: parent.width / 6
                                 height: 14
 
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 4 && win.activeSubIndex === 6) ? win.focusHighlightColor : "transparent"
+                                    radius: 2
+                                }
+
                                 Text {
                                     id: btnPodman
 
@@ -1976,6 +2387,12 @@ Scope {
                             Item {
                                 width: parent.width / 6
                                 height: 14
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 4 && win.activeSubIndex === 7) ? win.focusHighlightColor : "transparent"
+                                    radius: 2
+                                }
 
                                 Text {
                                     id: btnEmoji
@@ -2014,6 +2431,12 @@ Scope {
                                 width: parent.width / 6
                                 height: 14
 
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 4 && win.activeSubIndex === 8) ? win.focusHighlightColor : "transparent"
+                                    radius: 2
+                                }
+
                                 Text {
                                     id: btnOcr
 
@@ -2050,6 +2473,12 @@ Scope {
                             Item {
                                 width: parent.width / 6
                                 height: 14
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 4 && win.activeSubIndex === 9) ? win.focusHighlightColor : "transparent"
+                                    radius: 2
+                                }
 
                                 Text {
                                     id: btnVmm
@@ -2088,6 +2517,12 @@ Scope {
                                 width: parent.width / 6
                                 height: 14
 
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 4 && win.activeSubIndex === 10) ? win.focusHighlightColor : "transparent"
+                                    radius: 2
+                                }
+
                                 Text {
                                     id: btnColorscheme
 
@@ -2124,6 +2559,12 @@ Scope {
                             Item {
                                 width: parent.width / 6
                                 height: 14
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 4 && win.activeSubIndex === 11) ? win.focusHighlightColor : "transparent"
+                                    radius: 2
+                                }
 
                                 Text {
                                     id: btnWallpaper
@@ -2208,6 +2649,12 @@ Scope {
                                     height: 12
                                     anchors.verticalCenter: parent.verticalCenter
 
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: (win.activeSection === 5 && win.activeSubIndex === 0 && !root.pomoActive) ? win.focusHighlightColor : "transparent"
+                                        radius: 2
+                                    }
+
                                     TextInput {
                                         id: pomoInput
 
@@ -2258,6 +2705,12 @@ Scope {
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             renderType: Text.NativeRendering
+
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                color: (win.activeSection === 5 && win.activeSubIndex === (index + 1) && !root.pomoActive) ? win.focusHighlightColor : "transparent"
+                                                radius: 2
+                                            }
 
                                             MouseArea {
                                                 anchors.fill: parent
@@ -2323,6 +2776,12 @@ Scope {
                                         font.bold: true
                                         renderType: Text.NativeRendering
 
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            color: (win.activeSection === 5 && win.activeSubIndex === 0 && root.pomoActive) || (win.activeSection === 5 && win.activeSubIndex === 5 && !root.pomoActive) ? win.focusHighlightColor : "transparent"
+                                            radius: 2
+                                        }
+
                                         MouseArea {
                                             anchors.fill: parent
                                             onClicked: {
@@ -2357,6 +2816,12 @@ Scope {
                                         font.bold: true
                                         renderType: Text.NativeRendering
                                         visible: root.pomoActive
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            color: (win.activeSection === 5 && win.activeSubIndex === 1 && root.pomoActive) ? win.focusHighlightColor : "transparent"
+                                            radius: 2
+                                        }
 
                                         MouseArea {
                                             anchors.fill: parent
