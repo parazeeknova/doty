@@ -29,6 +29,28 @@ Scope {
                 property bool isMenuOpen: false
                 property var activeMenu: null
                 property real menuX: 0
+                property real menuAnimOpacity: 0
+                property real menuScale: 1.0
+                property bool suppressCloseHandler: false
+
+                function openMenu(menu, x) {
+                    suppressCloseHandler = true;
+                    menuCloseAnim.stop();
+                    suppressCloseHandler = false;
+                    win.activeMenu = menu;
+                    win.menuX = x;
+                    if (!win.isMenuOpen) {
+                        menuAnimOpacity = 0;
+                        menuScale = 0.92;
+                        win.isMenuOpen = true;
+                        menuOpenAnim.start();
+                    }
+                }
+
+                function closeMenu() {
+                    menuOpenAnim.stop();
+                    menuCloseAnim.start();
+                }
 
                 function closePopup() {
                     if (isClosing)
@@ -52,7 +74,7 @@ Scope {
                 }
 
                 margins {
-                    bottom: 162 - (win.isMenuOpen ? menuContent.implicitHeight + 8 : 0)
+                    bottom: 162
                     left: win.animLeftMargin
                 }
 
@@ -106,6 +128,53 @@ Scope {
 
                 }
 
+                ParallelAnimation {
+                    id: menuOpenAnim
+
+                    NumberAnimation {
+                        target: win
+                        property: "menuAnimOpacity"
+                        to: 1
+                        duration: 150
+                        easing.type: Easing.OutCubic
+                    }
+
+                    NumberAnimation {
+                        target: win
+                        property: "menuScale"
+                        to: 1.0
+                        duration: 150
+                        easing.type: Easing.OutCubic
+                    }
+
+                }
+
+                ParallelAnimation {
+                    id: menuCloseAnim
+
+                    onStopped: {
+                        if (!win.suppressCloseHandler)
+                            win.isMenuOpen = false;
+                    }
+
+                    NumberAnimation {
+                        target: win
+                        property: "menuAnimOpacity"
+                        to: 0
+                        duration: 100
+                        easing.type: Easing.InCubic
+                    }
+
+                    NumberAnimation {
+                        target: win
+                        property: "menuScale"
+                        to: 0.92
+                        duration: 100
+                        easing.type: Easing.InCubic
+                    }
+
+                }
+
                 HyprlandFocusGrab {
                     active: !win.isClosing
                     windows: [win]
@@ -119,7 +188,7 @@ Scope {
                     anchors.fill: parent
                     visible: win.isMenuOpen
                     onClicked: {
-                        win.isMenuOpen = false;
+                        win.closeMenu();
                     }
                 }
 
@@ -136,13 +205,15 @@ Scope {
                     visible: win.isMenuOpen
                     width: 180
                     implicitHeight: menuColumn.implicitHeight + 8
-                    color: theme.trayBgColor // Semi-transparent Gruvbox dark background
+                    color: theme.trayBgColor
                     border.width: 1
-                    border.color: theme.accent // Gruvbox retro warm text/border color
+                    border.color: theme.accent
                     radius: 0
-                    opacity: win.animOpacity
-                    anchors.top: trayBar.bottom
-                    anchors.topMargin: 8
+                    opacity: menuAnimOpacity
+                    scale: menuScale
+                    transformOrigin: Item.Bottom
+                    anchors.bottom: trayBar.top
+                    anchors.bottomMargin: 8
                     x: Math.max(8, Math.min(win.width - width - 8, win.menuX - width / 2 + 9))
 
                     Column {
@@ -214,7 +285,7 @@ Scope {
                                     onClicked: {
                                         if (modelData.enabled && !modelData.isSeparator) {
                                             modelData.triggered();
-                                            win.isMenuOpen = false;
+                                            win.closeMenu();
                                         }
                                     }
                                 }
@@ -231,13 +302,13 @@ Scope {
                 Rectangle {
                     id: trayBar
 
-                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     width: Math.max(34, mainLayout.implicitWidth + 16)
                     height: Math.max(34, mainLayout.implicitHeight + 16)
                     opacity: win.animOpacity
-                    color: win.isMenuOpen ? "transparent" : theme.popupBgColor
-                    border.width: win.isMenuOpen ? 0 : 1
+                    color: theme.popupBgColor
+                    border.width: 1
                     border.color: theme.accent
                     radius: 0
                     antialiasing: false
@@ -289,15 +360,11 @@ Scope {
                                     onClicked: (mouse) => {
                                         if (mouse.button === Qt.RightButton) {
                                             if (modelData.hasMenu) {
-                                                win.activeMenu = modelData.menu;
-                                                win.menuX = trayIconItem.mapToItem(win.contentItem, 0, 0).x;
-                                                win.isMenuOpen = true;
+                                                win.openMenu(modelData.menu, trayIconItem.mapToItem(win.contentItem, 0, 0).x);
                                             }
                                         } else {
                                             if (modelData.hasMenu && modelData.onlyMenu) {
-                                                win.activeMenu = modelData.menu;
-                                                win.menuX = trayIconItem.mapToItem(win.contentItem, 0, 0).x;
-                                                win.isMenuOpen = true;
+                                                win.openMenu(modelData.menu, trayIconItem.mapToItem(win.contentItem, 0, 0).x);
                                             } else {
                                                 modelData.activate();
                                             }
