@@ -877,7 +877,7 @@ Scope {
                                             Rectangle {
                                                 anchors.fill: parent
                                                 color: (win.activeSection === 0 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
-                                                radius: 2
+                                                radius: 0
                                             }
 
                                         }
@@ -918,7 +918,7 @@ Scope {
                                             Rectangle {
                                                 anchors.fill: parent
                                                 color: (win.activeSection === 0 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
-                                                radius: 2
+                                                radius: 0
                                             }
 
                                         }
@@ -948,7 +948,7 @@ Scope {
                                         Rectangle {
                                             anchors.fill: parent
                                             color: (win.activeSection === 0 && win.activeSubIndex === 2) ? win.focusHighlightColor : "transparent"
-                                            radius: 2
+                                            radius: 0
                                         }
 
                                     }
@@ -1465,7 +1465,7 @@ Scope {
                                     Rectangle {
                                         anchors.fill: parent
                                         color: (win.activeSection === 1 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
-                                        radius: 2
+                                        radius: 0
                                     }
 
                                 }
@@ -1493,7 +1493,7 @@ Scope {
                                     Rectangle {
                                         anchors.fill: parent
                                         color: (win.activeSection === 1 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
-                                        radius: 2
+                                        radius: 0
                                     }
 
                                 }
@@ -1633,7 +1633,7 @@ Scope {
                                     Rectangle {
                                         anchors.fill: parent
                                         color: (win.activeSection === 2 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
-                                        radius: 2
+                                        radius: 0
                                     }
 
                                 }
@@ -1741,7 +1741,7 @@ Scope {
                                                             Rectangle {
                                                                 anchors.fill: parent
                                                                 color: (win.activeSection === 2 && win.activeSubIndex === index + 1) ? win.focusHighlightColor : "transparent"
-                                                                radius: 2
+                                                                radius: 0
                                                             }
 
                                                         }
@@ -1870,7 +1870,7 @@ Scope {
                                     Rectangle {
                                         anchors.fill: parent
                                         color: (win.activeSection === 3 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
-                                        radius: 2
+                                        radius: 0
                                     }
 
                                 }
@@ -1908,7 +1908,7 @@ Scope {
                                     Rectangle {
                                         anchors.fill: parent
                                         color: (win.activeSection === 3 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
-                                        radius: 2
+                                        radius: 0
                                     }
 
                                 }
@@ -2085,7 +2085,7 @@ Scope {
                                 Rectangle {
                                     anchors.fill: parent
                                     color: (win.activeSection === 4 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
-                                    radius: 2
+                                    radius: 0
                                 }
 
                                 Text {
@@ -2128,7 +2128,7 @@ Scope {
                                 Rectangle {
                                     anchors.fill: parent
                                     color: (win.activeSection === 4 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
-                                    radius: 2
+                                    radius: 0
                                 }
 
                                 Text {
@@ -2171,7 +2171,7 @@ Scope {
                                 Rectangle {
                                     anchors.fill: parent
                                     color: (win.activeSection === 4 && win.activeSubIndex === 2) ? win.focusHighlightColor : "transparent"
-                                    radius: 2
+                                    radius: 0
                                 }
 
                                 Text {
@@ -2214,7 +2214,7 @@ Scope {
                                 Rectangle {
                                     anchors.fill: parent
                                     color: (win.activeSection === 4 && win.activeSubIndex === 3) ? win.focusHighlightColor : "transparent"
-                                    radius: 2
+                                    radius: 0
                                 }
 
                                 Text {
@@ -2257,7 +2257,7 @@ Scope {
                                 Rectangle {
                                     anchors.fill: parent
                                     color: (win.activeSection === 4 && win.activeSubIndex === 4) ? win.focusHighlightColor : "transparent"
-                                    radius: 2
+                                    radius: 0
                                 }
 
                                 Text {
@@ -2300,7 +2300,7 @@ Scope {
                                 Rectangle {
                                     anchors.fill: parent
                                     color: (win.activeSection === 4 && win.activeSubIndex === 5) ? win.focusHighlightColor : "transparent"
-                                    radius: 2
+                                    radius: 0
                                 }
 
                                 Text {
@@ -2348,7 +2348,7 @@ Scope {
                                 Rectangle {
                                     anchors.fill: parent
                                     color: (win.activeSection === 4 && win.activeSubIndex === 6) ? win.focusHighlightColor : "transparent"
-                                    radius: 2
+                                    radius: 0
                                 }
 
                                 Text {
@@ -2391,7 +2391,7 @@ Scope {
                                 Rectangle {
                                     anchors.fill: parent
                                     color: (win.activeSection === 4 && win.activeSubIndex === 7) ? win.focusHighlightColor : "transparent"
-                                    radius: 2
+                                    radius: 0
                                 }
 
                                 Text {
@@ -2434,7 +2434,7 @@ Scope {
                                 Rectangle {
                                     anchors.fill: parent
                                     color: (win.activeSection === 4 && win.activeSubIndex === 8) ? win.focusHighlightColor : "transparent"
-                                    radius: 2
+                                    radius: 0
                                 }
 
                                 Text {
@@ -2477,7 +2477,7 @@ Scope {
                                 Rectangle {
                                     anchors.fill: parent
                                     color: (win.activeSection === 4 && win.activeSubIndex === 9) ? win.focusHighlightColor : "transparent"
-                                    radius: 2
+                                    radius: 0
                                 }
 
                                 Text {
@@ -2520,7 +2520,7 @@ Scope {
                                 Rectangle {
                                     anchors.fill: parent
                                     color: (win.activeSection === 4 && win.activeSubIndex === 10) ? win.focusHighlightColor : "transparent"
-                                    radius: 2
+                                    radius: 0
                                 }
 
                                 Text {
@@ -2563,7 +2563,7 @@ Scope {
                                 Rectangle {
                                     anchors.fill: parent
                                     color: (win.activeSection === 4 && win.activeSubIndex === 11) ? win.focusHighlightColor : "transparent"
-                                    radius: 2
+                                    radius: 0
                                 }
 
                                 Text {
@@ -2652,7 +2652,7 @@ Scope {
                                     Rectangle {
                                         anchors.fill: parent
                                         color: (win.activeSection === 5 && win.activeSubIndex === 0 && !root.pomoActive) ? win.focusHighlightColor : "transparent"
-                                        radius: 2
+                                        radius: 0
                                     }
 
                                     TextInput {
@@ -2709,7 +2709,7 @@ Scope {
                                             Rectangle {
                                                 anchors.fill: parent
                                                 color: (win.activeSection === 5 && win.activeSubIndex === (index + 1) && !root.pomoActive) ? win.focusHighlightColor : "transparent"
-                                                radius: 2
+                                                radius: 0
                                             }
 
                                             MouseArea {
@@ -2779,7 +2779,7 @@ Scope {
                                         Rectangle {
                                             anchors.fill: parent
                                             color: (win.activeSection === 5 && win.activeSubIndex === 0 && root.pomoActive) || (win.activeSection === 5 && win.activeSubIndex === 5 && !root.pomoActive) ? win.focusHighlightColor : "transparent"
-                                            radius: 2
+                                            radius: 0
                                         }
 
                                         MouseArea {
@@ -2820,7 +2820,7 @@ Scope {
                                         Rectangle {
                                             anchors.fill: parent
                                             color: (win.activeSection === 5 && win.activeSubIndex === 1 && root.pomoActive) ? win.focusHighlightColor : "transparent"
-                                            radius: 2
+                                            radius: 0
                                         }
 
                                         MouseArea {
