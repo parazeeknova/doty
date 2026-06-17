@@ -12,10 +12,13 @@ Scope {
     property string homeDir: Quickshell.env("HOME")
     property var apps: []
     property var mostUsed: []
+    property var webHistory: []
     property var filteredApps: []
     property var activeWindows: []
     property int selectedActiveWindowIndex: -1
-    property var displayList: []
+    property var appDisplayList: []
+    property var webSearchDisplayList: []
+    property bool isWebSearchMode: searchQuery.trim().startsWith("!")
     property string searchQuery: ""
     property int selectedIndex: 0
     readonly property string fontName: "FiraCode Nerd Font"
@@ -39,45 +42,197 @@ Scope {
         rebuildDisplayList();
     }
 
+    function parseWebSearch(query) {
+        var q = query.trim();
+        if (!q.startsWith("!"))
+            return null;
+
+        var firstSpace = q.indexOf(" ");
+        var trigger = "";
+        var searchText = "";
+        if (firstSpace === -1) {
+            // No space yet, e.g. "!yt" or "!hello"
+            trigger = q.toLowerCase();
+            searchText = "";
+        } else {
+            trigger = q.substring(0, firstSpace).toLowerCase();
+            searchText = q.substring(firstSpace + 1).trim();
+        }
+        var engineName = "duckduckgo";
+        var searchUrl = "https://duckduckgo.com/?q=";
+        if (trigger === "!yt" || trigger === "!youtube") {
+            engineName = "youtube";
+            searchUrl = "https://www.youtube.com/results?search_query=";
+        } else if (trigger === "!g" || trigger === "!google") {
+            engineName = "google";
+            searchUrl = "https://www.google.com/search?q=";
+        } else if (trigger === "!gh" || trigger === "!github") {
+            engineName = "github";
+            searchUrl = "https://github.com/search?q=";
+        } else if (trigger === "!w" || trigger === "!wiki" || trigger === "!wikipedia") {
+            engineName = "wikipedia";
+            searchUrl = "https://en.wikipedia.org/wiki/Special:Search?search=";
+        } else {
+            // e.g. "!hello" -> query is "hello"
+
+            // Not a registered engine, treat the whole string after "!" as query, or if it has trigger, check
+            engineName = "duckduckgo";
+            searchUrl = "https://duckduckgo.com/?q=";
+            if (firstSpace === -1)
+                searchText = q.substring(1);
+            else
+                searchText = q.substring(1); // e.g. "!hello world" -> query is "hello world"
+        }
+        return {
+            "engine": engineName,
+            "url": searchUrl + encodeURIComponent(searchText),
+            "query": searchText
+        };
+    }
+
+    function getTriggerForEngine(engine) {
+        if (engine === "youtube")
+            return "!yt";
+
+        if (engine === "google")
+            return "!g";
+
+        if (engine === "github")
+            return "!gh";
+
+        if (engine === "wikipedia")
+            return "!w";
+
+        return "!";
+    }
+
+    function getReconstructedQuery(item) {
+        if (!item || item.type !== "web_search")
+            return "";
+
+        if (item.is_history) {
+            var trigger = root.getTriggerForEngine(item.engine);
+            if (trigger === "!")
+                return "!" + item.query;
+            else
+                return trigger + " " + item.query;
+        } else {
+            return root.searchQuery;
+        }
+    }
+
+    function launchWebSearch(query) {
+        if (!query)
+            return ;
+
+        var q = query.trim();
+        if (q === "!" || q === "!yt" || q === "!youtube" || q === "!g" || q === "!google" || q === "!gh" || q === "!github" || q === "!w" || q === "!wiki" || q === "!wikipedia")
+            return ;
+
+        Quickshell.execDetached([root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--web-search", query]);
+        root.requestClose();
+    }
+
+    function getActiveDisplayList() {
+        return root.isWebSearchMode ? root.webSearchDisplayList : root.appDisplayList;
+    }
+
     function rebuildDisplayList() {
         var list = [];
-        if (searchQuery.trim() === "") {
-            if (root.mostUsed.length > 0) {
-                list.push({
-                    "type": "header",
-                    "name": "most used"
-                });
-                for (var i = 0; i < root.mostUsed.length; i++) {
+        var query = root.searchQuery.trim();
+        if (query.startsWith("!")) {
+            if (query === "!") {
+                if (root.webHistory.length > 0) {
+                    for (var i = 0; i < root.webHistory.length; i++) {
+                        var item = root.webHistory[i];
+                        list.push({
+                            "type": "web_search",
+                            "engine": item.engine,
+                            "url": item.url,
+                            "query": item.query,
+                            "is_history": true
+                        });
+                    }
+                } else {
                     list.push({
-                        "type": "app",
-                        "data": root.mostUsed[i]
+                        "type": "web_search",
+                        "engine": "duckduckgo",
+                        "url": "",
+                        "query": "",
+                        "is_history": false
                     });
                 }
-                list.push({
-                    "type": "separator"
-                });
+            } else {
+                var webSearch = root.parseWebSearch(root.searchQuery);
+                if (webSearch) {
+                    list.push({
+                        "type": "web_search",
+                        "engine": webSearch.engine,
+                        "url": webSearch.url,
+                        "query": webSearch.query,
+                        "is_history": false
+                    });
+                } else {
+                    var triggerName = query.toLowerCase();
+                    var engine = "duckduckgo";
+                    if (triggerName === "!yt" || triggerName === "!youtube")
+                        engine = "youtube";
+                    else if (triggerName === "!g" || triggerName === "!google")
+                        engine = "google";
+                    else if (triggerName === "!gh" || triggerName === "!github")
+                        engine = "github";
+                    else if (triggerName === "!w" || triggerName === "!wiki" || triggerName === "!wikipedia")
+                        engine = "wikipedia";
+                    list.push({
+                        "type": "web_search",
+                        "engine": engine,
+                        "url": "",
+                        "query": "",
+                        "is_history": false
+                    });
+                }
             }
-            for (var j = 0; j < filteredApps.length; j++) {
-                list.push({
-                    "type": "app",
-                    "data": filteredApps[j]
-                });
-            }
+            root.webSearchDisplayList = list;
         } else {
-            for (var k = 0; k < filteredApps.length; k++) {
-                list.push({
-                    "type": "app",
-                    "data": filteredApps[k]
-                });
+            if (root.searchQuery.trim() === "") {
+                if (root.mostUsed.length > 0) {
+                    list.push({
+                        "type": "header",
+                        "name": "most used"
+                    });
+                    for (var i = 0; i < root.mostUsed.length; i++) {
+                        list.push({
+                            "type": "app",
+                            "data": root.mostUsed[i]
+                        });
+                    }
+                    list.push({
+                        "type": "separator"
+                    });
+                }
+                for (var j = 0; j < filteredApps.length; j++) {
+                    list.push({
+                        "type": "app",
+                        "data": filteredApps[j]
+                    });
+                }
+            } else {
+                for (var k = 0; k < filteredApps.length; k++) {
+                    list.push({
+                        "type": "app",
+                        "data": filteredApps[k]
+                    });
+                }
             }
+            root.appDisplayList = list;
         }
-        root.displayList = list;
         selectFirstApp();
     }
 
     function selectFirstApp() {
-        for (var i = 0; i < root.displayList.length; i++) {
-            if (root.displayList[i].type === "app") {
+        var list = root.getActiveDisplayList();
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].type === "app" || list[i].type === "web_search") {
                 root.selectedIndex = i;
                 break;
             }
@@ -85,10 +240,11 @@ Scope {
     }
 
     function selectNext() {
+        var list = root.getActiveDisplayList();
         var idx = root.selectedIndex;
-        while (idx < root.displayList.length - 1) {
+        while (idx < list.length - 1) {
             idx++;
-            if (root.displayList[idx].type === "app") {
+            if (list[idx].type === "app" || list[idx].type === "web_search") {
                 root.selectedIndex = idx;
                 break;
             }
@@ -96,10 +252,11 @@ Scope {
     }
 
     function selectPrev() {
+        var list = root.getActiveDisplayList();
         var idx = root.selectedIndex;
         while (idx > 0) {
             idx--;
-            if (root.displayList[idx].type === "app") {
+            if (list[idx].type === "app" || list[idx].type === "web_search") {
                 root.selectedIndex = idx;
                 break;
             }
@@ -259,6 +416,7 @@ Scope {
                     var data = JSON.parse(this.text);
                     root.mostUsed = data.most_used || [];
                     root.apps = data.all_apps || [];
+                    root.webHistory = data.web_history || [];
                     root.filterApps();
                 } catch (e) {
                     console.log("Failed to parse apps: " + e);
@@ -304,8 +462,9 @@ Scope {
 
                 required property var modelData
                 property bool isClosing: false
-                property real animOffsetY: -350
                 property real animOpacity: 0
+                property real animScale: 0.95
+                property real animY: 10
 
                 function closePopup() {
                     if (isClosing)
@@ -323,7 +482,7 @@ Scope {
                 focusable: true
                 color: "transparent"
                 implicitWidth: 240
-                implicitHeight: Math.min(320, 32 + (activeWindowsArea.visible ? activeWindowsArea.height + 4 : 0) + appsList.contentHeight + bottomRow.implicitHeight)
+                implicitHeight: Math.min(320, 32 + (activeWindowsArea.visible ? activeWindowsArea.height + 4 : 0) + Math.max(32, root.isWebSearchMode ? (webSearchList ? webSearchList.contentHeight : 0) : (appsList ? appsList.contentHeight : 0)) + bottomRow.implicitHeight)
                 Component.onCompleted: {
                     introAnim.start();
                     searchInput.forceActiveFocus();
@@ -343,7 +502,7 @@ Scope {
                 }
 
                 margins {
-                    top: win.animOffsetY
+                    top: 4
                     left: 32
                 }
 
@@ -352,20 +511,29 @@ Scope {
 
                     NumberAnimation {
                         target: win
-                        property: "animOffsetY"
-                        from: -350
-                        to: 4
-                        duration: 120
+                        property: "animOpacity"
+                        from: 0
+                        to: 1
+                        duration: 180
                         easing.type: Easing.OutCubic
                     }
 
                     NumberAnimation {
                         target: win
-                        property: "animOpacity"
-                        from: 0
+                        property: "animScale"
+                        from: 0.95
                         to: 1
-                        duration: 120
-                        easing.type: Easing.OutCubic
+                        duration: 220
+                        easing.type: Easing.OutExpo
+                    }
+
+                    NumberAnimation {
+                        target: win
+                        property: "animY"
+                        from: 10
+                        to: 0
+                        duration: 220
+                        easing.type: Easing.OutExpo
                     }
 
                 }
@@ -377,20 +545,29 @@ Scope {
 
                     NumberAnimation {
                         target: win
-                        property: "animOffsetY"
-                        from: 4
-                        to: -350
-                        duration: 120
-                        easing.type: Easing.OutCubic
+                        property: "animOpacity"
+                        from: 1
+                        to: 0
+                        duration: 150
+                        easing.type: Easing.OutQuad
                     }
 
                     NumberAnimation {
                         target: win
-                        property: "animOpacity"
+                        property: "animScale"
                         from: 1
-                        to: 0
-                        duration: 120
-                        easing.type: Easing.OutCubic
+                        to: 0.95
+                        duration: 150
+                        easing.type: Easing.OutQuad
+                    }
+
+                    NumberAnimation {
+                        target: win
+                        property: "animY"
+                        from: 0
+                        to: 10
+                        duration: 150
+                        easing.type: Easing.OutQuad
                     }
 
                 }
@@ -409,6 +586,7 @@ Scope {
 
                     anchors.fill: parent
                     opacity: win.animOpacity
+                    scale: win.animScale
                     color: theme.popupBgColor
                     border.width: 1
                     border.color: theme.accent
@@ -441,18 +619,28 @@ Scope {
                         } else if (event.key === Qt.Key_Up) {
                             root.selectedActiveWindowIndex = -1;
                             root.selectPrev();
-                            appsList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
+                            var activeList = root.isWebSearchMode ? webSearchList : appsList;
+                            activeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Down) {
                             root.selectedActiveWindowIndex = -1;
                             root.selectNext();
-                            appsList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
+                            var activeList = root.isWebSearchMode ? webSearchList : appsList;
+                            activeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                            if (root.selectedActiveWindowIndex >= 0)
+                            if (root.selectedActiveWindowIndex >= 0) {
                                 root.focusWorkspaceAndClose(root.activeWindows[root.selectedActiveWindowIndex].workspace_id);
-                            else if (root.displayList.length > 0 && root.displayList[root.selectedIndex] && root.displayList[root.selectedIndex].type === "app")
-                                root.launchApp(root.displayList[root.selectedIndex].data.name, root.displayList[root.selectedIndex].data.exec);
+                            } else {
+                                var list = root.getActiveDisplayList();
+                                if (list.length > 0 && list[root.selectedIndex]) {
+                                    var selected = list[root.selectedIndex];
+                                    if (selected.type === "app")
+                                        root.launchApp(selected.data.name, selected.data.exec);
+                                    else if (selected.type === "web_search")
+                                        root.launchWebSearch(root.getReconstructedQuery(selected));
+                                }
+                            }
                             event.accepted = true;
                         }
                     }
@@ -501,6 +689,15 @@ Scope {
                                 width: parent.width
                                 height: 1
                                 color: searchInput.activeFocus ? theme.accent : theme.secondary
+
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: 150
+                                        easing.type: Easing.OutQuad
+                                    }
+
+                                }
+
                             }
 
                         }
@@ -605,6 +802,14 @@ Scope {
                                         }
                                     }
 
+                                    Behavior on border.color {
+                                        ColorAnimation {
+                                            duration: 150
+                                            easing.type: Easing.OutQuad
+                                        }
+
+                                    }
+
                                 }
 
                             }
@@ -612,19 +817,14 @@ Scope {
                         }
 
                         // List view
-                        ListView {
-                            id: appsList
+                        // Shared list delegate
+                        Component {
+                            id: listDelegate
 
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            clip: true
-                            model: root.displayList
-                            spacing: 2
-
-                            delegate: Rectangle {
-                                width: appsList.width
-                                height: modelData.type === "app" ? 16 : (modelData.type === "header" ? 14 : 5)
-                                color: (modelData.type === "app" && root.selectedIndex === index) ? theme.bg_dark : "transparent"
+                            Rectangle {
+                                width: listContainer.width
+                                height: modelData.type === "app" ? 16 : (modelData.type === "header" ? 14 : (modelData.type === "separator" ? 5 : 16))
+                                color: ((modelData.type === "app" || modelData.type === "web_search") && root.selectedIndex === index) ? theme.bg_dark : "transparent"
                                 radius: 0
 
                                 // 1. Header Type
@@ -649,7 +849,7 @@ Scope {
                                 // 2. Separator Type
                                 Rectangle {
                                     visible: modelData.type === "separator"
-                                    width: parent.width
+                                    width: listContainer.width
                                     height: 1
                                     color: theme.accent
                                     opacity: 0.25
@@ -659,6 +859,7 @@ Scope {
                                 // 3. App Type
                                 Row {
                                     visible: modelData.type === "app"
+                                    width: listContainer.width - 8
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.leftMargin: 4
@@ -672,7 +873,15 @@ Scope {
                                         elide: Text.ElideRight
                                         width: 110
                                         renderType: Text.NativeRendering
-                                        anchors.verticalCenter: parent.verticalCenter
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
                                     }
 
                                     Text {
@@ -682,22 +891,184 @@ Scope {
                                         font.pointSize: 7
                                         opacity: root.selectedIndex === index ? 0.6 : 0.4
                                         elide: Text.ElideRight
-                                        width: appsList.width - 128
+                                        width: listContainer.width - 136
                                         renderType: Text.NativeRendering
-                                        anchors.verticalCenter: parent.verticalCenter
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                                // 4. Web Search Type
+                                Row {
+                                    visible: modelData.type === "web_search"
+                                    width: listContainer.width - 8
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.leftMargin: 4
+                                    spacing: 6
+
+                                    Text {
+                                        text: "󰖟"
+                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                        font.family: root.fontName
+                                        font.pointSize: 7.5
+                                        renderType: Text.NativeRendering
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                    }
+
+                                    Text {
+                                        text: (modelData.type === "web_search" && modelData.engine) ? (modelData.query ? ("search '" + modelData.query.toLowerCase() + "' on " + modelData.engine.toLowerCase()) : ("type to search on " + modelData.engine.toLowerCase() + "...")) : ""
+                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        elide: Text.ElideRight
+                                        width: listContainer.width - 32
+                                        renderType: Text.NativeRendering
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
                                     }
 
                                 }
 
                                 MouseArea {
                                     anchors.fill: parent
-                                    enabled: modelData.type === "app"
+                                    enabled: modelData.type === "app" || modelData.type === "web_search"
                                     hoverEnabled: true
                                     onEntered: {
                                         root.selectedIndex = index;
                                         root.selectedActiveWindowIndex = -1;
                                     }
-                                    onClicked: root.launchApp(modelData.data.name, modelData.data.exec)
+                                    onClicked: {
+                                        if (modelData.type === "app")
+                                            root.launchApp(modelData.data.name, modelData.data.exec);
+                                        else if (modelData.type === "web_search")
+                                            root.launchWebSearch(root.getReconstructedQuery(modelData));
+                                    }
+                                }
+
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: 120
+                                        easing.type: Easing.OutQuad
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                        // Container for the lists
+                        Item {
+                            id: listContainer
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            clip: true
+
+                            ListView {
+                                id: appsList
+
+                                anchors.fill: parent
+                                model: root.appDisplayList
+                                spacing: 2
+                                clip: true
+                                delegate: listDelegate
+                                opacity: root.isWebSearchMode ? 0 : 1
+                                visible: opacity > 0
+
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: 180
+                                        easing.type: Easing.OutCubic
+                                    }
+
+                                }
+
+                                transform: Translate {
+                                    y: root.isWebSearchMode ? -10 : 0
+
+                                    Behavior on y {
+                                        NumberAnimation {
+                                            duration: 180
+                                            easing.type: Easing.OutCubic
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                            ListView {
+                                id: webSearchList
+
+                                anchors.fill: parent
+                                model: root.webSearchDisplayList
+                                spacing: 2
+                                clip: true
+                                delegate: listDelegate
+                                opacity: root.isWebSearchMode ? 1 : 0
+                                visible: opacity > 0
+
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: 180
+                                        easing.type: Easing.OutCubic
+                                    }
+
+                                }
+
+                                transform: Translate {
+                                    y: root.isWebSearchMode ? 0 : 10
+
+                                    Behavior on y {
+                                        NumberAnimation {
+                                            duration: 180
+                                            easing.type: Easing.OutCubic
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                            Behavior on implicitHeight {
+                                NumberAnimation {
+                                    duration: 180
+                                    easing.type: Easing.OutCubic
                                 }
 
                             }
@@ -724,6 +1095,18 @@ Scope {
 
                         }
 
+                    }
+
+                    transform: Translate {
+                        y: win.animY
+                    }
+
+                }
+
+                Behavior on implicitHeight {
+                    NumberAnimation {
+                        duration: 180
+                        easing.type: Easing.OutCubic
                     }
 
                 }

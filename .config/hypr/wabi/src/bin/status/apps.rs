@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
+use std::process::Command;
 
 #[derive(Serialize, Deserialize, Clone)]
 struct AppInfo {
@@ -10,6 +11,92 @@ struct AppInfo {
     icon: String,
     #[serde(default)]
     count: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct WebHistoryItem {
+    query: String,
+    engine: String,
+    url: String,
+}
+
+fn url_encode(input: &str) -> String {
+    let mut encoded = String::new();
+    for byte in input.bytes() {
+        match byte {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                encoded.push(byte as char);
+            }
+            b' ' => {
+                encoded.push('+');
+            }
+            _ => {
+                encoded.push_str(&format!("%{:02X}", byte));
+            }
+        }
+    }
+    encoded
+}
+
+fn parse_web_search(query: &str) -> Option<WebHistoryItem> {
+    let q = query.trim();
+    if !q.starts_with('!') {
+        return None;
+    }
+
+    let first_space = q.find(' ');
+    let (trigger, search_text) = match first_space {
+        None => (q.to_lowercase(), ""),
+        Some(idx) => (q[..idx].to_lowercase(), q[idx + 1..].trim()),
+    };
+
+    let (engine_name, search_url, query_text) = if trigger == "!yt" || trigger == "!youtube" {
+        (
+            "youtube".to_string(),
+            "https://www.youtube.com/results?search_query=".to_string(),
+            search_text.to_string(),
+        )
+    } else if trigger == "!g" || trigger == "!google" {
+        (
+            "google".to_string(),
+            "https://www.google.com/search?q=".to_string(),
+            search_text.to_string(),
+        )
+    } else if trigger == "!gh" || trigger == "!github" {
+        (
+            "github".to_string(),
+            "https://github.com/search?q=".to_string(),
+            search_text.to_string(),
+        )
+    } else if trigger == "!w" || trigger == "!wiki" || trigger == "!wikipedia" {
+        (
+            "wikipedia".to_string(),
+            "https://en.wikipedia.org/wiki/Special:Search?search=".to_string(),
+            search_text.to_string(),
+        )
+    } else {
+        let q_text = if first_space.is_none() {
+            q[1..].to_string()
+        } else {
+            q[1..].to_string()
+        };
+        (
+            "duckduckgo".to_string(),
+            "https://duckduckgo.com/?q=".to_string(),
+            q_text,
+        )
+    };
+
+    if query_text.is_empty() {
+        return None;
+    }
+
+    let encoded_query = url_encode(&query_text);
+    Some(WebHistoryItem {
+        query: query_text,
+        engine: engine_name,
+        url: format!("{}{}", search_url, encoded_query),
+    })
 }
 
 fn parse_desktop_file(path: &Path) -> Option<AppInfo> {
@@ -42,7 +129,6 @@ fn parse_desktop_file(path: &Path) -> Option<AppInfo> {
                 }
                 "Exec" => {
                     if exec.is_none() {
-                        // Clean exec string from arguments like %u, %F, %U
                         let cleaned = val
                             .split_whitespace()
                             .filter(|arg| !arg.starts_with('%'))
@@ -111,9 +197,48 @@ fn main() {
         return;
     }
 
+    // Handle --web-search <query>
+    if args.len() > 2 && args[1] == "--web-search" {
+        let query = &args[2];
+        if let Some(item) = parse_web_search(query) {
+            let history_path = cache_dir.join("web_search_history.json");
+            let mut history: Vec<WebHistoryItem> = Vec::new();
+            if history_path.exists() {
+                if let Ok(content) = fs::read_to_string(&history_path) {
+                    if let Ok(list) = serde_json::from_str::<Vec<WebHistoryItem>>(&content) {
+                        history = list;
+                    }
+                }
+            }
+
+            // De-duplicate
+            history.retain(|x| {
+                !(x.query.to_lowercase() == item.query.to_lowercase() && x.engine == item.engine)
+            });
+            // Insert at front
+            history.insert(0, item.clone());
+            // Limit to 20
+            history.truncate(20);
+
+            // Save history
+            let _ = fs::create_dir_all(&cache_dir);
+            if let Ok(serialized) = serde_json::to_string(&history) {
+                let _ = fs::write(&history_path, serialized);
+            }
+
+            // Open in browser
+            let _ = Command::new("xdg-open").arg(&item.url).status();
+
+            // Switch to workspace 1
+            let _ = Command::new("hyprctl")
+                .args(["dispatch", "hl.dsp.focus({workspace=1})"])
+                .status();
+        }
+        return;
+    }
+
     let mut apps: HashMap<String, AppInfo> = HashMap::new();
 
-    let home = std::env::var("HOME").unwrap_or_default();
     let paths = [
         "/usr/share/applications".to_string(),
         format!("{}/.local/share/applications", home),
@@ -161,10 +286,22 @@ fn main() {
     });
     most_used.truncate(5);
 
+    // Load web history
+    let history_path = cache_dir.join("web_search_history.json");
+    let mut web_history: Vec<WebHistoryItem> = Vec::new();
+    if history_path.exists() {
+        if let Ok(content) = fs::read_to_string(&history_path) {
+            if let Ok(list) = serde_json::from_str::<Vec<WebHistoryItem>>(&content) {
+                web_history = list;
+            }
+        }
+    }
+
     #[derive(Serialize)]
     struct Response {
         most_used: Vec<AppInfo>,
         all_apps: Vec<AppInfo>,
+        web_history: Vec<WebHistoryItem>,
     }
 
     let _ = serde_json::to_writer(
@@ -172,6 +309,7 @@ fn main() {
         &Response {
             most_used,
             all_apps,
+            web_history,
         },
     );
 }
