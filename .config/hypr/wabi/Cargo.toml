@@ -133,5 +133,9 @@ path = "src/bin/status/apps.rs"
 name = "get_recents_list"
 path = "src/bin/status/recents.rs"
 
+[[bin]]
+name = "get_github_repos"
+path = "src/bin/status/github_repos.rs"
+
 
 

@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
+use std::io::Write;
 use std::path::Path;
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 #[derive(Serialize, Deserialize, Clone)]
 struct AppInfo {
@@ -18,6 +19,19 @@ struct WebHistoryItem {
     query: String,
     engine: String,
     url: String,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct FileHistoryItem {
+    path: String,
+    name: String,
+    timestamp: u64,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct FileIndexEntry {
+    path: String,
+    name: String,
 }
 
 fn url_encode(input: &str) -> String {
@@ -184,6 +198,175 @@ fn main() {
         }
     }
 
+    // Handle --clear-history
+    if args.len() > 1 && args[1] == "--clear-history" {
+        let history_path = cache_dir.join("web_search_history.json");
+        let _ = fs::write(&history_path, "[]");
+        return;
+    }
+
+    // Handle --clear-file-history
+    if args.len() > 1 && args[1] == "--clear-file-history" {
+        let history_path = cache_dir.join("file_history.json");
+        let _ = fs::write(&history_path, "[]");
+        return;
+    }
+
+    // Handle --index-files
+    if args.len() > 1 && args[1] == "--index-files" {
+        let index_path = cache_dir.join("file_index.json");
+        let _ = fs::create_dir_all(&cache_dir);
+
+        let output = Command::new("fd")
+            .args([
+                "--type",
+                "f",
+                "--hidden",
+                "--exclude",
+                ".git",
+                "--exclude",
+                "node_modules",
+                "--exclude",
+                ".cache",
+                "--exclude",
+                "target",
+                "--max-depth",
+                "8",
+            ])
+            .current_dir(&home)
+            .output();
+
+        if let Ok(out) = output {
+            let mut entries: Vec<FileIndexEntry> = Vec::new();
+            for line in String::from_utf8_lossy(&out.stdout).lines() {
+                let display_path = format!("~/{}", line);
+                let name = Path::new(line)
+                    .file_name()
+                    .and_then(|f| f.to_str())
+                    .unwrap_or(line)
+                    .to_string();
+                entries.push(FileIndexEntry {
+                    path: display_path,
+                    name,
+                });
+            }
+            if let Ok(serialized) = serde_json::to_string(&entries) {
+                let _ = fs::write(&index_path, serialized);
+            }
+            println!("{}", serde_json::json!({"indexed": entries.len()}));
+        }
+        return;
+    }
+
+    // Handle --search-files <query>
+    if args.len() > 2 && args[1] == "--search-files" {
+        let query = &args[2];
+        let index_path = cache_dir.join("file_index.json");
+
+        if !index_path.exists() {
+            println!("[]");
+            return;
+        }
+
+        if let Ok(content) = fs::read_to_string(&index_path) {
+            if let Ok(entries) = serde_json::from_str::<Vec<FileIndexEntry>>(&content) {
+                let mut fzf = Command::new("fzf")
+                    .args(["-f", query])
+                    .stdin(Stdio::piped())
+                    .stdout(Stdio::piped())
+                    .spawn()
+                    .ok();
+
+                if let Some(ref mut child) = fzf {
+                    if let Some(ref mut stdin) = child.stdin {
+                        for entry in &entries {
+                            let _ = writeln!(stdin, "{}", entry.path);
+                        }
+                    }
+                }
+
+                if let Some(child) = fzf {
+                    if let Ok(output) = child.wait_with_output() {
+                        let results: Vec<FileIndexEntry> = String::from_utf8_lossy(&output.stdout)
+                            .lines()
+                            .filter_map(|line| entries.iter().find(|e| e.path == line).cloned())
+                            .take(50)
+                            .collect();
+                        let _ = serde_json::to_writer(std::io::stdout(), &results);
+                        return;
+                    }
+                }
+            }
+        }
+        println!("[]");
+        return;
+    }
+
+    // Handle --open-file <path>
+    if args.len() > 2 && args[1] == "--open-file" {
+        let file_path = &args[2];
+        let history_path = cache_dir.join("file_history.json");
+        let mut history: Vec<FileHistoryItem> = Vec::new();
+        if history_path.exists() {
+            if let Ok(content) = fs::read_to_string(&history_path) {
+                if let Ok(list) = serde_json::from_str::<Vec<FileHistoryItem>>(&content) {
+                    history = list;
+                }
+            }
+        }
+
+        let name = Path::new(file_path)
+            .file_name()
+            .and_then(|f| f.to_str())
+            .unwrap_or(file_path)
+            .to_string();
+
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
+
+        // De-duplicate
+        history.retain(|x| x.path.as_str() != file_path.as_str());
+        history.insert(
+            0,
+            FileHistoryItem {
+                path: file_path.to_string(),
+                name,
+                timestamp,
+            },
+        );
+        history.truncate(30);
+
+        let _ = fs::create_dir_all(&cache_dir);
+        if let Ok(serialized) = serde_json::to_string(&history) {
+            let _ = fs::write(&history_path, serialized);
+        }
+
+        let open_path = if file_path.starts_with("~/") {
+            format!("{}/{}", home, &file_path[2..])
+        } else {
+            file_path.to_string()
+        };
+        let _ = Command::new("thunar").arg(&open_path).status();
+        return;
+    }
+
+    // Handle --file-history
+    if args.len() > 1 && args[1] == "--file-history" {
+        let history_path = cache_dir.join("file_history.json");
+        let mut history: Vec<FileHistoryItem> = Vec::new();
+        if history_path.exists() {
+            if let Ok(content) = fs::read_to_string(&history_path) {
+                if let Ok(list) = serde_json::from_str::<Vec<FileHistoryItem>>(&content) {
+                    history = list;
+                }
+            }
+        }
+        let _ = serde_json::to_writer(std::io::stdout(), &history);
+        return;
+    }
+
     // Handle --launch <app_name>
     if args.len() > 2 && args[1] == "--launch" {
         let app_name = &args[2];
@@ -297,11 +480,23 @@ fn main() {
         }
     }
 
+    // Load file history
+    let file_history_path = cache_dir.join("file_history.json");
+    let mut file_history: Vec<FileHistoryItem> = Vec::new();
+    if file_history_path.exists() {
+        if let Ok(content) = fs::read_to_string(&file_history_path) {
+            if let Ok(list) = serde_json::from_str::<Vec<FileHistoryItem>>(&content) {
+                file_history = list;
+            }
+        }
+    }
+
     #[derive(Serialize)]
     struct Response {
         most_used: Vec<AppInfo>,
         all_apps: Vec<AppInfo>,
         web_history: Vec<WebHistoryItem>,
+        file_history: Vec<FileHistoryItem>,
     }
 
     let _ = serde_json::to_writer(
@@ -310,6 +505,7 @@ fn main() {
             most_used,
             all_apps,
             web_history,
+            file_history,
         },
     );
 }

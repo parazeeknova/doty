@@ -38,6 +38,7 @@ install: build
 	cp target/release/get_sunset_status ../../quickshell/sunset_popup/get_sunset_status
 	cp target/release/get_apps_list ../../quickshell/apps_popup/get_apps_list
 	cp target/release/get_recents_list ../../quickshell/recents_popup/get_recents_list
+	cp target/release/get_github_repos ../../quickshell/apps_popup/get_github_repos
 	cp target/release/waybar_toggle ../../waybar/scripts/waybar_toggle
 	cp target/release/toggle_widgets ../../waybar/scripts/toggle_widgets
 	cp target/release/tray_count ../../waybar/scripts/tray_count

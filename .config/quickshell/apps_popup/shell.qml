@@ -13,14 +13,22 @@ Scope {
     property var apps: []
     property var mostUsed: []
     property var webHistory: []
+    property var fileHistory: []
     property var filteredApps: []
     property var activeWindows: []
     property int selectedActiveWindowIndex: -1
     property var appDisplayList: []
     property var webSearchDisplayList: []
-    property bool isWebSearchMode: searchQuery.trim().startsWith("!")
+    property var fileSearchDisplayList: []
+    property var gitRepos: []
+    property var gitRepoSearchResults: []
+    property bool isWebSearchMode: root.activeTab === 1 || searchQuery.trim().startsWith("!")
+    property bool isFileSearchMode: root.activeTab === 2 || searchQuery.trim().startsWith("@")
+    property bool isGitRepoMode: root.activeTab === 3 || searchQuery.trim().startsWith("#")
     property string searchQuery: ""
     property int selectedIndex: 0
+    property int activeTab: 0
+    property string fileSearchQuery: ""
     readonly property string fontName: "FiraCode Nerd Font"
 
     signal requestClose()
@@ -43,6 +51,8 @@ Scope {
     }
 
     function parseWebSearch(query) {
+        // e.g. "!hello" -> query is "hello"
+
         var q = query.trim();
         if (!q.startsWith("!"))
             return null;
@@ -73,8 +83,6 @@ Scope {
             engineName = "wikipedia";
             searchUrl = "https://en.wikipedia.org/wiki/Special:Search?search=";
         } else {
-            // e.g. "!hello" -> query is "hello"
-
             // Not a registered engine, treat the whole string after "!" as query, or if it has trigger, check
             engineName = "duckduckgo";
             searchUrl = "https://duckduckgo.com/?q=";
@@ -129,19 +137,44 @@ Scope {
         if (q === "!" || q === "!yt" || q === "!youtube" || q === "!g" || q === "!google" || q === "!gh" || q === "!github" || q === "!w" || q === "!wiki" || q === "!wikipedia")
             return ;
 
-        Quickshell.execDetached([root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--web-search", query]);
+        var searchQuery = q.startsWith("!") ? q : "!" + q;
+        Quickshell.execDetached([root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--web-search", searchQuery]);
+        root.requestClose();
+    }
+
+    function launchFile(path) {
+        if (!path)
+            return ;
+
+        Quickshell.execDetached([root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--open-file", path]);
+        root.requestClose();
+    }
+
+    function launchGitRepo(url) {
+        if (!url)
+            return ;
+
+        Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({workspace=1})"]);
+        Quickshell.execDetached(["xdg-open", url]);
         root.requestClose();
     }
 
     function getActiveDisplayList() {
-        return root.isWebSearchMode ? root.webSearchDisplayList : root.appDisplayList;
+        if (root.isGitRepoMode)
+            return root.gitRepoSearchResults;
+        else if (root.isFileSearchMode)
+            return root.fileSearchDisplayList;
+        else if (root.isWebSearchMode)
+            return root.webSearchDisplayList;
+        else
+            return root.appDisplayList;
     }
 
     function rebuildDisplayList() {
         var list = [];
         var query = root.searchQuery.trim();
-        if (query.startsWith("!")) {
-            if (query === "!") {
+        if (root.activeTab === 1 || query.startsWith("!")) {
+            if (query === "" || query === "!") {
                 if (root.webHistory.length > 0) {
                     for (var i = 0; i < root.webHistory.length; i++) {
                         var item = root.webHistory[i];
@@ -163,7 +196,15 @@ Scope {
                     });
                 }
             } else {
-                var webSearch = root.parseWebSearch(root.searchQuery);
+                var webSearch = null;
+                if (query.startsWith("!"))
+                    webSearch = root.parseWebSearch(root.searchQuery);
+                else if (root.activeTab === 1 && query !== "")
+                    webSearch = {
+                        "engine": "duckduckgo",
+                        "url": "https://duckduckgo.com/?q=" + encodeURIComponent(query),
+                        "query": query
+                    };
                 if (webSearch) {
                     list.push({
                         "type": "web_search",
@@ -193,6 +234,56 @@ Scope {
                 }
             }
             root.webSearchDisplayList = list;
+        } else if (root.activeTab === 2 || query.startsWith("@")) {
+            var fileQuery = query.startsWith("@") ? query.substring(1).trim() : query;
+            if (fileQuery === "") {
+                if (root.fileHistory.length > 0) {
+                    list.push({
+                        "type": "header",
+                        "name": "recent files"
+                    });
+                    for (var i = 0; i < root.fileHistory.length; i++) {
+                        var item = root.fileHistory[i];
+                        list.push({
+                            "type": "file",
+                            "data": item
+                        });
+                    }
+                } else {
+                    list.push({
+                        "type": "header",
+                        "name": "type to search files..."
+                    });
+                }
+                root.fileSearchDisplayList = list;
+            } else {
+                fileSearchDebounce.restart();
+            }
+        } else if (query.startsWith("#")) {
+            var gitQuery = query.substring(1).trim();
+            if (gitQuery === "") {
+                if (root.gitRepos.length > 0) {
+                    list.push({
+                        "type": "header",
+                        "name": "your repos"
+                    });
+                    for (var i = 0; i < root.gitRepos.length; i++) {
+                        var repo = root.gitRepos[i];
+                        list.push({
+                            "type": "git_repo",
+                            "data": repo
+                        });
+                    }
+                } else {
+                    list.push({
+                        "type": "header",
+                        "name": "type to search repos..."
+                    });
+                }
+                root.gitRepoSearchResults = list;
+            } else {
+                gitRepoSearchDebounce.restart();
+            }
         } else {
             if (root.searchQuery.trim() === "") {
                 if (root.mostUsed.length > 0) {
@@ -232,7 +323,7 @@ Scope {
     function selectFirstApp() {
         var list = root.getActiveDisplayList();
         for (var i = 0; i < list.length; i++) {
-            if (list[i].type === "app" || list[i].type === "web_search") {
+            if (list[i].type === "app" || list[i].type === "web_search" || list[i].type === "file" || list[i].type === "git_repo") {
                 root.selectedIndex = i;
                 break;
             }
@@ -244,7 +335,7 @@ Scope {
         var idx = root.selectedIndex;
         while (idx < list.length - 1) {
             idx++;
-            if (list[idx].type === "app" || list[idx].type === "web_search") {
+            if (list[idx].type === "app" || list[idx].type === "web_search" || list[idx].type === "file" || list[idx].type === "git_repo") {
                 root.selectedIndex = idx;
                 break;
             }
@@ -256,7 +347,7 @@ Scope {
         var idx = root.selectedIndex;
         while (idx > 0) {
             idx--;
-            if (list[idx].type === "app" || list[idx].type === "web_search") {
+            if (list[idx].type === "app" || list[idx].type === "web_search" || list[idx].type === "file" || list[idx].type === "git_repo") {
                 root.selectedIndex = idx;
                 break;
             }
@@ -390,6 +481,7 @@ Scope {
     Component.onCompleted: {
         getAppsProc.running = true;
         getRecentsProc.running = true;
+        gitRepoListProc.running = true;
     }
 
     Theme {
@@ -417,9 +509,62 @@ Scope {
                     root.mostUsed = data.most_used || [];
                     root.apps = data.all_apps || [];
                     root.webHistory = data.web_history || [];
+                    root.fileHistory = data.file_history || [];
                     root.filterApps();
                 } catch (e) {
                     console.log("Failed to parse apps: " + e);
+                }
+            }
+        }
+
+    }
+
+    Process {
+        id: clearHistoryProc
+
+        command: [root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--clear-history"]
+        running: false
+        onRunningChanged: {
+            if (!running)
+                root.webHistory = [];
+
+        }
+    }
+
+    Process {
+        id: clearFileHistoryProc
+
+        command: [root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--clear-file-history"]
+        running: false
+        onRunningChanged: {
+            if (!running) {
+                root.fileHistory = [];
+                rebuildDisplayList();
+            }
+        }
+    }
+
+    Process {
+        id: fileSearchProc
+
+        command: [root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--search-files", ""]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    var results = JSON.parse(this.text);
+                    var list = [];
+                    for (var i = 0; i < results.length; i++) {
+                        list.push({
+                            "type": "file",
+                            "data": results[i]
+                        });
+                    }
+                    root.fileSearchDisplayList = list;
+                    root.selectedIndex = 0;
+                } catch (e) {
+                    console.log("Failed to parse file search: " + e);
                 }
             }
         }
@@ -453,6 +598,102 @@ Scope {
         onTriggered: root.filterApps()
     }
 
+    Timer {
+        id: fileSearchDebounce
+
+        interval: 200
+        repeat: false
+        onTriggered: {
+            var query = root.searchQuery.trim();
+            var fileQuery = query.startsWith("@") ? query.substring(1).trim() : query;
+            if (fileQuery !== "") {
+                fileSearchProc.command = [root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--search-files", fileQuery];
+                fileSearchProc.running = true;
+            }
+        }
+    }
+
+    Timer {
+        id: gitRepoSearchDebounce
+
+        interval: 400
+        repeat: false
+        onTriggered: {
+            var query = root.searchQuery.trim();
+            var gitQuery = query.startsWith("#") ? query.substring(1).trim() : query;
+            if (gitQuery !== "") {
+                gitRepoSearchProc.running = false;
+                gitRepoSearchProc.command = [root.homeDir + "/.config/quickshell/apps_popup/get_github_repos", "--search-repos", gitQuery];
+                gitRepoSearchProc.running = true;
+            } else {
+                root.gitRepoSearchResults = [];
+            }
+        }
+    }
+
+    Process {
+        id: gitRepoListProc
+
+        command: [root.homeDir + "/.config/quickshell/apps_popup/get_github_repos", "--list-repos"]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    root.gitRepos = JSON.parse(this.text) || [];
+                } catch (e) {
+                    console.log("Failed to parse git repos: " + e);
+                }
+            }
+        }
+
+    }
+
+    Process {
+        id: gitRepoRefreshProc
+
+        command: [root.homeDir + "/.config/quickshell/apps_popup/get_github_repos", "--refresh-repos"]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    root.gitRepos = JSON.parse(this.text) || [];
+                } catch (e) {
+                    console.log("Failed to parse git repos: " + e);
+                }
+            }
+        }
+
+    }
+
+    Process {
+        id: gitRepoSearchProc
+
+        command: [root.homeDir + "/.config/quickshell/apps_popup/get_github_repos", "--search-repos", ""]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    var results = JSON.parse(this.text) || [];
+                    var list = [];
+                    for (var i = 0; i < results.length; i++) {
+                        list.push({
+                            "type": "git_repo",
+                            "data": results[i]
+                        });
+                    }
+                    root.gitRepoSearchResults = list;
+                    root.selectedIndex = 0;
+                } catch (e) {
+                    console.log("Failed to parse git repo search: " + e);
+                }
+            }
+        }
+
+    }
+
     Variants {
         model: Quickshell.screens
 
@@ -482,7 +723,7 @@ Scope {
                 focusable: true
                 color: "transparent"
                 implicitWidth: 240
-                implicitHeight: Math.min(320, 32 + (activeWindowsArea.visible ? activeWindowsArea.height + 4 : 0) + Math.max(32, root.isWebSearchMode ? (webSearchList ? webSearchList.contentHeight : 0) : (appsList ? appsList.contentHeight : 0)) + bottomRow.implicitHeight)
+                implicitHeight: Math.min(320, 32 + (activeWindowsArea.visible ? activeWindowsArea.height + 4 : 0) + Math.max(32, root.isGitRepoMode ? (gitRepoList ? gitRepoList.contentHeight : 0) : (root.isFileSearchMode ? (fileSearchList ? fileSearchList.contentHeight : 0) : (root.isWebSearchMode ? (webSearchList ? webSearchList.contentHeight : 0) : (appsList ? appsList.contentHeight : 0)))) + bottomRow.implicitHeight)
                 Component.onCompleted: {
                     introAnim.start();
                     searchInput.forceActiveFocus();
@@ -597,20 +838,28 @@ Scope {
                             win.closePopup();
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Tab) {
+                            root.activeTab = (root.activeTab + 1) % 4;
+                            if (root.activeTab === 1) {
+                                root.searchQuery = "!";
+                                searchInput.text = "!";
+                            } else if (root.activeTab === 2) {
+                                root.searchQuery = "@";
+                                searchInput.text = "@";
+                            } else if (root.activeTab === 3) {
+                                root.searchQuery = "#";
+                                searchInput.text = "#";
+                            } else {
+                                root.searchQuery = "";
+                                searchInput.text = "";
+                            }
+                            root.selectedIndex = 0;
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Shift) {
                             if (root.activeWindows.length > 0) {
-                                if (event.modifiers & Qt.ShiftModifier) {
-                                    // Shift + Tab (backward)
-                                    root.selectedActiveWindowIndex--;
-                                    if (root.selectedActiveWindowIndex < -1)
-                                        root.selectedActiveWindowIndex = root.activeWindows.length - 1;
+                                root.selectedActiveWindowIndex++;
+                                if (root.selectedActiveWindowIndex >= root.activeWindows.length)
+                                    root.selectedActiveWindowIndex = -1;
 
-                                } else {
-                                    // Tab (forward)
-                                    root.selectedActiveWindowIndex++;
-                                    if (root.selectedActiveWindowIndex >= root.activeWindows.length)
-                                        root.selectedActiveWindowIndex = -1;
-
-                                }
                                 if (root.selectedActiveWindowIndex >= 0)
                                     activeWindowsList.positionViewAtIndex(root.selectedActiveWindowIndex, ListView.Contain);
 
@@ -619,13 +868,13 @@ Scope {
                         } else if (event.key === Qt.Key_Up) {
                             root.selectedActiveWindowIndex = -1;
                             root.selectPrev();
-                            var activeList = root.isWebSearchMode ? webSearchList : appsList;
+                            var activeList = root.isGitRepoMode ? gitRepoList : (root.isFileSearchMode ? fileSearchList : (root.isWebSearchMode ? webSearchList : appsList));
                             activeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Down) {
                             root.selectedActiveWindowIndex = -1;
                             root.selectNext();
-                            var activeList = root.isWebSearchMode ? webSearchList : appsList;
+                            var activeList = root.isGitRepoMode ? gitRepoList : (root.isFileSearchMode ? fileSearchList : (root.isWebSearchMode ? webSearchList : appsList));
                             activeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
@@ -639,6 +888,10 @@ Scope {
                                         root.launchApp(selected.data.name, selected.data.exec);
                                     else if (selected.type === "web_search")
                                         root.launchWebSearch(root.getReconstructedQuery(selected));
+                                    else if (selected.type === "file")
+                                        root.launchFile(selected.data.path);
+                                    else if (selected.type === "git_repo")
+                                        root.launchGitRepo(selected.data.html_url);
                                 }
                             }
                             event.accepted = true;
@@ -672,7 +925,7 @@ Scope {
                                 }
 
                                 Text {
-                                    text: "search applications..."
+                                    text: root.activeTab === 0 ? "search applications..." : (root.activeTab === 1 ? "search the web..." : (root.activeTab === 2 ? "search files..." : "search github repos..."))
                                     color: theme.secondary
                                     font.family: root.fontName
                                     font.pointSize: 8
@@ -816,6 +1069,138 @@ Scope {
 
                         }
 
+                        // Tab Switcher
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 14
+                            spacing: 0
+
+                            Rectangle {
+                                Layout.fillWidth: true
+                                height: 14
+                                color: "transparent"
+
+                                Row {
+                                    anchors.centerIn: parent
+                                    spacing: 8
+
+                                    Text {
+                                        text: "apps"
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        font.bold: root.activeTab === 0
+                                        color: root.activeTab === 0 ? theme.accent : theme.secondary
+                                        renderType: Text.NativeRendering
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                root.activeTab = 0;
+                                                root.searchQuery = "";
+                                                searchInput.text = "";
+                                                root.selectedIndex = 0;
+                                            }
+                                        }
+
+                                    }
+
+                                    Text {
+                                        text: "|"
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        color: theme.secondary
+                                        opacity: 0.5
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    Text {
+                                        text: "web"
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        font.bold: root.activeTab === 1
+                                        color: root.activeTab === 1 ? theme.accent : theme.secondary
+                                        renderType: Text.NativeRendering
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                root.activeTab = 1;
+                                                root.searchQuery = "!";
+                                                searchInput.text = "!";
+                                                root.selectedIndex = 0;
+                                            }
+                                        }
+
+                                    }
+
+                                    Text {
+                                        text: "|"
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        color: theme.secondary
+                                        opacity: 0.5
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    Text {
+                                        text: "files"
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        font.bold: root.activeTab === 2
+                                        color: root.activeTab === 2 ? theme.accent : theme.secondary
+                                        renderType: Text.NativeRendering
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                root.activeTab = 2;
+                                                root.searchQuery = "@";
+                                                searchInput.text = "@";
+                                                root.selectedIndex = 0;
+                                            }
+                                        }
+
+                                    }
+
+                                    Text {
+                                        text: "|"
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        color: theme.secondary
+                                        opacity: 0.5
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    Text {
+                                        text: "github"
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        font.bold: root.activeTab === 3
+                                        color: root.activeTab === 3 ? theme.accent : theme.secondary
+                                        renderType: Text.NativeRendering
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                root.activeTab = 3;
+                                                root.searchQuery = "#";
+                                                searchInput.text = "#";
+                                                root.selectedIndex = 0;
+                                            }
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
                         // List view
                         // Shared list delegate
                         Component {
@@ -823,8 +1208,8 @@ Scope {
 
                             Rectangle {
                                 width: listContainer.width
-                                height: modelData.type === "app" ? 16 : (modelData.type === "header" ? 14 : (modelData.type === "separator" ? 5 : 16))
-                                color: ((modelData.type === "app" || modelData.type === "web_search") && root.selectedIndex === index) ? theme.bg_dark : "transparent"
+                                height: modelData.type === "app" ? 16 : (modelData.type === "header" ? 14 : (modelData.type === "separator" ? 5 : (modelData.type === "file" ? 16 : 16)))
+                                color: ((modelData.type === "app" || modelData.type === "web_search" || modelData.type === "file" || modelData.type === "git_repo") && root.selectedIndex === index) ? theme.bg_dark : "transparent"
                                 radius: 0
 
                                 // 1. Header Type
@@ -961,9 +1346,145 @@ Scope {
 
                                 }
 
+                                // 5. File Type
+                                Row {
+                                    visible: modelData.type === "file"
+                                    width: listContainer.width - 8
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.leftMargin: 4
+                                    spacing: 6
+
+                                    Text {
+                                        text: "󰉋"
+                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                        font.family: root.fontName
+                                        font.pointSize: 7.5
+                                        renderType: Text.NativeRendering
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                    }
+
+                                    Text {
+                                        text: {
+                                            if (!modelData.data)
+                                                return "";
+
+                                            var name = modelData.data.name || "";
+                                            var path = modelData.data.path || "";
+                                            var dir = path.substring(0, path.lastIndexOf("/"));
+                                            return name + "  " + dir;
+                                        }
+                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        opacity: root.selectedIndex === index ? 0.8 : 0.5
+                                        elide: Text.ElideRight
+                                        width: listContainer.width - 24
+                                        renderType: Text.NativeRendering
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                                // 6. Git Repo Type
+                                Row {
+                                    visible: modelData.type === "git_repo"
+                                    width: listContainer.width - 8
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.leftMargin: 4
+                                    spacing: 6
+
+                                    Text {
+                                        text: "󰊤"
+                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                        font.family: root.fontName
+                                        font.pointSize: 7.5
+                                        renderType: Text.NativeRendering
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                    }
+
+                                    Text {
+                                        text: {
+                                            if (!modelData.data)
+                                                return "";
+
+                                            var name = modelData.data.name || "";
+                                            var owner = modelData.data.owner_login || "";
+                                            var stars = modelData.data.stars || 0;
+                                            var lang = modelData.data.language || "";
+                                            var info = owner + "/" + name;
+                                            if (stars > 0)
+                                                info += "  ★ " + stars;
+
+                                            if (lang)
+                                                info += "  " + lang;
+
+                                            return info;
+                                        }
+                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        opacity: root.selectedIndex === index ? 0.8 : 0.5
+                                        elide: Text.ElideRight
+                                        width: listContainer.width - 24
+                                        renderType: Text.NativeRendering
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
                                 MouseArea {
                                     anchors.fill: parent
-                                    enabled: modelData.type === "app" || modelData.type === "web_search"
+                                    enabled: modelData.type === "app" || modelData.type === "web_search" || modelData.type === "file" || modelData.type === "git_repo"
                                     hoverEnabled: true
                                     onEntered: {
                                         root.selectedIndex = index;
@@ -974,6 +1495,10 @@ Scope {
                                             root.launchApp(modelData.data.name, modelData.data.exec);
                                         else if (modelData.type === "web_search")
                                             root.launchWebSearch(root.getReconstructedQuery(modelData));
+                                        else if (modelData.type === "file")
+                                            root.launchFile(modelData.data.path);
+                                        else if (modelData.type === "git_repo")
+                                            root.launchGitRepo(modelData.data.html_url);
                                     }
                                 }
 
@@ -1005,7 +1530,7 @@ Scope {
                                 spacing: 2
                                 clip: true
                                 delegate: listDelegate
-                                opacity: root.isWebSearchMode ? 0 : 1
+                                opacity: (root.isWebSearchMode || root.isFileSearchMode || root.isGitRepoMode) ? 0 : 1
                                 visible: opacity > 0
 
                                 Behavior on opacity {
@@ -1017,7 +1542,7 @@ Scope {
                                 }
 
                                 transform: Translate {
-                                    y: root.isWebSearchMode ? -10 : 0
+                                    y: (root.isWebSearchMode || root.isFileSearchMode || root.isGitRepoMode) ? -10 : 0
 
                                     Behavior on y {
                                         NumberAnimation {
@@ -1065,6 +1590,74 @@ Scope {
 
                             }
 
+                            ListView {
+                                id: fileSearchList
+
+                                anchors.fill: parent
+                                model: root.fileSearchDisplayList
+                                spacing: 2
+                                clip: true
+                                delegate: listDelegate
+                                opacity: root.isFileSearchMode ? 1 : 0
+                                visible: opacity > 0
+
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: 180
+                                        easing.type: Easing.OutCubic
+                                    }
+
+                                }
+
+                                transform: Translate {
+                                    y: root.isFileSearchMode ? 0 : 10
+
+                                    Behavior on y {
+                                        NumberAnimation {
+                                            duration: 180
+                                            easing.type: Easing.OutCubic
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                            ListView {
+                                id: gitRepoList
+
+                                anchors.fill: parent
+                                model: root.gitRepoSearchResults
+                                spacing: 2
+                                clip: true
+                                delegate: listDelegate
+                                opacity: root.isGitRepoMode ? 1 : 0
+                                visible: opacity > 0
+
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: 180
+                                        easing.type: Easing.OutCubic
+                                    }
+
+                                }
+
+                                transform: Translate {
+                                    y: root.isGitRepoMode ? 0 : 10
+
+                                    Behavior on y {
+                                        NumberAnimation {
+                                            duration: 180
+                                            easing.type: Easing.OutCubic
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
                             Behavior on implicitHeight {
                                 NumberAnimation {
                                     duration: 180
@@ -1085,12 +1678,64 @@ Scope {
                             Layout.rightMargin: 4
 
                             Text {
-                                text: root.apps.length + " applications found"
+                                text: root.isGitRepoMode ? root.gitRepos.length + " repos" : (root.isFileSearchMode ? root.fileHistory.length + " recent files" : (root.isWebSearchMode ? root.webHistory.length + " histories in websearch" : root.apps.length + " applications found"))
                                 font.family: root.fontName
                                 font.pointSize: 8
                                 font.italic: true
                                 color: theme.secondary
                                 renderType: Text.NativeRendering
+                                Layout.fillWidth: true
+                            }
+
+                            Text {
+                                visible: root.isWebSearchMode && root.webHistory.length > 0
+                                text: "clear"
+                                font.family: root.fontName
+                                font.pointSize: 8
+                                font.italic: true
+                                color: theme.secondary
+                                renderType: Text.NativeRendering
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: clearHistoryProc.running = true
+                                }
+
+                            }
+
+                            Text {
+                                visible: root.isFileSearchMode && root.fileHistory.length > 0
+                                text: "clear"
+                                font.family: root.fontName
+                                font.pointSize: 8
+                                font.italic: true
+                                color: theme.secondary
+                                renderType: Text.NativeRendering
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: clearFileHistoryProc.running = true
+                                }
+
+                            }
+
+                            Text {
+                                visible: root.isGitRepoMode
+                                text: "refresh"
+                                font.family: root.fontName
+                                font.pointSize: 8
+                                font.italic: true
+                                color: theme.secondary
+                                renderType: Text.NativeRendering
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: gitRepoRefreshProc.running = true
+                                }
+
                             }
 
                         }
