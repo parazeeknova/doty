@@ -38,7 +38,6 @@ install: build
 	cp target/release/caffeine ../../rofi/scripts/caffeine
 	cp target/release/cliphist ../../rofi/scripts/cliphist
 	cp target/release/notif_center ../../rofi/scripts/notif_center
-	cp target/release/power_menu ../../rofi/scripts/power_menu
 	cp target/release/profile ../../rofi/scripts/profile
 	cp target/release/recents ../../rofi/scripts/recents
 	cp target/release/sunset ../../rofi/scripts/sunset

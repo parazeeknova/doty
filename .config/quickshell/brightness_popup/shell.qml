@@ -17,6 +17,9 @@ Scope {
     property int pendingScreenVol: -1
     property int pendingKbdVol: -1
     property int pendingSunsetTemp: -1
+    property int lastActiveSection: 0
+    property int lastActiveSubIndex: 0
+    property bool isKeyboardTriggered: Quickshell.env("QS_KEYBOARD") === "1"
 
     signal requestClose()
 
@@ -24,8 +27,50 @@ Scope {
         delayRefreshTimer.restart();
     }
 
+    function saveFocusState(sec, sub) {
+        var state = {
+            "activeSection": sec,
+            "activeSubIndex": sub
+        };
+        var stateStr = JSON.stringify(state);
+        saveFocusProc.command = ["sh", "-c", "mkdir -p " + root.homeDir + "/.cache && echo '" + stateStr + "' > " + root.homeDir + "/.cache/quickshell_brightness_focus.json"];
+        saveFocusProc.running = false;
+        saveFocusProc.running = true;
+    }
+
     Component.onCompleted: {
         checkStatusProc.running = true;
+        focusStateFile.reload();
+    }
+
+    Process {
+        id: saveFocusProc
+
+        running: false
+    }
+
+    FileView {
+        id: focusStateFile
+
+        path: "file://" + root.homeDir + "/.cache/quickshell_brightness_focus.json"
+        watchChanges: false
+        onLoaded: {
+            try {
+                var raw = focusStateFile.text().trim();
+                if (raw === "")
+                    return ;
+
+                var parsed = JSON.parse(raw);
+                if (parsed.activeSection !== undefined)
+                    root.lastActiveSection = parsed.activeSection;
+
+                if (parsed.activeSubIndex !== undefined)
+                    root.lastActiveSubIndex = parsed.activeSubIndex;
+
+            } catch (e) {
+                console.log("Failed to parse brightness focus state: " + e);
+            }
+        }
     }
 
     Theme {
@@ -130,12 +175,91 @@ Scope {
 
         delegate: Component {
             PanelWindow {
+                // Screen brightness slider
+                // Keyboard backlight slider
+                // Night Light (Auto, Off, Temp slider if not auto)
+
                 id: win
 
                 required property var modelData
                 property bool isClosing: false
                 property real animLeftMargin: -260
                 property real animOpacity: 0
+                property int activeSection: root.lastActiveSection
+                property int activeSubIndex: root.lastActiveSubIndex
+                property bool isLoaded: false
+                property bool showFocusHighlight: root.isKeyboardTriggered
+                property string focusHighlightColor: showFocusHighlight ? "#30d5c4a1" : "transparent"
+
+                function getMaxItemsForSection(section) {
+                    if (section === 0)
+                        return 1;
+                    else if (section === 1)
+                        return 1;
+                    else if (section === 2)
+                        return root.sunsetState.toLowerCase() === "auto" ? 2 : 3;
+                    else if (section === 3)
+                        return 1; // Caffeine toggle button
+                    return 0;
+                }
+
+                function triggerActiveElement() {
+                    if (win.activeSection === 2) {
+                        if (win.activeSubIndex === 0) {
+                            root.sunsetState = "Auto";
+                            Quickshell.execDetached([root.homeDir + "/.config/rofi/scripts/sunset.sh", "auto"]);
+                            root.triggerRefresh();
+                        } else if (win.activeSubIndex === 1) {
+                            root.sunsetState = "Off";
+                            Quickshell.execDetached([root.homeDir + "/.config/rofi/scripts/sunset.sh", "off"]);
+                            root.triggerRefresh();
+                        }
+                    } else if (win.activeSection === 3) {
+                        if (win.activeSubIndex === 0) {
+                            var nextState = !root.caffeineActive;
+                            root.caffeineActive = nextState;
+                            Quickshell.execDetached([root.homeDir + "/.config/rofi/scripts/caffeine"]);
+                            root.triggerRefresh();
+                        }
+                    }
+                }
+
+                function navigateSlider(dir) {
+                    if (win.activeSection === 0) {
+                        var newScreen = Math.max(0, Math.min(root.screenBrightness + dir * 5, 100));
+                        root.screenBrightness = newScreen;
+                        root.pendingScreenVol = newScreen;
+                    } else if (win.activeSection === 1) {
+                        var change = dir * 33;
+                        var newKbd = Math.max(0, Math.min(root.kbdBrightness + change, 100));
+                        if (newKbd < 16)
+                            newKbd = 0;
+                        else if (newKbd < 50)
+                            newKbd = 33;
+                        else if (newKbd < 83)
+                            newKbd = 67;
+                        else
+                            newKbd = 100;
+                        root.kbdBrightness = newKbd;
+                        root.pendingKbdVol = newKbd;
+                    } else if (win.activeSection === 2 && win.activeSubIndex === 2) {
+                        var current = parseInt(root.sunsetState);
+                        if (isNaN(current))
+                            current = 6500;
+
+                        var target = Math.max(2800, Math.min(current + dir * 250, 6500));
+                        root.sunsetState = String(target);
+                        root.pendingSunsetTemp = target;
+                    }
+                }
+
+                function navigateSubIndex(dir) {
+                    var maxItems = getMaxItemsForSection(win.activeSection);
+                    if (maxItems > 0)
+                        win.activeSubIndex = (win.activeSubIndex + dir + maxItems) % maxItems;
+                    else
+                        win.activeSubIndex = 0;
+                }
 
                 function closePopup() {
                     if (isClosing)
@@ -145,13 +269,26 @@ Scope {
                     exitAnim.start();
                 }
 
+                onActiveSectionChanged: {
+                    if (isLoaded)
+                        root.saveFocusState(activeSection, activeSubIndex);
+
+                }
+                onActiveSubIndexChanged: {
+                    if (isLoaded)
+                        root.saveFocusState(activeSection, activeSubIndex);
+
+                }
                 screen: modelData
                 color: "transparent"
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
                 focusable: true
                 implicitWidth: 240
                 implicitHeight: mainLayout.implicitHeight + 20
-                Component.onCompleted: introAnim.start()
+                Component.onCompleted: {
+                    isLoaded = true;
+                    introAnim.start();
+                }
 
                 Connections {
                     function onRequestClose() {
@@ -239,9 +376,45 @@ Scope {
                     antialiasing: false
                     focus: true
                     Keys.onPressed: (event) => {
-                        if (event.key === Qt.Key_Escape)
+                        if (event.key === Qt.Key_Escape) {
                             win.closePopup();
-
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Tab) {
+                            win.showFocusHighlight = true;
+                            var attempts = 0;
+                            var nextSec = win.activeSection;
+                            while (attempts < 4) {
+                                if ((event.modifiers & Qt.ShiftModifier) || (event.modifiers & Qt.ControlModifier))
+                                    nextSec = (nextSec + 3) % 4;
+                                else
+                                    nextSec = (nextSec + 1) % 4;
+                                if (win.getMaxItemsForSection(nextSec) > 0) {
+                                    win.activeSection = nextSec;
+                                    break;
+                                }
+                                attempts++;
+                            }
+                            win.activeSubIndex = 0;
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Right) {
+                            win.showFocusHighlight = true;
+                            if (win.activeSection === 0 || win.activeSection === 1 || (win.activeSection === 2 && win.activeSubIndex === 2))
+                                win.navigateSlider(1);
+                            else
+                                win.navigateSubIndex(1);
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Up || event.key === Qt.Key_Left) {
+                            win.showFocusHighlight = true;
+                            if (win.activeSection === 0 || win.activeSection === 1 || (win.activeSection === 2 && win.activeSubIndex === 2))
+                                win.navigateSlider(-1);
+                            else
+                                win.navigateSubIndex(-1);
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+                            win.showFocusHighlight = true;
+                            win.triggerActiveElement();
+                            event.accepted = true;
+                        }
                     }
                     Component.onCompleted: {
                         forceActiveFocus();
@@ -282,6 +455,13 @@ Scope {
                             Item {
                                 width: parent.width
                                 height: 8
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    anchors.margins: -2
+                                    color: (win.activeSection === 0 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                    radius: 0
+                                }
 
                                 Row {
                                     id: screenSliderBlocks
@@ -369,6 +549,13 @@ Scope {
                             Item {
                                 width: parent.width
                                 height: 8
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    anchors.margins: -2
+                                    color: (win.activeSection === 1 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                    radius: 0
+                                }
 
                                 Row {
                                     id: kbdSliderBlocks
@@ -473,6 +660,12 @@ Scope {
                                     color: (root.sunsetState.toLowerCase() === "auto") ? theme.accent : theme.bg_light
                                     radius: 0
 
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: (win.activeSection === 2 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                        radius: 0
+                                    }
+
                                     Text {
                                         anchors.centerIn: parent
                                         text: "Auto"
@@ -500,6 +693,12 @@ Scope {
                                     height: 16
                                     color: (root.sunsetState.toLowerCase() === "off") ? theme.accent : theme.bg_light
                                     radius: 0
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: (win.activeSection === 2 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
+                                        radius: 0
+                                    }
 
                                     Text {
                                         anchors.centerIn: parent
@@ -547,6 +746,13 @@ Scope {
                                 width: parent.width
                                 height: 8
                                 visible: root.sunsetState.toLowerCase() !== "auto"
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    anchors.margins: -2
+                                    color: (win.activeSection === 2 && win.activeSubIndex === 2) ? win.focusHighlightColor : "transparent"
+                                    radius: 0
+                                }
 
                                 Row {
                                     id: tempSliderBlocks
@@ -639,6 +845,13 @@ Scope {
                                 font.pixelSize: 9
                                 font.bold: true
                                 renderType: Text.NativeRendering
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    anchors.margins: -2
+                                    color: (win.activeSection === 3 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                    radius: 0
+                                }
 
                                 MouseArea {
                                     anchors.fill: parent

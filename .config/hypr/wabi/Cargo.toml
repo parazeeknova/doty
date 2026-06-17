@@ -114,10 +114,6 @@ name = "notif_center"
 path = "src/bin/rofi/notif_center.rs"
 
 [[bin]]
-name = "power_menu"
-path = "src/bin/rofi/power_menu.rs"
-
-[[bin]]
 name = "profile"
 path = "src/bin/rofi/profile.rs"
 

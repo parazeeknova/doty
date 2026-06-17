@@ -365,7 +365,7 @@ Scope {
                                 anchors.bottom: parent.bottom
                                 width: parent.width
                                 height: 1
-                                color: searchInput.activeFocus ? theme.fg : theme.secondary
+                                color: theme.secondary
                             }
 
                         }

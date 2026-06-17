@@ -260,7 +260,7 @@ fn clean_description(desc: &str, cmd: &str) -> String {
             return "Open Application Menu".to_string();
         } else if cmd.contains("rofi_wrap -show recents") {
             return "Open Recent Documents".to_string();
-        } else if cmd.contains("rofi_wrap -show power") {
+        } else if cmd.contains("power_popup") {
             return "Open Power Menu".to_string();
         } else if cmd.contains("rofi_wrap -show sunset") {
             return "Open Night Light Controls".to_string();

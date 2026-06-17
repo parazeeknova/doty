@@ -199,11 +199,11 @@ hl.bind(mainMod .. " + ALT + H", hl.dsp
 ---------------------
 ---     Rofi      ---
 ---------------------
-
 hl.bind(mainMod .. " + SPACE", hl.dsp
     .exec_cmd("~/.config/rofi/scripts/rofi_wrap -show drun -mesg 'applications' -placeholder 'search applications'"))
 hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show recents"))
-hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show power"))
+hl.bind(mainMod .. " + X",
+    hl.dsp.exec_cmd("quickshell -c power_popup ipc call power_popup close || quickshell --config power_popup"))
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show sunset"))
 hl.bind(mainMod .. " + slash", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show ports -mesg 'occupied ports'"))
 hl.bind("XF86Launch3", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show profile"))
@@ -225,10 +225,12 @@ hl.bind(mainMod .. " + SHIFT + V",
     hl.dsp.exec_cmd("quickshell -c vm_popup ipc call vm_popup close || quickshell --config vm_popup"))
 hl.bind(mainMod .. " + ALT + W", hl.dsp.exec_cmd(
     "quickshell -c network_popup ipc call network_popup close || env QS_KEYBOARD=1 quickshell --config network_popup"))
-hl.bind(mainMod .. " + SHIFT + F", hl.dsp
-    .exec_cmd("quickshell -c bluetooth_popup ipc call bluetooth_popup close || quickshell --config bluetooth_popup"))
+hl.bind(mainMod .. " + SHIFT + F", hl.dsp.exec_cmd(
+    "quickshell -c bluetooth_popup ipc call bluetooth_popup close || env QS_KEYBOARD=1 quickshell --config bluetooth_popup"))
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(
-    "quickshell -c brightness_popup ipc call brightness_popup close || quickshell --config brightness_popup"))
+    "quickshell -c brightness_popup ipc call brightness_popup close || env QS_KEYBOARD=1 quickshell --config brightness_popup"))
+hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd(
+    "quickshell -c battery_popup ipc call battery_popup close || env QS_KEYBOARD=1 quickshell --config battery_popup"))
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd(
     "quickshell -c notif_popup ipc call notif_popup close || env QS_KEYBOARD=1 quickshell --config notif_popup"))
 hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd("~/.config/rofi/scripts/toggle_glass"))
@@ -301,7 +303,8 @@ hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock -c ~/.config/hypr/hyprlock.
 hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("$HOME/.config/quickshell/media_popup/get_media_status pick-color"))
 
 -- Power menu / Logout
-hl.bind("XF86PowerOff", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show power"))
+hl.bind("XF86PowerOff",
+    hl.dsp.exec_cmd("quickshell -c power_popup ipc call power_popup close || quickshell --config power_popup"))
 hl.bind(mainMod .. " + ALT + E", hl.dsp.exec_cmd(
     "sh -c 'if command -v uwsm >/dev/null 2>&1 && uwsm check; then uwsm stop; else hyprctl dispatch exit; fi'"))
 

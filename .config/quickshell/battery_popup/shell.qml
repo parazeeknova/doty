@@ -26,7 +26,7 @@ Scope {
     property int acScreenBrightness: 100
     property int acKbdBrightness: 90
     property int lowScreenBrightness: 30
-    property int lowKbdBrightness: 0 // Collapsible states for the cards
+    property int lowKbdBrightness: 0
     property bool acExpanded: false
     property bool batExpanded: false
     property bool lowExpanded: false
@@ -34,6 +34,9 @@ Scope {
     property bool isACActive: status === "Charging" || status === "Full"
     property bool isLowActive: !isACActive && capacity < lowBatteryThreshold
     property bool isBatActive: !isACActive && !isLowActive
+    property int lastActiveSection: 0
+    property int lastActiveSubIndex: 0
+    property bool isKeyboardTriggered: Quickshell.env("QS_KEYBOARD") === "1"
 
     function saveSettings() {
         var data = {
@@ -62,8 +65,50 @@ Scope {
         runCmd(["sh", "-c", "asusctl profile set " + profile + " && " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show 'profile: " + profile.toLowerCase() + "' good 1500"]);
     }
 
+    function saveFocusState(sec, sub) {
+        var state = {
+            "activeSection": sec,
+            "activeSubIndex": sub
+        };
+        var stateStr = JSON.stringify(state);
+        saveFocusProc.command = ["sh", "-c", "mkdir -p " + root.homeDir + "/.cache && echo '" + stateStr + "' > " + root.homeDir + "/.cache/quickshell_battery_focus.json"];
+        saveFocusProc.running = false;
+        saveFocusProc.running = true;
+    }
+
     Component.onCompleted: {
         checkStatusProc.running = true;
+        focusStateFile.reload();
+    }
+
+    Process {
+        id: saveFocusProc
+
+        running: false
+    }
+
+    FileView {
+        id: focusStateFile
+
+        path: "file://" + root.homeDir + "/.cache/quickshell_battery_focus.json"
+        watchChanges: false
+        onLoaded: {
+            try {
+                var raw = focusStateFile.text().trim();
+                if (raw === "")
+                    return ;
+
+                var parsed = JSON.parse(raw);
+                if (parsed.activeSection !== undefined)
+                    root.lastActiveSection = parsed.activeSection;
+
+                if (parsed.activeSubIndex !== undefined)
+                    root.lastActiveSubIndex = parsed.activeSubIndex;
+
+            } catch (e) {
+                console.log("Failed to parse battery focus state: " + e);
+            }
+        }
     }
 
     FileView {
@@ -156,12 +201,74 @@ Scope {
 
         delegate: Component {
             PanelWindow {
+                // Section 2: Power Mode Override Buttons (Quiet (0), Balanced (1), Performance (2))
+                // Section 3: Exit (0) / Off (1) buttons
+
                 id: win
 
                 required property var modelData
                 property bool isClosing: false
                 property real animLeftMargin: -260
                 property real animOpacity: 0
+                property int activeSection: root.lastActiveSection
+                property int activeSubIndex: root.lastActiveSubIndex
+                property bool isLoaded: false
+                property bool showFocusHighlight: root.isKeyboardTriggered
+                property string focusHighlightColor: showFocusHighlight ? "#30d5c4a1" : "transparent"
+
+                function getMaxItemsForSection(section) {
+                    if (section === 0) {
+                        // Section 0: Auto Power Control toggle button
+                        return 1;
+                    } else if (section === 1) {
+                        // Section 1: Mode adjusters (AC (0), Bat (1), Low (2) mode cards)
+                        if (!root.automationEnabled)
+                            return 0;
+
+                        return 3;
+                    } else if (section === 2)
+                        return 3;
+                    else if (section === 3)
+                        return 2;
+                    return 0;
+                }
+
+                function triggerActiveElement() {
+                    if (win.activeSection === 0) {
+                        root.automationEnabled = !root.automationEnabled;
+                        root.saveSettings();
+                    } else if (win.activeSection === 1) {
+                        if (win.activeSubIndex === 0)
+                            root.acExpanded = !root.acExpanded;
+                        else if (win.activeSubIndex === 1)
+                            root.batExpanded = !root.batExpanded;
+                        else if (win.activeSubIndex === 2)
+                            root.lowExpanded = !root.lowExpanded;
+                    } else if (win.activeSection === 2) {
+                        if (win.activeSubIndex === 0)
+                            root.setProfile("Quiet");
+                        else if (win.activeSubIndex === 1)
+                            root.setProfile("Balanced");
+                        else if (win.activeSubIndex === 2)
+                            root.setProfile("Performance");
+                    } else if (win.activeSection === 3) {
+                        if (win.activeSubIndex === 0) {
+                            win.closePopup();
+                            root.runCmd(["sh", "-c", "hyprctl dispatch 'hl.dsp.exit()' || pkill -x Hyprland"]);
+                        } else if (win.activeSubIndex === 1) {
+                            win.closePopup();
+                            root.runCmd(["systemctl", "poweroff"]);
+                        }
+                    }
+                }
+
+                function navigateSubIndex(dir) {
+                    var maxItems = getMaxItemsForSection(win.activeSection);
+                    if (maxItems > 0)
+                        win.activeSubIndex = (win.activeSubIndex + dir + maxItems) % maxItems;
+                    else
+                        win.activeSubIndex = 0;
+                }
 
                 function closePopup() {
                     if (isClosing)
@@ -171,14 +278,26 @@ Scope {
                     exitAnim.start();
                 }
 
+                onActiveSectionChanged: {
+                    if (isLoaded)
+                        root.saveFocusState(activeSection, activeSubIndex);
+
+                }
+                onActiveSubIndexChanged: {
+                    if (isLoaded)
+                        root.saveFocusState(activeSection, activeSubIndex);
+
+                }
                 screen: modelData
                 color: "transparent"
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
-                // Enable keyboard focus for key events (Esc key)
                 focusable: true
                 implicitWidth: 240
                 implicitHeight: (powerRow.y + powerRow.height) + 20
-                Component.onCompleted: introAnim.start()
+                Component.onCompleted: {
+                    isLoaded = true;
+                    introAnim.start();
+                }
 
                 anchors {
                     bottom: true
@@ -190,7 +309,6 @@ Scope {
                     left: win.animLeftMargin
                 }
 
-                // Slide-in + fade-in
                 ParallelAnimation {
                     id: introAnim
 
@@ -214,7 +332,6 @@ Scope {
 
                 }
 
-                // Slide-out + fade-out
                 ParallelAnimation {
                     id: exitAnim
 
@@ -240,7 +357,6 @@ Scope {
 
                 }
 
-                // Use HyprlandFocusGrab to automatically close the widget when clicking outside
                 HyprlandFocusGrab {
                     active: !win.isClosing
                     windows: [win]
@@ -257,12 +373,41 @@ Scope {
                     border.color: theme.accent
                     radius: 0
                     antialiasing: false
-                    // Request keyboard focus and listen for Escape key
                     focus: true
                     Keys.onPressed: (event) => {
-                        if (event.key === Qt.Key_Escape)
+                        if (event.key === Qt.Key_Escape) {
                             win.closePopup();
-
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Tab) {
+                            win.showFocusHighlight = true;
+                            var attempts = 0;
+                            var nextSec = win.activeSection;
+                            while (attempts < 4) {
+                                if ((event.modifiers & Qt.ShiftModifier) || (event.modifiers & Qt.ControlModifier))
+                                    nextSec = (nextSec + 3) % 4;
+                                else
+                                    nextSec = (nextSec + 1) % 4;
+                                if (win.getMaxItemsForSection(nextSec) > 0) {
+                                    win.activeSection = nextSec;
+                                    break;
+                                }
+                                attempts++;
+                            }
+                            win.activeSubIndex = 0;
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Right) {
+                            win.showFocusHighlight = true;
+                            win.navigateSubIndex(1);
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Up || event.key === Qt.Key_Left) {
+                            win.showFocusHighlight = true;
+                            win.navigateSubIndex(-1);
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+                            win.showFocusHighlight = true;
+                            win.triggerActiveElement();
+                            event.accepted = true;
+                        }
                     }
                     Component.onCompleted: {
                         forceActiveFocus();
@@ -409,6 +554,12 @@ Scope {
                                 root.saveSettings();
                             }
 
+                            Rectangle {
+                                anchors.fill: parent
+                                color: (win.activeSection === 0 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                radius: 0
+                            }
+
                             Row {
                                 anchors.fill: parent
                                 spacing: 8
@@ -478,6 +629,13 @@ Scope {
                                 color: root.isACActive ? Qt.rgba(theme.accent.r, theme.accent.g, theme.accent.b, 0.12) : theme.bg_dark
                                 border.width: 0
                                 radius: 2
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 1 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                    radius: 0
+                                    z: 10
+                                }
 
                                 Column {
                                     id: acCardCol
@@ -764,6 +922,13 @@ Scope {
                                 border.width: 0
                                 radius: 2
 
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 1 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
+                                    radius: 0
+                                    z: 10
+                                }
+
                                 Column {
                                     id: batCardCol
 
@@ -1048,6 +1213,13 @@ Scope {
                                 color: root.isLowActive ? Qt.rgba(theme.accent.r, theme.accent.g, theme.accent.b, 0.12) : theme.bg_dark
                                 border.width: 0
                                 radius: 2
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 1 && win.activeSubIndex === 2) ? win.focusHighlightColor : "transparent"
+                                    radius: 0
+                                    z: 10
+                                }
 
                                 Column {
                                     id: lowCardCol
@@ -1459,6 +1631,12 @@ Scope {
                                 border.color: "transparent"
                                 radius: 0
 
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 2 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                    radius: 0
+                                }
+
                                 Text {
                                     id: quietText
 
@@ -1500,6 +1678,12 @@ Scope {
                                 border.color: "transparent"
                                 radius: 0
 
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 2 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
+                                    radius: 0
+                                }
+
                                 Text {
                                     id: balancedText
 
@@ -1540,6 +1724,12 @@ Scope {
                                 color: "transparent"
                                 border.color: "transparent"
                                 radius: 0
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 2 && win.activeSubIndex === 2) ? win.focusHighlightColor : "transparent"
+                                    radius: 0
+                                }
 
                                 Text {
                                     id: perfText
@@ -1607,6 +1797,12 @@ Scope {
                                 border.color: "transparent"
                                 radius: 0
 
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 3 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                    radius: 0
+                                }
+
                                 Text {
                                     id: logoutText
 
@@ -1642,6 +1838,12 @@ Scope {
                                 color: "transparent"
                                 border.color: "transparent"
                                 radius: 0
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: (win.activeSection === 3 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
+                                    radius: 0
+                                }
 
                                 Text {
                                     id: poweroffText
