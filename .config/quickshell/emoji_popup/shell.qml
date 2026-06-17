@@ -122,7 +122,6 @@ Scope {
                 screen: modelData
                 WlrLayershell.namespace: "quickshell"
                 WlrLayershell.layer: WlrLayer.Overlay
-                WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
                 focusable: true
                 color: "transparent"
@@ -210,7 +209,8 @@ Scope {
                     anchors.fill: parent
                     opacity: win.animOpacity
                     color: theme.popupBgColor // transparent matching other widgets
-                    border.width: 0
+                    border.width: 1
+                    border.color: theme.accent
                     radius: 0
                     focus: true
                     Keys.onPressed: (event) => {

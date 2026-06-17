@@ -1,44 +1,34 @@
+use serde::Serialize;
 use std::collections::HashSet;
-use std::env;
 use std::process::Command;
+use wabi::print_json;
 
-fn notify(title: &str, msg: &str) {
-    let _ = Command::new("notify-send").args([title, msg]).status();
+#[derive(Serialize, Clone)]
+struct PortEntry {
+    protocol: String,
+    port: String,
+    process: String,
+    pid: String,
+    address: String,
+    peer: String,
+}
+
+#[derive(Serialize)]
+struct PortsStatus {
+    ports: Vec<PortEntry>,
 }
 
 fn main() {
-    let retv = env::var("ROFI_RETV").unwrap_or_default();
-    let info = env::var("ROFI_INFO").unwrap_or_default();
-
-    if retv == "1" && !info.is_empty() {
-        if let Ok(pid) = info.parse::<i32>() {
-            let status = Command::new("kill").args(["-9", &pid.to_string()]).status();
-            match status {
-                Ok(s) if s.success() => {
-                    notify("Ports Rofi", &format!("Killed process with PID {}", pid));
-                }
-                _ => {
-                    notify(
-                        "Ports Rofi",
-                        &format!("Failed to kill process with PID {}", pid),
-                    );
-                }
-            }
-        } else {
-            notify("Ports Rofi", &format!("Invalid PID: {}", info));
-        }
-        std::process::exit(0);
-    }
-
     let output = match Command::new("ss").args(["-tulpn"]).output() {
         Ok(out) => String::from_utf8_lossy(&out.stdout).into_owned(),
-        Err(e) => {
-            eprintln!("Error running ss: {}", e);
-            std::process::exit(1);
+        Err(_) => {
+            print_json(&PortsStatus { ports: vec![] });
+            return;
         }
     };
 
     let mut seen = HashSet::new();
+    let mut ports = Vec::new();
 
     for line in output.lines().skip(1) {
         if !line.contains("users:(") {
@@ -52,12 +42,14 @@ fn main() {
 
         let proto = parts[0].to_uppercase();
         let local_addr = parts[4];
+        let peer = if parts.len() > 5 { parts[5] } else { "*:*" };
         let port = local_addr.split(':').next_back().unwrap_or("");
+        let bind_addr = local_addr.rsplit_once(':').map(|(a, _)| a).unwrap_or(local_addr);
 
         if let Some(users_idx) = line.find("users:(") {
             let users_part = &line[users_idx..];
-
             let mut cursor = users_part;
+
             while let Some(pid_idx) = cursor.find("pid=") {
                 let pre_pid = &cursor[..pid_idx];
                 if let Some(first_quote) = pre_pid.rfind('"') {
@@ -79,9 +71,14 @@ fn main() {
                         );
                         if !seen.contains(&key) {
                             seen.insert(key.clone());
-                            let label =
-                                format!("[{}] Port {} -> {} (PID {})", proto, port, prog, pid);
-                            println!("{}\0info\x1f{}", label, pid);
+                            ports.push(PortEntry {
+                                protocol: proto.clone(),
+                                port: port.to_string(),
+                                process: prog.to_string(),
+                                pid: pid.to_string(),
+                                address: bind_addr.to_string(),
+                                peer: peer.to_string(),
+                            });
                         }
                     }
                 }
@@ -90,5 +87,5 @@ fn main() {
         }
     }
 
-    println!("\0message\x1fSelect a port to kill\n");
+    print_json(&PortsStatus { ports });
 }

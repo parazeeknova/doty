@@ -204,9 +204,9 @@ hl.bind(mainMod .. " + SPACE", hl.dsp
 hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show recents"))
 hl.bind(mainMod .. " + X",
     hl.dsp.exec_cmd("quickshell -c power_popup ipc call power_popup close || quickshell --config power_popup"))
-hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show sunset"))
-hl.bind(mainMod .. " + slash", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show ports -mesg 'occupied ports'"))
-hl.bind("XF86Launch3", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show profile"))
+hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("quickshell -c sunset_popup ipc call sunset_popup close || quickshell --config sunset_popup"))
+hl.bind(mainMod .. " + slash", hl.dsp.exec_cmd("quickshell -c ports_popup ipc call ports_popup close || quickshell --config ports_popup"))
+hl.bind("XF86Launch3", hl.dsp.exec_cmd("quickshell -c profile_popup ipc call profile_popup close || quickshell --config profile_popup"))
 
 ---------------------
 ---   Pyprland    ---

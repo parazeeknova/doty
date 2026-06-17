@@ -264,10 +264,10 @@ fn clean_description(desc: &str, cmd: &str) -> String {
             return "Open Power Menu".to_string();
         } else if cmd.contains("rofi_wrap -show sunset") {
             return "Open Night Light Controls".to_string();
-        } else if cmd.contains("rofi_wrap -show ports") {
+        } else if cmd.contains("ports_popup") {
             return "Show Occupied Network Ports".to_string();
-        } else if cmd.contains("rofi_wrap -show profile") {
-            return "Open User Profile Settings".to_string();
+        } else if cmd.contains("sunset_popup") {
+            return "Open Night Light Controls".to_string();
         }
     }
     desc.to_string()

@@ -15,6 +15,8 @@ Scope {
     property var filteredEntries: []
     property string searchQuery: ""
     property int selectedIndex: 0
+    property int activeWindow: 0 // 0 = main popup, 1 = external preview popup
+    property string currentPreviewText: ""
     // Theme tokens (Gruvbox Material Dark)
     readonly property color colorBgDark: "#e61d2021"
     // Sleek dark background
@@ -67,6 +69,57 @@ Scope {
         return entry;
     }
 
+    function hasPreview(entry) {
+        if (!entry)
+            return false;
+
+        var text = getEntryText(entry);
+        var type = getPreviewType(entry);
+        if (type === "image")
+            return true;
+
+        if (isFile(text))
+            return true;
+
+        if (text.length > 80)
+            return true;
+
+        return false;
+    }
+
+    function isFile(text) {
+        if (!text)
+            return false;
+
+        var trimmed = text.trim();
+        if (trimmed.startsWith("/") || trimmed.startsWith("file://"))
+            return true;
+
+        return false;
+    }
+
+    function cleanFilePath(text) {
+        var trimmed = text.trim();
+        if (trimmed.startsWith("file://"))
+            return trimmed.substring(7);
+
+        return trimmed;
+    }
+
+    function getLineCount(text) {
+        if (!text)
+            return 0;
+
+        return text.split("\n").length;
+    }
+
+    function getWordCount(text) {
+        if (!text)
+            return 0;
+
+        return text.split(/\s+/).filter(Boolean).length;
+    }
+
     function filterEntries() {
         if (searchQuery.trim() === "") {
             filteredEntries = rawEntries;
@@ -84,6 +137,28 @@ Scope {
         selectedIndex = 0;
     }
 
+    function updatePreviewText() {
+        decodeTextProc.running = false;
+        if (root.filteredEntries && root.filteredEntries.length > root.selectedIndex) {
+            var entry = root.filteredEntries[root.selectedIndex];
+            var type = root.getPreviewType(entry);
+            if (type === "text" && root.hasPreview(entry)) {
+                decodeTextProc.entryText = entry;
+                decodeTextProc.running = true;
+            } else {
+                root.currentPreviewText = root.getEntryText(entry);
+            }
+        } else {
+            root.currentPreviewText = "";
+        }
+    }
+
+    onSelectedIndexChanged: {
+        updatePreviewText();
+    }
+    onFilteredEntriesChanged: {
+        updatePreviewText();
+    }
     Component.onCompleted: {
         refreshClipboard();
     }
@@ -173,6 +248,23 @@ Scope {
         }
     }
 
+    // Decode text for preview
+    Process {
+        id: decodeTextProc
+
+        property string entryText: ""
+
+        command: ["sh", "-c", "echo \"$1\" | cliphist decode", "sh", entryText]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.currentPreviewText = this.text;
+            }
+        }
+
+    }
+
     // Render Window on each Screen
     Variants {
         model: Quickshell.screens
@@ -185,6 +277,7 @@ Scope {
                 property bool isClosing: false
                 property real animOffsetY: -350
                 property real animOpacity: 0
+                readonly property bool showPreview: root.filteredEntries && root.filteredEntries.length > root.selectedIndex ? root.hasPreview(root.filteredEntries[root.selectedIndex]) : false
 
                 function closePopup() {
                     if (isClosing)
@@ -194,14 +287,57 @@ Scope {
                     exitAnim.start();
                 }
 
+                function handleUp() {
+                    if (root.activeWindow === 1) {
+                        previewScrollView.ScrollBar.vertical.decrease();
+                    } else {
+                        if (root.selectedIndex > 0) {
+                            root.selectedIndex--;
+                            listView.positionViewAtIndex(root.selectedIndex, ListView.Contain);
+                        }
+                    }
+                }
+
+                function handleDown() {
+                    if (root.activeWindow === 1) {
+                        previewScrollView.ScrollBar.vertical.increase();
+                    } else {
+                        if (root.selectedIndex < root.filteredEntries.length - 1) {
+                            root.selectedIndex++;
+                            listView.positionViewAtIndex(root.selectedIndex, ListView.Contain);
+                        }
+                    }
+                }
+
+                function handleEscape() {
+                    win.closePopup();
+                }
+
+                function handleReturn() {
+                    if (root.filteredEntries.length > 0) {
+                        copyProc.entryText = root.filteredEntries[root.selectedIndex];
+                        copyProc.running = true;
+                    }
+                }
+
+                function handleTab() {
+                    if (root.activeWindow === 0) {
+                        if (win.showPreview)
+                            root.activeWindow = 1;
+
+                    } else {
+                        root.activeWindow = 0;
+                    }
+                }
+
                 screen: modelData
                 WlrLayershell.namespace: "quickshell"
                 WlrLayershell.layer: WlrLayer.Overlay
-                WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+                WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
                 focusable: true
                 color: "transparent"
-                implicitWidth: 200
+                implicitWidth: showPreview ? 528 : 200
                 implicitHeight: 260
                 Component.onCompleted: {
                     introAnim.start();
@@ -211,6 +347,17 @@ Scope {
                 Connections {
                     function onRequestClose() {
                         win.closePopup();
+                    }
+
+                    function onActiveWindowChanged() {
+                        if (root.activeWindow === 0) {
+                            searchInput.forceActiveFocus();
+                        } else if (root.activeWindow === 1) {
+                            if (win.showPreview)
+                                mainContainer.forceActiveFocus();
+                            else
+                                root.activeWindow = 0;
+                        }
                     }
 
                     target: root
@@ -275,48 +422,48 @@ Scope {
 
                 }
 
-                // Click outside to close
+                // Click outside or focus loss to close
                 HyprlandFocusGrab {
                     active: !win.isClosing
                     windows: [win]
-                    onCleared: win.closePopup()
+                    onCleared: {
+                        console.log("clipboard_popup: focus grab cleared, closing popup");
+                        win.closePopup();
+                    }
+                    onActiveChanged: {
+                        console.log("clipboard_popup: focus grab active status changed to:", active);
+                    }
                 }
 
-                // Container
+                // Main Container (left card)
                 Rectangle {
-                    anchors.fill: parent
-                    opacity: win.animOpacity
-                    color: theme.popupBgColor // transparent matching other widgets
-                    border.width: 0
+                    id: mainContainer
+
+                    anchors.left: parent.left
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    width: 200
+                    opacity: (root.activeWindow === 0) ? win.animOpacity : win.animOpacity * 0.4
+                    color: theme.popupBgColor
+                    border.width: 1
+                    border.color: theme.accent
                     radius: 0
                     focus: true
                     Keys.onPressed: (event) => {
-                        if (event.key === Qt.Key_Escape) {
-                            win.closePopup();
+                        if (event.key === Qt.Key_Tab) {
+                            win.handleTab();
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Up) {
-                            if (root.selectedIndex > 0) {
-                                root.selectedIndex--;
-                                listView.positionViewAtIndex(root.selectedIndex, ListView.Contain);
-                            }
+                            win.handleUp();
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Down) {
-                            if (root.selectedIndex < root.filteredEntries.length - 1) {
-                                root.selectedIndex++;
-                                listView.positionViewAtIndex(root.selectedIndex, ListView.Contain);
-                            }
+                            win.handleDown();
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Escape) {
+                            win.handleEscape();
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                            if (root.filteredEntries.length > 0) {
-                                copyProc.entryText = root.filteredEntries[root.selectedIndex];
-                                copyProc.running = true;
-                            }
-                            event.accepted = true;
-                        } else if (event.key === Qt.Key_Delete) {
-                            if (root.filteredEntries.length > 0) {
-                                deleteProc.entryText = root.filteredEntries[root.selectedIndex];
-                                deleteProc.running = true;
-                            }
+                            win.handleReturn();
                             event.accepted = true;
                         }
                     }
@@ -338,11 +485,34 @@ Scope {
                                 anchors.fill: parent
                                 anchors.bottomMargin: 2
                                 verticalAlignment: TextInput.AlignVCenter
-                                color: theme.fg
+                                color: theme.accent
                                 font.family: root.fontName
                                 font.pointSize: 8
-
-                                focus: true
+                                focus: root.activeWindow === 0
+                                Keys.onPressed: (event) => {
+                                    if (event.key === Qt.Key_Tab) {
+                                        win.handleTab();
+                                        event.accepted = true;
+                                    } else if (event.key === Qt.Key_Up) {
+                                        win.handleUp();
+                                        event.accepted = true;
+                                    } else if (event.key === Qt.Key_Down) {
+                                        win.handleDown();
+                                        event.accepted = true;
+                                    } else if (event.key === Qt.Key_Escape) {
+                                        win.handleEscape();
+                                        event.accepted = true;
+                                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                                        win.handleReturn();
+                                        event.accepted = true;
+                                    } else if (event.key === Qt.Key_Delete) {
+                                        if (root.filteredEntries.length > 0) {
+                                            deleteProc.entryText = root.filteredEntries[root.selectedIndex];
+                                            deleteProc.running = true;
+                                        }
+                                        event.accepted = true;
+                                    }
+                                }
                                 onTextChanged: {
                                     root.searchQuery = text.toLowerCase();
                                     root.filterEntries();
@@ -365,7 +535,7 @@ Scope {
                                 anchors.bottom: parent.bottom
                                 width: parent.width
                                 height: 1
-                                color: theme.secondary
+                                color: (root.activeWindow === 0 && searchInput.activeFocus) ? theme.accent : theme.secondary
                             }
 
                         }
@@ -429,7 +599,7 @@ Scope {
                                             visible: previewType === "text"
                                             anchors.fill: parent
                                             text: entryText.toLowerCase()
-                                            color: (root.selectedIndex === index) ? "#ddc7a1" : theme.fg
+                                            color: (root.selectedIndex === index) ? theme.accent : theme.secondary
                                             font.family: root.fontName
                                             font.pointSize: 8
                                             elide: Text.ElideRight
@@ -440,32 +610,286 @@ Scope {
 
                                     }
 
+                                    // Indicator showing a preview is available
+                                    Text {
+                                        text: "󰍜"
+                                        color: (root.selectedIndex === index) ? theme.accent : theme.secondary
+                                        font.family: root.fontName
+                                        font.pointSize: 8
+                                        visible: root.hasPreview(modelData)
+                                        renderType: Text.NativeRendering
+                                        Layout.alignment: Qt.AlignVCenter
+                                    }
+
                                 }
 
                             }
 
                         }
 
-                        // Clear All button
-                        Text {
-                            text: "clear all"
-                            font.family: root.fontName
-                            font.pointSize: 8
-                            color: clearAllMouseArea.containsMouse ? "#fb4934" : theme.secondary
-                            Layout.alignment: Qt.AlignRight
+                        // Bottom Row (total items & clear all)
+                        RowLayout {
+                            Layout.fillWidth: true
                             Layout.bottomMargin: 2
+                            Layout.leftMargin: 4
                             Layout.rightMargin: 4
 
-                            MouseArea {
-                                id: clearAllMouseArea
-
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                onClicked: {
-                                    wipeProc.running = true;
-                                }
+                            Text {
+                                text: root.filteredEntries.length + " items"
+                                font.family: root.fontName
+                                font.pointSize: 8
+                                font.italic: true
+                                color: theme.secondary
+                                renderType: Text.NativeRendering
                             }
 
+                            Item {
+                                Layout.fillWidth: true
+                            }
+
+                            Text {
+                                text: "clear all"
+                                font.family: root.fontName
+                                font.pointSize: 8
+                                color: clearAllMouseArea.containsMouse ? "#fb4934" : theme.secondary
+                                renderType: Text.NativeRendering
+
+                                MouseArea {
+                                    id: clearAllMouseArea
+
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onClicked: {
+                                        wipeProc.running = true;
+                                    }
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 100
+                        }
+
+                    }
+
+                }
+
+                // Preview Container (right card)
+                Rectangle {
+                    id: previewContainer
+
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    height: Math.min(260, previewLayout.implicitHeight + 8)
+                    width: 320
+                    opacity: win.showPreview ? ((root.activeWindow === 1) ? win.animOpacity : win.animOpacity * 0.6) : 0
+                    visible: opacity > 0
+                    color: theme.popupBgColor
+                    border.width: 1
+                    border.color: theme.accent
+                    radius: 0
+
+                    ColumnLayout {
+                        id: previewLayout
+
+                        anchors.fill: parent
+                        anchors.margins: 4
+                        spacing: 3
+
+                        // Header (Title & Meta)
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: 4
+
+                            Text {
+                                text: "󰈈 Preview"
+                                color: theme.accent
+                                font.family: root.fontName
+                                font.pointSize: 7.5
+                                font.bold: true
+                                renderType: Text.NativeRendering
+                            }
+
+                            Item {
+                                Layout.fillWidth: true
+                            }
+
+                            Text {
+                                text: {
+                                    var entry = root.filteredEntries[root.selectedIndex];
+                                    if (!entry)
+                                        return "";
+
+                                    var type = root.getPreviewType(entry);
+                                    if (type === "image")
+                                        return "Image";
+
+                                    var text = root.getEntryText(entry);
+                                    if (root.isFile(text))
+                                        return "File";
+
+                                    return "Text (" + text.length + " chars)";
+                                }
+                                color: theme.secondary
+                                font.family: root.fontName
+                                font.pointSize: 7.5
+                                renderType: Text.NativeRendering
+                            }
+
+                        }
+
+                        // Content Preview Area
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: {
+                                var entry = root.filteredEntries[root.selectedIndex];
+                                if (!entry)
+                                    return 20;
+
+                                var type = root.getPreviewType(entry);
+                                if (type === "image")
+                                    return 120;
+
+                                return Math.min(212, Math.max(40, previewText.implicitHeight + 8));
+                            }
+                            color: theme.bg_dark
+                            radius: 0
+                            clip: true
+
+                            // 1. Image Preview
+                            Image {
+                                anchors.fill: parent
+                                anchors.margins: 2
+                                fillMode: Image.PreserveAspectFit
+                                horizontalAlignment: Image.AlignHCenter
+                                verticalAlignment: Image.AlignVCenter
+                                visible: (root.filteredEntries && root.filteredEntries.length > root.selectedIndex) ? (root.getPreviewType(root.filteredEntries[root.selectedIndex]) === "image") : false
+                                source: {
+                                    var entry = root.filteredEntries[root.selectedIndex];
+                                    if (!entry)
+                                        return "";
+
+                                    return "file:///tmp/clip_" + root.getEntryId(entry) + ".png";
+                                }
+                                cache: false
+                            }
+
+                            // 2. Text Preview Scrollable
+                            ScrollView {
+                                id: previewScrollView
+
+                                anchors.fill: parent
+                                anchors.margins: 2
+                                clip: true
+                                visible: (root.filteredEntries && root.filteredEntries.length > root.selectedIndex) ? (root.getPreviewType(root.filteredEntries[root.selectedIndex]) === "text") : false
+
+                                Text {
+                                    id: previewText
+
+                                    width: previewContainer.width - 12
+                                    text: root.currentPreviewText
+                                    color: theme.fg
+                                    font.family: root.fontName
+                                    font.pointSize: 7.5
+                                    wrapMode: Text.WrapAnywhere
+                                    renderType: Text.NativeRendering
+                                }
+
+                            }
+
+                        }
+
+                        // Actions / Option Buttons Row
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: 8
+
+                            // Info label
+                            Text {
+                                text: {
+                                    var entry = root.filteredEntries[root.selectedIndex];
+                                    if (!entry)
+                                        return "";
+
+                                    var text = root.getEntryText(entry);
+                                    if (root.isFile(text))
+                                        return "File path";
+
+                                    var lines = root.getLineCount(text);
+                                    var words = root.getWordCount(text);
+                                    return lines + " lines, " + words + " words";
+                                }
+                                color: theme.secondary
+                                font.family: root.fontName
+                                font.pointSize: 7.5
+                                renderType: Text.NativeRendering
+                            }
+
+                            Item {
+                                Layout.fillWidth: true
+                            }
+
+                            // "go to location" for files
+                            Text {
+                                text: "go to location"
+                                font.family: root.fontName
+                                font.pointSize: 7.5
+                                font.bold: true
+                                color: fileLocMouse.containsMouse ? theme.accent : theme.secondary
+                                visible: (root.filteredEntries && root.filteredEntries.length > root.selectedIndex) ? root.isFile(root.getEntryText(root.filteredEntries[root.selectedIndex])) : false
+
+                                MouseArea {
+                                    id: fileLocMouse
+
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onClicked: {
+                                        var entry = root.filteredEntries[root.selectedIndex];
+                                        if (entry) {
+                                            var path = root.cleanFilePath(root.getEntryText(entry));
+                                            Quickshell.execDetached(["xdg-open", path]);
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            // "copy" button
+                            Text {
+                                text: "copy"
+                                font.family: root.fontName
+                                font.pointSize: 7.5
+                                font.bold: true
+                                color: copyBtnMouse.containsMouse ? theme.accent : theme.secondary
+
+                                MouseArea {
+                                    id: copyBtnMouse
+
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onClicked: {
+                                        var entry = root.filteredEntries[root.selectedIndex];
+                                        if (entry) {
+                                            copyProc.entryText = entry;
+                                            copyProc.running = true;
+                                        }
+                                    }
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 100
                         }
 
                     }

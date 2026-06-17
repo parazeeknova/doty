@@ -20,7 +20,7 @@ install: build
 	-pkill -f wallpaper_thumb_watcher 2>/dev/null || true
 	-pkill -f screentime_daemon 2>/dev/null || true
 	@sleep 0.5
-	mkdir -p ../../quickshell/battery_popup ../../quickshell/volume_popup ../../quickshell/osd/bin ../../quickshell/network_popup ../../quickshell/bluetooth_popup ../../quickshell/brightness_popup ../../quickshell/notif_popup ../../quickshell/sysmon_popup ../../quickshell/podman_popup ../../quickshell/media_popup ../../quickshell/vm_popup ../../rofi/scripts ../../quickshell/wallpaper_switcher ../../quickshell/github_graph ../../../scripts ../../waybar/scripts
+	mkdir -p ../../quickshell/battery_popup ../../quickshell/volume_popup ../../quickshell/osd/bin ../../quickshell/network_popup ../../quickshell/bluetooth_popup ../../quickshell/brightness_popup ../../quickshell/notif_popup ../../quickshell/sysmon_popup ../../quickshell/podman_popup ../../quickshell/media_popup ../../quickshell/vm_popup ../../quickshell/ports_popup ../../quickshell/sunset_popup ../../rofi/scripts ../../quickshell/wallpaper_switcher ../../quickshell/github_graph ../../../scripts ../../waybar/scripts
 	cp target/release/get_battery_status ../../quickshell/battery_popup/get_battery_status
 	cp target/release/log_battery ../../quickshell/battery_popup/log_battery
 	cp target/release/battery_daemon ../../quickshell/battery_popup/battery_daemon
@@ -34,11 +34,11 @@ install: build
 	cp target/release/get_podman_status ../../quickshell/podman_popup/get_podman_status
 	cp target/release/get_media_status ../../quickshell/media_popup/get_media_status
 	cp target/release/get_vm_status ../../quickshell/vm_popup/get_vm_status
-	cp target/release/ports_menu ../../rofi/scripts/ports_menu
+	cp target/release/get_ports_status ../../quickshell/ports_popup/get_ports_status
+	cp target/release/get_sunset_status ../../quickshell/sunset_popup/get_sunset_status
 	cp target/release/caffeine ../../rofi/scripts/caffeine
 	cp target/release/cliphist ../../rofi/scripts/cliphist
 	cp target/release/notif_center ../../rofi/scripts/notif_center
-	cp target/release/profile ../../rofi/scripts/profile
 	cp target/release/recents ../../rofi/scripts/recents
 	cp target/release/sunset ../../rofi/scripts/sunset
 	cp target/release/toggle_glass ../../rofi/scripts/toggle_glass
