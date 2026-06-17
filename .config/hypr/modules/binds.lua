@@ -197,16 +197,20 @@ hl.bind(mainMod .. " + ALT + H", hl.dsp
     .exec_cmd('pgrep -x helium && hyprctl dispatch \'hl.dsp.workspace.toggle_special("helium")\' || helium-browser'))
 
 ---------------------
----     Rofi      ---
+---    Old Rofi   ---
 ---------------------
-hl.bind(mainMod .. " + SPACE", hl.dsp
-    .exec_cmd("~/.config/rofi/scripts/rofi_wrap -show drun -mesg 'applications' -placeholder 'search applications'"))
-hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd("~/.config/rofi/scripts/rofi_wrap -show recents"))
+hl.bind(mainMod .. " + SPACE",
+    hl.dsp.exec_cmd("quickshell -c apps_popup ipc call apps_popup close || quickshell --config apps_popup"))
+hl.bind(mainMod .. " + TAB", hl.dsp
+    .exec_cmd("quickshell -c recents_popup ipc call recents_popup close || quickshell --config recents_popup"))
 hl.bind(mainMod .. " + X",
     hl.dsp.exec_cmd("quickshell -c power_popup ipc call power_popup close || quickshell --config power_popup"))
-hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("quickshell -c sunset_popup ipc call sunset_popup close || quickshell --config sunset_popup"))
-hl.bind(mainMod .. " + slash", hl.dsp.exec_cmd("quickshell -c ports_popup ipc call ports_popup close || quickshell --config ports_popup"))
-hl.bind("XF86Launch3", hl.dsp.exec_cmd("quickshell -c profile_popup ipc call profile_popup close || quickshell --config profile_popup"))
+hl.bind(mainMod .. " + I",
+    hl.dsp.exec_cmd("quickshell -c sunset_popup ipc call sunset_popup close || quickshell --config sunset_popup"))
+hl.bind(mainMod .. " + slash",
+    hl.dsp.exec_cmd("quickshell -c ports_popup ipc call ports_popup close || quickshell --config ports_popup"))
+hl.bind("XF86Launch3", hl.dsp
+    .exec_cmd("quickshell -c profile_popup ipc call profile_popup close || quickshell --config profile_popup"))
 
 ---------------------
 ---   Pyprland    ---

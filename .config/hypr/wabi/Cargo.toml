@@ -106,30 +106,6 @@ name = "presets_lister"
 path = "src/bin/theme/presets_lister.rs"
 
 [[bin]]
-name = "caffeine"
-path = "src/bin/rofi/caffeine.rs"
-
-[[bin]]
-name = "cliphist"
-path = "src/bin/rofi/cliphist.rs"
-
-[[bin]]
-name = "notif_center"
-path = "src/bin/rofi/notif_center.rs"
-
-[[bin]]
-name = "recents"
-path = "src/bin/rofi/recents.rs"
-
-[[bin]]
-name = "toggle_glass"
-path = "src/bin/rofi/toggle_glass.rs"
-
-[[bin]]
-name = "rofi_wrap"
-path = "src/bin/rofi/rofi_wrap.rs"
-
-[[bin]]
 name = "battery_daemon"
 path = "src/bin/status/battery_daemon.rs"
 
@@ -148,5 +124,14 @@ path = "src/bin/status/get_screentime_status.rs"
 [[bin]]
 name = "check_daemons"
 path = "src/bin/status/check_daemons.rs"
+
+[[bin]]
+name = "get_apps_list"
+path = "src/bin/status/apps.rs"
+
+[[bin]]
+name = "get_recents_list"
+path = "src/bin/status/recents.rs"
+
 
 

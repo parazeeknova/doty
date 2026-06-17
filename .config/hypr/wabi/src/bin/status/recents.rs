@@ -1,12 +1,20 @@
+use serde::Serialize;
 use serde_json::Value;
-use std::env;
-use std::io::{self, Write};
 use std::process::Command;
+
+#[derive(Serialize)]
+struct ClientInfo {
+    address: String,
+    title: String,
+    workspace_id: i64,
+    workspace_roman: String,
+    class: String,
+}
 
 fn to_roman(mut num: i32) -> String {
     let mut roman = String::new();
     let values = [10, 9, 5, 4, 1];
-    let symbols = ["x", "ix", "v", "iv", "i"];
+    let symbols = ["X", "IX", "V", "IV", "I"];
 
     for i in 0..values.len() {
         while num >= values[i] {
@@ -18,19 +26,7 @@ fn to_roman(mut num: i32) -> String {
 }
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    if args.len() > 1 && !args[1].is_empty() {
-        if let Ok(rofi_info) = env::var("ROFI_INFO")
-            && rofi_info.starts_with("ws:")
-        {
-            let ws = rofi_info.trim_start_matches("ws:");
-            let _ = Command::new("hyprctl")
-                .args(["dispatch", &format!("hl.dsp.focus({{workspace={}}})", ws)])
-                .status();
-        }
-        std::process::exit(0);
-    }
-
+    let mut clients_list = Vec::new();
     let clients_out = Command::new("hyprctl").args(["clients", "-j"]).output();
 
     if let Ok(out) = clients_out
@@ -46,13 +42,24 @@ fn main() {
                         .and_then(|w| w.get("id"))
                         .and_then(|id| id.as_i64())
                 {
-                    let roman = to_roman(ws_id as i32);
-                    println!("[{}] {}\0info\x1fws:{}", roman, title, ws_id);
+                    let address = client.get("address").and_then(|a| a.as_str()).unwrap_or_default().to_string();
+                    let class = client.get("class").and_then(|c| c.as_str()).unwrap_or_default().to_string();
+                    clients_list.push(ClientInfo {
+                        address,
+                        title: title.to_string(),
+                        workspace_id: ws_id,
+                        workspace_roman: to_roman(ws_id as i32),
+                        class,
+                    });
                 }
             }
         }
     }
 
-    println!("\0message\x1frecents");
-    let _ = io::stdout().flush();
+    #[derive(Serialize)]
+    struct Response {
+        clients: Vec<ClientInfo>,
+    }
+
+    let _ = serde_json::to_writer(std::io::stdout(), &Response { clients: clients_list });
 }
