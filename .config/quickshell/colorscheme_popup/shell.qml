@@ -795,7 +795,7 @@ Scope {
                                 width: parent.width
                                 height: 14
                                 onClicked: {
-                                    Quickshell.execDetached([root.homeDir + "/doty/.config/rofi/scripts/toggle_glass"]);
+                                    Quickshell.execDetached(["theme_switcher", "--toggle-glass"]);
                                 }
 
                                 Row {

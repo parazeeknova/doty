@@ -448,6 +448,12 @@ fn patch_kvantum_svg(svg_template: &Path, svg_output: &Path, vars: &HashMap<Stri
 fn main() {
     let args: Vec<String> = env::args().collect();
 
+    // Handle --toggle-glass
+    if args.len() > 1 && args[1] == "--toggle-glass" {
+        toggle_glass();
+        return;
+    }
+
     let mut mode = String::new();
     let mut value = String::new();
 
@@ -944,6 +950,30 @@ fn toggle_hex_alpha_lines(content: &str, key: &str, line_suffix: &str, want_alph
         .collect::<Vec<_>>()
         .join("\n")
         + if content.ends_with('\n') { "\n" } else { "" }
+}
+
+fn toggle_glass() {
+    let home = home_dir();
+    let state_file = home.join(".cache").join("quickshell").join("glass_state");
+    let tmp_state = std::path::PathBuf::from("/tmp/quickshell_glass_state");
+
+    let current = fs::read_to_string(&state_file)
+        .map(|s| s.trim().to_string())
+        .unwrap_or_else(|_| "true".to_string());
+
+    let new_state = if current == "true" { "false" } else { "true" };
+
+    let _ = fs::write(&state_file, new_state);
+    let _ = fs::write(&tmp_state, new_state);
+
+    apply_glass_state();
+
+    let status = if new_state == "true" { "On" } else { "Off" };
+    let color = if new_state == "true" { "good" } else { "bad" };
+    let osdctl = home.join(".config").join("quickshell").join("osd/bin/osdctl");
+    let _ = Command::new(&osdctl)
+        .args(["show", &format!("Glass: {}", status), color, "1200"])
+        .status();
 }
 
 fn apply_glass_state() {

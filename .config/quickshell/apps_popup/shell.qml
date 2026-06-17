@@ -51,8 +51,6 @@ Scope {
     }
 
     function parseWebSearch(query) {
-        // e.g. "!hello" -> query is "hello"
-
         var q = query.trim();
         if (!q.startsWith("!"))
             return null;
@@ -201,10 +199,10 @@ Scope {
                     webSearch = root.parseWebSearch(root.searchQuery);
                 else if (root.activeTab === 1 && query !== "")
                     webSearch = {
-                        "engine": "duckduckgo",
-                        "url": "https://duckduckgo.com/?q=" + encodeURIComponent(query),
-                        "query": query
-                    };
+                    "engine": "duckduckgo",
+                    "url": "https://duckduckgo.com/?q=" + encodeURIComponent(query),
+                    "query": query
+                };
                 if (webSearch) {
                     list.push({
                         "type": "web_search",
@@ -704,8 +702,7 @@ Scope {
                 required property var modelData
                 property bool isClosing: false
                 property real animOpacity: 0
-                property real animScale: 0.95
-                property real animY: 10
+                property real animOffsetY: -20
 
                 function closePopup() {
                     if (isClosing)
@@ -755,25 +752,16 @@ Scope {
                         property: "animOpacity"
                         from: 0
                         to: 1
-                        duration: 180
+                        duration: 150
                         easing.type: Easing.OutCubic
                     }
 
                     NumberAnimation {
                         target: win
-                        property: "animScale"
-                        from: 0.95
-                        to: 1
-                        duration: 220
-                        easing.type: Easing.OutExpo
-                    }
-
-                    NumberAnimation {
-                        target: win
-                        property: "animY"
-                        from: 10
+                        property: "animOffsetY"
+                        from: -20
                         to: 0
-                        duration: 220
+                        duration: 180
                         easing.type: Easing.OutExpo
                     }
 
@@ -789,26 +777,17 @@ Scope {
                         property: "animOpacity"
                         from: 1
                         to: 0
-                        duration: 150
-                        easing.type: Easing.OutQuad
+                        duration: 120
+                        easing.type: Easing.OutCubic
                     }
 
                     NumberAnimation {
                         target: win
-                        property: "animScale"
-                        from: 1
-                        to: 0.95
-                        duration: 150
-                        easing.type: Easing.OutQuad
-                    }
-
-                    NumberAnimation {
-                        target: win
-                        property: "animY"
+                        property: "animOffsetY"
                         from: 0
-                        to: 10
-                        duration: 150
-                        easing.type: Easing.OutQuad
+                        to: -20
+                        duration: 120
+                        easing.type: Easing.OutCubic
                     }
 
                 }
@@ -827,7 +806,7 @@ Scope {
 
                     anchors.fill: parent
                     opacity: win.animOpacity
-                    scale: win.animScale
+                    y: win.animOffsetY
                     color: theme.popupBgColor
                     border.width: 1
                     border.color: theme.accent
@@ -1740,10 +1719,6 @@ Scope {
 
                         }
 
-                    }
-
-                    transform: Translate {
-                        y: win.animY
                     }
 
                 }
