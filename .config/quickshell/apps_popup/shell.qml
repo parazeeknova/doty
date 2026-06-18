@@ -145,6 +145,13 @@ Scope {
         root.requestClose();
     }
 
+    function launchWebSearchItem(item) {
+        if (!item || item.type !== "web_search")
+            return ;
+
+        root.launchWebSearch(root.getReconstructedQuery(item));
+    }
+
     function launchFile(path) {
         if (!path)
             return ;
@@ -844,7 +851,7 @@ Scope {
                 screen: modelData
                 WlrLayershell.namespace: "quickshell"
                 WlrLayershell.layer: WlrLayer.Overlay
-                WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+                WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
                 focusable: true
                 color: "transparent"
@@ -1030,7 +1037,7 @@ Scope {
 
                                     }
                                     var isStaleWebSearch = false;
-                                    if (currentText.startsWith("!") && selected.type === "web_search") {
+                                    if (currentText.startsWith("!") && selected.type === "web_search" && !selected.is_history) {
                                         var webQuery = currentText.substring(1).trim();
                                         var selQuery = selected.query || "";
                                         if (selQuery.toLowerCase() !== webQuery.toLowerCase())
@@ -1048,7 +1055,7 @@ Scope {
                                         if (selected.type === "app")
                                             root.launchApp(selected.data.name, selected.data.exec);
                                         else if (selected.type === "web_search")
-                                            root.launchWebSearch(root.getReconstructedQuery(selected));
+                                            root.launchWebSearchItem(selected);
                                         else if (selected.type === "file")
                                             root.launchFile(selected.data.path);
                                         else if (selected.type === "git_repo")
@@ -1851,7 +1858,7 @@ Scope {
                                         if (modelData.type === "app")
                                             root.launchApp(modelData.data.name, modelData.data.exec);
                                         else if (modelData.type === "web_search")
-                                            root.launchWebSearch(root.getReconstructedQuery(modelData));
+                                            root.launchWebSearchItem(modelData);
                                         else if (modelData.type === "file")
                                             root.launchFile(modelData.data.path);
                                         else if (modelData.type === "git_repo")

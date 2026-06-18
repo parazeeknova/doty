@@ -200,9 +200,9 @@ hl.bind(mainMod .. " + ALT + H", hl.dsp
 ---    Old Rofi   ---
 ---------------------
 hl.bind(mainMod .. " + SPACE",
-    hl.dsp.exec_cmd("quickshell -c apps_popup ipc call apps_popup close || quickshell --config apps_popup"))
+    hl.dsp.exec_cmd("quickshell -c apps_popup ipc call apps_popup close || (quickshell -c recents_popup ipc call recents_popup close; quickshell --config apps_popup)"))
 hl.bind(mainMod .. " + TAB", hl.dsp
-    .exec_cmd("quickshell -c recents_popup ipc call recents_popup close || quickshell --config recents_popup"))
+    .exec_cmd("quickshell -c recents_popup ipc call recents_popup close || (quickshell -c apps_popup ipc call apps_popup close; quickshell --config recents_popup)"))
 hl.bind(mainMod .. " + X",
     hl.dsp.exec_cmd("quickshell -c power_popup ipc call power_popup close || quickshell --config power_popup"))
 hl.bind(mainMod .. " + I",
