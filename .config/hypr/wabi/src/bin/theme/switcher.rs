@@ -897,7 +897,7 @@ fn main() {
     // Apply Spicetify theme if installed
     let spicetify_path = home_dir().join(".spicetify").join("spicetify");
     if spicetify_path.exists() {
-        let _ = Command::new(spicetify_path).arg("apply").status();
+        let _ = Command::new(spicetify_path).args(["apply", "-n"]).status();
     }
 
     // Rebuild bat's theme cache (non-blocking, picks up on next launch)
