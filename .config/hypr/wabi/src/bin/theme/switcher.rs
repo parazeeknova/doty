@@ -897,7 +897,16 @@ fn main() {
     // Apply Spicetify theme if installed
     let spicetify_path = home_dir().join(".spicetify").join("spicetify");
     if spicetify_path.exists() {
-        let _ = Command::new(spicetify_path).args(["apply", "-n"]).status();
+        let _ = Command::new(&spicetify_path).args(["apply", "-n"]).status();
+        if Command::new("pgrep").arg("-x").arg("spotify").status().map(|s| s.success()).unwrap_or(false) {
+            let _ = Command::new("pkill").arg("-x").arg("spotify").status();
+            std::thread::sleep(std::time::Duration::from_millis(500));
+            let _ = Command::new("uwsm")
+                .args(["app", "--", "spotify"])
+                .stdout(std::process::Stdio::null())
+                .stderr(std::process::Stdio::null())
+                .spawn();
+        }
     }
 
     // Rebuild bat's theme cache (non-blocking, picks up on next launch)

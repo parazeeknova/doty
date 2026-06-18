@@ -47,7 +47,7 @@ hl.bind(mainMod .. " + semicolon", focus_or_launch("code-insiders", "uwsm app --
 hl.bind(mainMod .. " + ALT + semicolon", focus_or_launch("code", "uwsm app -- code"))
 
 -- Music
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("hyprctl clients | grep -iq 'class: .*spotify' && hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })' || uwsm app -- spotify"))
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("hyprctl clients | grep -iq 'class: .*spotify' && hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })' || (uwsm app -- spotify && hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })')"))
 
 ---------------------
 ---    Windows    ---
