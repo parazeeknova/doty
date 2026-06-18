@@ -8,8 +8,10 @@ body, #app-mount {
   --brand-experiment-30a: rgba({{accent_rgb}}, 0.3) !important;
   --brand-experiment-500: #{{accent_hex}} !important;
   --brand-experiment-600: #{{secondary_hex}} !important;
+  --brand-500: #{{accent_hex}} !important;
+  --brand-600: #{{secondary_hex}} !important;
 
-  /* Backgrounds */
+  /* Primary Backgrounds (Frosted Glass Translucency) */
   --background-primary: rgba({{bg_rgb}}, 0.45) !important;
   --background-secondary: rgba({{bg_dark_rgb}}, 0.6) !important;
   --background-secondary-alt: rgba({{bg_dark_rgb}}, 0.65) !important;
@@ -17,6 +19,20 @@ body, #app-mount {
   --background-floating: rgba({{bg_dark_rgb}}, 0.85) !important;
   --background-accent: rgba({{bg_light_rgb}}, 0.45) !important;
   --background-message-hover: rgba({{bg_light_rgb}}, 0.07) !important;
+  
+  /* Additional Background Mappings from Catppuccin */
+  --background-surface-highest: rgba({{bg_light_rgb}}, 0.5) !important;
+  --background-surface-higher: rgba({{bg_light_rgb}}, 0.4) !important;
+  --background-surface-high: rgba({{bg_rgb}}, 0.45) !important;
+  --background-base-lowest: rgba({{bg_dark_rgb}}, 0.75) !important;
+  --background-base-lower: rgba({{bg_dark_rgb}}, 0.6) !important;
+  --background-base-low: rgba({{bg_rgb}}, 0.45) !important;
+  --bg-surface-raised: rgba({{bg_dark_rgb}}, 0.6) !important;
+  --home-background: rgba({{bg_rgb}}, 0.45) !important;
+  --chat-background: rgba({{bg_rgb}}, 0.45) !important;
+  --chat-background-default: rgba({{bg_rgb}}, 0.45) !important;
+  --chat-border: rgba({{bg_dark_rgb}}, 0.3) !important;
+  --chat-text-muted: #{{fg_light_hex}} !important;
 
   /* Text and Interactive States */
   --text-normal: #{{fg_hex}} !important;
@@ -24,23 +40,38 @@ body, #app-mount {
   --text-link: #{{accent_hex}} !important;
   --text-positive: #{{accent_hex}} !important;
   --text-danger: #{{error_hex}} !important;
+  --text-default: #{{fg_hex}} !important;
+  --text-strong: #{{fg_hex}} !important;
+  --text-subtle: #{{fg_light_hex}} !important;
 
   --interactive-normal: #{{fg_light_hex}} !important;
   --interactive-hover: #{{fg_hex}} !important;
   --interactive-active: #{{accent_hex}} !important;
-  --interactive-muted: #{{bg_light_hex}} !important;
+  --interactive-muted: rgba({{fg_light_rgb}}, 0.5) !important;
+  
+  --interactive-icon-default: #{{fg_light_hex}} !important;
+  --interactive-icon-hover: #{{fg_hex}} !important;
+  --interactive-icon-active: #{{accent_hex}} !important;
+  --interactive-text-default: #{{fg_light_hex}} !important;
+  --interactive-text-hover: #{{fg_hex}} !important;
+  --interactive-text-active: #{{accent_hex}} !important;
 
   /* Interactive Backgrounds */
   --background-modifier-hover: rgba({{bg_light_rgb}}, 0.12) !important;
   --background-modifier-active: rgba({{bg_light_rgb}}, 0.22) !important;
   --background-modifier-selected: rgba({{accent_rgb}}, 0.12) !important;
   --background-modifier-accent: rgba({{accent_rgb}}, 0.25) !important;
+  
+  --interactive-background-hover: rgba({{bg_light_rgb}}, 0.12) !important;
+  --interactive-background-selected: rgba({{accent_rgb}}, 0.12) !important;
+  --interactive-background-active: rgba({{accent_rgb}}, 0.22) !important;
 
   /* Card and Input Backgrounds */
   --channeltextarea-background: rgba({{bg_light_rgb}}, 0.4) !important;
   --activity-card-background: rgba({{bg_dark_rgb}}, 0.5) !important;
   --deprecated-card-bg: rgba({{bg_dark_rgb}}, 0.5) !important;
   --deprecated-quickbinder-border: rgba({{bg_light_rgb}}, 0.5) !important;
+  --card-background-default: rgba({{bg_light_rgb}}, 0.4) !important;
 
   /* Scrollbars */
   --scrollbar-thin-thumb: rgba({{accent_rgb}}, 0.3) !important;
@@ -49,4 +80,9 @@ body, #app-mount {
   --scrollbar-auto-track: transparent !important;
   --scrollbar-auto-scrollbar-color-thumb: rgba({{accent_rgb}}, 0.3) !important;
   --scrollbar-auto-scrollbar-color-track: transparent !important;
+  
+  /* Status Colors */
+  --status-positive: #{{accent_hex}} !important;
+  --status-warning: #{{secondary_hex}} !important;
+  --status-danger: #{{error_hex}} !important;
 }
