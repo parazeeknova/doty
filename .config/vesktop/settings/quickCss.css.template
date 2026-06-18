@@ -1,0 +1,33 @@
+@import url('https://mwittrien.github.io/BetterDiscordAddons/Themes/DiscordRecolor/DiscordRecolor.css');
+
+:root {
+  --accentcolor: {{accent_rgb}};
+  --accentcolor2: {{secondary_rgb}};
+  --linkcolor: {{accent_rgb}};
+  --mentioncolor: {{accent_rgb}};
+  --textbrightest: {{fg_rgb}};
+  --textbrighter: {{fg_light_rgb}};
+  --textbright: {{fg_light_rgb}};
+  --textdark: {{bg_light_rgb}};
+  --textdarker: {{bg_dark_rgb}};
+  --textdarkest: {{bg_rgb}};
+
+  --backgroundaccent: {{accent_rgb}};
+  --backgroundprimary: {{bg_rgb}};
+  --backgroundsecondary: {{bg_dark_rgb}};
+  --backgroundsecondaryalt: {{bg_dark_rgb}};
+  --backgroundtertiary: {{bg_dark_rgb}};
+  --backgroundfloating: {{bg_rgb}};
+  --settingsicons: 0;
+}
+
+::-webkit-scrollbar {
+  width: 10px !important;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 500px !important;
+  background: rgba(var(--accentcolor), 0.7) !important;
+  background-clip: content-box !important;
+  border: 2px solid transparent !important;
+}

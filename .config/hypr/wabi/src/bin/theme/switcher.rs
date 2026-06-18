@@ -672,6 +672,10 @@ fn main() {
             ".config/spicetify/Themes/wabi/color.ini.template",
             ".config/spicetify/Themes/wabi/color.ini",
         ),
+        (
+            ".config/vesktop/settings/quickCss.css.template",
+            ".config/vesktop/settings/quickCss.css",
+        ),
     ];
 
     for (tmpl, dest) in mappings {

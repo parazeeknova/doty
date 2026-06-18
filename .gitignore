@@ -40,4 +40,6 @@ vm_guest_credentials
 *.db-shm
 *.db-wal
 .config/spicetify/Themes/wabi/color.ini
+.config/vesktop/settings/quickCss.css
+
 

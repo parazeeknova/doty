@@ -3,39 +3,39 @@
 # Loaded automatically because fish auto-sources every *.fish under conf.d/.
 
 if status is-interactive
-    set -g fish_color_normal              "#e1e4d9"
-    set -g fish_color_command             "#abd28f"
-    set -g fish_color_keyword             "#abd28f" --bold
-    set -g fish_color_quote               "#a0cfcf"
-    set -g fish_color_redirection         "#bdcbaf"
-    set -g fish_color_end                 "#bdcbaf" --bold
+    set -g fish_color_normal              "#eee0d5"
+    set -g fish_color_command             "#fcb974"
+    set -g fish_color_keyword             "#fcb974" --bold
+    set -g fish_color_quote               "#bfcc9b"
+    set -g fish_color_redirection         "#e1c1a3"
+    set -g fish_color_end                 "#e1c1a3" --bold
     set -g fish_color_error               "#ffb4ab" --bold
-    set -g fish_color_param               "#c4c8bb"
-    set -g fish_color_option              "#bdcbaf"
-    set -g fish_color_comment             "#43483e" --italics
-    set -g fish_color_selection           --background="#1d211a" --bold
-    set -g fish_color_operator            "#abd28f"
-    set -g fish_color_escape              "#a0cfcf"
-    set -g fish_color_autosuggestion      "#43483e"
-    set -g fish_color_cwd                 "#abd28f" --bold
+    set -g fish_color_param               "#d5c3b5"
+    set -g fish_color_option              "#e1c1a3"
+    set -g fish_color_comment             "#50453a" --italics
+    set -g fish_color_selection           --background="#261e18" --bold
+    set -g fish_color_operator            "#fcb974"
+    set -g fish_color_escape              "#bfcc9b"
+    set -g fish_color_autosuggestion      "#50453a"
+    set -g fish_color_cwd                 "#fcb974" --bold
     set -g fish_color_cwd_root            "#ffb4ab" --bold
-    set -g fish_color_user                "#bdcbaf"
-    set -g fish_color_host                "#abd28f"
-    set -g fish_color_host_remote         "#a0cfcf"
+    set -g fish_color_user                "#e1c1a3"
+    set -g fish_color_host                "#fcb974"
+    set -g fish_color_host_remote         "#bfcc9b"
     set -g fish_color_status              "#ffb4ab"
     set -g fish_color_cancel              "#ffb4ab" --reverse
-    set -g fish_color_search_match        --background="#1d211a" "#a0cfcf" --bold
-    set -g fish_color_history_current     "#abd28f" --bold
+    set -g fish_color_search_match        --background="#261e18" "#bfcc9b" --bold
+    set -g fish_color_history_current     "#fcb974" --bold
     set -g fish_color_valid_path          --underline
-    set -g fish_color_match               "#a0cfcf" --bold
+    set -g fish_color_match               "#bfcc9b" --bold
 
-    set -g fish_pager_color_progress      "#11140e" --background="#abd28f"
-    set -g fish_pager_color_background    --background="#11140e"
-    set -g fish_pager_color_prefix        "#abd28f" --bold
-    set -g fish_pager_color_completion    "#e1e4d9"
-    set -g fish_pager_color_description   "#c4c8bb" --italics
-    set -g fish_pager_color_selected_background --background="#1d211a"
-    set -g fish_pager_color_selected_prefix "#abd28f" --bold
-    set -g fish_pager_color_selected_completion "#e1e4d9" --bold
-    set -g fish_pager_color_selected_description "#bdcbaf" --italics
+    set -g fish_pager_color_progress      "#19120c" --background="#fcb974"
+    set -g fish_pager_color_background    --background="#19120c"
+    set -g fish_pager_color_prefix        "#fcb974" --bold
+    set -g fish_pager_color_completion    "#eee0d5"
+    set -g fish_pager_color_description   "#d5c3b5" --italics
+    set -g fish_pager_color_selected_background --background="#261e18"
+    set -g fish_pager_color_selected_prefix "#fcb974" --bold
+    set -g fish_pager_color_selected_completion "#eee0d5" --bold
+    set -g fish_pager_color_selected_description "#e1c1a3" --italics
 end
