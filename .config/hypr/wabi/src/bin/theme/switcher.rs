@@ -1021,10 +1021,11 @@ fn apply_glass_state() {
     }
 
     let _ = Command::new("makoctl").arg("reload").status();
+    let _ = Command::new("pkill").args(["-USR2", "-x", "waybar"]).status();
 
     let hypr_eval = format!(
-        "hl.config({{ decoration = {{ active_opacity = {}, inactive_opacity = {}, blur = {{ enabled = {} }} }} }})",
-        opacity, inactive_opacity, blur
+        "hl.config({{ decoration = {{ active_opacity = {}, inactive_opacity = {}, blur = {{ enabled = {} }} }} }}); if hl.plugin.hyprglass then hl.plugin.hyprglass.config({{ enabled = {} }}) end",
+        opacity, inactive_opacity, blur, glass_enabled
     );
     let _ = Command::new("hyprctl").args(["eval", &hypr_eval]).status();
 

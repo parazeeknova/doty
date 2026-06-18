@@ -298,7 +298,7 @@ hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd(
 ---------------------
 
 -- Widget toggle
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/waybar/scripts/toggle_widgets"))
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(dotfiles .. "/.config/waybar/scripts/toggle_widgets"))
 
 -- Lock screen
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock -c ~/.config/hypr/hyprlock.conf"))

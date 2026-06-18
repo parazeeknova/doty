@@ -151,3 +151,86 @@ hl.config {
         }
     }
 }
+
+-- This requires https://github.com/hyprnux/hyprglass plugin
+-- hyprpm add https://github.com/hyprnux/hyprglass && hyprpm enable hyprglass
+if hl.plugin.hyprglass then
+    local hg = hl.plugin.hyprglass
+
+    -- Read initial glass state
+    local glass_state_file = io.open(os.getenv("HOME") .. "/.cache/quickshell/glass_state", "r")
+    local glass_enabled = true
+    if glass_state_file then
+        local content = glass_state_file:read("*all"):gsub("%s+", "")
+        glass_enabled = (content == "true")
+        glass_state_file:close()
+    end
+
+    -- Determine matugen generated accent tint color
+    local tint_color = 0x8899aa22
+    if colors.accent_hex then
+        tint_color = tonumber("0x" .. colors.accent_hex .. "22") or 0x8899aa22
+    end
+
+    hg.config({
+        enabled = glass_enabled,
+        default_theme = "dark",
+        default_preset = "clear",
+        tint_color = tint_color,
+        brightness = 0.7,
+        layers = {
+            enabled = 1
+        }
+    })
+
+    hg.layer("waybar", {
+        preset = "clear"
+    })
+    hg.layer("quickshell", {
+        preset = "clear"
+    })
+    hg.layer("github-graph", {
+        preset = "clear"
+    })
+    hg.layer("osd", {
+        preset = "clear"
+    })
+    hg.layer("workspace-overview", {
+        preset = "clear"
+    })
+    hg.layer("notifications", {
+        preset = "clear"
+    })
+
+    -- Clear Preset for semi glass effect
+    hg.preset("clear", {
+        blur_strength = 1.0,
+        blur_iterations = 0.82,
+        refraction_strength = 0.96,
+        chromatic_aberration = 0.95,
+        fresnel_strength = 0.95,
+        specular_strength = 0.45,
+        glass_opacity = 0.91,
+        edge_thickness = 0.035,
+        lens_distortion = 0.8,
+        dark = {
+            brightness = 0.82,
+            contrast = 0.92,
+            saturation = 0.82,
+            vibrancy = 0.12,
+            vibrancy_darkness = 0.12,
+            adaptive_dim = 0.32,
+            adaptive_boost = 0.01
+        }
+    })
+
+    if glass_enabled then
+        hl.window_rule({
+            name = "prevent-double-blur",
+            match = {
+                class = ".*"
+            },
+            no_blur = true
+        })
+    end
+end

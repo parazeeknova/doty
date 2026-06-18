@@ -737,6 +737,25 @@ fn main() {
             }
             return;
         }
+        Some("--web-search-item") => {
+            if let (Some(query), Some(engine), Some(url)) = (args.get(2), args.get(3), args.get(4)) {
+                let item = WebHistoryItem {
+                    query: query.to_string(),
+                    engine: engine.to_string(),
+                    url: url.to_string(),
+                };
+                if !item.query.trim().is_empty() && !item.url.trim().is_empty() {
+                    if let Err(e) = add_web_history(&conn, &item) {
+                        eprintln!("Error saving web search history: {}", e);
+                    }
+                    let _ = Command::new("xdg-open").arg(&item.url).status();
+                    let _ = Command::new("hyprctl")
+                        .args(["dispatch", "hl.dsp.focus({workspace=1})"])
+                        .status();
+                }
+            }
+            return;
+        }
         _ => {
             // Load usage map
             let usage_map = get_usage_map(&conn);

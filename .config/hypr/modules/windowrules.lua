@@ -1,7 +1,6 @@
 --------------------------------
 ---- WINDOWS AND WORKSPACES ----
 --------------------------------
-
 hl.window_rule({
     -- Ignore maximize requests from all apps. You'll probably like this.
     name = "suppress-maximize-events",
@@ -27,33 +26,13 @@ hl.window_rule({
     no_focus = true
 })
 
-hl.layer_rule({
-    name = "rofi-dropdown",
-    match = {
-        namespace = "rofi"
-    },
-    animation = "slide top",
-    blur = true
-})
-
-hl.window_rule({
-    name = "rofi-normal-window",
-    match = {
-        class = "^[Rr]ofi$"
-    },
-    float = true,
-    center = true,
-    no_shadow = true,
-    pin = true
-})
-
 hl.window_rule({
     name = "satty-float",
     match = {
         class = "satty"
     },
     float = true,
-    size = { 800, 400 },
+    size = {800, 400},
     center = true
 })
 
@@ -64,7 +43,7 @@ hl.window_rule({
         initial_title = ".* - Thunar$"
     },
     float = true,
-    size = { 1000, 600 },
+    size = {1000, 600},
     center = true
 })
 
@@ -85,7 +64,7 @@ hl.window_rule({
         title = ".+"
     },
     float = true,
-    size = { 1000, 600 },
+    size = {1000, 600},
     center = true
 })
 
@@ -158,14 +137,14 @@ hl.layer_rule({
 
 -- Workspace assignments for specific applications using exact class names (anchored regex)
 local workspace_assignments = {
-    ["1"] = { "^zen$", "^[Vv]ivaldi.*$", "^brave-origin-nightly$" },
-    ["2"] = { "^code-insiders$", "^dev\\.warp\\.Warp$" },
-    ["3"] = { "^thunar$", "^Code$", "^code$" },
-    ["4"] = { "^com\\.mitchellh\\.ghostty$" },
-    ["5"] = { "^[Ss]potify$" },
-    ["6"] = { "^vesktop$", "^TelegramDesktop$" },
-    ["9"] = { "^virt-manager$", "^qemu.*$", "^Qemu.*$" },
-    ["10"] = { "^[Vv]mware.*$" }
+    ["1"] = {"^zen$", "^[Vv]ivaldi.*$", "^brave-origin-nightly$"},
+    ["2"] = {"^code-insiders$", "^dev\\.warp\\.Warp$"},
+    ["3"] = {"^thunar$", "^Code$", "^code$"},
+    ["4"] = {"^com\\.mitchellh\\.ghostty$"},
+    ["5"] = {"^[Ss]potify$"},
+    ["6"] = {"^vesktop$", "^TelegramDesktop$"},
+    ["9"] = {"^virt-manager$", "^qemu.*$", "^Qemu.*$"},
+    ["10"] = {"^[Vv]mware.*$"}
 }
 
 for ws, classes in pairs(workspace_assignments) do
@@ -187,7 +166,7 @@ hl.window_rule({
     },
     workspace = "special:gitkraken",
     float = true,
-    size = { 1200, 800 },
+    size = {1200, 800},
     center = true
 })
 
@@ -198,7 +177,7 @@ hl.window_rule({
     },
     workspace = "special:helium",
     float = true,
-    size = { 1200, 800 },
+    size = {1200, 800},
     center = true
 })
 

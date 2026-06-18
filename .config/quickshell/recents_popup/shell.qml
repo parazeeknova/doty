@@ -218,7 +218,7 @@ Scope {
                 screen: modelData
                 WlrLayershell.namespace: "quickshell"
                 WlrLayershell.layer: WlrLayer.Overlay
-                WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+                WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
                 focusable: true
                 color: "transparent"

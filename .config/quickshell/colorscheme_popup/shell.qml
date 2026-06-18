@@ -12,6 +12,8 @@ Scope {
     property string currentThemeMode: ""
     property string currentThemeValue: ""
     property bool glassEnabled: true
+    property bool waybarEnabled: true
+    property string widgetsMode: "default"
     property var wallpapers: []
     property var presets: []
     property string lastPresetsJson: ""
@@ -107,6 +109,28 @@ Scope {
         watchChanges: true
         onLoaded: {
             root.glassEnabled = (glassWatcher.text().trim() !== "false");
+        }
+        onFileChanged: reload()
+    }
+
+    FileView {
+        id: widgetsConfigWatcher
+
+        path: "file:///tmp/quickshell_widgets_config"
+        watchChanges: true
+        onLoaded: {
+            root.widgetsMode = widgetsConfigWatcher.text().trim();
+        }
+        onFileChanged: reload()
+    }
+
+    FileView {
+        id: waybarStateWatcher
+
+        path: "file:///tmp/quickshell_waybar_state"
+        watchChanges: true
+        onLoaded: {
+            root.waybarEnabled = (waybarStateWatcher.text().trim() !== "false");
         }
         onFileChanged: reload()
     }
@@ -848,6 +872,233 @@ Scope {
 
                                 }
 
+                            }
+
+                            MouseArea {
+                                width: parent.width
+                                height: 14
+                                onClicked: {
+                                    Quickshell.execDetached([root.homeDir + "/.config/waybar/scripts/waybar_toggle"]);
+                                }
+
+                                Row {
+                                    anchors.fill: parent
+                                    spacing: 8
+
+                                    Text {
+                                        text: "Waybar Panel"
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: false
+                                        renderType: Text.NativeRendering
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: parent.width - 36
+                                    }
+
+                                    Rectangle {
+                                        width: 28
+                                        height: 12
+                                        color: root.waybarEnabled ? theme.accent : theme.bg_light
+                                        border.color: theme.accent
+                                        border.width: 1
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        radius: 0
+
+                                        Rectangle {
+                                            width: 8
+                                            height: 8
+                                            color: root.waybarEnabled ? theme.bg : theme.accent
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            x: root.waybarEnabled ? 18 : 2
+
+                                            Behavior on x {
+                                                NumberAnimation {
+                                                    duration: 150
+                                                    easing.type: Easing.OutQuad
+                                                }
+
+                                            }
+
+                                        }
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 150
+                                            }
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                            // --- SECTION 5: DESKTOP WIDGETS ---
+                            Column {
+                                width: parent.width
+                                spacing: 4
+
+                                Text {
+                                    text: "Desktop Widgets"
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                    font.bold: true
+                                    opacity: 0.5
+                                    renderType: Text.NativeRendering
+                                }
+
+                                Row {
+                                    width: parent.width
+                                    height: 16
+                                    spacing: 3
+
+                                    // Button 1: Auto / Default
+                                    Rectangle {
+                                        width: (parent.width - 12) / 5
+                                        height: parent.height
+                                        color: root.widgetsMode === "default" || root.widgetsMode === "" ? theme.accent : (autoBtnMouse.containsMouse ? theme.bg_light : theme.bg_dark)
+                                        border.color: theme.accent
+                                        border.width: root.widgetsMode === "default" || root.widgetsMode === "" || autoBtnMouse.containsMouse ? 1 : 0
+                                        radius: 0
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "Auto"
+                                            color: root.widgetsMode === "default" || root.widgetsMode === "" ? theme.bg : (autoBtnMouse.containsMouse ? theme.accent : theme.fg_light)
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 7
+                                            font.bold: root.widgetsMode === "default" || root.widgetsMode === ""
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                        MouseArea {
+                                            id: autoBtnMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            onClicked: {
+                                                Quickshell.execDetached([root.homeDir + "/.config/waybar/scripts/toggle_widgets", "--set-mode", "default"]);
+                                            }
+                                        }
+                                    }
+
+                                    // Button 2: Both
+                                    Rectangle {
+                                        width: (parent.width - 12) / 5
+                                        height: parent.height
+                                        color: root.widgetsMode === "both" ? theme.accent : (bothBtnMouse.containsMouse ? theme.bg_light : theme.bg_dark)
+                                        border.color: theme.accent
+                                        border.width: root.widgetsMode === "both" || bothBtnMouse.containsMouse ? 1 : 0
+                                        radius: 0
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "Both"
+                                            color: root.widgetsMode === "both" ? theme.bg : (bothBtnMouse.containsMouse ? theme.accent : theme.fg_light)
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 7
+                                            font.bold: root.widgetsMode === "both"
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                        MouseArea {
+                                            id: bothBtnMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            onClicked: {
+                                                Quickshell.execDetached([root.homeDir + "/.config/waybar/scripts/toggle_widgets", "--set-mode", "both"]);
+                                            }
+                                        }
+                                    }
+
+                                    // Button 3: GH (GitHub)
+                                    Rectangle {
+                                        width: (parent.width - 12) / 5
+                                        height: parent.height
+                                        color: root.widgetsMode === "github" ? theme.accent : (ghBtnMouse.containsMouse ? theme.bg_light : theme.bg_dark)
+                                        border.color: theme.accent
+                                        border.width: root.widgetsMode === "github" || ghBtnMouse.containsMouse ? 1 : 0
+                                        radius: 0
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "GH"
+                                            color: root.widgetsMode === "github" ? theme.bg : (ghBtnMouse.containsMouse ? theme.accent : theme.fg_light)
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 7
+                                            font.bold: root.widgetsMode === "github"
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                        MouseArea {
+                                            id: ghBtnMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            onClicked: {
+                                                Quickshell.execDetached([root.homeDir + "/.config/waybar/scripts/toggle_widgets", "--set-mode", "github"]);
+                                            }
+                                        }
+                                    }
+
+                                    // Button 4: WS (Workspace)
+                                    Rectangle {
+                                        width: (parent.width - 12) / 5
+                                        height: parent.height
+                                        color: root.widgetsMode === "workspace" ? theme.accent : (wsBtnMouse.containsMouse ? theme.bg_light : theme.bg_dark)
+                                        border.color: theme.accent
+                                        border.width: root.widgetsMode === "workspace" || wsBtnMouse.containsMouse ? 1 : 0
+                                        radius: 0
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "WS"
+                                            color: root.widgetsMode === "workspace" ? theme.bg : (wsBtnMouse.containsMouse ? theme.accent : theme.fg_light)
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 7
+                                            font.bold: root.widgetsMode === "workspace"
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                        MouseArea {
+                                            id: wsBtnMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            onClicked: {
+                                                Quickshell.execDetached([root.homeDir + "/.config/waybar/scripts/toggle_widgets", "--set-mode", "workspace"]);
+                                            }
+                                        }
+                                    }
+
+                                    // Button 5: None
+                                    Rectangle {
+                                        width: (parent.width - 12) / 5
+                                        height: parent.height
+                                        color: root.widgetsMode === "none" ? theme.accent : (noneBtnMouse.containsMouse ? theme.bg_light : theme.bg_dark)
+                                        border.color: theme.accent
+                                        border.width: root.widgetsMode === "none" || noneBtnMouse.containsMouse ? 1 : 0
+                                        radius: 0
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "None"
+                                            color: root.widgetsMode === "none" ? theme.bg : (noneBtnMouse.containsMouse ? theme.accent : theme.fg_light)
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 7
+                                            font.bold: root.widgetsMode === "none"
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                        MouseArea {
+                                            id: noneBtnMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            onClicked: {
+                                                Quickshell.execDetached([root.homeDir + "/.config/waybar/scripts/toggle_widgets", "--set-mode", "none"]);
+                                            }
+                                        }
+                                    }
+                                }
                             }
 
                             Row {
