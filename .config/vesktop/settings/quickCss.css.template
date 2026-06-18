@@ -74,15 +74,23 @@ body, #app-mount {
   --card-background-default: rgba({{bg_light_rgb}}, 0.4) !important;
 
   /* Scrollbars */
-  --scrollbar-thin-thumb: rgba({{accent_rgb}}, 0.3) !important;
+  --scrollbar-thin-thumb: rgba({{accent_rgb}}, 0.5) !important;
   --scrollbar-thin-track: transparent !important;
-  --scrollbar-auto-thumb: rgba({{accent_rgb}}, 0.3) !important;
+  --scrollbar-auto-thumb: rgba({{accent_rgb}}, 0.5) !important;
   --scrollbar-auto-track: transparent !important;
-  --scrollbar-auto-scrollbar-color-thumb: rgba({{accent_rgb}}, 0.3) !important;
+  --scrollbar-auto-scrollbar-color-thumb: rgba({{accent_rgb}}, 0.5) !important;
   --scrollbar-auto-scrollbar-color-track: transparent !important;
   
   /* Status Colors */
   --status-positive: #{{accent_hex}} !important;
   --status-warning: #{{secondary_hex}} !important;
   --status-danger: #{{error_hex}} !important;
+
+  /* Borders and Dividers */
+  --border-subtle: rgba({{accent_rgb}}, 0.15) !important;
+  --border-muted: rgba({{accent_rgb}}, 0.1) !important;
+  --border-strong: rgba({{accent_rgb}}, 0.25) !important;
+  --border-normal: rgba({{accent_rgb}}, 0.2) !important;
+  --divider-subtle: rgba({{accent_rgb}}, 0.15) !important;
+  --divider-strong: rgba({{accent_rgb}}, 0.25) !important;
 }
