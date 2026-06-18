@@ -986,28 +986,41 @@ Scope {
                             }
                             root.selectedIndex = 0;
                             event.accepted = true;
-                        } else if (event.key === Qt.Key_Shift) {
-                            if (root.activeWindows.length > 0) {
-                                root.selectedActiveWindowIndex++;
-                                if (root.selectedActiveWindowIndex >= root.activeWindows.length)
-                                    root.selectedActiveWindowIndex = -1;
+                        } else if (event.key === Qt.Key_Up) {
+                            if (event.modifiers & Qt.ShiftModifier) {
+                                if (root.activeWindows.length > 0) {
+                                    root.selectedActiveWindowIndex--;
+                                    if (root.selectedActiveWindowIndex < -1)
+                                        root.selectedActiveWindowIndex = root.activeWindows.length - 1;
 
-                                if (root.selectedActiveWindowIndex >= 0)
-                                    activeWindowsList.positionViewAtIndex(root.selectedActiveWindowIndex, ListView.Contain);
+                                    if (root.selectedActiveWindowIndex >= 0)
+                                        activeWindowsList.positionViewAtIndex(root.selectedActiveWindowIndex, ListView.Contain);
 
+                                }
+                            } else {
+                                root.selectedActiveWindowIndex = -1;
+                                root.selectPrev();
+                                var activeList = root.isBookmarkMode ? bookmarkList : (root.isGitRepoMode ? gitRepoList : (root.isFileSearchMode ? fileSearchList : (root.isWebSearchMode ? webSearchList : appsList)));
+                                activeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
                             }
                             event.accepted = true;
-                        } else if (event.key === Qt.Key_Up) {
-                            root.selectedActiveWindowIndex = -1;
-                            root.selectPrev();
-                            var activeList = root.isBookmarkMode ? bookmarkList : (root.isGitRepoMode ? gitRepoList : (root.isFileSearchMode ? fileSearchList : (root.isWebSearchMode ? webSearchList : appsList)));
-                            activeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
-                            event.accepted = true;
                         } else if (event.key === Qt.Key_Down) {
-                            root.selectedActiveWindowIndex = -1;
-                            root.selectNext();
-                            var activeList = root.isBookmarkMode ? bookmarkList : (root.isGitRepoMode ? gitRepoList : (root.isFileSearchMode ? fileSearchList : (root.isWebSearchMode ? webSearchList : appsList)));
-                            activeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
+                            if (event.modifiers & Qt.ShiftModifier) {
+                                if (root.activeWindows.length > 0) {
+                                    root.selectedActiveWindowIndex++;
+                                    if (root.selectedActiveWindowIndex >= root.activeWindows.length)
+                                        root.selectedActiveWindowIndex = -1;
+
+                                    if (root.selectedActiveWindowIndex >= 0)
+                                        activeWindowsList.positionViewAtIndex(root.selectedActiveWindowIndex, ListView.Contain);
+
+                                }
+                            } else {
+                                root.selectedActiveWindowIndex = -1;
+                                root.selectNext();
+                                var activeList = root.isBookmarkMode ? bookmarkList : (root.isGitRepoMode ? gitRepoList : (root.isFileSearchMode ? fileSearchList : (root.isWebSearchMode ? webSearchList : appsList)));
+                                activeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
+                            }
                             event.accepted = true;
                         } else if (((event.key === Qt.Key_Delete || event.key === Qt.Key_Backspace) && (event.modifiers & Qt.ShiftModifier)) || (event.key === Qt.Key_Delete)) {
                             var list = root.getActiveDisplayList();

@@ -1,7 +1,7 @@
 [user]
 	name = Harsh Sahu
 	email = yesh8harsh+github@gmail.com
-	signingkey = /home/parazeeknova/.ssh/id_ed25519.pub
+	signingkey = /home/parazeeknova/.ssh/github_signing_key.pub
 
 [core]
   compression = 9
