@@ -668,6 +668,10 @@ fn main() {
             ".config/zathura/zathurarc",
         ),
         (".config/mpv/mpv.conf.template", ".config/mpv/mpv.conf"),
+        (
+            ".config/spicetify/Themes/wabi/color.ini.template",
+            ".config/spicetify/Themes/wabi/color.ini",
+        ),
     ];
 
     for (tmpl, dest) in mappings {
@@ -890,6 +894,11 @@ fn main() {
     let _ = Command::new("killall").arg("-USR2").arg("cava").status();
     let _ = Command::new("killall").arg("-USR1").arg("kitty").status();
 
+    // Apply Spicetify theme if installed
+    let spicetify_path = home_dir().join(".spicetify").join("spicetify");
+    if spicetify_path.exists() {
+        let _ = Command::new(spicetify_path).arg("apply").status();
+    }
 
     // Rebuild bat's theme cache (non-blocking, picks up on next launch)
     let _ = Command::new("bat").arg("cache").arg("--build").spawn();

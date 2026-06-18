@@ -1,0 +1,21 @@
+[wabi]
+text               = {{fg_hex}}
+subtext            = {{fg_light_hex}}
+nav-active-text    = {{accent_hex}}
+main               = {{bg_hex}}
+sidebar            = {{bg_dark_hex}}
+player             = {{bg_dark_hex}}
+card               = {{bg_light_hex}}
+shadow             = {{bg_dark_hex}}
+main-secondary     = {{bg_light_hex}}
+button             = {{accent_hex}}
+button-secondary   = {{fg_light_hex}}
+button-active      = {{accent_hex}}
+button-disabled    = {{bg_light_hex}}
+nav-active         = {{bg_light_hex}}
+play-button        = {{accent_hex}}
+tab-active         = {{bg_light_hex}}
+notification       = {{bg_light_hex}}
+notification-error = {{error_hex}}
+playback-bar       = {{accent_hex}}
+misc               = {{fg_light_hex}}
