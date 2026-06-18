@@ -1,3 +1,7 @@
+body, #app-mount {
+  background-color: transparent !important;
+}
+
 :root {
   /* Brand/Accent (blurple overrides) */
   --brand-experiment: #{{accent_hex}} !important;
@@ -6,12 +10,12 @@
   --brand-experiment-600: #{{secondary_hex}} !important;
 
   /* Backgrounds */
-  --background-primary: #{{bg_hex}} !important;
-  --background-secondary: #{{bg_dark_hex}} !important;
-  --background-secondary-alt: #{{bg_dark_hex}} !important;
-  --background-tertiary: #{{bg_dark_hex}} !important;
-  --background-floating: #{{bg_hex}} !important;
-  --background-accent: #{{bg_light_hex}} !important;
+  --background-primary: rgba({{bg_rgb}}, 0.45) !important;
+  --background-secondary: rgba({{bg_dark_rgb}}, 0.6) !important;
+  --background-secondary-alt: rgba({{bg_dark_rgb}}, 0.65) !important;
+  --background-tertiary: rgba({{bg_dark_rgb}}, 0.75) !important;
+  --background-floating: rgba({{bg_dark_rgb}}, 0.85) !important;
+  --background-accent: rgba({{bg_light_rgb}}, 0.45) !important;
   --background-message-hover: rgba({{bg_light_rgb}}, 0.07) !important;
 
   /* Text and Interactive States */
@@ -33,10 +37,10 @@
   --background-modifier-accent: rgba({{accent_rgb}}, 0.25) !important;
 
   /* Card and Input Backgrounds */
-  --channeltextarea-background: #{{bg_light_hex}} !important;
-  --activity-card-background: #{{bg_dark_hex}} !important;
-  --deprecated-card-bg: #{{bg_dark_hex}} !important;
-  --deprecated-quickbinder-border: #{{bg_light_hex}} !important;
+  --channeltextarea-background: rgba({{bg_light_rgb}}, 0.4) !important;
+  --activity-card-background: rgba({{bg_dark_rgb}}, 0.5) !important;
+  --deprecated-card-bg: rgba({{bg_dark_rgb}}, 0.5) !important;
+  --deprecated-quickbinder-border: rgba({{bg_light_rgb}}, 0.5) !important;
 
   /* Scrollbars */
   --scrollbar-thin-thumb: rgba({{accent_rgb}}, 0.3) !important;
