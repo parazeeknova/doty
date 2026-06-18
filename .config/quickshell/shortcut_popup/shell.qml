@@ -10,15 +10,14 @@ Scope {
     id: root
 
     property string homeDir: Quickshell.env("HOME")
-    
-    // State properties
+
     property var bindsData: []
     property string searchQuery: ""
     property var flatBinds: []
     property int selectedIndex: 0
-    
+
     readonly property string fontName: "FiraCode Nerd Font"
-    
+
     signal requestClose()
 
     function updateFlatBinds() {
@@ -28,11 +27,11 @@ Scope {
             var cat = bindsData[i];
             for (var j = 0; j < cat.binds.length; j++) {
                 var bind = cat.binds[j];
-                if (query === "" || 
-                    bind.keys.toLowerCase().indexOf(query) !== -1 || 
+                if (query === "" ||
+                    bind.keys.toLowerCase().indexOf(query) !== -1 ||
                     bind.description.toLowerCase().indexOf(query) !== -1 ||
                     cat.category.toLowerCase().indexOf(query) !== -1) {
-                    
+
                     temp.push({
                         keys: bind.keys,
                         description: bind.description,
@@ -53,10 +52,8 @@ Scope {
         id: theme
     }
 
-    // Process to run the compiled Rust parser to get binds data
     Process {
         id: getBindsProc
-
         command: [root.homeDir + "/.config/quickshell/shortcut_popup/parse_binds"]
         running: true
 
@@ -75,11 +72,9 @@ Scope {
         function close() {
             root.requestClose();
         }
-
         target: "shortcut_popup"
     }
 
-    // Copy process for clipboard feedback
     Process {
         id: copyProc
         property string copyText: ""
@@ -88,7 +83,6 @@ Scope {
         running: false
     }
 
-    // Render Window on each Screen
     Variants {
         model: Quickshell.screens
 
@@ -98,13 +92,11 @@ Scope {
 
                 required property var modelData
                 property bool isClosing: false
-                property real animOffsetY: -350
+                property real animOffsetY: -10
                 property real animOpacity: 0
 
                 function closePopup() {
-                    if (isClosing)
-                        return;
-
+                    if (isClosing) return;
                     isClosing = true;
                     exitAnim.start();
                 }
@@ -113,9 +105,8 @@ Scope {
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
                 focusable: true
                 color: "transparent"
-                implicitWidth: 220
-                implicitHeight: 300
-
+                implicitWidth: 240
+                implicitHeight: 320
 
                 Component.onCompleted: {
                     introAnim.start();
@@ -123,10 +114,7 @@ Scope {
                 }
 
                 Connections {
-                    function onRequestClose() {
-                        win.closePopup();
-                    }
-
+                    function onRequestClose() { win.closePopup(); }
                     target: root
                 }
 
@@ -142,47 +130,15 @@ Scope {
 
                 ParallelAnimation {
                     id: introAnim
-
-                    NumberAnimation {
-                        target: win
-                        property: "animOffsetY"
-                        from: -350
-                        to: 4
-                        duration: 120
-                        easing.type: Easing.OutCubic
-                    }
-
-                    NumberAnimation {
-                        target: win
-                        property: "animOpacity"
-                        from: 0
-                        to: 1
-                        duration: 120
-                        easing.type: Easing.OutCubic
-                    }
+                    NumberAnimation { target: win; property: "animOffsetY"; from: -10; to: 4; duration: 100; easing.type: Easing.OutCubic }
+                    NumberAnimation { target: win; property: "animOpacity"; from: 0; to: 1; duration: 100; easing.type: Easing.OutCubic }
                 }
 
                 ParallelAnimation {
                     id: exitAnim
                     onStopped: Qt.quit()
-
-                    NumberAnimation {
-                        target: win
-                        property: "animOffsetY"
-                        from: 4
-                        to: -350
-                        duration: 100
-                        easing.type: Easing.InCubic
-                    }
-
-                    NumberAnimation {
-                        target: win
-                        property: "animOpacity"
-                        from: 1
-                        to: 0
-                        duration: 100
-                        easing.type: Easing.InCubic
-                    }
+                    NumberAnimation { target: win; property: "animOffsetY"; from: 4; to: -10; duration: 80; easing.type: Easing.InCubic }
+                    NumberAnimation { target: win; property: "animOpacity"; from: 1; to: 0; duration: 80; easing.type: Easing.InCubic }
                 }
 
                 HyprlandFocusGrab {
@@ -191,7 +147,6 @@ Scope {
                     onCleared: win.closePopup()
                 }
 
-                // Concise Boxy Main Container
                 Rectangle {
                     anchors.fill: parent
                     opacity: win.animOpacity
@@ -199,9 +154,8 @@ Scope {
                     border.width: 1
                     border.color: theme.accent
                     radius: 0
-                    antialiasing: false
                     focus: true
-                    
+
                     Keys.onPressed: (event) => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
@@ -232,55 +186,55 @@ Scope {
 
                     ColumnLayout {
                         anchors.fill: parent
-                        anchors.margins: 4
-                        spacing: 4
+                        anchors.margins: 2
+                        anchors.leftMargin: 6
+                        spacing: 0
 
-                        // Search Input
+                        // Search
                         Rectangle {
                             Layout.fillWidth: true
-                            height: 18
+                            height: 16
                             color: "transparent"
 
                             TextInput {
                                 id: searchInput
                                 renderType: Text.NativeRendering
                                 anchors.fill: parent
-                                anchors.bottomMargin: 2
+                                anchors.bottomMargin: 1
                                 verticalAlignment: TextInput.AlignVCenter
                                 color: theme.fg
                                 font.family: root.fontName
                                 font.pixelSize: 9
                                 focus: true
-                                onTextChanged: {
-                                    root.searchQuery = text;
-                                }
+                                clip: true
+                                onTextChanged: root.searchQuery = text
 
                                 Text {
-                                    text: "Search binds..."
+                                    text: "search..."
                                     renderType: Text.NativeRendering
-                                    color: theme.secondary
+                                    color: theme.bg_light
                                     font.family: root.fontName
                                     font.pixelSize: 9
-                                    visible: searchInput.text === ""
+                                    visible: searchInput.text === "" && !searchInput.activeFocus
                                     anchors.fill: parent
                                     verticalAlignment: Text.AlignVCenter
                                 }
                             }
 
-                            // Underline
                             Rectangle {
                                 anchors.bottom: parent.bottom
                                 width: parent.width
                                 height: 1
-                                color: searchInput.activeFocus ? theme.fg : theme.secondary
+                                color: searchInput.activeFocus ? theme.accent : theme.bg_light
                             }
                         }
 
-                        // Unified Binds List
+                        // Binds
                         ListView {
                             id: bindsList
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            Layout.topMargin: 2
                             model: root.flatBinds
                             clip: true
                             spacing: 0
@@ -289,80 +243,59 @@ Scope {
                                 width: bindsList.width
                                 spacing: 0
 
-                                // Section Header (Visible dynamically)
+                                // Category
                                 Rectangle {
-                                    id: headerRect
                                     Layout.fillWidth: true
                                     visible: {
                                         if (index === 0) return true;
-                                        if (index > 0 && root.flatBinds && index < root.flatBinds.length) {
+                                        if (index > 0 && root.flatBinds && index < root.flatBinds.length)
                                             return root.flatBinds[index].category !== root.flatBinds[index - 1].category;
-                                        }
                                         return false;
                                     }
-                                    height: visible ? 16 : 0
+                                    height: visible ? 14 : 0
                                     color: "transparent"
 
                                     Text {
-                                        text: {
-                                            var catName = modelData.category.toLowerCase();
-                                            var icon = "󰘳";
-                                            if (catName.indexOf("application") !== -1) icon = "󰀻";
-                                            else if (catName.indexOf("window") !== -1) icon = "󱂬";
-                                            else if (catName.indexOf("layout") !== -1) icon = "󰕰";
-                                            else if (catName.indexOf("workspace") !== -1) icon = "󰖲";
-                                            else if (catName.indexOf("rofi") !== -1 || catName.indexOf("menu") !== -1) icon = "󰍜";
-                                            else if (catName.indexOf("pypr") !== -1) icon = "󱗼";
-                                            else if (catName.indexOf("screenshot") !== -1) icon = "󰄀";
-                                            else if (catName.indexOf("system") !== -1) icon = "󰒓";
-                                            return icon + " " + modelData.category.toUpperCase();
-                                        }
+                                        text: modelData.category.charAt(0).toUpperCase() + modelData.category.slice(1)
                                         renderType: Text.NativeRendering
                                         color: theme.accent
                                         font.family: root.fontName
-                                        font.pixelSize: 8
+                                        font.pixelSize: 9
                                         font.bold: true
-                                        verticalAlignment: Text.AlignVCenter
-                                        anchors.fill: parent
-                                        anchors.leftMargin: 2
+                                        opacity: 0.7
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.left: parent.left
                                     }
                                 }
 
-                                // Main Item Row
+                                // Bind
                                 Rectangle {
                                     Layout.fillWidth: true
-                                    height: 25
-                                    color: (root.selectedIndex === index) ? theme.bg_light : "transparent"
-                                    radius: 0
-                                    antialiasing: false
+                                    height: 18
+                                    color: (root.selectedIndex === index) ? Qt.rgba(theme.accent.r, theme.accent.g, theme.accent.b, 0.1) : "transparent"
 
-                                    ColumnLayout {
-                                        anchors.left: parent.left
-                                        anchors.right: parent.right
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        anchors.leftMargin: 4
-                                        anchors.rightMargin: 4
-                                        spacing: 0
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.leftMargin: 2
+                                        anchors.rightMargin: 2
+                                        spacing: 6
 
-                                        // Keys row
                                         Text {
                                             text: modelData.keys
                                             renderType: Text.NativeRendering
-                                            color: (root.selectedIndex === index) ? theme.accent : theme.fg
+                                            color: theme.accent
                                             font.family: root.fontName
                                             font.pixelSize: 9
                                             font.bold: true
-                                            Layout.fillWidth: true
-                                            elide: Text.ElideRight
+                                            Layout.preferredWidth: implicitWidth
                                         }
 
-                                        // Description
                                         Text {
                                             text: modelData.description
                                             renderType: Text.NativeRendering
-                                            color: (root.selectedIndex === index) ? theme.fg : theme.secondary
+                                            color: (root.selectedIndex === index) ? theme.fg : theme.fg_light
                                             font.family: root.fontName
-                                            font.pixelSize: 8
+                                            font.pixelSize: 9
                                             Layout.fillWidth: true
                                             elide: Text.ElideRight
                                         }
@@ -371,9 +304,7 @@ Scope {
                                     MouseArea {
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: {
-                                            root.selectedIndex = index;
-                                        }
+                                        onEntered: root.selectedIndex = index
                                         onClicked: (mouse) => {
                                             if (mouse.button === Qt.RightButton) {
                                                 if (mouse.modifiers & Qt.ShiftModifier) {
@@ -395,6 +326,22 @@ Scope {
                                         }
                                     }
                                 }
+                            }
+                        }
+
+                        // Footer
+                        Rectangle {
+                            Layout.fillWidth: true
+                            height: 12
+                            color: "transparent"
+
+                            Text {
+                                text: root.flatBinds.length + " keybinds"
+                                renderType: Text.NativeRendering
+                                color: theme.bg_light
+                                font.family: root.fontName
+                                font.pixelSize: 9
+                                anchors.verticalCenter: parent.verticalCenter
                             }
                         }
                     }

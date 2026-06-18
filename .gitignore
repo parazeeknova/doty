@@ -20,9 +20,9 @@ __pycache__
 .config/quickshell/media_popup/flags.json
 .config/quickshell/media_popup/ping.txt
 .config/quickshell/media_popup/settings.json
-.config/quickshell/screentime.db
-.config/quickshell/screentime.db-shm
-.config/quickshell/screentime.db-wal
+.config/quickshell/notif_popup/screentime.db
+.config/quickshell/notif_popup/screentime.db-shm
+.config/quickshell/notif_popup/screentime.db-wal
 .config/quickshell/media_popup/assets.db-wal
 .config/quickshell/media_popup/assets.db-shm
 .config/gtk-3.0/bookmarks
@@ -34,3 +34,9 @@ __pycache__
 ref/
 vm_password
 vm_guest_credentials
+.config/quickshell/apps_popup/launcher.db
+.config/quickshell/apps_popup/launcher.db-shm
+.config/quickshell/apps_popup/launcher.db-wal
+*.db
+*.db-shm
+*.db-wal

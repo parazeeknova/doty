@@ -47,6 +47,7 @@ install: build
 	cp target/release/theme_switcher ../../../scripts/theme_switcher
 	cp target/release/set_wallpaper ../../../scripts/set_wallpaper_bin
 	cp target/release/parse_binds ../../quickshell/shortcut_popup/parse_binds
+	cp target/release/caffeine ../../quickshell/brightness_popup/caffeine
 	mkdir -p $(HOME)/.local/bin
 	cp target/release/screentime_daemon $(HOME)/.local/bin/screentime_daemon
 	cp target/release/get_screentime_status $(HOME)/.local/bin/get_screentime_status

@@ -7,8 +7,6 @@ import Quickshell.Io
 import Quickshell.Wayland
 
 Scope {
-    // (pickColor logic inlined in MouseArea to avoid scope issues with win id)
-
     id: root
 
     property string homeDir: Quickshell.env("HOME")
@@ -32,6 +30,14 @@ Scope {
     property string tagDraft: ""
     property var tagSuggestions: []
     property int searchDebounce: 0
+    property int focusIndex: 0
+    property int focusSection: 0
+    readonly property int sectionScreenshots: 0
+    readonly property int sectionRecording: 1
+    readonly property int sectionColorPicker: 2
+    readonly property int sectionOcr: 3
+    readonly property int sectionSettings: 4
+    readonly property int sectionHistory: 5
     readonly property var recordCodecs: ["h264", "hevc", "vp9", "av1"]
     readonly property var recordFpsOptions: ["native", 30, 60, 120]
     readonly property var recordQualityOptions: ["low", "med", "high", "lossless"]
@@ -167,6 +173,126 @@ Scope {
     function closePreview() {
         root.previewAsset = null;
         root.previewOcrText = "";
+    }
+
+    function activateFocusItem() {
+        if (root.focusSection === root.sectionScreenshots) {
+            if (root.focusIndex === 0) {
+                win.closePopup();
+                var slurp = "slurp -b \\#1d2021b0 -c \\#d5c4a1ff -s \\#00000000";
+                Quickshell.execDetached(["sh", "-c", "mkdir -p \"" + root.screenshotDir + "\" && FILE=\"" + root.screenshotDir + "/Screenshot_$(date '+%Y-%m-%d_%H.%M.%S').png\" && grim -g \"$(" + slurp + ")\" \"$FILE\" && swappy -f \"$FILE\" -o \"$FILE\" && wl-copy < \"$FILE\" && \"" + root.helperPath + "\" add-asset screenshot \"$FILE\""]);
+            } else if (root.focusIndex === 1) {
+                win.closePopup();
+                var slurp = "slurp -b \\#1d2021b0 -c \\#d5c4a1ff -s \\#00000000";
+                Quickshell.execDetached(["sh", "-c", "grim -g \"$(" + slurp + ")\" - | wl-copy"]);
+            } else if (root.focusIndex === 2) {
+                win.closePopup();
+                Quickshell.execDetached(["sh", "-c", "grim -o \"$(hyprctl activeworkspace -j | jq -r '.monitor')\" - | wl-copy"]);
+            } else if (root.focusIndex === 3) {
+                win.closePopup();
+                Quickshell.execDetached(["sh", "-c", "mkdir -p \"" + root.screenshotDir + "\" && FILE=\"" + root.screenshotDir + "/Screenshot_$(date '+%Y-%m-%d_%H.%M.%S').png\" && grim -o \"$(hyprctl activeworkspace -j | jq -r '.monitor')\" \"$FILE\" && wl-copy < \"$FILE\" && \"" + root.helperPath + "\" add-asset screenshot \"$FILE\""]);
+            }
+        } else if (root.focusSection === root.sectionRecording) {
+            if (root.focusIndex === 0) {
+                if (root.isRecording) {
+                    Quickshell.execDetached(["sh", "-c", "pkill -SIGINT wf-recorder && " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Recording Saved\" \"good\" 1200"]);
+                    root.updateStatus();
+                } else {
+                    win.closePopup();
+                    var audioArgs = "";
+                    if (flagsAdapter.recordAudio && flagsAdapter.recordMic)
+                        audioArgs = "-a\"$(pactl get-default-sink).monitor\" -a\"$(pactl get-default-source)\"";
+                    else if (flagsAdapter.recordAudio)
+                        audioArgs = "-a\"$(pactl get-default-sink).monitor\"";
+                    else if (flagsAdapter.recordMic)
+                        audioArgs = "-a\"$(pactl get-default-source)\"";
+                    Quickshell.execDetached(["sh", "-c", "GEOM=$(slurp) && if [ ! -z \"$GEOM\" ]; then " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Recording Started\" \"bad\" 1200 && mkdir -p \"" + root.recordingDir + "\" && FILE=\"" + root.recordingDir + "/Recording_$(date '+%Y-%m-%d_%H.%M.%S').mp4\" && (wf-recorder " + audioArgs + " " + root.recorderExtraArgs() + " -g \"$GEOM\" -f \"$FILE\" ; \"" + root.helperPath + "\" add-asset recording \"$FILE\") ; fi"]);
+                }
+            } else if (root.focusIndex === 1 && !root.isRecording) {
+                win.closePopup();
+                var audioArgs = "";
+                if (flagsAdapter.recordAudio && flagsAdapter.recordMic)
+                    audioArgs = "-a\"$(pactl get-default-sink).monitor\" -a\"$(pactl get-default-source)\"";
+                else if (flagsAdapter.recordAudio)
+                    audioArgs = "-a\"$(pactl get-default-sink).monitor\"";
+                else if (flagsAdapter.recordMic)
+                    audioArgs = "-a\"$(pactl get-default-source)\"";
+                Quickshell.execDetached(["sh", "-c", root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Recording Started\" \"bad\" 1200 && mkdir -p \"" + root.recordingDir + "\" && FILE=\"" + root.recordingDir + "/Recording_$(date '+%Y-%m-%d_%H.%M.%S').mp4\" && (wf-recorder " + audioArgs + " " + root.recorderExtraArgs() + " -f \"$FILE\" ; \"" + root.helperPath + "\" add-asset recording \"$FILE\")"]);
+            } else if (root.focusIndex === 2 && !root.isRecording) {
+                flagsAdapter.recordAudio = !flagsAdapter.recordAudio;
+            } else if (root.focusIndex === 3 && !root.isRecording) {
+                flagsAdapter.recordMic = !flagsAdapter.recordMic;
+            } else if (root.focusIndex === 4 && !root.isRecording) {
+                var arr = root.recordFpsOptions;
+                var i = arr.indexOf(flagsAdapter.recordFps);
+                flagsAdapter.recordFps = arr[(i + 1) % arr.length];
+            } else if (root.focusIndex === 5 && !root.isRecording) {
+                var arr = root.recordQualityOptions;
+                var i = arr.indexOf(flagsAdapter.recordQuality);
+                flagsAdapter.recordQuality = arr[(i + 1) % arr.length];
+            } else if (root.focusIndex === 6 && !root.isRecording) {
+                var arr = root.recordCodecs;
+                var i = arr.indexOf(flagsAdapter.recordCodec);
+                flagsAdapter.recordCodec = arr[(i + 1) % arr.length];
+            } else if (root.focusIndex === 7 && !root.isRecording) {
+                var arr = root.recordPresetOptions;
+                var i = arr.indexOf(flagsAdapter.recordPreset);
+                flagsAdapter.recordPreset = arr[(i + 1) % arr.length];
+            }
+        } else if (root.focusSection === root.sectionColorPicker) {
+            if (root.focusIndex === 0) {
+                root.requestClose();
+                Quickshell.execDetached([root.helperPath, "pick-color"]);
+            }
+        } else if (root.focusSection === root.sectionOcr) {
+            if (root.focusIndex === 0) {
+                win.closePopup();
+                var slurp = "slurp -b \\#1d2021b0 -c \\#d5c4a1ff -s \\#00000000";
+                Quickshell.execDetached(["sh", "-c", "grim -g \"$(" + slurp + ")\" /tmp/ocr_image.png && TEXT=$(tesseract /tmp/ocr_image.png stdout 2>/dev/null) && rm /tmp/ocr_image.png && if [ ! -z \"$TEXT\" ]; then echo -n \"$TEXT\" | wl-copy && " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Text Extracted\" \"good\" 1200 && \"" + root.helperPath + "\" add ocr \"$TEXT\"; else notify-send -t 1500 -a \"OCR\" \"No text found\"; fi"]);
+            } else if (root.focusIndex === 1) {
+                ocrImagePickerProc.running = true;
+            }
+        } else if (root.focusSection === root.sectionSettings) {
+            targetDirHeader.expanded = !targetDirHeader.expanded;
+        } else if (root.focusSection === root.sectionHistory) {
+            if (root.focusIndex === 0) {
+                root.activeHistoryTab = "ALL";
+                root.closeEditor();
+            } else if (root.focusIndex === 1) {
+                root.activeHistoryTab = "OCR";
+                root.closeEditor();
+            } else if (root.focusIndex === 2) {
+                Quickshell.execDetached([root.helperPath, "clear-all"]);
+                root.closeEditor();
+                root.updateStatus();
+            }
+        }
+    }
+
+    function maxFocusIndex() {
+        if (root.focusSection === root.sectionScreenshots)
+            return 3;
+
+        if (root.focusSection === root.sectionRecording)
+            return root.isRecording ? 0 : 7;
+
+        if (root.focusSection === root.sectionColorPicker)
+            return 0;
+
+        if (root.focusSection === root.sectionOcr)
+            return 1;
+
+        if (root.focusSection === root.sectionSettings)
+            return 0;
+
+        if (root.focusSection === root.sectionHistory)
+            return 2;
+
+        return 0;
+    }
+
+    function focusBorderColor(section, index) {
+        return (root.focusSection === section && root.focusIndex === index) ? theme.accent : "#504945";
     }
 
     function commitTagDraft(tagName) {
@@ -425,6 +551,7 @@ Scope {
                 Component.onCompleted: {
                     root.updateStatus();
                     introAnim.start();
+                    mainContainer.forceActiveFocus();
                 }
                 screen: modelData
                 color: "transparent"
@@ -515,9 +642,41 @@ Scope {
                     antialiasing: false
                     focus: true
                     Keys.onPressed: (event) => {
-                        if (event.key === Qt.Key_Escape)
+                        if (event.key === Qt.Key_Escape) {
                             win.closePopup();
+                            event.accepted = true;
+                            return ;
+                        }
+                        if (root.previewAsset !== null || root.previewOcrText !== "") {
+                            if (event.key === Qt.Key_Escape || event.key === Qt.Key_Q) {
+                                root.closePreview();
+                                event.accepted = true;
+                            }
+                            return ;
+                        }
+                        if (event.key === Qt.Key_Tab) {
+                            root.focusSection = (root.focusSection + 1) % 6;
+                            root.focusIndex = 0;
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Backtab) {
+                            root.focusSection = (root.focusSection + 5) % 6;
+                            root.focusIndex = 0;
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Right) {
+                            var max = maxFocusIndex();
+                            if (root.focusIndex < max)
+                                root.focusIndex++;
 
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Up || event.key === Qt.Key_Left) {
+                            if (root.focusIndex > 0)
+                                root.focusIndex--;
+
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+                            activateFocusItem();
+                            event.accepted = true;
+                        }
                     }
                     Component.onCompleted: {
                         forceActiveFocus();
@@ -609,7 +768,7 @@ Scope {
                                     height: 38
                                     color: theme.bg_light
                                     border.width: 1
-                                    border.color: "#504945"
+                                    border.color: focusBorderColor(root.sectionScreenshots, 0)
 
                                     Column {
                                         anchors.centerIn: parent
@@ -653,7 +812,7 @@ Scope {
                                     height: 38
                                     color: theme.bg_light
                                     border.width: 1
-                                    border.color: "#504945"
+                                    border.color: focusBorderColor(root.sectionScreenshots, 1)
 
                                     Column {
                                         anchors.centerIn: parent
@@ -697,7 +856,7 @@ Scope {
                                     height: 38
                                     color: theme.bg_light
                                     border.width: 1
-                                    border.color: "#504945"
+                                    border.color: focusBorderColor(root.sectionScreenshots, 2)
 
                                     Column {
                                         anchors.centerIn: parent
@@ -740,7 +899,7 @@ Scope {
                                     height: 38
                                     color: theme.bg_light
                                     border.width: 1
-                                    border.color: "#504945"
+                                    border.color: focusBorderColor(root.sectionScreenshots, 3)
 
                                     Column {
                                         anchors.centerIn: parent
@@ -804,7 +963,7 @@ Scope {
                                     height: 18
                                     color: root.isRecording ? "#80cc241d" : theme.bg_light
                                     border.width: 1
-                                    border.color: root.isRecording ? theme.error : "#504945"
+                                    border.color: root.isRecording ? theme.error : focusBorderColor(root.sectionRecording, 0)
 
                                     Text {
                                         anchors.centerIn: parent
@@ -853,7 +1012,7 @@ Scope {
                                     height: 18
                                     color: theme.bg_light
                                     border.width: 1
-                                    border.color: "#504945"
+                                    border.color: focusBorderColor(root.sectionRecording, 1)
                                     visible: !root.isRecording
 
                                     Text {
@@ -897,7 +1056,7 @@ Scope {
                                     height: 18
                                     color: flagsAdapter.recordAudio ? "#504945" : theme.bg_light
                                     border.width: 1
-                                    border.color: flagsAdapter.recordAudio ? "#fe8019" : "#504945"
+                                    border.color: flagsAdapter.recordAudio ? "#fe8019" : focusBorderColor(root.sectionRecording, 2)
 
                                     Text {
                                         anchors.centerIn: parent
@@ -922,7 +1081,7 @@ Scope {
                                     height: 18
                                     color: flagsAdapter.recordMic ? "#504945" : theme.bg_light
                                     border.width: 1
-                                    border.color: flagsAdapter.recordMic ? "#fe8019" : "#504945"
+                                    border.color: flagsAdapter.recordMic ? "#fe8019" : focusBorderColor(root.sectionRecording, 3)
 
                                     Text {
                                         anchors.centerIn: parent
@@ -1160,7 +1319,7 @@ Scope {
                                         height: 24
                                         color: theme.bg_light
                                         border.width: 1
-                                        border.color: "#504945"
+                                        border.color: focusBorderColor(root.sectionColorPicker, 0)
                                         radius: 2
 
                                         Text {
@@ -1283,7 +1442,7 @@ Scope {
                                     height: 18
                                     color: theme.bg_light
                                     border.width: 1
-                                    border.color: "#504945"
+                                    border.color: focusBorderColor(root.sectionOcr, 0)
 
                                     Text {
                                         anchors.centerIn: parent
@@ -1313,7 +1472,7 @@ Scope {
                                     height: 18
                                     color: theme.bg_light
                                     border.width: 1
-                                    border.color: "#504945"
+                                    border.color: focusBorderColor(root.sectionOcr, 1)
 
                                     Text {
                                         anchors.centerIn: parent
@@ -1356,7 +1515,7 @@ Scope {
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Target Directory  " + (targetDirHeader.expanded ? "v" : ">")
-                                    color: "#a89984"
+                                    color: root.focusSection === root.sectionSettings ? theme.accent : "#a89984"
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     font.bold: true
@@ -1649,7 +1808,7 @@ Scope {
 
                                     Text {
                                         text: "Asset history"
-                                        color: root.activeHistoryTab === "ALL" ? theme.accent : "#928374"
+                                        color: root.focusSection === root.sectionHistory && root.focusIndex === 0 ? theme.accent : (root.activeHistoryTab === "ALL" ? theme.accent : "#928374")
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: root.activeHistoryTab === "ALL"
@@ -1666,7 +1825,7 @@ Scope {
 
                                     Text {
                                         text: "OCR history"
-                                        color: root.activeHistoryTab === "OCR" ? theme.accent : "#928374"
+                                        color: root.focusSection === root.sectionHistory && root.focusIndex === 1 ? theme.accent : (root.activeHistoryTab === "OCR" ? theme.accent : "#928374")
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: root.activeHistoryTab === "OCR"
@@ -1686,7 +1845,7 @@ Scope {
                                 Text {
                                     anchors.right: parent.right
                                     text: "clear"
-                                    color: "#928374"
+                                    color: root.focusSection === root.sectionHistory && root.focusIndex === 2 ? theme.error : "#928374"
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
 

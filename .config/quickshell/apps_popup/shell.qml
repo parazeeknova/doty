@@ -22,16 +22,21 @@ Scope {
     property var fileSearchDisplayList: []
     property var gitRepos: []
     property var gitRepoSearchResults: []
+    property var bookmarks: []
+    property var bookmarkDisplayList: []
     property bool isWebSearchMode: root.activeTab === 1 || searchQuery.trim().startsWith("!")
     property bool isFileSearchMode: root.activeTab === 2 || searchQuery.trim().startsWith("@")
     property bool isGitRepoMode: root.activeTab === 3 || searchQuery.trim().startsWith("#")
+    property bool isBookmarkMode: root.activeTab === 4 || searchQuery.trim().startsWith("~")
     property string searchQuery: ""
     property int selectedIndex: 0
     property int activeTab: 0
     property string fileSearchQuery: ""
+    property string rawSearchQuery: ""
     readonly property string fontName: "FiraCode Nerd Font"
 
     signal requestClose()
+    signal resetSearchInput(string text)
 
     function filterApps() {
         if (searchQuery.trim() === "") {
@@ -157,8 +162,44 @@ Scope {
         root.requestClose();
     }
 
+    function launchBookmark(url) {
+        if (!url)
+            return ;
+
+        Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({workspace=1})"]);
+        Quickshell.execDetached(["xdg-open", url]);
+        root.requestClose();
+    }
+
+    function saveBookmark(url) {
+        if (!url)
+            return ;
+
+        var originalUrl = url;
+        if (root.rawSearchQuery.trim().startsWith("~")) {
+            var inputUrl = root.rawSearchQuery.trim().substring(1).trim();
+            if (inputUrl.toLowerCase() === url.toLowerCase())
+                originalUrl = inputUrl;
+
+        }
+        addBookmarkProc.running = false;
+        addBookmarkProc.command = [root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--add-bookmark", originalUrl];
+        addBookmarkProc.running = true;
+    }
+
+    function deleteBookmark(url) {
+        if (!url)
+            return ;
+
+        deleteBookmarkProc.running = false;
+        deleteBookmarkProc.command = [root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--delete-bookmark", url];
+        deleteBookmarkProc.running = true;
+    }
+
     function getActiveDisplayList() {
-        if (root.isGitRepoMode)
+        if (root.isBookmarkMode)
+            return root.bookmarkDisplayList;
+        else if (root.isGitRepoMode)
             return root.gitRepoSearchResults;
         else if (root.isFileSearchMode)
             return root.fileSearchDisplayList;
@@ -171,7 +212,53 @@ Scope {
     function rebuildDisplayList() {
         var list = [];
         var query = root.searchQuery.trim();
-        if (root.activeTab === 1 || query.startsWith("!")) {
+        if (root.activeTab === 4 || query.startsWith("~")) {
+            var bookmarkQuery = query.startsWith("~") ? query.substring(1).trim() : query;
+            var matching = [];
+            for (var idx = 0; idx < root.bookmarks.length; idx++) {
+                var bm = root.bookmarks[idx];
+                if (bookmarkQuery === "" || bm.url.toLowerCase().indexOf(bookmarkQuery) !== -1 || bm.name.toLowerCase().indexOf(bookmarkQuery) !== -1)
+                    matching.push(bm);
+
+            }
+            if (matching.length > 0) {
+                list.push({
+                    "type": "header",
+                    "name": "saved bookmarks"
+                });
+                for (var i = 0; i < matching.length; i++) {
+                    list.push({
+                        "type": "bookmark",
+                        "data": matching[i]
+                    });
+                }
+            }
+            if (bookmarkQuery !== "") {
+                var alreadyBookmarked = false;
+                for (var i = 0; i < root.bookmarks.length; i++) {
+                    var normUrl = bookmarkQuery.toLowerCase();
+                    if (!normUrl.includes("://"))
+                        normUrl = "https://" + normUrl;
+
+                    if (root.bookmarks[i].url.toLowerCase() === normUrl) {
+                        alreadyBookmarked = true;
+                        break;
+                    }
+                }
+                if (!alreadyBookmarked)
+                    list.unshift({
+                    "type": "add_bookmark",
+                    "url": bookmarkQuery
+                });
+
+            } else if (matching.length === 0) {
+                list.push({
+                    "type": "header",
+                    "name": "type a URL to bookmark..."
+                });
+            }
+            root.bookmarkDisplayList = list;
+        } else if (root.activeTab === 1 || query.startsWith("!")) {
             if (query === "" || query === "!") {
                 if (root.webHistory.length > 0) {
                     for (var i = 0; i < root.webHistory.length; i++) {
@@ -321,7 +408,7 @@ Scope {
     function selectFirstApp() {
         var list = root.getActiveDisplayList();
         for (var i = 0; i < list.length; i++) {
-            if (list[i].type === "app" || list[i].type === "web_search" || list[i].type === "file" || list[i].type === "git_repo") {
+            if (list[i].type === "app" || list[i].type === "web_search" || list[i].type === "file" || list[i].type === "git_repo" || list[i].type === "bookmark" || list[i].type === "add_bookmark") {
                 root.selectedIndex = i;
                 break;
             }
@@ -333,7 +420,7 @@ Scope {
         var idx = root.selectedIndex;
         while (idx < list.length - 1) {
             idx++;
-            if (list[idx].type === "app" || list[idx].type === "web_search" || list[idx].type === "file" || list[idx].type === "git_repo") {
+            if (list[idx].type === "app" || list[idx].type === "web_search" || list[idx].type === "file" || list[idx].type === "git_repo" || list[idx].type === "bookmark" || list[idx].type === "add_bookmark") {
                 root.selectedIndex = idx;
                 break;
             }
@@ -345,7 +432,7 @@ Scope {
         var idx = root.selectedIndex;
         while (idx > 0) {
             idx--;
-            if (list[idx].type === "app" || list[idx].type === "web_search" || list[idx].type === "file" || list[idx].type === "git_repo") {
+            if (list[idx].type === "app" || list[idx].type === "web_search" || list[idx].type === "file" || list[idx].type === "git_repo" || list[idx].type === "bookmark" || list[idx].type === "add_bookmark") {
                 root.selectedIndex = idx;
                 break;
             }
@@ -508,6 +595,7 @@ Scope {
                     root.apps = data.all_apps || [];
                     root.webHistory = data.web_history || [];
                     root.fileHistory = data.file_history || [];
+                    root.bookmarks = data.bookmarks || [];
                     root.filterApps();
                 } catch (e) {
                     console.log("Failed to parse apps: " + e);
@@ -515,6 +603,47 @@ Scope {
             }
         }
 
+    }
+
+    Process {
+        id: addBookmarkProc
+
+        command: [root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--add-bookmark", ""]
+        running: false
+        onRunningChanged: {
+            if (!running) {
+                getAppsProc.running = false;
+                getAppsProc.running = true;
+                root.searchQuery = "~";
+                root.resetSearchInput("~");
+            }
+        }
+    }
+
+    Process {
+        id: deleteBookmarkProc
+
+        command: [root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--delete-bookmark", ""]
+        running: false
+        onRunningChanged: {
+            if (!running) {
+                getAppsProc.running = false;
+                getAppsProc.running = true;
+            }
+        }
+    }
+
+    Process {
+        id: clearBookmarksProc
+
+        command: [root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--clear-bookmarks"]
+        running: false
+        onRunningChanged: {
+            if (!running) {
+                root.bookmarks = [];
+                rebuildDisplayList();
+            }
+        }
     }
 
     Process {
@@ -720,7 +849,21 @@ Scope {
                 focusable: true
                 color: "transparent"
                 implicitWidth: 240
-                implicitHeight: Math.min(320, 32 + (activeWindowsArea.visible ? activeWindowsArea.height + 4 : 0) + Math.max(32, root.isGitRepoMode ? (gitRepoList ? gitRepoList.contentHeight : 0) : (root.isFileSearchMode ? (fileSearchList ? fileSearchList.contentHeight : 0) : (root.isWebSearchMode ? (webSearchList ? webSearchList.contentHeight : 0) : (appsList ? appsList.contentHeight : 0)))) + bottomRow.implicitHeight)
+                implicitHeight: {
+                    var spacingAndStatic = activeWindowsArea.visible ? 94 : 52;
+                    var contentH = 0;
+                    if (root.isBookmarkMode)
+                        contentH = bookmarkList ? bookmarkList.contentHeight : 0;
+                    else if (root.isGitRepoMode)
+                        contentH = gitRepoList ? gitRepoList.contentHeight : 0;
+                    else if (root.isFileSearchMode)
+                        contentH = fileSearchList ? fileSearchList.contentHeight : 0;
+                    else if (root.isWebSearchMode)
+                        contentH = webSearchList ? webSearchList.contentHeight : 0;
+                    else
+                        contentH = appsList ? appsList.contentHeight : 0;
+                    return Math.min(320, spacingAndStatic + Math.max(48, contentH) + bottomRow.implicitHeight);
+                }
                 Component.onCompleted: {
                     introAnim.start();
                     searchInput.forceActiveFocus();
@@ -817,7 +960,7 @@ Scope {
                             win.closePopup();
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Tab) {
-                            root.activeTab = (root.activeTab + 1) % 4;
+                            root.activeTab = (root.activeTab + 1) % 5;
                             if (root.activeTab === 1) {
                                 root.searchQuery = "!";
                                 searchInput.text = "!";
@@ -827,6 +970,9 @@ Scope {
                             } else if (root.activeTab === 3) {
                                 root.searchQuery = "#";
                                 searchInput.text = "#";
+                            } else if (root.activeTab === 4) {
+                                root.searchQuery = "~";
+                                searchInput.text = "~";
                             } else {
                                 root.searchQuery = "";
                                 searchInput.text = "";
@@ -847,30 +993,80 @@ Scope {
                         } else if (event.key === Qt.Key_Up) {
                             root.selectedActiveWindowIndex = -1;
                             root.selectPrev();
-                            var activeList = root.isGitRepoMode ? gitRepoList : (root.isFileSearchMode ? fileSearchList : (root.isWebSearchMode ? webSearchList : appsList));
+                            var activeList = root.isBookmarkMode ? bookmarkList : (root.isGitRepoMode ? gitRepoList : (root.isFileSearchMode ? fileSearchList : (root.isWebSearchMode ? webSearchList : appsList)));
                             activeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Down) {
                             root.selectedActiveWindowIndex = -1;
                             root.selectNext();
-                            var activeList = root.isGitRepoMode ? gitRepoList : (root.isFileSearchMode ? fileSearchList : (root.isWebSearchMode ? webSearchList : appsList));
+                            var activeList = root.isBookmarkMode ? bookmarkList : (root.isGitRepoMode ? gitRepoList : (root.isFileSearchMode ? fileSearchList : (root.isWebSearchMode ? webSearchList : appsList)));
                             activeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
                             event.accepted = true;
+                        } else if (((event.key === Qt.Key_Delete || event.key === Qt.Key_Backspace) && (event.modifiers & Qt.ShiftModifier)) || (event.key === Qt.Key_Delete)) {
+                            var list = root.getActiveDisplayList();
+                            if (list.length > 0 && list[root.selectedIndex]) {
+                                var selected = list[root.selectedIndex];
+                                if (selected.type === "bookmark") {
+                                    root.deleteBookmark(selected.data.url);
+                                    event.accepted = true;
+                                }
+                            }
                         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                             if (root.selectedActiveWindowIndex >= 0) {
                                 root.focusWorkspaceAndClose(root.activeWindows[root.selectedActiveWindowIndex].workspace_id);
                             } else {
+                                var currentText = searchInput.text.trim();
                                 var list = root.getActiveDisplayList();
                                 if (list.length > 0 && list[root.selectedIndex]) {
                                     var selected = list[root.selectedIndex];
-                                    if (selected.type === "app")
-                                        root.launchApp(selected.data.name, selected.data.exec);
-                                    else if (selected.type === "web_search")
-                                        root.launchWebSearch(root.getReconstructedQuery(selected));
-                                    else if (selected.type === "file")
-                                        root.launchFile(selected.data.path);
-                                    else if (selected.type === "git_repo")
-                                        root.launchGitRepo(selected.data.html_url);
+                                    var isStaleBookmark = false;
+                                    if (currentText.startsWith("~") && selected.type === "bookmark") {
+                                        var urlToSave = currentText.substring(1).trim();
+                                        var queryLower = urlToSave.toLowerCase();
+                                        var bmUrl = (selected.data && selected.data.url) ? selected.data.url.toLowerCase() : "";
+                                        var bmName = (selected.data && selected.data.name) ? selected.data.name.toLowerCase() : "";
+                                        if (bmUrl.indexOf(queryLower) === -1 && bmName.indexOf(queryLower) === -1)
+                                            isStaleBookmark = true;
+
+                                    }
+                                    var isStaleWebSearch = false;
+                                    if (currentText.startsWith("!") && selected.type === "web_search") {
+                                        var webQuery = currentText.substring(1).trim();
+                                        var selQuery = selected.query || "";
+                                        if (selQuery.toLowerCase() !== webQuery.toLowerCase())
+                                            isStaleWebSearch = true;
+
+                                    }
+                                    if (currentText.startsWith("~") && (selected.type !== "bookmark" || isStaleBookmark) && selected.type !== "add_bookmark") {
+                                        var urlToSave = currentText.substring(1).trim();
+                                        if (urlToSave !== "")
+                                            root.saveBookmark(urlToSave);
+
+                                    } else if (currentText.startsWith("!") && (selected.type !== "web_search" || isStaleWebSearch)) {
+                                        root.launchWebSearch(currentText);
+                                    } else {
+                                        if (selected.type === "app")
+                                            root.launchApp(selected.data.name, selected.data.exec);
+                                        else if (selected.type === "web_search")
+                                            root.launchWebSearch(root.getReconstructedQuery(selected));
+                                        else if (selected.type === "file")
+                                            root.launchFile(selected.data.path);
+                                        else if (selected.type === "git_repo")
+                                            root.launchGitRepo(selected.data.html_url);
+                                        else if (selected.type === "bookmark")
+                                            root.launchBookmark(selected.data.url);
+                                        else if (selected.type === "add_bookmark")
+                                            root.saveBookmark(selected.url);
+                                    }
+                                } else {
+                                    if (currentText.startsWith("~")) {
+                                        var urlToSave = currentText.substring(1).trim();
+                                        if (urlToSave !== "")
+                                            root.saveBookmark(urlToSave);
+
+                                    } else if (currentText.startsWith("!")) {
+                                        root.launchWebSearch(currentText);
+                                    }
                                 }
                             }
                             event.accepted = true;
@@ -898,13 +1094,23 @@ Scope {
                                 font.family: root.fontName
                                 font.pointSize: 8
                                 focus: true
+                                Keys.forwardTo: [mainContainer]
                                 onTextChanged: {
+                                    root.rawSearchQuery = text;
                                     root.searchQuery = text.toLowerCase();
                                     searchDebounce.restart();
                                 }
 
+                                Connections {
+                                    function onResetSearchInput(text) {
+                                        searchInput.text = text;
+                                    }
+
+                                    target: root
+                                }
+
                                 Text {
-                                    text: root.activeTab === 0 ? "search applications..." : (root.activeTab === 1 ? "search the web..." : (root.activeTab === 2 ? "search files..." : "search github repos..."))
+                                    text: root.activeTab === 0 ? "search applications..." : (root.activeTab === 1 ? "search the web..." : (root.activeTab === 2 ? "search files..." : (root.activeTab === 3 ? "search github repos..." : "search bookmarks...")))
                                     color: theme.secondary
                                     font.family: root.fontName
                                     font.pointSize: 8
@@ -1174,6 +1380,36 @@ Scope {
 
                                     }
 
+                                    Text {
+                                        text: "|"
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        color: theme.secondary
+                                        opacity: 0.5
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    Text {
+                                        text: "bmarks"
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        font.bold: root.activeTab === 4
+                                        color: root.activeTab === 4 ? theme.accent : theme.secondary
+                                        renderType: Text.NativeRendering
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                root.activeTab = 4;
+                                                root.searchQuery = "~";
+                                                searchInput.text = "~";
+                                                root.selectedIndex = 0;
+                                            }
+                                        }
+
+                                    }
+
                                 }
 
                             }
@@ -1187,8 +1423,8 @@ Scope {
 
                             Rectangle {
                                 width: listContainer.width
-                                height: modelData.type === "app" ? 16 : (modelData.type === "header" ? 14 : (modelData.type === "separator" ? 5 : (modelData.type === "file" ? 16 : 16)))
-                                color: ((modelData.type === "app" || modelData.type === "web_search" || modelData.type === "file" || modelData.type === "git_repo") && root.selectedIndex === index) ? theme.bg_dark : "transparent"
+                                height: modelData.type === "app" ? 16 : (modelData.type === "header" ? 14 : (modelData.type === "separator" ? 5 : (modelData.type === "file" ? 16 : (modelData.type === "bookmark" ? 16 : (modelData.type === "add_bookmark" ? 16 : 16)))))
+                                color: ((modelData.type === "app" || modelData.type === "web_search" || modelData.type === "file" || modelData.type === "git_repo" || modelData.type === "bookmark" || modelData.type === "add_bookmark") && root.selectedIndex === index) ? theme.bg_dark : "transparent"
                                 radius: 0
 
                                 // 1. Header Type
@@ -1461,9 +1697,151 @@ Scope {
 
                                 }
 
+                                // 7. Bookmark Type
+                                Row {
+                                    visible: modelData.type === "bookmark"
+                                    width: listContainer.width - 8
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.leftMargin: 4
+                                    spacing: 6
+
+                                    Text {
+                                        text: "󰓆"
+                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                        font.family: root.fontName
+                                        font.pointSize: 7.5
+                                        renderType: Text.NativeRendering
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                    }
+
+                                    Text {
+                                        text: {
+                                            if (!modelData.data)
+                                                return "";
+
+                                            var name = modelData.data.name || "";
+                                            var url = modelData.data.url || "";
+                                            return name + "  " + url;
+                                        }
+                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        opacity: root.selectedIndex === index ? 0.8 : 0.5
+                                        elide: Text.ElideRight
+                                        width: listContainer.width - 40
+                                        renderType: Text.NativeRendering
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                                // Small delete indicator or button on the right
+                                Text {
+                                    text: ""
+                                    color: theme.secondary
+                                    font.family: root.fontName
+                                    font.pointSize: 7
+                                    opacity: root.selectedIndex === index ? 0.8 : 0
+                                    visible: modelData.type === "bookmark" && root.selectedIndex === index
+                                    renderType: Text.NativeRendering
+                                    anchors.right: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.rightMargin: 8
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            root.deleteBookmark(modelData.data.url);
+                                        }
+                                    }
+
+                                }
+
+                                // 8. Add Bookmark Type
+                                Row {
+                                    visible: modelData.type === "add_bookmark"
+                                    width: listContainer.width - 8
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.leftMargin: 4
+                                    spacing: 6
+
+                                    Text {
+                                        text: "󰐕"
+                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                        font.family: root.fontName
+                                        font.pointSize: 7.5
+                                        renderType: Text.NativeRendering
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                    }
+
+                                    Text {
+                                        text: "save bookmark '" + (modelData.url || "") + "'"
+                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                        font.family: root.fontName
+                                        font.pointSize: 7
+                                        opacity: root.selectedIndex === index ? 0.8 : 0.5
+                                        elide: Text.ElideRight
+                                        width: listContainer.width - 24
+                                        renderType: Text.NativeRendering
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: 120
+                                                easing.type: Easing.OutQuad
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
                                 MouseArea {
                                     anchors.fill: parent
-                                    enabled: modelData.type === "app" || modelData.type === "web_search" || modelData.type === "file" || modelData.type === "git_repo"
+                                    enabled: modelData.type === "app" || modelData.type === "web_search" || modelData.type === "file" || modelData.type === "git_repo" || modelData.type === "bookmark" || modelData.type === "add_bookmark"
                                     hoverEnabled: true
                                     onEntered: {
                                         root.selectedIndex = index;
@@ -1478,6 +1856,10 @@ Scope {
                                             root.launchFile(modelData.data.path);
                                         else if (modelData.type === "git_repo")
                                             root.launchGitRepo(modelData.data.html_url);
+                                        else if (modelData.type === "bookmark")
+                                            root.launchBookmark(modelData.data.url);
+                                        else if (modelData.type === "add_bookmark")
+                                            root.saveBookmark(modelData.url);
                                     }
                                 }
 
@@ -1509,7 +1891,7 @@ Scope {
                                 spacing: 2
                                 clip: true
                                 delegate: listDelegate
-                                opacity: (root.isWebSearchMode || root.isFileSearchMode || root.isGitRepoMode) ? 0 : 1
+                                opacity: (root.isWebSearchMode || root.isFileSearchMode || root.isGitRepoMode || root.isBookmarkMode) ? 0 : 1
                                 visible: opacity > 0
 
                                 Behavior on opacity {
@@ -1521,7 +1903,7 @@ Scope {
                                 }
 
                                 transform: Translate {
-                                    y: (root.isWebSearchMode || root.isFileSearchMode || root.isGitRepoMode) ? -10 : 0
+                                    y: (root.isWebSearchMode || root.isFileSearchMode || root.isGitRepoMode || root.isBookmarkMode) ? -10 : 0
 
                                     Behavior on y {
                                         NumberAnimation {
@@ -1637,6 +2019,40 @@ Scope {
 
                             }
 
+                            ListView {
+                                id: bookmarkList
+
+                                anchors.fill: parent
+                                model: root.bookmarkDisplayList
+                                spacing: 2
+                                clip: true
+                                delegate: listDelegate
+                                opacity: root.isBookmarkMode ? 1 : 0
+                                visible: opacity > 0
+
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: 180
+                                        easing.type: Easing.OutCubic
+                                    }
+
+                                }
+
+                                transform: Translate {
+                                    y: root.isBookmarkMode ? 0 : 10
+
+                                    Behavior on y {
+                                        NumberAnimation {
+                                            duration: 180
+                                            easing.type: Easing.OutCubic
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
                             Behavior on implicitHeight {
                                 NumberAnimation {
                                     duration: 180
@@ -1657,13 +2073,30 @@ Scope {
                             Layout.rightMargin: 4
 
                             Text {
-                                text: root.isGitRepoMode ? root.gitRepos.length + " repos" : (root.isFileSearchMode ? root.fileHistory.length + " recent files" : (root.isWebSearchMode ? root.webHistory.length + " histories in websearch" : root.apps.length + " applications found"))
+                                text: root.isBookmarkMode ? root.bookmarks.length + " bookmarks" : (root.isGitRepoMode ? root.gitRepos.length + " repos" : (root.isFileSearchMode ? root.fileHistory.length + " recent files" : (root.isWebSearchMode ? root.webHistory.length + " histories in websearch" : root.apps.length + " applications found")))
                                 font.family: root.fontName
                                 font.pointSize: 8
                                 font.italic: true
                                 color: theme.secondary
                                 renderType: Text.NativeRendering
                                 Layout.fillWidth: true
+                            }
+
+                            Text {
+                                visible: root.isBookmarkMode && root.bookmarks.length > 0
+                                text: "clear"
+                                font.family: root.fontName
+                                font.pointSize: 8
+                                font.italic: true
+                                color: theme.secondary
+                                renderType: Text.NativeRendering
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: clearBookmarksProc.running = true
+                                }
+
                             }
 
                             Text {

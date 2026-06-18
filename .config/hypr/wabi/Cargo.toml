@@ -92,6 +92,10 @@ path = "src/bin/utils/tray_count.rs"
 name = "parse_binds"
 path = "src/bin/utils/parse_binds.rs"
 
+[[bin]]
+name = "caffeine"
+path = "src/bin/utils/caffeine.rs"
+
 
 [[bin]]
 name = "theme_switcher"
