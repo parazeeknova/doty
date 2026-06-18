@@ -2,7 +2,7 @@ body, #app-mount {
   background-color: transparent !important;
 }
 
-:root {
+:root, .theme-dark, .theme-light, .visual-refresh, .visual-refresh.theme-dark, .visual-refresh .theme-dark {
   /* Brand/Accent (blurple overrides) */
   --brand-experiment: #{{accent_hex}} !important;
   --brand-experiment-30a: rgba({{accent_rgb}}, 0.3) !important;
