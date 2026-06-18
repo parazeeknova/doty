@@ -1,33 +1,48 @@
-@import url('https://mwittrien.github.io/BetterDiscordAddons/Themes/DiscordRecolor/DiscordRecolor.css');
-
 :root {
-  --accentcolor: {{accent_rgb}};
-  --accentcolor2: {{secondary_rgb}};
-  --linkcolor: {{accent_rgb}};
-  --mentioncolor: {{accent_rgb}};
-  --textbrightest: {{fg_rgb}};
-  --textbrighter: {{fg_light_rgb}};
-  --textbright: {{fg_light_rgb}};
-  --textdark: {{bg_light_rgb}};
-  --textdarker: {{bg_dark_rgb}};
-  --textdarkest: {{bg_rgb}};
+  /* Brand/Accent (blurple overrides) */
+  --brand-experiment: #{{accent_hex}} !important;
+  --brand-experiment-30a: rgba({{accent_rgb}}, 0.3) !important;
+  --brand-experiment-500: #{{accent_hex}} !important;
+  --brand-experiment-600: #{{secondary_hex}} !important;
 
-  --backgroundaccent: {{accent_rgb}};
-  --backgroundprimary: {{bg_rgb}};
-  --backgroundsecondary: {{bg_dark_rgb}};
-  --backgroundsecondaryalt: {{bg_dark_rgb}};
-  --backgroundtertiary: {{bg_dark_rgb}};
-  --backgroundfloating: {{bg_rgb}};
-  --settingsicons: 0;
-}
+  /* Backgrounds */
+  --background-primary: #{{bg_hex}} !important;
+  --background-secondary: #{{bg_dark_hex}} !important;
+  --background-secondary-alt: #{{bg_dark_hex}} !important;
+  --background-tertiary: #{{bg_dark_hex}} !important;
+  --background-floating: #{{bg_hex}} !important;
+  --background-accent: #{{bg_light_hex}} !important;
+  --background-message-hover: rgba({{bg_light_rgb}}, 0.07) !important;
 
-::-webkit-scrollbar {
-  width: 10px !important;
-}
+  /* Text and Interactive States */
+  --text-normal: #{{fg_hex}} !important;
+  --text-muted: #{{fg_light_hex}} !important;
+  --text-link: #{{accent_hex}} !important;
+  --text-positive: #{{accent_hex}} !important;
+  --text-danger: #{{error_hex}} !important;
 
-::-webkit-scrollbar-thumb {
-  border-radius: 500px !important;
-  background: rgba(var(--accentcolor), 0.7) !important;
-  background-clip: content-box !important;
-  border: 2px solid transparent !important;
+  --interactive-normal: #{{fg_light_hex}} !important;
+  --interactive-hover: #{{fg_hex}} !important;
+  --interactive-active: #{{accent_hex}} !important;
+  --interactive-muted: #{{bg_light_hex}} !important;
+
+  /* Interactive Backgrounds */
+  --background-modifier-hover: rgba({{bg_light_rgb}}, 0.12) !important;
+  --background-modifier-active: rgba({{bg_light_rgb}}, 0.22) !important;
+  --background-modifier-selected: rgba({{accent_rgb}}, 0.12) !important;
+  --background-modifier-accent: rgba({{accent_rgb}}, 0.25) !important;
+
+  /* Card and Input Backgrounds */
+  --channeltextarea-background: #{{bg_light_hex}} !important;
+  --activity-card-background: #{{bg_dark_hex}} !important;
+  --deprecated-card-bg: #{{bg_dark_hex}} !important;
+  --deprecated-quickbinder-border: #{{bg_light_hex}} !important;
+
+  /* Scrollbars */
+  --scrollbar-thin-thumb: rgba({{accent_rgb}}, 0.3) !important;
+  --scrollbar-thin-track: transparent !important;
+  --scrollbar-auto-thumb: rgba({{accent_rgb}}, 0.3) !important;
+  --scrollbar-auto-track: transparent !important;
+  --scrollbar-auto-scrollbar-color-thumb: rgba({{accent_rgb}}, 0.3) !important;
+  --scrollbar-auto-scrollbar-color-track: transparent !important;
 }
