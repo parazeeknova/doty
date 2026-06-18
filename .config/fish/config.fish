@@ -67,3 +67,5 @@ set -gx PATH $PATH /home/parazeeknova/.lmstudio/bin
 
 # Added by Antigravity CLI installer
 set -gx PATH "/home/parazeeknova/.local/bin" $PATH
+
+fish_add_path /home/parazeeknova/.spicetify

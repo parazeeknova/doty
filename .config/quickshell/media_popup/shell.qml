@@ -20,6 +20,12 @@ Scope {
     property var assets: []
     property var allTags: []
     property string activeHistoryTab: "ALL"
+    onActiveHistoryTabChanged: {
+        if (activeHistoryTab !== "ALL" && focusSection === sectionHistoryGrid) {
+            focusSection = sectionHistory;
+            focusIndex = 0;
+        }
+    }
     property int expandedOcrIndex: -1
     property string filterText: ""
     property string activeTag: ""
@@ -31,13 +37,14 @@ Scope {
     property var tagSuggestions: []
     property int searchDebounce: 0
     property int focusIndex: 0
-    property int focusSection: 0
+    property int focusSection: 6
     readonly property int sectionScreenshots: 0
     readonly property int sectionRecording: 1
     readonly property int sectionColorPicker: 2
     readonly property int sectionOcr: 3
     readonly property int sectionSettings: 4
     readonly property int sectionHistory: 5
+    readonly property int sectionHistoryGrid: 6
     readonly property var recordCodecs: ["h264", "hevc", "vp9", "av1"]
     readonly property var recordFpsOptions: ["native", 30, 60, 120]
     readonly property var recordQualityOptions: ["low", "med", "high", "lossless"]
@@ -178,18 +185,18 @@ Scope {
     function activateFocusItem() {
         if (root.focusSection === root.sectionScreenshots) {
             if (root.focusIndex === 0) {
-                win.closePopup();
+                root.requestClose();
                 var slurp = "slurp -b \\#1d2021b0 -c \\#d5c4a1ff -s \\#00000000";
                 Quickshell.execDetached(["sh", "-c", "mkdir -p \"" + root.screenshotDir + "\" && FILE=\"" + root.screenshotDir + "/Screenshot_$(date '+%Y-%m-%d_%H.%M.%S').png\" && grim -g \"$(" + slurp + ")\" \"$FILE\" && swappy -f \"$FILE\" -o \"$FILE\" && wl-copy < \"$FILE\" && \"" + root.helperPath + "\" add-asset screenshot \"$FILE\""]);
             } else if (root.focusIndex === 1) {
-                win.closePopup();
+                root.requestClose();
                 var slurp = "slurp -b \\#1d2021b0 -c \\#d5c4a1ff -s \\#00000000";
                 Quickshell.execDetached(["sh", "-c", "grim -g \"$(" + slurp + ")\" - | wl-copy"]);
             } else if (root.focusIndex === 2) {
-                win.closePopup();
+                root.requestClose();
                 Quickshell.execDetached(["sh", "-c", "grim -o \"$(hyprctl activeworkspace -j | jq -r '.monitor')\" - | wl-copy"]);
             } else if (root.focusIndex === 3) {
-                win.closePopup();
+                root.requestClose();
                 Quickshell.execDetached(["sh", "-c", "mkdir -p \"" + root.screenshotDir + "\" && FILE=\"" + root.screenshotDir + "/Screenshot_$(date '+%Y-%m-%d_%H.%M.%S').png\" && grim -o \"$(hyprctl activeworkspace -j | jq -r '.monitor')\" \"$FILE\" && wl-copy < \"$FILE\" && \"" + root.helperPath + "\" add-asset screenshot \"$FILE\""]);
             }
         } else if (root.focusSection === root.sectionRecording) {
@@ -198,7 +205,7 @@ Scope {
                     Quickshell.execDetached(["sh", "-c", "pkill -SIGINT wf-recorder && " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Recording Saved\" \"good\" 1200"]);
                     root.updateStatus();
                 } else {
-                    win.closePopup();
+                    root.requestClose();
                     var audioArgs = "";
                     if (flagsAdapter.recordAudio && flagsAdapter.recordMic)
                         audioArgs = "-a\"$(pactl get-default-sink).monitor\" -a\"$(pactl get-default-source)\"";
@@ -209,7 +216,7 @@ Scope {
                     Quickshell.execDetached(["sh", "-c", "GEOM=$(slurp) && if [ ! -z \"$GEOM\" ]; then " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Recording Started\" \"bad\" 1200 && mkdir -p \"" + root.recordingDir + "\" && FILE=\"" + root.recordingDir + "/Recording_$(date '+%Y-%m-%d_%H.%M.%S').mp4\" && (wf-recorder " + audioArgs + " " + root.recorderExtraArgs() + " -g \"$GEOM\" -f \"$FILE\" ; \"" + root.helperPath + "\" add-asset recording \"$FILE\") ; fi"]);
                 }
             } else if (root.focusIndex === 1 && !root.isRecording) {
-                win.closePopup();
+                root.requestClose();
                 var audioArgs = "";
                 if (flagsAdapter.recordAudio && flagsAdapter.recordMic)
                     audioArgs = "-a\"$(pactl get-default-sink).monitor\" -a\"$(pactl get-default-source)\"";
@@ -246,7 +253,7 @@ Scope {
             }
         } else if (root.focusSection === root.sectionOcr) {
             if (root.focusIndex === 0) {
-                win.closePopup();
+                root.requestClose();
                 var slurp = "slurp -b \\#1d2021b0 -c \\#d5c4a1ff -s \\#00000000";
                 Quickshell.execDetached(["sh", "-c", "grim -g \"$(" + slurp + ")\" /tmp/ocr_image.png && TEXT=$(tesseract /tmp/ocr_image.png stdout 2>/dev/null) && rm /tmp/ocr_image.png && if [ ! -z \"$TEXT\" ]; then echo -n \"$TEXT\" | wl-copy && " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Text Extracted\" \"good\" 1200 && \"" + root.helperPath + "\" add ocr \"$TEXT\"; else notify-send -t 1500 -a \"OCR\" \"No text found\"; fi"]);
             } else if (root.focusIndex === 1) {
@@ -265,6 +272,16 @@ Scope {
                 Quickshell.execDetached([root.helperPath, "clear-all"]);
                 root.closeEditor();
                 root.updateStatus();
+            }
+        } else if (root.focusSection === root.sectionHistoryGrid) {
+            var assetsOnPage = root.filteredAssets().slice(root.currentPage * 20, (root.currentPage + 1) * 20);
+            if (root.focusIndex >= 0 && root.focusIndex < assetsOnPage.length) {
+                var asset = assetsOnPage[root.focusIndex];
+                if (!asset.deleted) {
+                    Quickshell.execDetached(["sh", "-c", "echo -n '" + asset.source_path + "' | wl-copy && notify-send -t 1000 -a 'Media' 'Copied path to clipboard'"]);
+                    root.closePreview();
+                    root.requestClose();
+                }
             }
         }
     }
@@ -287,6 +304,11 @@ Scope {
 
         if (root.focusSection === root.sectionHistory)
             return 2;
+
+        if (root.focusSection === root.sectionHistoryGrid) {
+            var count = root.filteredAssets().slice(root.currentPage * 20, (root.currentPage + 1) * 20).length;
+            return count > 0 ? count - 1 : 0;
+        }
 
         return 0;
     }
@@ -409,7 +431,13 @@ Scope {
                     root.screenshotDir = data.screenshot_dir;
                     root.recordingDir = data.recording_dir;
                     root.history = data.history || [];
-                    root.assets = data.assets || [];
+                    var rawAssets = data.assets || [];
+                    for (var i = 0; i < rawAssets.length; i++) {
+                        if (!rawAssets[i].tags) {
+                            rawAssets[i].tags = [];
+                        }
+                    }
+                    root.assets = rawAssets;
                     root.allTags = data.tags || [];
                     root.colors = data.colors || [];
                     root.syncColors();
@@ -633,6 +661,7 @@ Scope {
                 }
 
                 Rectangle {
+                    id: mainContainer
                     anchors.fill: parent
                     opacity: win.animOpacity
                     color: theme.popupBgColor // Matching background color of other popups
@@ -642,11 +671,6 @@ Scope {
                     antialiasing: false
                     focus: true
                     Keys.onPressed: (event) => {
-                        if (event.key === Qt.Key_Escape) {
-                            win.closePopup();
-                            event.accepted = true;
-                            return ;
-                        }
                         if (root.previewAsset !== null || root.previewOcrText !== "") {
                             if (event.key === Qt.Key_Escape || event.key === Qt.Key_Q) {
                                 root.closePreview();
@@ -654,32 +678,92 @@ Scope {
                             }
                             return ;
                         }
+                        if (event.key === Qt.Key_Escape) {
+                            win.closePopup();
+                            event.accepted = true;
+                            return ;
+                        }
                         if (event.key === Qt.Key_Tab) {
-                            root.focusSection = (root.focusSection + 1) % 6;
+                            var numSections = (root.activeHistoryTab === "ALL") ? 7 : 6;
+                            root.focusSection = (root.focusSection + 1) % numSections;
                             root.focusIndex = 0;
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Backtab) {
-                            root.focusSection = (root.focusSection + 5) % 6;
+                            var numSections = (root.activeHistoryTab === "ALL") ? 7 : 6;
+                            root.focusSection = (root.focusSection + numSections - 1) % numSections;
                             root.focusIndex = 0;
                             event.accepted = true;
-                        } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Right) {
+                        } else if (event.key === Qt.Key_Down) {
+                            if (root.focusSection === root.sectionHistoryGrid) {
+                                var max = maxFocusIndex();
+                                if (root.focusIndex + 4 <= max) {
+                                    root.focusIndex += 4;
+                                }
+                            } else {
+                                var max = maxFocusIndex();
+                                if (root.focusIndex < max)
+                                    root.focusIndex++;
+                            }
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Up) {
+                            if (root.focusSection === root.sectionHistoryGrid) {
+                                if (root.focusIndex >= 4) {
+                                    root.focusIndex -= 4;
+                                }
+                            } else {
+                                if (root.focusIndex > 0)
+                                    root.focusIndex--;
+                            }
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Right) {
                             var max = maxFocusIndex();
                             if (root.focusIndex < max)
                                 root.focusIndex++;
-
                             event.accepted = true;
-                        } else if (event.key === Qt.Key_Up || event.key === Qt.Key_Left) {
+                        } else if (event.key === Qt.Key_Left) {
                             if (root.focusIndex > 0)
                                 root.focusIndex--;
-
                             event.accepted = true;
-                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+                        } else if (event.key === Qt.Key_Delete) {
+                            if (root.focusSection === root.sectionHistoryGrid) {
+                                var assetsOnPage = root.filteredAssets().slice(root.currentPage * 20, (root.currentPage + 1) * 20);
+                                if (root.focusIndex >= 0 && root.focusIndex < assetsOnPage.length) {
+                                    root.purgeAsset(assetsOnPage[root.focusIndex]);
+                                    event.accepted = true;
+                                }
+                            }
+                        } else if (event.key === Qt.Key_Space) {
+                            if (root.focusSection === root.sectionHistoryGrid) {
+                                var assetsOnPage = root.filteredAssets().slice(root.currentPage * 20, (root.currentPage + 1) * 20);
+                                if (root.focusIndex >= 0 && root.focusIndex < assetsOnPage.length) {
+                                    root.previewAsset = assetsOnPage[root.focusIndex];
+                                    event.accepted = true;
+                                    return;
+                                }
+                            }
+                            activateFocusItem();
+                            event.accepted = true;
+                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                             activateFocusItem();
                             event.accepted = true;
                         }
                     }
                     Component.onCompleted: {
                         forceActiveFocus();
+                    }
+
+                    Connections {
+                        target: root
+                        function onPreviewAssetChanged() {
+                            if (root.previewAsset === null && root.previewOcrText === "") {
+                                mainContainer.forceActiveFocus();
+                            }
+                        }
+                        function onPreviewOcrTextChanged() {
+                            if (root.previewAsset === null && root.previewOcrText === "") {
+                                mainContainer.forceActiveFocus();
+                            }
+                        }
                     }
 
                     MouseArea {
@@ -731,16 +815,16 @@ Scope {
                                 color: "#a89984"
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 10
-                            }
 
-                            MouseArea {
-                                anchors.fill: closeText
-                                anchors.margins: -4
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onEntered: closeText.color = theme.error
-                                onExited: closeText.color = "#a89984"
-                                onClicked: win.closePopup()
+                                MouseArea {
+                                    anchors.fill: parent
+                                    anchors.margins: -4
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onEntered: closeText.color = theme.error
+                                    onExited: closeText.color = "#a89984"
+                                    onClicked: win.closePopup()
+                                }
                             }
 
                         }
@@ -1111,10 +1195,15 @@ Scope {
                                 rowSpacing: 2
                                 visible: !root.isRecording
 
-                                Item {
-                                    Layout.preferredWidth: fpsText.implicitWidth
+                                Rectangle {
+                                    id: fpsRect
+                                    Layout.preferredWidth: fpsText.implicitWidth + 8
                                     Layout.preferredHeight: 14
                                     Layout.alignment: Qt.AlignLeft
+                                    color: (root.focusSection === root.sectionRecording && root.focusIndex === 4) ? theme.bg_light : "transparent"
+                                    border.width: 1
+                                    border.color: (root.focusSection === root.sectionRecording && root.focusIndex === 4) ? theme.accent : "transparent"
+                                    radius: 2
 
                                     Text {
                                         id: fpsText
@@ -1126,98 +1215,113 @@ Scope {
                                         font.pixelSize: 8
                                     }
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            var arr = root.recordFpsOptions;
-                                            var i = arr.indexOf(flagsAdapter.recordFps);
-                                            flagsAdapter.recordFps = arr[(i + 1) % arr.length];
-                                        }
-                                    }
+                                     MouseArea {
+                                         anchors.fill: parent
+                                         cursorShape: Qt.PointingHandCursor
+                                         onClicked: {
+                                             var arr = root.recordFpsOptions;
+                                             var i = arr.indexOf(flagsAdapter.recordFps);
+                                             flagsAdapter.recordFps = arr[(i + 1) % arr.length];
+                                         }
+                                     }
 
-                                }
+                                 }
 
-                                Item {
-                                    Layout.preferredWidth: qualityText.implicitWidth
+                                Rectangle {
+                                    id: qualityRect
+                                    Layout.preferredWidth: qualityText.implicitWidth + 8
                                     Layout.preferredHeight: 14
                                     Layout.alignment: Qt.AlignLeft
+                                    color: (root.focusSection === root.sectionRecording && root.focusIndex === 5) ? theme.bg_light : "transparent"
+                                    border.width: 1
+                                    border.color: (root.focusSection === root.sectionRecording && root.focusIndex === 5) ? theme.accent : "transparent"
+                                    radius: 2
 
-                                    Text {
-                                        id: qualityText
-
-                                        anchors.centerIn: parent
-                                        text: "󰊢 Quality: " + flagsAdapter.recordQuality
-                                        color: theme.accent
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
-                                    }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            var arr = root.recordQualityOptions;
-                                            var i = arr.indexOf(flagsAdapter.recordQuality);
-                                            flagsAdapter.recordQuality = arr[(i + 1) % arr.length];
-                                        }
-                                    }
-
-                                }
-
-                                Item {
-                                    Layout.preferredWidth: codecText.implicitWidth
+                                     Text {
+                                         id: qualityText
+ 
+                                         anchors.centerIn: parent
+                                         text: "󰊢 Quality: " + flagsAdapter.recordQuality
+                                         color: theme.accent
+                                         font.family: "FiraCode Nerd Font"
+                                         font.pixelSize: 8
+                                     }
+ 
+                                     MouseArea {
+                                         anchors.fill: parent
+                                         cursorShape: Qt.PointingHandCursor
+                                         onClicked: {
+                                             var arr = root.recordQualityOptions;
+                                             var i = arr.indexOf(flagsAdapter.recordQuality);
+                                             flagsAdapter.recordQuality = arr[(i + 1) % arr.length];
+                                         }
+                                     }
+ 
+                                 }
+ 
+                                Rectangle {
+                                    id: codecRect
+                                    Layout.preferredWidth: codecText.implicitWidth + 8
                                     Layout.preferredHeight: 14
                                     Layout.alignment: Qt.AlignLeft
+                                    color: (root.focusSection === root.sectionRecording && root.focusIndex === 6) ? theme.bg_light : "transparent"
+                                    border.width: 1
+                                    border.color: (root.focusSection === root.sectionRecording && root.focusIndex === 6) ? theme.accent : "transparent"
+                                    radius: 2
 
-                                    Text {
-                                        id: codecText
-
-                                        anchors.centerIn: parent
-                                        text: "󰈙 Codec: " + flagsAdapter.recordCodec
-                                        color: theme.accent
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
-                                    }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            var arr = root.recordCodecs;
-                                            var i = arr.indexOf(flagsAdapter.recordCodec);
-                                            flagsAdapter.recordCodec = arr[(i + 1) % arr.length];
-                                        }
-                                    }
-
-                                }
-
-                                Item {
-                                    Layout.preferredWidth: presetText.implicitWidth
+                                     Text {
+                                         id: codecText
+ 
+                                         anchors.centerIn: parent
+                                         text: "󰈙 Codec: " + flagsAdapter.recordCodec
+                                         color: theme.accent
+                                         font.family: "FiraCode Nerd Font"
+                                         font.pixelSize: 8
+                                     }
+ 
+                                     MouseArea {
+                                         anchors.fill: parent
+                                         cursorShape: Qt.PointingHandCursor
+                                         onClicked: {
+                                             var arr = root.recordCodecs;
+                                             var i = arr.indexOf(flagsAdapter.recordCodec);
+                                             flagsAdapter.recordCodec = arr[(i + 1) % arr.length];
+                                         }
+                                     }
+ 
+                                 }
+ 
+                                Rectangle {
+                                    id: presetRect
+                                    Layout.preferredWidth: presetText.implicitWidth + 8
                                     Layout.preferredHeight: 14
                                     Layout.alignment: Qt.AlignLeft
+                                    color: (root.focusSection === root.sectionRecording && root.focusIndex === 7) ? theme.bg_light : "transparent"
+                                    border.width: 1
+                                    border.color: (root.focusSection === root.sectionRecording && root.focusIndex === 7) ? theme.accent : "transparent"
+                                    radius: 2
 
-                                    Text {
-                                        id: presetText
-
-                                        anchors.centerIn: parent
-                                        text: "󰓣 Preset: " + flagsAdapter.recordPreset
-                                        color: theme.accent
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
-                                    }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            var arr = root.recordPresetOptions;
-                                            var i = arr.indexOf(flagsAdapter.recordPreset);
-                                            flagsAdapter.recordPreset = arr[(i + 1) % arr.length];
-                                        }
-                                    }
-
-                                }
+                                     Text {
+                                         id: presetText
+ 
+                                         anchors.centerIn: parent
+                                         text: "󰓣 Preset: " + flagsAdapter.recordPreset
+                                         color: theme.accent
+                                         font.family: "FiraCode Nerd Font"
+                                         font.pixelSize: 8
+                                     }
+ 
+                                     MouseArea {
+                                         anchors.fill: parent
+                                         cursorShape: Qt.PointingHandCursor
+                                         onClicked: {
+                                             var arr = root.recordPresetOptions;
+                                             var i = arr.indexOf(flagsAdapter.recordPreset);
+                                             flagsAdapter.recordPreset = arr[(i + 1) % arr.length];
+                                         }
+                                     }
+ 
+                                 }
 
                             }
 
@@ -2001,7 +2105,7 @@ Scope {
                                                 height: parent.width
                                                 color: theme.bg_dark
                                                 border.width: 1
-                                                border.color: tileMouse.containsMouse ? theme.accent : theme.bg_light
+                                                border.color: (tileMouse.containsMouse || (root.focusSection === root.sectionHistoryGrid && root.focusIndex === index)) ? theme.accent : theme.bg_light
                                                 opacity: modelData.deleted ? 0.4 : 1
 
                                                 Image {
@@ -2209,300 +2313,7 @@ Scope {
 
                             }
 
-                            // Asset editor popup (right-click on a tile)
-                            Popup {
-                                id: assetEditor
 
-                                property var editorAsset: root.expandedAssetId >= 0 ? root.assetById(root.expandedAssetId) : null
-
-                                visible: root.expandedAssetId >= 0
-                                width: mainLayout.width - 16
-                                x: 8
-                                y: 0
-                                padding: 6
-                                modal: true
-                                focus: true
-                                closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-                                onClosed: root.closeEditor()
-
-                                background: Rectangle {
-                                    color: theme.bg
-                                    border.width: 1
-                                    border.color: theme.accent
-                                    radius: 2
-                                }
-
-                                contentItem: Column {
-                                    width: assetEditor.width
-                                    spacing: 4
-
-                                    Text {
-                                        width: parent.width
-                                        text: assetEditor.editorAsset ? root.basename(assetEditor.editorAsset.source_path) : ""
-                                        color: theme.accent
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
-                                        font.bold: true
-                                        elide: Text.ElideMiddle
-                                    }
-
-                                    Text {
-                                        visible: assetEditor.editorAsset && assetEditor.editorAsset.deleted
-                                        text: "file missing"
-                                        color: "#fb4934"
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 7
-                                    }
-
-                                    // Existing tags row
-                                    Flow {
-                                        width: parent.width
-                                        spacing: 3
-
-                                        Repeater {
-                                            model: assetEditor.editorAsset ? assetEditor.editorAsset.tags : []
-
-                                            delegate: Rectangle {
-                                                height: 12
-                                                width: tagInnerText.implicitWidth + 14
-                                                color: theme.bg_light
-                                                border.width: 1
-                                                border.color: theme.accent
-                                                radius: 2
-
-                                                Text {
-                                                    id: tagInnerText
-
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                    anchors.left: parent.left
-                                                    anchors.leftMargin: 4
-                                                    text: modelData
-                                                    color: theme.accent
-                                                    font.family: "FiraCode Nerd Font"
-                                                    font.pixelSize: 7
-                                                }
-
-                                                Text {
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                    anchors.right: parent.right
-                                                    anchors.rightMargin: 3
-                                                    text: "×"
-                                                    color: "#fb4934"
-                                                    font.family: "FiraCode Nerd Font"
-                                                    font.pixelSize: 9
-                                                }
-
-                                                MouseArea {
-                                                    anchors.fill: parent
-                                                    onClicked: root.removeTagFromAsset(assetEditor.editorAsset, modelData)
-                                                }
-
-                                            }
-
-                                        }
-
-                                        // + add button
-                                        Rectangle {
-                                            visible: !tagInput.visible
-                                            height: 12
-                                            width: addBtnText.implicitWidth + 10
-                                            color: theme.bg_light
-                                            border.width: 1
-                                            border.color: "#504945"
-                                            radius: 2
-
-                                            Text {
-                                                id: addBtnText
-
-                                                anchors.centerIn: parent
-                                                text: "+ add tag"
-                                                color: theme.accent
-                                                font.family: "FiraCode Nerd Font"
-                                                font.pixelSize: 7
-                                            }
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                onClicked: {
-                                                    tagInput.visible = true;
-                                                    tagInput.forceActiveFocus();
-                                                }
-                                            }
-
-                                        }
-
-                                    }
-
-                                    // Tag input
-                                    Rectangle {
-                                        id: tagInputWrap
-
-                                        width: parent.width
-                                        height: tagInput.visible ? tagInput.implicitHeight + 4 : 0
-                                        visible: tagInput.visible
-                                        color: theme.bg_dark
-                                        border.width: 1
-                                        border.color: theme.accent
-
-                                        TextField {
-                                            id: tagInput
-
-                                            anchors.fill: parent
-                                            anchors.leftMargin: 3
-                                            anchors.rightMargin: 3
-                                            background: null
-                                            color: theme.accent
-                                            placeholderText: "type and press enter"
-                                            placeholderTextColor: "#928374"
-                                            font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 7
-                                            text: root.tagDraft
-                                            onTextChanged: {
-                                                root.tagDraft = text;
-                                                root.refreshTagSuggestions();
-                                            }
-                                            onAccepted: {
-                                                root.commitTagDraft();
-                                                visible = false;
-                                            }
-                                            Keys.onEscapePressed: {
-                                                text = "";
-                                                root.tagDraft = "";
-                                                visible = false;
-                                            }
-                                        }
-
-                                    }
-
-                                    // Suggestions
-                                    Column {
-                                        width: parent.width
-                                        spacing: 1
-                                        visible: tagInput.visible && root.tagSuggestions.length > 0
-
-                                        Repeater {
-                                            model: root.tagSuggestions
-
-                                            delegate: Rectangle {
-                                                width: parent.width
-                                                height: 11
-                                                color: theme.bg_light
-
-                                                Text {
-                                                    anchors.left: parent.left
-                                                    anchors.leftMargin: 4
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                    text: modelData
-                                                    color: theme.accent
-                                                    font.family: "FiraCode Nerd Font"
-                                                    font.pixelSize: 7
-                                                }
-
-                                                MouseArea {
-                                                    anchors.fill: parent
-                                                    onClicked: {
-                                                        root.commitTagDraft(modelData);
-                                                        tagInput.visible = false;
-                                                    }
-                                                }
-
-                                            }
-
-                                        }
-
-                                    }
-
-                                    // Actions
-                                    Row {
-                                        spacing: 4
-                                        anchors.right: parent.right
-
-                                        Rectangle {
-                                            width: 32
-                                            height: 14
-                                            color: theme.bg_light
-                                            border.width: 1
-                                            border.color: "#504945"
-
-                                            Text {
-                                                anchors.centerIn: parent
-                                                text: "Open"
-                                                color: theme.accent
-                                                font.family: "FiraCode Nerd Font"
-                                                font.pixelSize: 7
-                                            }
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                onClicked: {
-                                                    if (assetEditor.editorAsset) {
-                                                        Quickshell.execDetached(["xdg-open", assetEditor.editorAsset.source_path]);
-                                                        root.closeEditor();
-                                                    }
-                                                }
-                                            }
-
-                                        }
-
-                                        Rectangle {
-                                            width: 38
-                                            height: 14
-                                            color: theme.bg_light
-                                            border.width: 1
-                                            border.color: "#504945"
-
-                                            Text {
-                                                anchors.centerIn: parent
-                                                text: "Reveal"
-                                                color: theme.accent
-                                                font.family: "FiraCode Nerd Font"
-                                                font.pixelSize: 7
-                                            }
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                onClicked: {
-                                                    if (assetEditor.editorAsset) {
-                                                        var dir = assetEditor.editorAsset.source_path.substring(0, assetEditor.editorAsset.source_path.lastIndexOf("/"));
-                                                        Quickshell.execDetached(["xdg-open", dir]);
-                                                        root.closeEditor();
-                                                    }
-                                                }
-                                            }
-
-                                        }
-
-                                        Rectangle {
-                                            width: 38
-                                            height: 14
-                                            color: assetEditor.editorAsset && assetEditor.editorAsset.deleted ? "#fb4934" : theme.bg_light
-                                            border.width: 1
-                                            border.color: assetEditor.editorAsset && assetEditor.editorAsset.deleted ? "#fb4934" : "#504945"
-
-                                            Text {
-                                                anchors.centerIn: parent
-                                                text: "Purge"
-                                                color: assetEditor.editorAsset && assetEditor.editorAsset.deleted ? "#1d2021" : theme.accent
-                                                font.family: "FiraCode Nerd Font"
-                                                font.pixelSize: 7
-                                            }
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                onClicked: {
-                                                    if (assetEditor.editorAsset)
-                                                        root.purgeAsset(assetEditor.editorAsset);
-
-                                                }
-                                            }
-
-                                        }
-
-                                    }
-
-                                }
-
-                            }
 
                             // OCR History Tab
                             Column {

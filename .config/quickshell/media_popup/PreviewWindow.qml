@@ -14,10 +14,10 @@ PanelWindow {
     screen: winObj.screen
     color: "transparent"
     exclusionMode: PanelWindow.ExclusionMode.Ignore
-    focusable: true
+    focusable: false
     WlrLayershell.namespace: "quickshell"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
     anchors {
         top: true
