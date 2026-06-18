@@ -141,5 +141,9 @@ path = "src/bin/status/recents.rs"
 name = "get_github_repos"
 path = "src/bin/status/github_repos.rs"
 
+[[bin]]
+name = "wabi_power"
+path = "src/bin/utils/power.rs"
+
 
 

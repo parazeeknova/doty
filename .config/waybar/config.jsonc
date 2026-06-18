@@ -2,23 +2,18 @@
   "layer": "top",
   "position": "left",
   "width": 20,
-  "margin-left": 4,
-  "margin-top": 4,
-  "margin-bottom": 4,
-  "spacing": 4,
-  "modules-left": [
-    "hyprland/workspaces",
-    "hyprland/window"
-  ],
-  "modules-center": [
-    "clock#date"
-  ],
+  "margin-left": 2,
+  "margin-top": 2,
+  "margin-bottom": 2,
+  "spacing": 2,
+  "modules-left": ["hyprland/workspaces", "hyprland/window"],
+  "modules-center": ["clock#date"],
   "modules-right": [
     "custom/tray_toggle",
     "network",
     "pulseaudio",
     "battery",
-    "clock"
+    "clock",
   ],
   "custom/tray_toggle": {
     "format": "{}",
@@ -26,7 +21,7 @@
     "exec": "~/.config/waybar/scripts/tray_count",
     "signal": 5,
     "on-click": "quickshell -c tray_popup ipc call tray_popup close || quickshell --config tray_popup",
-    "tooltip": false
+    "tooltip": false,
   },
   "network": {
     "rotate": 270,
@@ -35,15 +30,9 @@
     "format-ethernet": "lan {icon}",
     "format-linked": "{icon}",
     "format-disconnected": "󰖪",
-    "format-icons": [
-      "󰤯",
-      "󰤟",
-      "󰤢",
-      "󰤥",
-      "󰤨"
-    ],
+    "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
     "on-click": "quickshell --config network_popup",
-    "tooltip": false
+    "tooltip": false,
   },
   "hyprland/workspaces": {
     "format": "{icon}",
@@ -57,25 +46,25 @@
       "7": "vii",
       "8": "viii",
       "9": "ix",
-      "10": "x"
-    }
+      "10": "x",
+    },
   },
   "hyprland/window": {
     "format": "{title}",
     "tooltip": false,
     "max-length": 40,
     "rotate": 270,
-    "on-click": "quickshell --config workspace_popup"
+    "on-click": "quickshell --config workspace_popup",
   },
   "clock": {
     "format": "{:%I\n%M\n%p}",
     "tooltip": false,
-    "on-click": "quickshell --config sysmon_popup"
+    "on-click": "quickshell --config sysmon_popup",
   },
   "clock#date": {
     "format": "{:%d\n%m\n%y}",
     "tooltip": false,
-    "on-click": "quickshell --config notif_popup"
+    "on-click": "quickshell --config notif_popup",
   },
   "pulseaudio": {
     "rotate": 270,
@@ -90,19 +79,14 @@
       "phone-muted": "",
       "portable": "",
       "car": "",
-      "default": [
-        "",
-        "󰕾"
-      ]
+      "default": ["", "󰕾"],
     },
     "scroll-step": 1,
     "on-scroll-up": "~/.config/quickshell/osd/bin/osdctl volume up",
     "on-scroll-down": "~/.config/quickshell/osd/bin/osdctl volume down",
     "on-click": "quickshell --config volume_popup",
-    "ignored-sinks": [
-      "Easy Effects Sink"
-    ],
-    "tooltip": false
+    "ignored-sinks": ["Easy Effects Sink"],
+    "tooltip": false,
   },
   "battery": {
     "rotate": 270,
@@ -114,33 +98,9 @@
     "on-click": "quickshell --config battery_popup",
     "tooltip": false,
     "format-icons": {
-      "default": [
-        "󰂎",
-        "󰁺",
-        "󰁻",
-        "󰁼",
-        "󰁽",
-        "󰁾",
-        "󰁿",
-        "󰂀",
-        "󰂁",
-        "󰂂",
-        "󰁹"
-      ],
-      "charging": [
-        "󰢟",
-        "󰢜",
-        "󰂆",
-        "󰂇",
-        "󰂈",
-        "󰢝",
-        "󰂉",
-        "󰢞",
-        "󰂊",
-        "󰂋",
-        "󰂅"
-      ]
-    }
+      "default": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+      "charging": ["󰢟", "󰢜", "󰂆", "󰂇", "󰂈", "󰢝", "󰂉", "󰢞", "󰂊", "󰂋", "󰂅"],
+    },
   },
   "cava": {
     "rotate": 270,
@@ -162,15 +122,6 @@
     "waves": false,
     "noise_reduction": 0.11,
     "input_delay": 1,
-    "format-icons": [
-      "▁",
-      "▂",
-      "▃",
-      "▄",
-      "▅",
-      "▆",
-      "▇",
-      "█"
-    ]
-  }
+    "format-icons": ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"],
+  },
 }

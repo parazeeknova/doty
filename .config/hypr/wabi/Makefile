@@ -41,6 +41,7 @@ install: build
 	cp target/release/get_github_repos ../../quickshell/apps_popup/get_github_repos
 	cp target/release/waybar_toggle ../../waybar/scripts/waybar_toggle
 	cp target/release/toggle_widgets ../../waybar/scripts/toggle_widgets
+	cp target/release/wabi_power ../../waybar/scripts/wabi_power
 	cp target/release/tray_count ../../waybar/scripts/tray_count
 	cp target/release/wallpaper_thumb_watcher ../../quickshell/wallpaper_switcher/wallpaper_thumb_watcher
 	cp target/release/get_github_graph ../../quickshell/github_graph/get_github_graph

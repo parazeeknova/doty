@@ -34,27 +34,8 @@ Scope {
     signal requestClose()
 
     function executeAction(action) {
-        switch (action) {
-        case "lock":
-            Quickshell.execDetached(["hyprlock", "-c", root.homeDir + "/.config/hypr/hyprlock.conf"]);
-            root.requestClose();
-            break;
-        case "sleep":
-            Quickshell.execDetached(["systemctl", "suspend"]);
-            root.requestClose();
-            break;
-        case "reboot":
-            Quickshell.execDetached(["systemctl", "reboot"]);
-            root.requestClose();
-            break;
-        case "poweroff":
-            Quickshell.execDetached(["systemctl", "poweroff"]);
-            root.requestClose();
-            break;
-        case "logout":
-            logoutProc.running = true;
-            break;
-        }
+        Quickshell.execDetached([root.homeDir + "/.config/waybar/scripts/wabi_power", action]);
+        root.requestClose();
     }
 
     Theme {
@@ -67,14 +48,6 @@ Scope {
         }
 
         target: "power_popup"
-    }
-
-    Process {
-        id: logoutProc
-
-        command: ["sh", "-c", "if command -v uwsm >/dev/null 2>&1 && uwsm check; then uwsm stop; else hyprctl dispatch hl.dsp.exit() || pkill -x Hyprland; fi"]
-        running: false
-        onExited: root.requestClose()
     }
 
     Variants {
