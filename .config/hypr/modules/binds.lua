@@ -38,16 +38,20 @@ hl.bind(mainMod .. " + SHIFT + E", hl.dsp
     .exec_cmd("env WAYLAND_DISPLAY=\"\" DBUS_SESSION_BUS_ADDRESS=\"\" uwsm app -- thunar --class=thunar.floating"))
 
 -- Browsers
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("hyprctl clients | grep -iq 'class: .*zen' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:^zen$\" })' || uwsm app -- zen-browser"))
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(
+    "hyprctl clients | grep -iq 'class: .*zen' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:^zen$\" })' || uwsm app -- zen-browser"))
 hl.bind(mainMod .. " + ALT + B", focus_or_launch("vivaldi-stable", "uwsm app -- vivaldi-stable"))
 hl.bind(mainMod .. " + CTRL + B", focus_or_launch("brave-origin-nightly", "uwsm app -- brave-origin-nightly"))
 
 -- Editors
-hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd("hyprctl clients | grep -iq 'class: .*code-insiders' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:^code-insiders$\" })' || uwsm app -- code-insiders"))
-hl.bind(mainMod .. " + ALT + semicolon", hl.dsp.exec_cmd("hyprctl clients | grep -Eiq 'class: code$' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:^[Cc]ode$\" })' || uwsm app -- code"))
+hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd(
+    "hyprctl clients | grep -iq 'class: .*code-insiders' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:^code-insiders$\" })' || uwsm app -- code-insiders"))
+hl.bind(mainMod .. " + ALT + semicolon", hl.dsp.exec_cmd(
+    "hyprctl clients | grep -Eiq 'class: code$' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:^[Cc]ode$\" })' || uwsm app -- code"))
 
 -- Music
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("hyprctl clients | grep -iq 'class: .*spotify' && hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })' || (uwsm app -- spotify && hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })')"))
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(
+    "hyprctl clients | grep -iq 'class: .*spotify' && hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })' || (uwsm app -- spotify && hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })')"))
 
 ---------------------
 ---    Windows    ---
@@ -199,10 +203,10 @@ hl.bind(mainMod .. " + ALT + H", hl.dsp
 ---------------------
 ---    Old Rofi   ---
 ---------------------
-hl.bind(mainMod .. " + SPACE",
-    hl.dsp.exec_cmd("quickshell -c apps_popup ipc call apps_popup close || (quickshell -c recents_popup ipc call recents_popup close; quickshell --config apps_popup)"))
-hl.bind(mainMod .. " + TAB", hl.dsp
-    .exec_cmd("quickshell -c recents_popup ipc call recents_popup close || (quickshell -c apps_popup ipc call apps_popup close; quickshell --config recents_popup)"))
+hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(
+    "quickshell -c apps_popup ipc call apps_popup close || (quickshell -c recents_popup ipc call recents_popup close; quickshell --config apps_popup)"))
+hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd(
+    "quickshell -c recents_popup ipc call recents_popup close || (quickshell -c apps_popup ipc call apps_popup close; quickshell --config recents_popup)"))
 hl.bind(mainMod .. " + X",
     hl.dsp.exec_cmd("quickshell -c power_popup ipc call power_popup close || quickshell --config power_popup"))
 hl.bind(mainMod .. " + I",
@@ -307,10 +311,13 @@ hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock -c ~/.config/hypr/hyprlock.
 hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("$HOME/.config/quickshell/media_popup/get_media_status pick-color"))
 
 -- Power menu / Logout
-hl.bind("XF86PowerOff",
-    hl.dsp.exec_cmd("quickshell -c power_popup ipc call power_popup close || quickshell --config power_popup"))
+hl.bind("XF86PowerOff", hl.dsp.exec_cmd(
+    [[sh -c 'LOCK="/tmp/power_menu.lock"; now=$(date +%s%3N); last=$(cat "$LOCK" 2>/dev/null || echo 0); elapsed=$((now - last)); if [ "$elapsed" -lt 500 ]; then exit 0; fi; echo "$now" > "$LOCK"; quickshell -c power_popup ipc call power_popup close || quickshell --config power_popup']]),
+    {
+        locked = true
+    })
 hl.bind(mainMod .. " + ALT + E", hl.dsp.exec_cmd(
-    "sh -c 'if command -v uwsm >/dev/null 2>&1 && uwsm check; then uwsm stop; else hyprctl dispatch exit; fi'"))
+    "sh -c 'if command -v uwsm >/dev/null 2>&1 && uwsm check is-active; then uwsm stop; else hyprctl dispatch exit; fi'"))
 
 -- Caps lock OSD
 hl.bind("Caps_Lock", hl.dsp.exec_cmd(osdctl .. " caps toggle"), {
