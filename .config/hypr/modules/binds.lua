@@ -43,7 +43,7 @@ hl.bind(mainMod .. " + ALT + B", focus_or_launch("vivaldi-stable", "uwsm app -- 
 hl.bind(mainMod .. " + CTRL + B", focus_or_launch("brave-origin-nightly", "uwsm app -- brave-origin-nightly"))
 
 -- Editors
-hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd("hyprctl clients | grep -iq 'class: .*code-insiders' && hyprctl dispatch focuswindow class:^code-insiders$ || uwsm app -- code-insiders"))
+hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd("hyprctl clients | grep -iq 'class: .*code-insiders' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:^code-insiders$\" })' || uwsm app -- code-insiders"))
 hl.bind(mainMod .. " + ALT + semicolon", focus_or_launch("code", "uwsm app -- code"))
 
 -- Music
