@@ -38,7 +38,7 @@ hl.bind(mainMod .. " + SHIFT + E", hl.dsp
     .exec_cmd("env WAYLAND_DISPLAY=\"\" DBUS_SESSION_BUS_ADDRESS=\"\" uwsm app -- thunar --class=thunar.floating"))
 
 -- Browsers
-hl.bind(mainMod .. " + B", focus_or_launch("zen", "uwsm app -- zen-browser"))
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("hyprctl clients | grep -iq 'class: .*zen' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:^zen$\" })' || uwsm app -- zen-browser"))
 hl.bind(mainMod .. " + ALT + B", focus_or_launch("vivaldi-stable", "uwsm app -- vivaldi-stable"))
 hl.bind(mainMod .. " + CTRL + B", focus_or_launch("brave-origin-nightly", "uwsm app -- brave-origin-nightly"))
 
