@@ -145,5 +145,9 @@ path = "src/bin/status/github_repos.rs"
 name = "wabi_power"
 path = "src/bin/utils/power.rs"
 
+[[bin]]
+name = "kbd_aura"
+path = "src/bin/utils/kbd_aura.rs"
+
 
 

@@ -46,6 +46,7 @@ install: build
 	cp target/release/wallpaper_thumb_watcher ../../quickshell/wallpaper_switcher/wallpaper_thumb_watcher
 	cp target/release/get_github_graph ../../quickshell/github_graph/get_github_graph
 	cp target/release/theme_switcher ../../../scripts/theme_switcher
+	cp target/release/kbd_aura ../../../scripts/kbd_aura
 	cp target/release/set_wallpaper ../../../scripts/set_wallpaper_bin
 	cp target/release/parse_binds ../../quickshell/shortcut_popup/parse_binds
 	cp target/release/caffeine ../../quickshell/brightness_popup/caffeine

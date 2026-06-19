@@ -933,6 +933,26 @@ fn main() {
     // Restore glass state after template rendering
     apply_glass_state();
 
+    // Update keyboard backlight color using kbd_aura utility
+    if let Some(accent_hex) = vars.get("accent_hex") {
+        let kbd_aura_path = doty.join("scripts/kbd_aura");
+        let clean_hex = accent_hex.replace("#", "").to_uppercase();
+        
+        let status = if kbd_aura_path.exists() {
+            Command::new(&kbd_aura_path)
+                .arg(&clean_hex)
+                .status()
+        } else {
+            Command::new("asusctl")
+                .args(["aura", "effect", "static", "--colour", &clean_hex])
+                .status()
+        };
+
+        if let Err(e) = status {
+            eprintln!("Failed to apply keyboard backlight color: {}", e);
+        }
+    }
+
     println!("Theme applied successfully!");
 }
 
