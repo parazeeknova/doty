@@ -44,7 +44,7 @@ hl.bind(mainMod .. " + CTRL + B", focus_or_launch("brave-origin-nightly", "uwsm 
 
 -- Editors
 hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd("hyprctl clients | grep -iq 'class: .*code-insiders' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:^code-insiders$\" })' || uwsm app -- code-insiders"))
-hl.bind(mainMod .. " + ALT + semicolon", focus_or_launch("code", "uwsm app -- code"))
+hl.bind(mainMod .. " + ALT + semicolon", hl.dsp.exec_cmd("hyprctl clients | grep -Eiq 'class: code$' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:^[Cc]ode$\" })' || uwsm app -- code"))
 
 -- Music
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("hyprctl clients | grep -iq 'class: .*spotify' && hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })' || (uwsm app -- spotify && hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })')"))
