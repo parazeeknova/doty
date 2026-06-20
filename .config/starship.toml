@@ -99,7 +99,7 @@ sym=""
 if echo "$rem" | grep -q "github"; then sym="";
 elif echo "$rem" | grep -q "gitlab"; then sym="";
 elif echo "$rem" | grep -q "bitbucket"; then sym="";
-elif echo "$rem" | grep -q "git"; then sym=""; fi
+elif echo "$rem" | grep -q "git"; then sym="󰊢"; fi
 
 usr=$(awk "/user:/ {print \\$2; exit}" ~/.config/gh/hosts.yml 2>/dev/null)
 if [ -z "$usr" ]; then

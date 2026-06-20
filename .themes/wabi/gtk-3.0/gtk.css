@@ -688,8 +688,14 @@ flowbox flowboxchild {
   border-top: 1px solid @border_color;
 }
 
+/* Selection fix */
+*:selected {
+  background-color: @selected_bg_color;
+  color: @selected_fg_color;
+}
+
 /* General view override */
-.view, iconview, .view:selected, iconview:selected {
+.view, iconview {
   background-color: @bg_dim;
   color: @fg_color;
 }
@@ -797,3 +803,979 @@ paned > separator {
   box-shadow: none;
 }
 
+/* Force selection highlight colors and make all selections flat (square corners) */
+*:selected { background-color: @selected_bg_color; color: @selected_fg_color; border-radius: 0px; -gtk-outline-radius: 0px; }
+*:selected:focus { background-color: @selected_bg_color; color: @selected_fg_color; border-radius: 0px; -gtk-outline-radius: 0px; }
+*:selected:hover { background-color: @selected_bg_color; color: @selected_fg_color; border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview *:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView *:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView *:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview *:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView *:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView *:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view *:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .standard-view .view :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .standard-view .view *:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.standard-view :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.standard-view *:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview *:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.view :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+.view *:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+flowbox :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+flowbox *:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+list :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+list *:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; border-radius: 0px; -gtk-outline-radius: 0px; }
+
+*:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+*:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+*:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview * { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+iconview *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar iconview *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView * { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+ExoIconView *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ExoIconView *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView * { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+ThunarIconView *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar ThunarIconView *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.view *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .view *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview * { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+treeview *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar treeview *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild * { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+flowboxchild *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar flowboxchild *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell * { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+cell *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cell *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.cell *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .cell *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview * { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+cellview *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar cellview *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+item { border-radius: 0px; -gtk-outline-radius: 0px; }
+item * { border-radius: 0px; -gtk-outline-radius: 0px; }
+item:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+item :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+item *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+item:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+item :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+item *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+item:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+item :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+item *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+item:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+item :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+item *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+item:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+item :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+item *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+item:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+item :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+item *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+item:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+item :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+item *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+item:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+item :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+item *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+item:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+item :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+item *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar item *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.item *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item * { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item :selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item *:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item :active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item *:active { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item :checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item *:checked { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item :hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item *:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item :focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item *:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item :selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item *:selected:focus { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item :selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item *:selected:hover { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item :backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item *:backdrop { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item :backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+.thunar .item *:backdrop:selected { border-radius: 0px; -gtk-outline-radius: 0px; }
+
+/* High-specificity selection colors */
+iconview:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+iconview:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+iconview:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+iconview:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+iconview:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+iconview:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+iconview:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+iconview:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+iconview:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+iconview:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+iconview:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+iconview:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar iconview:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar iconview:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar iconview:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar iconview:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar iconview:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar iconview:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar iconview:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar iconview:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar iconview:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar iconview:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar iconview:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar iconview:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ExoIconView:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ExoIconView:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ExoIconView:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ExoIconView:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ExoIconView:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ExoIconView:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ExoIconView:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ExoIconView:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ExoIconView:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ExoIconView:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ExoIconView:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ExoIconView:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ExoIconView:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ExoIconView:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ExoIconView:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ExoIconView:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ExoIconView:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ExoIconView:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ExoIconView:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ExoIconView:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ExoIconView:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ExoIconView:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ExoIconView:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ExoIconView:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ThunarIconView:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ThunarIconView:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ThunarIconView:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ThunarIconView:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ThunarIconView:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ThunarIconView:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ThunarIconView:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ThunarIconView:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ThunarIconView:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ThunarIconView:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ThunarIconView:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+ThunarIconView:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ThunarIconView:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ThunarIconView:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ThunarIconView:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ThunarIconView:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ThunarIconView:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ThunarIconView:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ThunarIconView:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ThunarIconView:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ThunarIconView:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ThunarIconView:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ThunarIconView:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar ThunarIconView:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.view:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.view:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.view:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.view:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.view:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.view:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.view:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.view:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.view:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.view:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.view:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.view:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .view:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .view:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .view:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .view:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .view:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .view:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .view:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .view:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .view:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .view:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .view:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .view:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+treeview:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+treeview:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+treeview:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+treeview:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+treeview:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+treeview:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+treeview:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+treeview:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+treeview:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+treeview:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+treeview:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+treeview:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar treeview:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar treeview:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar treeview:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar treeview:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar treeview:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar treeview:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar treeview:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar treeview:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar treeview:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar treeview:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar treeview:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar treeview:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+flowboxchild:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+flowboxchild:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+flowboxchild:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+flowboxchild:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+flowboxchild:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+flowboxchild:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+flowboxchild:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+flowboxchild:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+flowboxchild:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+flowboxchild:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+flowboxchild:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+flowboxchild:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar flowboxchild:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar flowboxchild:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar flowboxchild:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar flowboxchild:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar flowboxchild:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar flowboxchild:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar flowboxchild:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar flowboxchild:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar flowboxchild:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar flowboxchild:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar flowboxchild:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar flowboxchild:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cell:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cell:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cell:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cell:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cell:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cell:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cell:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cell:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cell:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cell:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cell:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cell:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cell:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cell:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cell:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cell:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cell:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cell:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cell:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cell:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cell:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cell:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cell:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cell:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.cell:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.cell:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.cell:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.cell:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.cell:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.cell:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.cell:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.cell:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.cell:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.cell:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.cell:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.cell:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .cell:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .cell:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .cell:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .cell:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .cell:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .cell:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .cell:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .cell:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .cell:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .cell:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .cell:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .cell:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cellview:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cellview:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cellview:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cellview:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cellview:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cellview:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cellview:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cellview:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cellview:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cellview:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cellview:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+cellview:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cellview:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cellview:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cellview:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cellview:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cellview:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cellview:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cellview:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cellview:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cellview:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cellview:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cellview:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar cellview:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+item:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+item:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+item:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+item:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+item:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+item:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+item:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+item:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+item:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+item:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+item:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+item:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar item:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar item:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar item:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar item:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar item:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar item:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar item:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar item:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar item:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar item:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar item:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar item:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.item:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.item:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.item:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.item:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.item:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.item:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.item:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.item:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.item:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.item:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.item:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.item:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .item:selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .item:selected :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .item:selected :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .item:selected :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .item:active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .item:active :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .item:active :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .item:active :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .item:checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .item:checked :selected { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .item:checked :active { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+.thunar .item:checked :checked { background-color: @selected_bg_color; color: @selected_fg_color; background-image: none; }
+
+/* Fix menu bar spacing, background, and text colors */
+menubar,
+.menubar {
+  background-color: @bg_dim;
+  color: @fg_color;
+  border-bottom: 1px solid @border_color;
+  padding: 1px 4px;
+  margin: 0px;
+  min-height: 0px;
+}
+
+menubar > menuitem,
+.menubar > menuitem {
+  padding: 1px 6px;
+  margin: 0px;
+  color: @fg_color;
+  background-color: transparent;
+  min-height: 0px;
+}
+
+menubar > menuitem:hover,
+.menubar > menuitem:hover {
+  background-color: alpha(#d5c4a1, 0.12);
+  color: @fg_color;
+}
+
+menubar > menuitem label,
+.menubar > menuitem label {
+  color: @fg_color;
+  padding: 0;
+  margin: 0;
+}
+
+menubar > menuitem:hover label,
+.menubar > menuitem:hover label {
+  color: @fg_color;
+}

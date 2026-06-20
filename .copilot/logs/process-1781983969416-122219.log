@@ -1,0 +1,5 @@
+2026-06-20T19:32:49.418Z [INFO] Starting CLI in server mode (stdio)
+2026-06-20T19:32:49.419Z [INFO] Starting CLI in stdio mode
+2026-06-20T19:32:49.421Z [INFO] CLI server ready (stdio mode)
+2026-06-20T19:32:49.421Z [INFO] Server started, waiting for requests
+2026-06-20T19:32:49.529Z [INFO] Shell completions: installed fish completions to /home/parazeeknova/.config/fish/completions/copilot.fish

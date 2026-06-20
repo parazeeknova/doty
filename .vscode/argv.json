@@ -12,9 +12,10 @@
 
   // Allows to disable crash reporting.
   // Should restart the app if the value is changed.
-  "enable-crash-reporter": true,
+  "enable-crash-reporter": false,
 
   // Unique id used for correlating crash reports sent from this instance.
   // Do not edit this value.
-  "crash-reporter-id": "08a631fd-23c3-4e1f-b397-d4bea41c9d15"
+  "crash-reporter-id": "08a631fd-23c3-4e1f-b397-d4bea41c9d15",
+  "password-store": "basic"
 }

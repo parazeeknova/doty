@@ -10,6 +10,7 @@ fish_variables
 .gemini/antigravity-cli/
 .gemini/config
 .codex
+.vscode/extensions/
 __pycache__
 .config/systemd/system/getty@tty1.service.d/autologin.conf
 .config/quickshell/osd/state.json
@@ -39,7 +40,4 @@ vm_guest_credentials
 *.db
 *.db-shm
 *.db-wal
-.config/spicetify/Themes/wabi/color.ini
-.config/vesktop/settings/quickCss.css
-
-
+thunar-pkg/

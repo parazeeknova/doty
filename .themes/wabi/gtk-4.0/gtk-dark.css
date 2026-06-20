@@ -84,7 +84,7 @@ textview border {
 
 iconview:hover,
 iconview:selected {
-  border-radius: 6px;
+  border-radius: 0px;
 }
 
 rubberband,
@@ -2697,8 +2697,8 @@ menubar:backdrop {
 
 menubar>item {
   transition: all 75ms cubic-bezier(0, 0, 0.2, 1);
-  min-height: 20px;
-  padding: 4px 8px;
+  min-height: 0px;
+  padding: 1px 6px;
   color: rgba(251, 241, 199, 0.7);
 }
 
