@@ -1,0 +1,99 @@
+* {
+  all: unset;
+  font-family: "FiraCode Nerd", monospace;
+  color: {{fg}};
+  font-weight: bold;
+  font-size: 9pt;
+}
+
+.window {
+  border-radius: 0px;
+  background-color: {{bg}};
+  border: solid 2px {{bg_light}};
+  margin: 2px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+tabs {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid {{bg_light}};
+}
+
+tabs > tab {
+  margin-right: 0.8rem;
+  padding: 2px 4px;
+}
+
+.tab-label {
+  color: {{fg_light}};
+  transition: all 0.15s ease-in-out;
+}
+
+tabs > tab:checked > .tab-label, tabs > tab:active > .tab-label {
+  color: {{accent}};
+  border-bottom: 2px solid {{accent}};
+}
+
+tabs > tab:hover > .tab-label {
+  color: {{fg}};
+}
+
+.page {
+  padding: 0.6rem;
+}
+
+.image-label {
+  font-size: 8pt;
+  padding: 0.2rem 0.1rem 0.1rem 0.1rem;
+  color: {{fg}};
+  font-weight: 500;
+}
+
+flowboxchild > .card, button > .card {
+  transition: all 0.15s ease-in-out;
+  border: solid 1px transparent;
+  border-color: {{bg_dark}};
+  border-radius: 0px;
+  background-color: {{bg_dark}};
+  padding: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+flowboxchild:hover > .card, button:hover > .card {
+  background-color: {{bg_light}};
+  border-color: {{bg_light}};
+}
+
+flowboxchild:active > .card, flowboxchild:selected > .card, button:active > .card, button:selected > .card, button:focus > .card {
+  border: solid 1px {{accent}};
+  background-color: {{bg_light}};
+}
+
+.image {
+  border-radius: 0px;
+}
+
+.region-button {
+  padding: 0.4rem 0.8rem;
+  border-radius: 0px;
+  background-color: {{accent}};
+  color: {{bg}};
+  font-weight: bold;
+  transition: all 0.15s ease-in-out;
+}
+
+.region-button:not(:disabled):hover, .region-button:not(:disabled):focus {
+  background-color: {{secondary}};
+  color: {{bg_dark}};
+}
+
+.region-button:disabled {
+  background-color: {{bg_light}};
+  color: {{fg_light}};
+  opacity: 0.6;
+}
+
+.restore-button {
+  padding: 0.3rem;
+  color: {{fg_light}};
+}

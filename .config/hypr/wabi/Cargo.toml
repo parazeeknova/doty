@@ -149,5 +149,8 @@ path = "src/bin/utils/power.rs"
 name = "kbd_aura"
 path = "src/bin/utils/kbd_aura.rs"
 
+[[bin]]
+name = "mtp_notify"
+path = "src/bin/utils/mtp_notify.rs"
 
 

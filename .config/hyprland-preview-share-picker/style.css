@@ -1,0 +1,99 @@
+* {
+  all: unset;
+  font-family: "FiraCode Nerd", monospace;
+  color: #eee0d4;
+  font-weight: bold;
+  font-size: 9pt;
+}
+
+.window {
+  border-radius: 0px;
+  background-color: #18120c;
+  border: solid 2px #504539;
+  margin: 2px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+tabs {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid #504539;
+}
+
+tabs > tab {
+  margin-right: 0.8rem;
+  padding: 2px 4px;
+}
+
+.tab-label {
+  color: #d4c4b5;
+  transition: all 0.15s ease-in-out;
+}
+
+tabs > tab:checked > .tab-label, tabs > tab:active > .tab-label {
+  color: #f8bb71;
+  border-bottom: 2px solid #f8bb71;
+}
+
+tabs > tab:hover > .tab-label {
+  color: #eee0d4;
+}
+
+.page {
+  padding: 0.6rem;
+}
+
+.image-label {
+  font-size: 8pt;
+  padding: 0.2rem 0.1rem 0.1rem 0.1rem;
+  color: #eee0d4;
+  font-weight: 500;
+}
+
+flowboxchild > .card, button > .card {
+  transition: all 0.15s ease-in-out;
+  border: solid 1px transparent;
+  border-color: #251e17;
+  border-radius: 0px;
+  background-color: #251e17;
+  padding: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+flowboxchild:hover > .card, button:hover > .card {
+  background-color: #504539;
+  border-color: #504539;
+}
+
+flowboxchild:active > .card, flowboxchild:selected > .card, button:active > .card, button:selected > .card, button:focus > .card {
+  border: solid 1px #f8bb71;
+  background-color: #504539;
+}
+
+.image {
+  border-radius: 0px;
+}
+
+.region-button {
+  padding: 0.4rem 0.8rem;
+  border-radius: 0px;
+  background-color: #f8bb71;
+  color: #18120c;
+  font-weight: bold;
+  transition: all 0.15s ease-in-out;
+}
+
+.region-button:not(:disabled):hover, .region-button:not(:disabled):focus {
+  background-color: #dfc2a2;
+  color: #251e17;
+}
+
+.region-button:disabled {
+  background-color: #504539;
+  color: #d4c4b5;
+  opacity: 0.6;
+}
+
+.restore-button {
+  padding: 0.3rem;
+  color: #d4c4b5;
+}

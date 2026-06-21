@@ -676,6 +676,10 @@ fn main() {
             ".config/vesktop/settings/quickCss.css.template",
             ".config/vesktop/settings/quickCss.css",
         ),
+        (
+            ".config/hyprland-preview-share-picker/style.css.template",
+            ".config/hyprland-preview-share-picker/style.css",
+        ),
     ];
 
     for (tmpl, dest) in mappings {

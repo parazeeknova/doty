@@ -11,6 +11,7 @@ hl.on("hyprland.start", function()
     -- System Startups
     hl.exec_cmd("hyprpm reload -n; " .. dotfiles .. "/scripts/theme_switcher restore")
     hl.exec_cmd("hyprctl setcursor capitaine-cursors 24")
+    hl.exec_cmd("uwsm app -- udiskie --tray --notify")
     -- Restore glass state from persistent cache to tmpfs
     hl.exec_cmd(
         "sh -c 'cat ~/.cache/quickshell/glass_state 2>/dev/null > /tmp/quickshell_glass_state || printf true > /tmp/quickshell_glass_state'")
@@ -28,10 +29,8 @@ hl.on("hyprland.start", function()
     hl.exec_cmd(
         "sh -c 'cat ~/.cache/quickshell/widgets_config 2>/dev/null > /tmp/quickshell_widgets_config || printf default > /tmp/quickshell_widgets_config'")
     hl.exec_cmd("sh -c 'sleep 2 && " .. dotfiles .. "/.config/waybar/scripts/toggle_widgets restore'")
-    hl.exec_cmd(
-        "sh -c '" ..
-        dotfiles ..
-        "/scripts/set_wallpaper \"$(cat ~/.cache/last_wallpaper 2>/dev/null || echo \"$HOME/Pictures/Anime/grey_lain_wallpaper.jpg\")\"'")
+    hl.exec_cmd("sh -c '" .. dotfiles ..
+                    "/scripts/set_wallpaper \"$(cat ~/.cache/last_wallpaper 2>/dev/null || echo \"$HOME/Pictures/Anime/grey_lain_wallpaper.jpg\")\"'")
     hl.exec_cmd("uwsm app -- hyprsunset")
     hl.exec_cmd("uwsm app -- hypridle")
     hl.exec_cmd("uwsm app -- pypr")
@@ -40,6 +39,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("uwsm app -- ~/.config/quickshell/wallpaper_switcher/wallpaper_thumb_watcher")
     hl.exec_cmd("uwsm app -- ~/.config/quickshell/battery_popup/battery_daemon")
     hl.exec_cmd("uwsm app -- ~/.local/bin/screentime_daemon")
+    hl.exec_cmd("uwsm app -- ~/.local/bin/mtp_notify")
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
     hl.exec_cmd(
         "systemctl --user start ssh-agent.service && sh -c 'sleep 3 && env SSH_ASKPASS=/usr/lib/seahorse/ssh-askpass ssh-add ~/.ssh/id_ed25519 < /dev/null'")
