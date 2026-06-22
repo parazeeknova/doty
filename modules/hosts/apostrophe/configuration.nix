@@ -45,7 +45,11 @@
     programs.hyprland = {
       enable = true;
       xwayland.enable = true;
+      portalPackage = pkgs.xdg-desktop-portal-hyprland;
     };
+
+    # -- Electron Apps (Wayland) --
+    environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
     # -- Auto Login --
     services.displayManager.autoLogin = {
