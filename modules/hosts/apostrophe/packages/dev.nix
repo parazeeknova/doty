@@ -9,13 +9,6 @@
       rustup
       go
 
-      # -- Dev Tools --
-      git
-      lazygit
-      gitkraken
-      difftastic
-      diff-so-fancy
-
       # -- Package Managers --
       pnpm
       bun
@@ -35,17 +28,6 @@
 
       # -- API Tools --
       httpie
-
-      # -- Misc --
-      ripgrep
-      fd
-      bat
-      eza
-      fzf
-      zoxide
-      tree-sitter
-      direnv
-      nix-direnv
     ];
   };
 }

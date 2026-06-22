@@ -45,7 +45,6 @@
       # -- System Tray / Applets --
       networkmanagerapplet
       blueman
-      brightnessctl
 
       # -- Qt / GTK Themes --
       qt6Packages.qt6ct
@@ -59,7 +58,6 @@
       # -- System Tools --
       udiskie
       lm_sensors
-      pciutils
 
       # -- Security --
       seahorse

@@ -7,9 +7,6 @@
       vim
       neovim
 
-      # -- Version Control --
-      git
-
       # -- Shell Tools --
       starship
       zoxide
