@@ -22,7 +22,7 @@
       hyprpicker
 
       # -- Qt / GTK Themes --
-      qt6ct
+      qt6Packages.qt6ct
       qt5ct
       kvantum
       papirus-icon-theme
