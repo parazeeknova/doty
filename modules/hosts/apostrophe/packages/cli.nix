@@ -43,7 +43,6 @@
       inxi
       lshw
       fastfetch
-      neofetch
       killall
       pciutils
       usbutils
