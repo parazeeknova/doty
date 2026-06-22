@@ -16,14 +16,17 @@
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+    # -- Boot --
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
     boot.kernelPackages = pkgs.linuxPackages_latest;
     boot.initrd.luks.devices."luks-fe7a0acb-6379-4025-aab3-05a299853e60".device = "/dev/disk/by-uuid/fe7a0acb-6379-4025-aab3-05a299853e60";
 
+    # -- Networking --
     networking.hostName = "apostrophe";
     networking.networkmanager.enable = true;
 
+    # -- Locale --
     time.timeZone = "Asia/Kolkata";
     i18n.defaultLocale = "en_IN";
     i18n.extraLocaleSettings = {
@@ -38,14 +41,19 @@
       LC_TIME = "en_IN";
     };
 
-    services.xserver.enable = true;
-    services.displayManager.gdm.enable = true;
-    services.desktopManager.gnome.enable = true;
-    services.xserver.xkb = {
-      layout = "us";
-      variant = "";
+    # -- Hyprland --
+    programs.hyprland = {
+      enable = true;
+      xwayland.enable = true;
     };
 
+    # -- Auto Login --
+    services.displayManager.autoLogin = {
+      enable = true;
+      user = "parazeeknova";
+    };
+
+    # -- Audio --
     services.pulseaudio.enable = false;
     security.rtkit.enable = true;
     services.pipewire = {
@@ -55,6 +63,7 @@
       pulse.enable = true;
     };
 
+    # -- Graphics --
     services.xserver.videoDrivers = [ "nvidia" ];
     hardware.graphics.enable = true;
     hardware.nvidia = {
@@ -72,19 +81,19 @@
       };
     };
 
+    # -- Input --
     services.libinput.enable = true;
 
+    # -- User --
     users.users."parazeeknova" = {
       isNormalUser = true;
       description = "Harsh Sahu";
       extraGroups = [ "networkmanager" "wheel" ];
-      packages = with pkgs; [
-      ];
     };
 
+    # -- Misc --
     programs.firefox.enable = true;
     nixpkgs.config.allowUnfree = true;
-
     programs.nix-ld.enable = true;
 
     system.stateVersion = "26.05";
