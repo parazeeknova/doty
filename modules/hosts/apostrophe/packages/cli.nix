@@ -10,7 +10,6 @@
       bash
       fishPlugins.fzf
       fishPlugins.done
-      fishPlugins.hydro
       fishPlugins.puffer
       fishPlugins.sponge
       fishPlugins.autopair
@@ -24,6 +23,7 @@
       tree
       file
       which
+      tree-sitter
 
       # -- Text Processing --
       jq
@@ -31,18 +31,16 @@
       gnused
       gawk
       gnugrep
-      ripgrep
 
       # -- System Utils --
       htop
       btop
       iotop
       powertop
-      lm_sensors
-      usbutils
-      pciutils
-      lshw
       inxi
+      lshw
+      fastfetch
+      neofetch
 
       # -- Network Utils --
       nmap
@@ -51,12 +49,18 @@
       dnsutils
       iperf3
 
+      # -- Dev Tools --
+      lazygit
+      gitkraken
+
       # -- Misc --
       tmux
       screen
       less
       man-db
       tldr
+      direnv
+      nix-direnv
       cmatrix
       sl
       fortune
