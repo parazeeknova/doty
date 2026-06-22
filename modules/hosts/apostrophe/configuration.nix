@@ -42,16 +42,6 @@
       LC_TIME = "en_IN";
     };
 
-    # -- Hyprland --
-    programs.hyprland = {
-      enable = true;
-      xwayland.enable = true;
-      portalPackage = pkgs.xdg-desktop-portal-hyprland;
-    };
-
-    # -- Electron Apps (Wayland) --
-    environment.sessionVariables.NIXOS_OZONE_WL = "1";
-
     # -- Auto Login (TTY) --
     services.getty.autologinUser = "parazeeknova";
 
