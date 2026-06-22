@@ -104,7 +104,7 @@
         gp = "git push";
         gs = "git status --short";
         gap = "git add --patch";
-        gcns = "git -c commit.gpgsign=false commit -m"
+        gcns = "git -c commit.gpgsign=false commit -m";
 
         # -- TMUX --
         t = "tmux";
