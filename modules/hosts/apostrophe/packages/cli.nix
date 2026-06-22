@@ -3,6 +3,13 @@
   flake.nixosModules.apostrophePackagesCli = { config, pkgs, lib, ... }: {
 
     environment.systemPackages = with pkgs; [
+      # -- Editors --
+      vim
+      neovim
+
+      # -- Version Control --
+      git
+
       # -- Shell Tools --
       starship
       zoxide
@@ -32,12 +39,10 @@
       gnused
       gawk
       gnugrep
-      file
       xclip
 
       # -- System Utils --
       htop
-      btop
       iotop
       powertop
       inxi
@@ -69,6 +74,9 @@
       difftastic
       diff-so-fancy
 
+      # -- Media --
+      ffmpeg
+
       # -- Misc --
       tmux
       screen
@@ -77,10 +85,6 @@
       tldr
       direnv
       nix-direnv
-      cmatrix
-      sl
-      fortune
-      cowsay
     ];
   };
 }

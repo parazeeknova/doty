@@ -3,19 +3,10 @@
   flake.nixosModules.apostrophePackagesDesktop = { config, pkgs, lib, ... }: {
 
     environment.systemPackages = with pkgs; [
-      # -- Browsers --
-      firefox
       vivaldi
-      zen-browser
-
-      # -- Editors (GUI) --
       vscode
-
-      # -- Terminal Emulators --
       ghostty
       kitty
-
-      # -- File Managers --
       thunar
       xfce.thunar-archive-plugin
       xfce.thunar-volman
@@ -31,9 +22,6 @@
       hyprpaper
       pyprland
       quickshell
-      swaylock
-      swayidle
-      swaybg
       grim
       slurp
       swappy
@@ -72,8 +60,6 @@
       udiskie
       lm_sensors
       pciutils
-      htop
-      btop
 
       # -- Security --
       seahorse

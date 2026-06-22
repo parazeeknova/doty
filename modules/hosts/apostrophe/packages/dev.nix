@@ -8,14 +8,17 @@
       python3
       rustup
       go
-      jdk
-      ruby
+
+      # -- Dev Tools --
+      git
+      lazygit
+      gitkraken
+      difftastic
+      diff-so-fancy
 
       # -- Package Managers --
       pnpm
       bun
-      cargo
-      npm
       yarn
 
       # -- Build Tools --
@@ -29,14 +32,6 @@
       nix-output-monitor
       nixfmt-rfc-style
       nil
-
-      # -- Containers --
-      podman
-      docker-compose
-
-      # -- Database --
-      sqlite
-      postgresql
 
       # -- API Tools --
       httpie
