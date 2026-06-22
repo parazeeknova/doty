@@ -5,6 +5,7 @@
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
+      backupFileExtension = "bak";
       users.parazeeknova = { ... }: {
 
         home = {

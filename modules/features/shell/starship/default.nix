@@ -7,7 +7,9 @@
       enableFishIntegration = true;
     };
 
-    home-manager.users.parazeeknova.xdg.configFile."starship.toml".source =
-      ./starship.toml;
+    home-manager.users.parazeeknova.xdg.configFile."starship.toml" = {
+      source = ./starship.toml;
+      force = true;
+    };
   };
 }
