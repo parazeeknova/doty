@@ -77,12 +77,9 @@
       # -- Documents --
       zathura
       evince
-      libreoffice
 
       # -- Communication --
       vesktop
-      signal-desktop
-      telegram-desktop
     ];
   };
 }
