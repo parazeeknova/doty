@@ -8,10 +8,16 @@
       settings = {
         command_timeout = 1000;
         add_newline = false;
-        format = "$directory\n\${custom.giturl}\n$git_branch\n$git_state\n\${custom.git_wrapper}\n\n➜ ";
-        right_format = "$all\${custom.gcex}";
+        format = ''
+          $directory''${custom.giturl}
+          $git_branch$git_state''${custom.git_wrapper}
+
+          ➜
+        '';
+        right_format = "$all''${custom.gcex}";
         palette = "matugen";
 
+        # -- Palette (wabi gruvbox) --
         palettes.matugen = {
           rosewater = "#f8bb71";
           flamingo = "#f8bb71";
@@ -41,6 +47,7 @@
           crust = "#251e17";
         };
 
+        # -- Directory --
         directory = {
           style = "sapphire";
           format = "[ $path ]($style)";
@@ -53,8 +60,33 @@
           };
         };
 
-        os.disabled = true;
+        # -- OS --
+        os = {
+          disabled = true;
+          symbols = {
+            Windows = "󰍲";
+            Ubuntu = "󰕈";
+            SUSE = "";
+            Raspbian = "󰐿";
+            Mint = "󰣭";
+            Macos = "";
+            Manjaro = "";
+            Linux = "󰌽";
+            Gentoo = "󰣨";
+            Fedora = "󰣛";
+            Alpine = "";
+            Amazon = "";
+            Android = "";
+            Arch = "󰣇";
+            Artix = "󰣇";
+            CentOS = "";
+            Debian = "󰣚";
+            Redhat = "󱄛";
+            RedHatEnterprise = "󱄛";
+          };
+        };
 
+        # -- Custom: Git URL --
         custom.giturl = {
           description = "Display symbol for remote Git server and username";
           command = ''bash -c '
@@ -85,14 +117,17 @@ fi
           format = "at $output ";
         };
 
+        # -- Git Branch --
         git_branch = {
           symbol = "[基](base) ";
           style = "fg:lavender bg:base";
           format = "on [$symbol$branch]($style)[基](base)";
         };
 
+        # -- Git Status --
         git_status.disabled = true;
 
+        # -- Custom: Git Wrapper --
         custom.git_wrapper = {
           description = "Show git status with unstaged count";
           command = ''bash -c '
@@ -121,17 +156,50 @@ echo "$out"
           style = "red bold";
         };
 
-        nodejs.symbol = "";
-        c.symbol = " ";
-        rust.symbol = "";
-        golang.symbol = "";
-        php.symbol = "";
-        java.symbol = " ";
-        kotlin.symbol = "";
-        haskell.symbol = "";
-        python.symbol = "";
-        docker_context.symbol = "";
+        # -- Language Symbols --
+        nodejs = {
+          symbol = "";
+          format = "[ $symbol( $version) ]($style)";
+        };
+        c = {
+          symbol = " ";
+          format = "[ $symbol( $version) ]($style)";
+        };
+        rust = {
+          symbol = "";
+          format = "[ $symbol $version ]($style)";
+        };
+        golang = {
+          symbol = "";
+          format = "[ $symbol( $version) ]($style)";
+          detect_files = [ "go.mod" ];
+        };
+        php = {
+          symbol = "";
+          format = "[ $symbol( $version) ]($style)";
+        };
+        java = {
+          symbol = " ";
+          format = "[ $symbol( $version) ]($style)";
+        };
+        kotlin = {
+          symbol = "";
+          format = "[ $symbol( $version) ]($style)";
+        };
+        haskell = {
+          symbol = "";
+          format = "[ $symbol( $version) ]($style)";
+        };
+        python = {
+          symbol = "";
+          format = "[ $symbol( $version) ]($style)";
+        };
+        docker_context = {
+          symbol = "";
+          format = "[ $symbol( $context) ]($style)";
+        };
 
+        # -- Time --
         time = {
           disabled = true;
           time_format = "%R";
@@ -139,8 +207,10 @@ echo "$out"
           format = "[[  $time ](fg:mantle bg:foam)]($style)";
         };
 
+        # -- Line Break --
         line_break.disabled = true;
 
+        # -- Character --
         character = {
           disabled = false;
           success_symbol = "[𝘹](bold fg:green)";
@@ -151,8 +221,10 @@ echo "$out"
           vimcmd_visual_symbol = "[ ](bold fg:lavender)";
         };
 
+        # -- Google Cloud --
         gcloud.disabled = true;
 
+        # -- Custom: GC EX --
         custom.gcex = {
           command = "awk -F'=' '/^account/ {gsub(/[ \\t]+/, \\\"\\\", \\$2); print substr(\\$2, 1, 2); exit}' ~/.config/gcloud/configurations/config_$(cat ~/.config/gcloud/active_config 2>/dev/null || echo 'default') 2>/dev/null";
           when = "test -d ~/.config/gcloud";
@@ -161,6 +233,7 @@ echo "$out"
           ignore_timeout = true;
         };
 
+        # -- Bun --
         bun = {
           symbol = " ";
           style = "peach";
