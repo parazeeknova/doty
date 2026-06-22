@@ -3,6 +3,8 @@
   flake.nixosModules.apostropheConfiguration = { config, pkgs, lib, ... }: {
     imports = [
       self.nixosModules.apostropheHardware
+      inputs.home-manager.nixosModules.home-manager
+      self.nixosModules.parazeeknovaHome
     ];
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -80,6 +82,7 @@
       git
       pciutils
       nodejs
+      vscode
     ];
 
     programs.nix-ld.enable = true;
