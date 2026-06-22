@@ -96,6 +96,9 @@
       shell = pkgs.fish;
     };
 
+    # -- Shell --
+    programs.fish.enable = true;
+
     # -- Misc --
     programs.firefox.enable = true;
     nixpkgs.config.allowUnfree = true;
