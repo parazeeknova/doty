@@ -22,5 +22,17 @@
       XDG_SESSION_TYPE = "wayland";
       XDG_SESSION_DESKTOP = "Hyprland";
     };
+
+    # -- Hyprland Config --
+    home-manager.users.parazeeknova.xdg.configFile."hypr" = {
+      source = ./hypr;
+      recursive = true;
+    };
+
+    # -- Quickshell Config --
+    home-manager.users.parazeeknova.xdg.configFile."quickshell" = {
+      source = ../quickshell;
+      recursive = true;
+    };
   };
 }

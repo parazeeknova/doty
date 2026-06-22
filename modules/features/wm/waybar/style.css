@@ -1,0 +1,67 @@
+@import "colors/matugen.css";
+
+* {
+  all: unset;
+  font-family: "FiraCode Nerd Font", monospace;
+}
+
+window#waybar {
+  background-color: @bg0;
+  color: @fg;
+}
+
+#workspaces {
+  font-size: 0.8rem;
+  padding: 4px 0;
+}
+
+#workspaces button {
+  color: @fg_light;
+  min-width: 22px;
+  padding: 2px 0;
+}
+
+#workspaces button.active {
+  color: @accent;
+}
+
+#clock {
+  font-size: 0.8rem;
+  color: @fg1;
+  padding: 4px 0;
+}
+
+#pulseaudio {
+  font-size: 0.8rem;
+  color: @fg1;
+  padding: 4px 0;
+}
+
+#network {
+  font-size: 0.8rem;
+  color: @fg1;
+  padding: 4px 0;
+}
+
+#custom-tray_toggle {
+  font-size: 0.8rem;
+  color: @fg1;
+  padding: 4px 0;
+}
+
+#window {
+  font-size: 0.8rem;
+  color: @fg1;
+  padding: 4px 0;
+}
+
+#battery {
+  font-size: 0.8rem;
+  padding: 4px 0;
+}
+
+#clock-date {
+  font-size: 0.7rem;
+  color: @blue;
+  padding: 4px 0;
+}

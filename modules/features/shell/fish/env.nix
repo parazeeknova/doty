@@ -10,7 +10,7 @@
 
         # -- SSH / GPG --
         set -gx GPG_TTY (tty)
-        set -gx SSH_ASKPASS /usr/lib/seahorse/ssh-askpass
+        set -gx SSH_ASKPASS ${pkgs.seahorse}/libexec/seahorse/ssh-askpass
         set -gx SSH_AUTH_SOCK "$XDG_RUNTIME_DIR/ssh-agent.socket"
 
         # -- Man Pages --

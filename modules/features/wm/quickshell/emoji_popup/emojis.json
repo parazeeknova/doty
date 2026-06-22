@@ -1,0 +1,7714 @@
+[
+    {
+        "char": "😀",
+        "name": "grinning face face smile happy joy :D grin"
+    },
+    {
+        "char": "😃",
+        "name": "grinning face with big eyes face happy joy haha :D :) smile funny"
+    },
+    {
+        "char": "😄",
+        "name": "grinning face with smiling eyes face happy joy funny haha laugh like :D :) smile"
+    },
+    {
+        "char": "😁",
+        "name": "beaming face with smiling eyes face happy smile joy kawaii"
+    },
+    {
+        "char": "😆",
+        "name": "grinning squinting face happy joy lol satisfied haha face glad XD laugh"
+    },
+    {
+        "char": "😅",
+        "name": "grinning face with sweat face hot happy laugh sweat smile relief"
+    },
+    {
+        "char": "🤣",
+        "name": "rolling on the floor laughing face rolling floor laughing lol haha rofl"
+    },
+    {
+        "char": "😂",
+        "name": "face with tears of joy face cry tears weep happy happytears haha"
+    },
+    {
+        "char": "🙂",
+        "name": "slightly smiling face face smile"
+    },
+    {
+        "char": "🙃",
+        "name": "upside down face face flipped silly smile"
+    },
+    {
+        "char": "😉",
+        "name": "winking face face happy mischievous secret ;) smile eye"
+    },
+    {
+        "char": "😊",
+        "name": "smiling face with smiling eyes face smile happy flushed crush embarrassed shy joy"
+    },
+    {
+        "char": "😇",
+        "name": "smiling face with halo face angel heaven halo"
+    },
+    {
+        "char": "🥰",
+        "name": "smiling face with hearts face love like affection valentines infatuation crush hearts adore"
+    },
+    {
+        "char": "😍",
+        "name": "smiling face with heart eyes face love like affection valentines infatuation crush heart"
+    },
+    {
+        "char": "🤩",
+        "name": "star struck face smile starry eyes grinning"
+    },
+    {
+        "char": "😘",
+        "name": "face blowing a kiss face love like affection valentines infatuation kiss"
+    },
+    {
+        "char": "😗",
+        "name": "kissing face love like face 3 valentines infatuation kiss"
+    },
+    {
+        "char": "☺️",
+        "name": "smiling face face blush massage happiness"
+    },
+    {
+        "char": "😚",
+        "name": "kissing face with closed eyes face love like affection valentines infatuation kiss"
+    },
+    {
+        "char": "😙",
+        "name": "kissing face with smiling eyes face affection valentines infatuation kiss"
+    },
+    {
+        "char": "😋",
+        "name": "face savoring food happy joy tongue smile face silly yummy nom delicious savouring"
+    },
+    {
+        "char": "😛",
+        "name": "face with tongue face prank childish playful mischievous smile tongue"
+    },
+    {
+        "char": "😜",
+        "name": "winking face with tongue face prank childish playful mischievous smile wink tongue"
+    },
+    {
+        "char": "🤪",
+        "name": "zany face face goofy crazy"
+    },
+    {
+        "char": "😝",
+        "name": "squinting face with tongue face prank playful mischievous smile tongue"
+    },
+    {
+        "char": "🤑",
+        "name": "money mouth face face rich dollar money"
+    },
+    {
+        "char": "🤗",
+        "name": "hugging face face smile hug"
+    },
+    {
+        "char": "🤭",
+        "name": "face with hand over mouth face whoops shock surprise"
+    },
+    {
+        "char": "🤫",
+        "name": "shushing face face quiet shhh"
+    },
+    {
+        "char": "🤔",
+        "name": "thinking face face hmmm think consider"
+    },
+    {
+        "char": "🤐",
+        "name": "zipper mouth face face sealed zipper secret"
+    },
+    {
+        "char": "🤨",
+        "name": "face with raised eyebrow face distrust scepticism disapproval disbelief surprise"
+    },
+    {
+        "char": "😐",
+        "name": "neutral face indifference meh :| neutral"
+    },
+    {
+        "char": "😑",
+        "name": "expressionless face face indifferent - - meh deadpan"
+    },
+    {
+        "char": "😶",
+        "name": "face without mouth face hellokitty"
+    },
+    {
+        "char": "😏",
+        "name": "smirking face face smile mean prank smug sarcasm"
+    },
+    {
+        "char": "😒",
+        "name": "unamused face indifference bored straight face serious sarcasm unimpressed skeptical dubious side eye"
+    },
+    {
+        "char": "🙄",
+        "name": "face with rolling eyes face eyeroll frustrated"
+    },
+    {
+        "char": "😬",
+        "name": "grimacing face face grimace teeth"
+    },
+    {
+        "char": "🤥",
+        "name": "lying face face lie pinocchio"
+    },
+    {
+        "char": "😌",
+        "name": "relieved face face relaxed phew massage happiness"
+    },
+    {
+        "char": "😔",
+        "name": "pensive face face sad depressed upset"
+    },
+    {
+        "char": "😪",
+        "name": "sleepy face face tired rest nap"
+    },
+    {
+        "char": "🤤",
+        "name": "drooling face face"
+    },
+    {
+        "char": "😴",
+        "name": "sleeping face face tired sleepy night zzz"
+    },
+    {
+        "char": "😷",
+        "name": "face with medical mask face sick ill disease"
+    },
+    {
+        "char": "🤒",
+        "name": "face with thermometer sick temperature thermometer cold fever"
+    },
+    {
+        "char": "🤕",
+        "name": "face with head bandage injured clumsy bandage hurt"
+    },
+    {
+        "char": "🤢",
+        "name": "nauseated face face vomit gross green sick throw up ill"
+    },
+    {
+        "char": "🤮",
+        "name": "face vomiting face sick"
+    },
+    {
+        "char": "🤧",
+        "name": "sneezing face face gesundheit sneeze sick allergy"
+    },
+    {
+        "char": "🥵",
+        "name": "hot face face feverish heat red sweating"
+    },
+    {
+        "char": "🥶",
+        "name": "cold face face blue freezing frozen frostbite icicles"
+    },
+    {
+        "char": "🥴",
+        "name": "woozy face face dizzy intoxicated tipsy wavy"
+    },
+    {
+        "char": "😵",
+        "name": "dizzy face spent unconscious xox dizzy"
+    },
+    {
+        "char": "🤯",
+        "name": "exploding head face shocked mind blown"
+    },
+    {
+        "char": "🤠",
+        "name": "cowboy hat face face cowgirl hat"
+    },
+    {
+        "char": "🥳",
+        "name": "partying face face celebration woohoo"
+    },
+    {
+        "char": "😎",
+        "name": "smiling face with sunglasses face cool smile summer beach sunglass"
+    },
+    {
+        "char": "🤓",
+        "name": "nerd face face nerdy geek dork"
+    },
+    {
+        "char": "🧐",
+        "name": "face with monocle face stuffy wealthy"
+    },
+    {
+        "char": "😕",
+        "name": "confused face face indifference huh weird hmmm :/"
+    },
+    {
+        "char": "😟",
+        "name": "worried face face concern nervous :("
+    },
+    {
+        "char": "🙁",
+        "name": "slightly frowning face face frowning disappointed sad upset"
+    },
+    {
+        "char": "☹️",
+        "name": "frowning face face sad upset frown"
+    },
+    {
+        "char": "😮",
+        "name": "face with open mouth face surprise impressed wow whoa :O"
+    },
+    {
+        "char": "😯",
+        "name": "hushed face face woo shh"
+    },
+    {
+        "char": "😲",
+        "name": "astonished face face xox surprised poisoned"
+    },
+    {
+        "char": "😳",
+        "name": "flushed face face blush shy flattered sex"
+    },
+    {
+        "char": "🥺",
+        "name": "pleading face face begging mercy"
+    },
+    {
+        "char": "😦",
+        "name": "frowning face with open mouth face aw what"
+    },
+    {
+        "char": "😧",
+        "name": "anguished face face stunned nervous"
+    },
+    {
+        "char": "😨",
+        "name": "fearful face face scared terrified nervous oops huh"
+    },
+    {
+        "char": "😰",
+        "name": "anxious face with sweat face nervous sweat"
+    },
+    {
+        "char": "😥",
+        "name": "sad but relieved face face phew sweat nervous"
+    },
+    {
+        "char": "😢",
+        "name": "crying face face tears sad depressed upset :'("
+    },
+    {
+        "char": "😭",
+        "name": "loudly crying face face cry tears sad upset depressed sob"
+    },
+    {
+        "char": "😱",
+        "name": "face screaming in fear face munch scared omg"
+    },
+    {
+        "char": "😖",
+        "name": "confounded face face confused sick unwell oops :S"
+    },
+    {
+        "char": "😣",
+        "name": "persevering face face sick no upset oops"
+    },
+    {
+        "char": "😞",
+        "name": "disappointed face face sad upset depressed :("
+    },
+    {
+        "char": "😓",
+        "name": "downcast face with sweat face hot sad tired exercise"
+    },
+    {
+        "char": "😩",
+        "name": "weary face face tired sleepy sad frustrated upset"
+    },
+    {
+        "char": "😫",
+        "name": "tired face sick whine upset frustrated"
+    },
+    {
+        "char": "🥱",
+        "name": "yawning face tired sleepy"
+    },
+    {
+        "char": "😤",
+        "name": "face with steam from nose face gas phew proud pride"
+    },
+    {
+        "char": "😡",
+        "name": "pouting face angry mad hate despise"
+    },
+    {
+        "char": "😠",
+        "name": "angry face mad face annoyed frustrated"
+    },
+    {
+        "char": "🤬",
+        "name": "face with symbols on mouth face swearing cursing cussing profanity expletive"
+    },
+    {
+        "char": "😈",
+        "name": "smiling face with horns devil horns"
+    },
+    {
+        "char": "👿",
+        "name": "angry face with horns devil angry horns"
+    },
+    {
+        "char": "💀",
+        "name": "skull dead skeleton creepy death"
+    },
+    {
+        "char": "☠️",
+        "name": "skull and crossbones poison danger deadly scary death pirate evil"
+    },
+    {
+        "char": "💩",
+        "name": "pile of poo hankey shitface fail turd shit"
+    },
+    {
+        "char": "🤡",
+        "name": "clown face face"
+    },
+    {
+        "char": "👹",
+        "name": "ogre monster red mask halloween scary creepy devil demon japanese ogre"
+    },
+    {
+        "char": "👺",
+        "name": "goblin red evil mask monster scary creepy japanese goblin"
+    },
+    {
+        "char": "👻",
+        "name": "ghost halloween spooky scary"
+    },
+    {
+        "char": "👽",
+        "name": "alien UFO paul weird outer space"
+    },
+    {
+        "char": "👾",
+        "name": "alien monster game arcade play"
+    },
+    {
+        "char": "🤖",
+        "name": "robot computer machine bot"
+    },
+    {
+        "char": "😺",
+        "name": "grinning cat animal cats happy smile"
+    },
+    {
+        "char": "😸",
+        "name": "grinning cat with smiling eyes animal cats smile"
+    },
+    {
+        "char": "😹",
+        "name": "cat with tears of joy animal cats haha happy tears"
+    },
+    {
+        "char": "😻",
+        "name": "smiling cat with heart eyes animal love like affection cats valentines heart"
+    },
+    {
+        "char": "😼",
+        "name": "cat with wry smile animal cats smirk"
+    },
+    {
+        "char": "😽",
+        "name": "kissing cat animal cats kiss"
+    },
+    {
+        "char": "🙀",
+        "name": "weary cat animal cats munch scared scream"
+    },
+    {
+        "char": "😿",
+        "name": "crying cat animal tears weep sad cats upset cry"
+    },
+    {
+        "char": "😾",
+        "name": "pouting cat animal cats"
+    },
+    {
+        "char": "🙈",
+        "name": "see no evil monkey monkey animal nature haha"
+    },
+    {
+        "char": "🙉",
+        "name": "hear no evil monkey animal monkey nature"
+    },
+    {
+        "char": "🙊",
+        "name": "speak no evil monkey monkey animal nature omg"
+    },
+    {
+        "char": "💋",
+        "name": "kiss mark face lips love like affection valentines"
+    },
+    {
+        "char": "💌",
+        "name": "love letter email like affection envelope valentines"
+    },
+    {
+        "char": "💘",
+        "name": "heart with arrow love like heart affection valentines"
+    },
+    {
+        "char": "💝",
+        "name": "heart with ribbon love valentines"
+    },
+    {
+        "char": "💖",
+        "name": "sparkling heart love like affection valentines"
+    },
+    {
+        "char": "💗",
+        "name": "growing heart like love affection valentines pink"
+    },
+    {
+        "char": "💓",
+        "name": "beating heart love like affection valentines pink heart"
+    },
+    {
+        "char": "💞",
+        "name": "revolving hearts love like affection valentines"
+    },
+    {
+        "char": "💕",
+        "name": "two hearts love like affection valentines heart"
+    },
+    {
+        "char": "💟",
+        "name": "heart decoration purple-square love like"
+    },
+    {
+        "char": "❣️",
+        "name": "heart exclamation decoration love"
+    },
+    {
+        "char": "💔",
+        "name": "broken heart sad sorry break heart heartbreak"
+    },
+    {
+        "char": "❤️",
+        "name": "red heart love like valentines"
+    },
+    {
+        "char": "🧡",
+        "name": "orange heart love like affection valentines"
+    },
+    {
+        "char": "💛",
+        "name": "yellow heart love like affection valentines"
+    },
+    {
+        "char": "💚",
+        "name": "green heart love like affection valentines"
+    },
+    {
+        "char": "💙",
+        "name": "blue heart love like affection valentines"
+    },
+    {
+        "char": "💜",
+        "name": "purple heart love like affection valentines"
+    },
+    {
+        "char": "🤎",
+        "name": "brown heart coffee"
+    },
+    {
+        "char": "🖤",
+        "name": "black heart evil"
+    },
+    {
+        "char": "🤍",
+        "name": "white heart pure"
+    },
+    {
+        "char": "💯",
+        "name": "hundred points score perfect numbers century exam quiz test pass hundred"
+    },
+    {
+        "char": "💢",
+        "name": "anger symbol angry mad"
+    },
+    {
+        "char": "💥",
+        "name": "collision bomb explode explosion collision blown"
+    },
+    {
+        "char": "💫",
+        "name": "dizzy star sparkle shoot magic"
+    },
+    {
+        "char": "💦",
+        "name": "sweat droplets water drip oops"
+    },
+    {
+        "char": "💨",
+        "name": "dashing away wind air fast shoo fart smoke puff"
+    },
+    {
+        "char": "🕳️",
+        "name": "hole embarrassing"
+    },
+    {
+        "char": "💣",
+        "name": "bomb boom explode explosion terrorism"
+    },
+    {
+        "char": "💬",
+        "name": "speech balloon bubble words message talk chatting"
+    },
+    {
+        "char": "👁️‍🗨️",
+        "name": "eye in speech bubble info"
+    },
+    {
+        "char": "🗨️",
+        "name": "left speech bubble words message talk chatting"
+    },
+    {
+        "char": "🗯️",
+        "name": "right anger bubble caption speech thinking mad"
+    },
+    {
+        "char": "💭",
+        "name": "thought balloon bubble cloud speech thinking dream"
+    },
+    {
+        "char": "💤",
+        "name": "zzz sleepy tired dream"
+    },
+    {
+        "char": "👋",
+        "name": "waving hand hands gesture goodbye solong farewell hello hi palm"
+    },
+    {
+        "char": "🤚",
+        "name": "raised back of hand fingers raised backhand"
+    },
+    {
+        "char": "🖐️",
+        "name": "hand with fingers splayed hand fingers palm"
+    },
+    {
+        "char": "✋",
+        "name": "raised hand fingers stop highfive palm ban"
+    },
+    {
+        "char": "🖖",
+        "name": "vulcan salute hand fingers spock star trek"
+    },
+    {
+        "char": "👌",
+        "name": "ok hand fingers limbs perfect ok okay"
+    },
+    {
+        "char": "🤏",
+        "name": "pinching hand tiny small size"
+    },
+    {
+        "char": "✌️",
+        "name": "victory hand fingers ohyeah hand peace victory two"
+    },
+    {
+        "char": "🤞",
+        "name": "crossed fingers good lucky"
+    },
+    {
+        "char": "🤟",
+        "name": "love you gesture hand fingers gesture"
+    },
+    {
+        "char": "🤘",
+        "name": "sign of the horns hand fingers evil eye sign of horns rock on"
+    },
+    {
+        "char": "🤙",
+        "name": "call me hand hands gesture shaka"
+    },
+    {
+        "char": "👈",
+        "name": "backhand index pointing left direction fingers hand left"
+    },
+    {
+        "char": "👉",
+        "name": "backhand index pointing right fingers hand direction right"
+    },
+    {
+        "char": "👆",
+        "name": "backhand index pointing up fingers hand direction up"
+    },
+    {
+        "char": "🖕",
+        "name": "middle finger hand fingers rude middle flipping"
+    },
+    {
+        "char": "👇",
+        "name": "backhand index pointing down fingers hand direction down"
+    },
+    {
+        "char": "☝️",
+        "name": "index pointing up hand fingers direction up"
+    },
+    {
+        "char": "👍",
+        "name": "thumbs up thumbsup yes awesome good agree accept cool hand like +1"
+    },
+    {
+        "char": "👎",
+        "name": "thumbs down thumbsdown no dislike hand -1"
+    },
+    {
+        "char": "✊",
+        "name": "raised fist fingers hand grasp"
+    },
+    {
+        "char": "👊",
+        "name": "oncoming fist angry violence fist hit attack hand"
+    },
+    {
+        "char": "🤛",
+        "name": "left facing fist hand fistbump"
+    },
+    {
+        "char": "🤜",
+        "name": "right facing fist hand fistbump"
+    },
+    {
+        "char": "👏",
+        "name": "clapping hands hands praise applause congrats yay"
+    },
+    {
+        "char": "🙌",
+        "name": "raising hands gesture hooray yea celebration hands"
+    },
+    {
+        "char": "👐",
+        "name": "open hands fingers butterfly hands open"
+    },
+    {
+        "char": "🤲",
+        "name": "palms up together hands gesture cupped prayer"
+    },
+    {
+        "char": "🤝",
+        "name": "handshake agreement shake"
+    },
+    {
+        "char": "🙏",
+        "name": "folded hands please hope wish namaste highfive pray"
+    },
+    {
+        "char": "✍️",
+        "name": "writing hand lower left ballpoint pen stationery write compose"
+    },
+    {
+        "char": "💅",
+        "name": "nail polish beauty manicure finger fashion nail"
+    },
+    {
+        "char": "🤳",
+        "name": "selfie camera phone"
+    },
+    {
+        "char": "💪",
+        "name": "flexed biceps arm flex hand summer strong biceps"
+    },
+    {
+        "char": "🦾",
+        "name": "mechanical arm accessibility"
+    },
+    {
+        "char": "🦿",
+        "name": "mechanical leg accessibility"
+    },
+    {
+        "char": "🦵",
+        "name": "leg kick limb"
+    },
+    {
+        "char": "🦶",
+        "name": "foot kick stomp"
+    },
+    {
+        "char": "👂",
+        "name": "ear face hear sound listen"
+    },
+    {
+        "char": "🦻",
+        "name": "ear with hearing aid accessibility"
+    },
+    {
+        "char": "👃",
+        "name": "nose smell sniff"
+    },
+    {
+        "char": "🧠",
+        "name": "brain smart intelligent"
+    },
+    {
+        "char": "🦷",
+        "name": "tooth teeth dentist"
+    },
+    {
+        "char": "🦴",
+        "name": "bone skeleton"
+    },
+    {
+        "char": "👀",
+        "name": "eyes look watch stalk peek see"
+    },
+    {
+        "char": "👁️",
+        "name": "eye face look see watch stare"
+    },
+    {
+        "char": "👅",
+        "name": "tongue mouth playful"
+    },
+    {
+        "char": "👄",
+        "name": "mouth mouth kiss"
+    },
+    {
+        "char": "👶",
+        "name": "baby child boy girl toddler"
+    },
+    {
+        "char": "🧒",
+        "name": "child gender-neutral young"
+    },
+    {
+        "char": "👦",
+        "name": "boy man male guy teenager"
+    },
+    {
+        "char": "👧",
+        "name": "girl female woman teenager"
+    },
+    {
+        "char": "🧑",
+        "name": "person gender-neutral person"
+    },
+    {
+        "char": "👱",
+        "name": "person blond hair hairstyle"
+    },
+    {
+        "char": "👨",
+        "name": "man mustache father dad guy classy sir moustache"
+    },
+    {
+        "char": "🧔",
+        "name": "man beard person bewhiskered"
+    },
+    {
+        "char": "👨‍🦰",
+        "name": "man red hair hairstyle"
+    },
+    {
+        "char": "👨‍🦱",
+        "name": "man curly hair hairstyle"
+    },
+    {
+        "char": "👨‍🦳",
+        "name": "man white hair old elder"
+    },
+    {
+        "char": "👨‍🦲",
+        "name": "man bald hairless"
+    },
+    {
+        "char": "👩",
+        "name": "woman female girls lady"
+    },
+    {
+        "char": "👩‍🦰",
+        "name": "woman red hair hairstyle"
+    },
+    {
+        "char": "🧑‍🦰",
+        "name": "person red hair hairstyle"
+    },
+    {
+        "char": "👩‍🦱",
+        "name": "woman curly hair hairstyle"
+    },
+    {
+        "char": "🧑‍🦱",
+        "name": "person curly hair hairstyle"
+    },
+    {
+        "char": "👩‍🦳",
+        "name": "woman white hair old elder"
+    },
+    {
+        "char": "🧑‍🦳",
+        "name": "person white hair elder old"
+    },
+    {
+        "char": "👩‍🦲",
+        "name": "woman bald hairless"
+    },
+    {
+        "char": "🧑‍🦲",
+        "name": "person bald hairless"
+    },
+    {
+        "char": "👱‍♀️",
+        "name": "woman blond hair woman female girl blonde person"
+    },
+    {
+        "char": "👱‍♂️",
+        "name": "man blond hair man male boy blonde guy person"
+    },
+    {
+        "char": "🧓",
+        "name": "older person human elder senior gender-neutral"
+    },
+    {
+        "char": "👴",
+        "name": "old man human male men old elder senior"
+    },
+    {
+        "char": "👵",
+        "name": "old woman human female women lady old elder senior"
+    },
+    {
+        "char": "🙍",
+        "name": "person frowning worried"
+    },
+    {
+        "char": "🙍‍♂️",
+        "name": "man frowning male boy man sad depressed discouraged unhappy"
+    },
+    {
+        "char": "🙍‍♀️",
+        "name": "woman frowning female girl woman sad depressed discouraged unhappy"
+    },
+    {
+        "char": "🙎",
+        "name": "person pouting upset"
+    },
+    {
+        "char": "🙎‍♂️",
+        "name": "man pouting male boy man"
+    },
+    {
+        "char": "🙎‍♀️",
+        "name": "woman pouting female girl woman"
+    },
+    {
+        "char": "🙅",
+        "name": "person gesturing no decline"
+    },
+    {
+        "char": "🙅‍♂️",
+        "name": "man gesturing no male boy man nope"
+    },
+    {
+        "char": "🙅‍♀️",
+        "name": "woman gesturing no female girl woman nope"
+    },
+    {
+        "char": "🙆",
+        "name": "person gesturing ok agree"
+    },
+    {
+        "char": "🙆‍♂️",
+        "name": "man gesturing ok men boy male blue human man"
+    },
+    {
+        "char": "🙆‍♀️",
+        "name": "woman gesturing ok women girl female pink human woman"
+    },
+    {
+        "char": "💁",
+        "name": "person tipping hand information"
+    },
+    {
+        "char": "💁‍♂️",
+        "name": "man tipping hand male boy man human information"
+    },
+    {
+        "char": "💁‍♀️",
+        "name": "woman tipping hand female girl woman human information"
+    },
+    {
+        "char": "🙋",
+        "name": "person raising hand question"
+    },
+    {
+        "char": "🙋‍♂️",
+        "name": "man raising hand male boy man"
+    },
+    {
+        "char": "🙋‍♀️",
+        "name": "woman raising hand female girl woman"
+    },
+    {
+        "char": "🧏",
+        "name": "deaf person accessibility"
+    },
+    {
+        "char": "🧏‍♂️",
+        "name": "deaf man accessibility"
+    },
+    {
+        "char": "🧏‍♀️",
+        "name": "deaf woman accessibility"
+    },
+    {
+        "char": "🙇",
+        "name": "person bowing respectiful"
+    },
+    {
+        "char": "🙇‍♂️",
+        "name": "man bowing man male boy"
+    },
+    {
+        "char": "🙇‍♀️",
+        "name": "woman bowing woman female girl"
+    },
+    {
+        "char": "🤦",
+        "name": "person facepalming disappointed"
+    },
+    {
+        "char": "🤦‍♂️",
+        "name": "man facepalming man male boy disbelief"
+    },
+    {
+        "char": "🤦‍♀️",
+        "name": "woman facepalming woman female girl disbelief"
+    },
+    {
+        "char": "🤷",
+        "name": "person shrugging regardless"
+    },
+    {
+        "char": "🤷‍♂️",
+        "name": "man shrugging man male boy confused indifferent doubt"
+    },
+    {
+        "char": "🤷‍♀️",
+        "name": "woman shrugging woman female girl confused indifferent doubt"
+    },
+    {
+        "char": "🧑‍⚕️",
+        "name": "health worker hospital"
+    },
+    {
+        "char": "👨‍⚕️",
+        "name": "man health worker doctor nurse therapist healthcare man human"
+    },
+    {
+        "char": "👩‍⚕️",
+        "name": "woman health worker doctor nurse therapist healthcare woman human"
+    },
+    {
+        "char": "🧑‍🎓",
+        "name": "student learn"
+    },
+    {
+        "char": "👨‍🎓",
+        "name": "man student graduate man human"
+    },
+    {
+        "char": "👩‍🎓",
+        "name": "woman student graduate woman human"
+    },
+    {
+        "char": "🧑‍🏫",
+        "name": "teacher professor"
+    },
+    {
+        "char": "👨‍🏫",
+        "name": "man teacher instructor professor man human"
+    },
+    {
+        "char": "👩‍🏫",
+        "name": "woman teacher instructor professor woman human"
+    },
+    {
+        "char": "🧑‍⚖️",
+        "name": "judge law"
+    },
+    {
+        "char": "👨‍⚖️",
+        "name": "man judge justice court man human"
+    },
+    {
+        "char": "👩‍⚖️",
+        "name": "woman judge justice court woman human"
+    },
+    {
+        "char": "🧑‍🌾",
+        "name": "farmer crops"
+    },
+    {
+        "char": "👨‍🌾",
+        "name": "man farmer rancher gardener man human"
+    },
+    {
+        "char": "👩‍🌾",
+        "name": "woman farmer rancher gardener woman human"
+    },
+    {
+        "char": "🧑‍🍳",
+        "name": "cook food kitchen culinary"
+    },
+    {
+        "char": "👨‍🍳",
+        "name": "man cook chef man human"
+    },
+    {
+        "char": "👩‍🍳",
+        "name": "woman cook chef woman human"
+    },
+    {
+        "char": "🧑‍🔧",
+        "name": "mechanic worker technician"
+    },
+    {
+        "char": "👨‍🔧",
+        "name": "man mechanic plumber man human wrench"
+    },
+    {
+        "char": "👩‍🔧",
+        "name": "woman mechanic plumber woman human wrench"
+    },
+    {
+        "char": "🧑‍🏭",
+        "name": "factory worker labor"
+    },
+    {
+        "char": "👨‍🏭",
+        "name": "man factory worker assembly industrial man human"
+    },
+    {
+        "char": "👩‍🏭",
+        "name": "woman factory worker assembly industrial woman human"
+    },
+    {
+        "char": "🧑‍💼",
+        "name": "office worker business"
+    },
+    {
+        "char": "👨‍💼",
+        "name": "man office worker business manager man human"
+    },
+    {
+        "char": "👩‍💼",
+        "name": "woman office worker business manager woman human"
+    },
+    {
+        "char": "🧑‍🔬",
+        "name": "scientist chemistry"
+    },
+    {
+        "char": "👨‍🔬",
+        "name": "man scientist biologist chemist engineer physicist man human"
+    },
+    {
+        "char": "👩‍🔬",
+        "name": "woman scientist biologist chemist engineer physicist woman human"
+    },
+    {
+        "char": "🧑‍💻",
+        "name": "technologist computer"
+    },
+    {
+        "char": "👨‍💻",
+        "name": "man technologist coder developer engineer programmer software man human laptop computer"
+    },
+    {
+        "char": "👩‍💻",
+        "name": "woman technologist coder developer engineer programmer software woman human laptop computer"
+    },
+    {
+        "char": "🧑‍🎤",
+        "name": "singer song artist performer"
+    },
+    {
+        "char": "👨‍🎤",
+        "name": "man singer rockstar entertainer man human"
+    },
+    {
+        "char": "👩‍🎤",
+        "name": "woman singer rockstar entertainer woman human"
+    },
+    {
+        "char": "🧑‍🎨",
+        "name": "artist painting draw creativity"
+    },
+    {
+        "char": "👨‍🎨",
+        "name": "man artist painter man human"
+    },
+    {
+        "char": "👩‍🎨",
+        "name": "woman artist painter woman human"
+    },
+    {
+        "char": "🧑‍✈️",
+        "name": "pilot fly plane airplane"
+    },
+    {
+        "char": "👨‍✈️",
+        "name": "man pilot aviator plane man human"
+    },
+    {
+        "char": "👩‍✈️",
+        "name": "woman pilot aviator plane woman human"
+    },
+    {
+        "char": "🧑‍🚀",
+        "name": "astronaut outerspace"
+    },
+    {
+        "char": "👨‍🚀",
+        "name": "man astronaut space rocket man human"
+    },
+    {
+        "char": "👩‍🚀",
+        "name": "woman astronaut space rocket woman human"
+    },
+    {
+        "char": "🧑‍🚒",
+        "name": "firefighter fire"
+    },
+    {
+        "char": "👨‍🚒",
+        "name": "man firefighter fireman man human"
+    },
+    {
+        "char": "👩‍🚒",
+        "name": "woman firefighter fireman woman human"
+    },
+    {
+        "char": "👮",
+        "name": "police officer cop"
+    },
+    {
+        "char": "👮‍♂️",
+        "name": "man police officer man police law legal enforcement arrest 911"
+    },
+    {
+        "char": "👮‍♀️",
+        "name": "woman police officer woman police law legal enforcement arrest 911 female"
+    },
+    {
+        "char": "🕵️",
+        "name": "detective human spy detective"
+    },
+    {
+        "char": "🕵️‍♂️",
+        "name": "man detective crime"
+    },
+    {
+        "char": "🕵️‍♀️",
+        "name": "woman detective human spy detective female woman"
+    },
+    {
+        "char": "💂",
+        "name": "guard protect"
+    },
+    {
+        "char": "💂‍♂️",
+        "name": "man guard uk gb british male guy royal"
+    },
+    {
+        "char": "💂‍♀️",
+        "name": "woman guard uk gb british female royal woman"
+    },
+    {
+        "char": "👷",
+        "name": "construction worker labor build"
+    },
+    {
+        "char": "👷‍♂️",
+        "name": "man construction worker male human wip guy build construction worker labor"
+    },
+    {
+        "char": "👷‍♀️",
+        "name": "woman construction worker female human wip build construction worker labor woman"
+    },
+    {
+        "char": "🤴",
+        "name": "prince boy man male crown royal king"
+    },
+    {
+        "char": "👸",
+        "name": "princess girl woman female blond crown royal queen"
+    },
+    {
+        "char": "👳",
+        "name": "person wearing turban headdress"
+    },
+    {
+        "char": "👳‍♂️",
+        "name": "man wearing turban male indian hinduism arabs"
+    },
+    {
+        "char": "👳‍♀️",
+        "name": "woman wearing turban female indian hinduism arabs woman"
+    },
+    {
+        "char": "👲",
+        "name": "man with skullcap male boy chinese"
+    },
+    {
+        "char": "🧕",
+        "name": "woman with headscarf female hijab mantilla tichel"
+    },
+    {
+        "char": "🤵",
+        "name": "man in tuxedo couple marriage wedding groom"
+    },
+    {
+        "char": "👰",
+        "name": "bride with veil couple marriage wedding woman bride"
+    },
+    {
+        "char": "🤰",
+        "name": "pregnant woman baby"
+    },
+    {
+        "char": "🤱",
+        "name": "breast feeding nursing baby"
+    },
+    {
+        "char": "👼",
+        "name": "baby angel heaven wings halo"
+    },
+    {
+        "char": "🎅",
+        "name": "santa claus festival man male xmas father christmas"
+    },
+    {
+        "char": "🤶",
+        "name": "mrs claus woman female xmas mother christmas"
+    },
+    {
+        "char": "🦸",
+        "name": "superhero marvel"
+    },
+    {
+        "char": "🦸‍♂️",
+        "name": "man superhero man male good hero superpowers"
+    },
+    {
+        "char": "🦸‍♀️",
+        "name": "woman superhero woman female good heroine superpowers"
+    },
+    {
+        "char": "🦹",
+        "name": "supervillain marvel"
+    },
+    {
+        "char": "🦹‍♂️",
+        "name": "man supervillain man male evil bad criminal hero superpowers"
+    },
+    {
+        "char": "🦹‍♀️",
+        "name": "woman supervillain woman female evil bad criminal heroine superpowers"
+    },
+    {
+        "char": "🧙",
+        "name": "mage magic"
+    },
+    {
+        "char": "🧙‍♂️",
+        "name": "man mage man male mage sorcerer"
+    },
+    {
+        "char": "🧙‍♀️",
+        "name": "woman mage woman female mage witch"
+    },
+    {
+        "char": "🧚",
+        "name": "fairy wings magical"
+    },
+    {
+        "char": "🧚‍♂️",
+        "name": "man fairy man male"
+    },
+    {
+        "char": "🧚‍♀️",
+        "name": "woman fairy woman female"
+    },
+    {
+        "char": "🧛",
+        "name": "vampire blood twilight"
+    },
+    {
+        "char": "🧛‍♂️",
+        "name": "man vampire man male dracula"
+    },
+    {
+        "char": "🧛‍♀️",
+        "name": "woman vampire woman female"
+    },
+    {
+        "char": "🧜",
+        "name": "merperson sea"
+    },
+    {
+        "char": "🧜‍♂️",
+        "name": "merman man male triton"
+    },
+    {
+        "char": "🧜‍♀️",
+        "name": "mermaid woman female merwoman ariel"
+    },
+    {
+        "char": "🧝",
+        "name": "elf magical"
+    },
+    {
+        "char": "🧝‍♂️",
+        "name": "man elf man male"
+    },
+    {
+        "char": "🧝‍♀️",
+        "name": "woman elf woman female"
+    },
+    {
+        "char": "🧞",
+        "name": "genie magical wishes"
+    },
+    {
+        "char": "🧞‍♂️",
+        "name": "man genie man male"
+    },
+    {
+        "char": "🧞‍♀️",
+        "name": "woman genie woman female"
+    },
+    {
+        "char": "🧟",
+        "name": "zombie dead"
+    },
+    {
+        "char": "🧟‍♂️",
+        "name": "man zombie man male dracula undead walking dead"
+    },
+    {
+        "char": "🧟‍♀️",
+        "name": "woman zombie woman female undead walking dead"
+    },
+    {
+        "char": "💆",
+        "name": "person getting massage relax"
+    },
+    {
+        "char": "💆‍♂️",
+        "name": "man getting massage male boy man head"
+    },
+    {
+        "char": "💆‍♀️",
+        "name": "woman getting massage female girl woman head"
+    },
+    {
+        "char": "💇",
+        "name": "person getting haircut hairstyle"
+    },
+    {
+        "char": "💇‍♂️",
+        "name": "man getting haircut male boy man"
+    },
+    {
+        "char": "💇‍♀️",
+        "name": "woman getting haircut female girl woman"
+    },
+    {
+        "char": "🚶",
+        "name": "person walking move"
+    },
+    {
+        "char": "🚶‍♂️",
+        "name": "man walking human feet steps"
+    },
+    {
+        "char": "🚶‍♀️",
+        "name": "woman walking human feet steps woman female"
+    },
+    {
+        "char": "🧍",
+        "name": "person standing still"
+    },
+    {
+        "char": "🧍‍♂️",
+        "name": "man standing still"
+    },
+    {
+        "char": "🧍‍♀️",
+        "name": "woman standing still"
+    },
+    {
+        "char": "🧎",
+        "name": "person kneeling pray respectful"
+    },
+    {
+        "char": "🧎‍♂️",
+        "name": "man kneeling pray respectful"
+    },
+    {
+        "char": "🧎‍♀️",
+        "name": "woman kneeling respectful pray"
+    },
+    {
+        "char": "🧑‍🦯",
+        "name": "person with probing cane blind"
+    },
+    {
+        "char": "👨‍🦯",
+        "name": "man with probing cane blind"
+    },
+    {
+        "char": "👩‍🦯",
+        "name": "woman with probing cane blind"
+    },
+    {
+        "char": "🧑‍🦼",
+        "name": "person in motorized wheelchair disability accessibility"
+    },
+    {
+        "char": "👨‍🦼",
+        "name": "man in motorized wheelchair disability accessibility"
+    },
+    {
+        "char": "👩‍🦼",
+        "name": "woman in motorized wheelchair disability accessibility"
+    },
+    {
+        "char": "🧑‍🦽",
+        "name": "person in manual wheelchair disability accessibility"
+    },
+    {
+        "char": "👨‍🦽",
+        "name": "man in manual wheelchair disability accessibility"
+    },
+    {
+        "char": "👩‍🦽",
+        "name": "woman in manual wheelchair disability accessibility"
+    },
+    {
+        "char": "🏃",
+        "name": "person running move"
+    },
+    {
+        "char": "🏃‍♂️",
+        "name": "man running man walking exercise race running"
+    },
+    {
+        "char": "🏃‍♀️",
+        "name": "woman running woman walking exercise race running female"
+    },
+    {
+        "char": "💃",
+        "name": "woman dancing female girl woman fun"
+    },
+    {
+        "char": "🕺",
+        "name": "man dancing male boy fun dancer"
+    },
+    {
+        "char": "🕴️",
+        "name": "man in suit levitating suit business levitate hover jump"
+    },
+    {
+        "char": "👯",
+        "name": "people with bunny ears perform costume"
+    },
+    {
+        "char": "👯‍♂️",
+        "name": "men with bunny ears male bunny men boys"
+    },
+    {
+        "char": "👯‍♀️",
+        "name": "women with bunny ears female bunny women girls"
+    },
+    {
+        "char": "🧖",
+        "name": "person in steamy room relax spa"
+    },
+    {
+        "char": "🧖‍♂️",
+        "name": "man in steamy room male man spa steamroom sauna"
+    },
+    {
+        "char": "🧖‍♀️",
+        "name": "woman in steamy room female woman spa steamroom sauna"
+    },
+    {
+        "char": "🧗",
+        "name": "person climbing sport"
+    },
+    {
+        "char": "🧗‍♂️",
+        "name": "man climbing sports hobby man male rock"
+    },
+    {
+        "char": "🧗‍♀️",
+        "name": "woman climbing sports hobby woman female rock"
+    },
+    {
+        "char": "🤺",
+        "name": "person fencing sports fencing sword"
+    },
+    {
+        "char": "🏇",
+        "name": "horse racing animal betting competition gambling luck"
+    },
+    {
+        "char": "⛷️",
+        "name": "skier sports winter snow"
+    },
+    {
+        "char": "🏂",
+        "name": "snowboarder sports winter"
+    },
+    {
+        "char": "🏌️",
+        "name": "person golfing sports business"
+    },
+    {
+        "char": "🏌️‍♂️",
+        "name": "man golfing sport"
+    },
+    {
+        "char": "🏌️‍♀️",
+        "name": "woman golfing sports business woman female"
+    },
+    {
+        "char": "🏄",
+        "name": "person surfing sport sea"
+    },
+    {
+        "char": "🏄‍♂️",
+        "name": "man surfing sports ocean sea summer beach"
+    },
+    {
+        "char": "🏄‍♀️",
+        "name": "woman surfing sports ocean sea summer beach woman female"
+    },
+    {
+        "char": "🚣",
+        "name": "person rowing boat sport move"
+    },
+    {
+        "char": "🚣‍♂️",
+        "name": "man rowing boat sports hobby water ship"
+    },
+    {
+        "char": "🚣‍♀️",
+        "name": "woman rowing boat sports hobby water ship woman female"
+    },
+    {
+        "char": "🏊",
+        "name": "person swimming sport pool"
+    },
+    {
+        "char": "🏊‍♂️",
+        "name": "man swimming sports exercise human athlete water summer"
+    },
+    {
+        "char": "🏊‍♀️",
+        "name": "woman swimming sports exercise human athlete water summer woman female"
+    },
+    {
+        "char": "⛹️",
+        "name": "person bouncing ball sports human"
+    },
+    {
+        "char": "⛹️‍♂️",
+        "name": "man bouncing ball sport"
+    },
+    {
+        "char": "⛹️‍♀️",
+        "name": "woman bouncing ball sports human woman female"
+    },
+    {
+        "char": "🏋️",
+        "name": "person lifting weights sports training exercise"
+    },
+    {
+        "char": "🏋️‍♂️",
+        "name": "man lifting weights sport"
+    },
+    {
+        "char": "🏋️‍♀️",
+        "name": "woman lifting weights sports training exercise woman female"
+    },
+    {
+        "char": "🚴",
+        "name": "person biking sport move"
+    },
+    {
+        "char": "🚴‍♂️",
+        "name": "man biking sports bike exercise hipster"
+    },
+    {
+        "char": "🚴‍♀️",
+        "name": "woman biking sports bike exercise hipster woman female"
+    },
+    {
+        "char": "🚵",
+        "name": "person mountain biking sport move"
+    },
+    {
+        "char": "🚵‍♂️",
+        "name": "man mountain biking transportation sports human race bike"
+    },
+    {
+        "char": "🚵‍♀️",
+        "name": "woman mountain biking transportation sports human race bike woman female"
+    },
+    {
+        "char": "🤸",
+        "name": "person cartwheeling sport gymnastic"
+    },
+    {
+        "char": "🤸‍♂️",
+        "name": "man cartwheeling gymnastics"
+    },
+    {
+        "char": "🤸‍♀️",
+        "name": "woman cartwheeling gymnastics"
+    },
+    {
+        "char": "🤼",
+        "name": "people wrestling sport"
+    },
+    {
+        "char": "🤼‍♂️",
+        "name": "men wrestling sports wrestlers"
+    },
+    {
+        "char": "🤼‍♀️",
+        "name": "women wrestling sports wrestlers"
+    },
+    {
+        "char": "🤽",
+        "name": "person playing water polo sport"
+    },
+    {
+        "char": "🤽‍♂️",
+        "name": "man playing water polo sports pool"
+    },
+    {
+        "char": "🤽‍♀️",
+        "name": "woman playing water polo sports pool"
+    },
+    {
+        "char": "🤾",
+        "name": "person playing handball sport"
+    },
+    {
+        "char": "🤾‍♂️",
+        "name": "man playing handball sports"
+    },
+    {
+        "char": "🤾‍♀️",
+        "name": "woman playing handball sports"
+    },
+    {
+        "char": "🤹",
+        "name": "person juggling performance balance"
+    },
+    {
+        "char": "🤹‍♂️",
+        "name": "man juggling juggle balance skill multitask"
+    },
+    {
+        "char": "🤹‍♀️",
+        "name": "woman juggling juggle balance skill multitask"
+    },
+    {
+        "char": "🧘",
+        "name": "person in lotus position meditate"
+    },
+    {
+        "char": "🧘‍♂️",
+        "name": "man in lotus position man male meditation yoga serenity zen mindfulness"
+    },
+    {
+        "char": "🧘‍♀️",
+        "name": "woman in lotus position woman female meditation yoga serenity zen mindfulness"
+    },
+    {
+        "char": "🛀",
+        "name": "person taking bath clean shower bathroom"
+    },
+    {
+        "char": "🛌",
+        "name": "person in bed bed rest"
+    },
+    {
+        "char": "🧑‍🤝‍🧑",
+        "name": "people holding hands friendship"
+    },
+    {
+        "char": "👭",
+        "name": "women holding hands pair friendship couple love like female people human"
+    },
+    {
+        "char": "👫",
+        "name": "woman and man holding hands pair people human love date dating like affection valentines marriage"
+    },
+    {
+        "char": "👬",
+        "name": "men holding hands pair couple love like bromance friendship people human"
+    },
+    {
+        "char": "💏",
+        "name": "kiss pair valentines love like dating marriage"
+    },
+    {
+        "char": "👩‍❤️‍💋‍👨",
+        "name": "kiss woman man love"
+    },
+    {
+        "char": "👨‍❤️‍💋‍👨",
+        "name": "kiss man man pair valentines love like dating marriage"
+    },
+    {
+        "char": "👩‍❤️‍💋‍👩",
+        "name": "kiss woman woman pair valentines love like dating marriage"
+    },
+    {
+        "char": "💑",
+        "name": "couple with heart pair love like affection human dating valentines marriage"
+    },
+    {
+        "char": "👩‍❤️‍👨",
+        "name": "couple with heart woman man love"
+    },
+    {
+        "char": "👨‍❤️‍👨",
+        "name": "couple with heart man man pair love like affection human dating valentines marriage"
+    },
+    {
+        "char": "👩‍❤️‍👩",
+        "name": "couple with heart woman woman pair love like affection human dating valentines marriage"
+    },
+    {
+        "char": "👪",
+        "name": "family home parents child mom dad father mother people human"
+    },
+    {
+        "char": "👨‍👩‍👦",
+        "name": "family man woman boy love"
+    },
+    {
+        "char": "👨‍👩‍👧",
+        "name": "family man woman girl home parents people human child"
+    },
+    {
+        "char": "👨‍👩‍👧‍👦",
+        "name": "family man woman girl boy home parents people human children"
+    },
+    {
+        "char": "👨‍👩‍👦‍👦",
+        "name": "family man woman boy boy home parents people human children"
+    },
+    {
+        "char": "👨‍👩‍👧‍👧",
+        "name": "family man woman girl girl home parents people human children"
+    },
+    {
+        "char": "👨‍👨‍👦",
+        "name": "family man man boy home parents people human children"
+    },
+    {
+        "char": "👨‍👨‍👧",
+        "name": "family man man girl home parents people human children"
+    },
+    {
+        "char": "👨‍👨‍👧‍👦",
+        "name": "family man man girl boy home parents people human children"
+    },
+    {
+        "char": "👨‍👨‍👦‍👦",
+        "name": "family man man boy boy home parents people human children"
+    },
+    {
+        "char": "👨‍👨‍👧‍👧",
+        "name": "family man man girl girl home parents people human children"
+    },
+    {
+        "char": "👩‍👩‍👦",
+        "name": "family woman woman boy home parents people human children"
+    },
+    {
+        "char": "👩‍👩‍👧",
+        "name": "family woman woman girl home parents people human children"
+    },
+    {
+        "char": "👩‍👩‍👧‍👦",
+        "name": "family woman woman girl boy home parents people human children"
+    },
+    {
+        "char": "👩‍👩‍👦‍👦",
+        "name": "family woman woman boy boy home parents people human children"
+    },
+    {
+        "char": "👩‍👩‍👧‍👧",
+        "name": "family woman woman girl girl home parents people human children"
+    },
+    {
+        "char": "👨‍👦",
+        "name": "family man boy home parent people human child"
+    },
+    {
+        "char": "👨‍👦‍👦",
+        "name": "family man boy boy home parent people human children"
+    },
+    {
+        "char": "👨‍👧",
+        "name": "family man girl home parent people human child"
+    },
+    {
+        "char": "👨‍👧‍👦",
+        "name": "family man girl boy home parent people human children"
+    },
+    {
+        "char": "👨‍👧‍👧",
+        "name": "family man girl girl home parent people human children"
+    },
+    {
+        "char": "👩‍👦",
+        "name": "family woman boy home parent people human child"
+    },
+    {
+        "char": "👩‍👦‍👦",
+        "name": "family woman boy boy home parent people human children"
+    },
+    {
+        "char": "👩‍👧",
+        "name": "family woman girl home parent people human child"
+    },
+    {
+        "char": "👩‍👧‍👦",
+        "name": "family woman girl boy home parent people human children"
+    },
+    {
+        "char": "👩‍👧‍👧",
+        "name": "family woman girl girl home parent people human children"
+    },
+    {
+        "char": "🗣️",
+        "name": "speaking head user person human sing say talk"
+    },
+    {
+        "char": "👤",
+        "name": "bust in silhouette user person human"
+    },
+    {
+        "char": "👥",
+        "name": "busts in silhouette user person human group team"
+    },
+    {
+        "char": "👣",
+        "name": "footprints feet tracking walking beach"
+    },
+    {
+        "char": "🐵",
+        "name": "monkey face animal nature circus"
+    },
+    {
+        "char": "🐒",
+        "name": "monkey animal nature banana circus"
+    },
+    {
+        "char": "🦍",
+        "name": "gorilla animal nature circus"
+    },
+    {
+        "char": "🦧",
+        "name": "orangutan animal"
+    },
+    {
+        "char": "🐶",
+        "name": "dog face animal friend nature woof puppy pet faithful"
+    },
+    {
+        "char": "🐕",
+        "name": "dog animal nature friend doge pet faithful"
+    },
+    {
+        "char": "🦮",
+        "name": "guide dog animal blind"
+    },
+    {
+        "char": "🐕‍🦺",
+        "name": "service dog blind animal"
+    },
+    {
+        "char": "🐩",
+        "name": "poodle dog animal 101 nature pet"
+    },
+    {
+        "char": "🐺",
+        "name": "wolf animal nature wild"
+    },
+    {
+        "char": "🦊",
+        "name": "fox animal nature face"
+    },
+    {
+        "char": "🦝",
+        "name": "raccoon animal nature"
+    },
+    {
+        "char": "🐱",
+        "name": "cat face animal meow nature pet kitten"
+    },
+    {
+        "char": "🐈",
+        "name": "cat animal meow pet cats"
+    },
+    {
+        "char": "🦁",
+        "name": "lion animal nature"
+    },
+    {
+        "char": "🐯",
+        "name": "tiger face animal cat danger wild nature roar"
+    },
+    {
+        "char": "🐅",
+        "name": "tiger animal nature roar"
+    },
+    {
+        "char": "🐆",
+        "name": "leopard animal nature"
+    },
+    {
+        "char": "🐴",
+        "name": "horse face animal brown nature"
+    },
+    {
+        "char": "🐎",
+        "name": "horse animal gamble luck"
+    },
+    {
+        "char": "🦄",
+        "name": "unicorn animal nature mystical"
+    },
+    {
+        "char": "🦓",
+        "name": "zebra animal nature stripes safari"
+    },
+    {
+        "char": "🦌",
+        "name": "deer animal nature horns venison"
+    },
+    {
+        "char": "🐮",
+        "name": "cow face beef ox animal nature moo milk"
+    },
+    {
+        "char": "🐂",
+        "name": "ox animal cow beef"
+    },
+    {
+        "char": "🐃",
+        "name": "water buffalo animal nature ox cow"
+    },
+    {
+        "char": "🐄",
+        "name": "cow beef ox animal nature moo milk"
+    },
+    {
+        "char": "🐷",
+        "name": "pig face animal oink nature"
+    },
+    {
+        "char": "🐖",
+        "name": "pig animal nature"
+    },
+    {
+        "char": "🐗",
+        "name": "boar animal nature"
+    },
+    {
+        "char": "🐽",
+        "name": "pig nose animal oink"
+    },
+    {
+        "char": "🐏",
+        "name": "ram animal sheep nature"
+    },
+    {
+        "char": "🐑",
+        "name": "ewe animal nature wool shipit"
+    },
+    {
+        "char": "🐐",
+        "name": "goat animal nature"
+    },
+    {
+        "char": "🐪",
+        "name": "camel animal hot desert hump"
+    },
+    {
+        "char": "🐫",
+        "name": "two hump camel animal nature hot desert hump"
+    },
+    {
+        "char": "🦙",
+        "name": "llama animal nature alpaca"
+    },
+    {
+        "char": "🦒",
+        "name": "giraffe animal nature spots safari"
+    },
+    {
+        "char": "🐘",
+        "name": "elephant animal nature nose th circus"
+    },
+    {
+        "char": "🦏",
+        "name": "rhinoceros animal nature horn"
+    },
+    {
+        "char": "🦛",
+        "name": "hippopotamus animal nature"
+    },
+    {
+        "char": "🐭",
+        "name": "mouse face animal nature cheese wedge rodent"
+    },
+    {
+        "char": "🐁",
+        "name": "mouse animal nature rodent"
+    },
+    {
+        "char": "🐀",
+        "name": "rat animal mouse rodent"
+    },
+    {
+        "char": "🐹",
+        "name": "hamster animal nature"
+    },
+    {
+        "char": "🐰",
+        "name": "rabbit face animal nature pet spring magic bunny"
+    },
+    {
+        "char": "🐇",
+        "name": "rabbit animal nature pet magic spring"
+    },
+    {
+        "char": "🐿️",
+        "name": "chipmunk animal nature rodent squirrel"
+    },
+    {
+        "char": "🦔",
+        "name": "hedgehog animal nature spiny"
+    },
+    {
+        "char": "🦇",
+        "name": "bat animal nature blind vampire"
+    },
+    {
+        "char": "🐻",
+        "name": "bear animal nature wild"
+    },
+    {
+        "char": "🐨",
+        "name": "koala animal nature"
+    },
+    {
+        "char": "🐼",
+        "name": "panda animal nature panda"
+    },
+    {
+        "char": "🦥",
+        "name": "sloth animal"
+    },
+    {
+        "char": "🦦",
+        "name": "otter animal"
+    },
+    {
+        "char": "🦨",
+        "name": "skunk animal"
+    },
+    {
+        "char": "🦘",
+        "name": "kangaroo animal nature australia joey hop marsupial"
+    },
+    {
+        "char": "🦡",
+        "name": "badger animal nature honey"
+    },
+    {
+        "char": "🐾",
+        "name": "paw prints animal tracking footprints dog cat pet feet"
+    },
+    {
+        "char": "🦃",
+        "name": "turkey animal bird"
+    },
+    {
+        "char": "🐔",
+        "name": "chicken animal cluck nature bird"
+    },
+    {
+        "char": "🐓",
+        "name": "rooster animal nature chicken"
+    },
+    {
+        "char": "🐣",
+        "name": "hatching chick animal chicken egg born baby bird"
+    },
+    {
+        "char": "🐤",
+        "name": "baby chick animal chicken bird"
+    },
+    {
+        "char": "🐥",
+        "name": "front facing baby chick animal chicken baby bird"
+    },
+    {
+        "char": "🐦",
+        "name": "bird animal nature fly tweet spring"
+    },
+    {
+        "char": "🐧",
+        "name": "penguin animal nature"
+    },
+    {
+        "char": "🕊️",
+        "name": "dove animal bird"
+    },
+    {
+        "char": "🦅",
+        "name": "eagle animal nature bird"
+    },
+    {
+        "char": "🦆",
+        "name": "duck animal nature bird mallard"
+    },
+    {
+        "char": "🦢",
+        "name": "swan animal nature bird"
+    },
+    {
+        "char": "🦉",
+        "name": "owl animal nature bird hoot"
+    },
+    {
+        "char": "🦩",
+        "name": "flamingo animal"
+    },
+    {
+        "char": "🦚",
+        "name": "peacock animal nature peahen bird"
+    },
+    {
+        "char": "🦜",
+        "name": "parrot animal nature bird pirate talk"
+    },
+    {
+        "char": "🐸",
+        "name": "frog animal nature croak toad"
+    },
+    {
+        "char": "🐊",
+        "name": "crocodile animal nature reptile lizard alligator"
+    },
+    {
+        "char": "🐢",
+        "name": "turtle animal slow nature tortoise"
+    },
+    {
+        "char": "🦎",
+        "name": "lizard animal nature reptile"
+    },
+    {
+        "char": "🐍",
+        "name": "snake animal evil nature hiss python"
+    },
+    {
+        "char": "🐲",
+        "name": "dragon face animal myth nature chinese green"
+    },
+    {
+        "char": "🐉",
+        "name": "dragon animal myth nature chinese green"
+    },
+    {
+        "char": "🦕",
+        "name": "sauropod animal nature dinosaur brachiosaurus brontosaurus diplodocus extinct"
+    },
+    {
+        "char": "🦖",
+        "name": "t rex animal nature dinosaur tyrannosaurus extinct"
+    },
+    {
+        "char": "🐳",
+        "name": "spouting whale animal nature sea ocean"
+    },
+    {
+        "char": "🐋",
+        "name": "whale animal nature sea ocean"
+    },
+    {
+        "char": "🐬",
+        "name": "dolphin animal nature fish sea ocean flipper fins beach"
+    },
+    {
+        "char": "🐟",
+        "name": "fish animal food nature"
+    },
+    {
+        "char": "🐠",
+        "name": "tropical fish animal swim ocean beach nemo"
+    },
+    {
+        "char": "🐡",
+        "name": "blowfish animal nature food sea ocean"
+    },
+    {
+        "char": "🦈",
+        "name": "shark animal nature fish sea ocean jaws fins beach"
+    },
+    {
+        "char": "🐙",
+        "name": "octopus animal creature ocean sea nature beach"
+    },
+    {
+        "char": "🐚",
+        "name": "spiral shell nature sea beach"
+    },
+    {
+        "char": "🐌",
+        "name": "snail slow animal shell"
+    },
+    {
+        "char": "🦋",
+        "name": "butterfly animal insect nature caterpillar"
+    },
+    {
+        "char": "🐛",
+        "name": "bug animal insect nature worm"
+    },
+    {
+        "char": "🐜",
+        "name": "ant animal insect nature bug"
+    },
+    {
+        "char": "🐝",
+        "name": "honeybee animal insect nature bug spring honey"
+    },
+    {
+        "char": "🐞",
+        "name": "lady beetle animal insect nature ladybug"
+    },
+    {
+        "char": "🦗",
+        "name": "cricket animal cricket chirp"
+    },
+    {
+        "char": "🕷️",
+        "name": "spider animal arachnid"
+    },
+    {
+        "char": "🕸️",
+        "name": "spider web animal insect arachnid silk"
+    },
+    {
+        "char": "🦂",
+        "name": "scorpion animal arachnid"
+    },
+    {
+        "char": "🦟",
+        "name": "mosquito animal nature insect malaria"
+    },
+    {
+        "char": "🦠",
+        "name": "microbe amoeba bacteria germs virus"
+    },
+    {
+        "char": "💐",
+        "name": "bouquet flowers nature spring"
+    },
+    {
+        "char": "🌸",
+        "name": "cherry blossom nature plant spring flower"
+    },
+    {
+        "char": "💮",
+        "name": "white flower japanese spring"
+    },
+    {
+        "char": "🏵️",
+        "name": "rosette flower decoration military"
+    },
+    {
+        "char": "🌹",
+        "name": "rose flowers valentines love spring"
+    },
+    {
+        "char": "🥀",
+        "name": "wilted flower plant nature flower"
+    },
+    {
+        "char": "🌺",
+        "name": "hibiscus plant vegetable flowers beach"
+    },
+    {
+        "char": "🌻",
+        "name": "sunflower nature plant fall"
+    },
+    {
+        "char": "🌼",
+        "name": "blossom nature flowers yellow"
+    },
+    {
+        "char": "🌷",
+        "name": "tulip flowers plant nature summer spring"
+    },
+    {
+        "char": "🌱",
+        "name": "seedling plant nature grass lawn spring"
+    },
+    {
+        "char": "🌲",
+        "name": "evergreen tree plant nature"
+    },
+    {
+        "char": "🌳",
+        "name": "deciduous tree plant nature"
+    },
+    {
+        "char": "🌴",
+        "name": "palm tree plant vegetable nature summer beach mojito tropical"
+    },
+    {
+        "char": "🌵",
+        "name": "cactus vegetable plant nature"
+    },
+    {
+        "char": "🌾",
+        "name": "sheaf of rice nature plant"
+    },
+    {
+        "char": "🌿",
+        "name": "herb vegetable plant medicine weed grass lawn"
+    },
+    {
+        "char": "☘️",
+        "name": "shamrock vegetable plant nature irish clover"
+    },
+    {
+        "char": "🍀",
+        "name": "four leaf clover vegetable plant nature lucky irish"
+    },
+    {
+        "char": "🍁",
+        "name": "maple leaf nature plant vegetable ca fall"
+    },
+    {
+        "char": "🍂",
+        "name": "fallen leaf nature plant vegetable leaves"
+    },
+    {
+        "char": "🍃",
+        "name": "leaf fluttering in wind nature plant tree vegetable grass lawn spring"
+    },
+    {
+        "char": "🍇",
+        "name": "grapes fruit food wine"
+    },
+    {
+        "char": "🍈",
+        "name": "melon fruit nature food"
+    },
+    {
+        "char": "🍉",
+        "name": "watermelon fruit food picnic summer"
+    },
+    {
+        "char": "🍊",
+        "name": "tangerine food fruit nature orange"
+    },
+    {
+        "char": "🍋",
+        "name": "lemon fruit nature"
+    },
+    {
+        "char": "🍌",
+        "name": "banana fruit food monkey"
+    },
+    {
+        "char": "🍍",
+        "name": "pineapple fruit nature food"
+    },
+    {
+        "char": "🥭",
+        "name": "mango fruit food tropical"
+    },
+    {
+        "char": "🍎",
+        "name": "red apple fruit mac school"
+    },
+    {
+        "char": "🍏",
+        "name": "green apple fruit nature"
+    },
+    {
+        "char": "🍐",
+        "name": "pear fruit nature food"
+    },
+    {
+        "char": "🍑",
+        "name": "peach fruit nature food"
+    },
+    {
+        "char": "🍒",
+        "name": "cherries food fruit"
+    },
+    {
+        "char": "🍓",
+        "name": "strawberry fruit food nature"
+    },
+    {
+        "char": "🥝",
+        "name": "kiwi fruit fruit food"
+    },
+    {
+        "char": "🍅",
+        "name": "tomato fruit vegetable nature food"
+    },
+    {
+        "char": "🥥",
+        "name": "coconut fruit nature food palm"
+    },
+    {
+        "char": "🥑",
+        "name": "avocado fruit food"
+    },
+    {
+        "char": "🍆",
+        "name": "eggplant vegetable nature food aubergine"
+    },
+    {
+        "char": "🥔",
+        "name": "potato food tuber vegatable starch"
+    },
+    {
+        "char": "🥕",
+        "name": "carrot vegetable food orange"
+    },
+    {
+        "char": "🌽",
+        "name": "ear of corn food vegetable plant"
+    },
+    {
+        "char": "🌶️",
+        "name": "hot pepper food spicy chilli chili"
+    },
+    {
+        "char": "🥒",
+        "name": "cucumber fruit food pickle"
+    },
+    {
+        "char": "🥬",
+        "name": "leafy green food vegetable plant bok choy cabbage kale lettuce"
+    },
+    {
+        "char": "🥦",
+        "name": "broccoli fruit food vegetable"
+    },
+    {
+        "char": "🧄",
+        "name": "garlic food spice cook"
+    },
+    {
+        "char": "🧅",
+        "name": "onion cook food spice"
+    },
+    {
+        "char": "🍄",
+        "name": "mushroom plant vegetable"
+    },
+    {
+        "char": "🥜",
+        "name": "peanuts food nut"
+    },
+    {
+        "char": "🌰",
+        "name": "chestnut food squirrel"
+    },
+    {
+        "char": "🍞",
+        "name": "bread food wheat breakfast toast"
+    },
+    {
+        "char": "🥐",
+        "name": "croissant food bread french"
+    },
+    {
+        "char": "🥖",
+        "name": "baguette bread food bread french"
+    },
+    {
+        "char": "🥨",
+        "name": "pretzel food bread twisted"
+    },
+    {
+        "char": "🥯",
+        "name": "bagel food bread bakery schmear"
+    },
+    {
+        "char": "🥞",
+        "name": "pancakes food breakfast flapjacks hotcakes"
+    },
+    {
+        "char": "🧇",
+        "name": "waffle food breakfast"
+    },
+    {
+        "char": "🧀",
+        "name": "cheese wedge food chadder"
+    },
+    {
+        "char": "🍖",
+        "name": "meat on bone good food drumstick"
+    },
+    {
+        "char": "🍗",
+        "name": "poultry leg food meat drumstick bird chicken turkey"
+    },
+    {
+        "char": "🥩",
+        "name": "cut of meat food cow meat cut chop lambchop porkchop"
+    },
+    {
+        "char": "🥓",
+        "name": "bacon food breakfast pork pig meat"
+    },
+    {
+        "char": "🍔",
+        "name": "hamburger meat fast food beef cheeseburger mcdonalds burger king"
+    },
+    {
+        "char": "🍟",
+        "name": "french fries chips snack fast food"
+    },
+    {
+        "char": "🍕",
+        "name": "pizza food party"
+    },
+    {
+        "char": "🌭",
+        "name": "hot dog food frankfurter"
+    },
+    {
+        "char": "🥪",
+        "name": "sandwich food lunch bread"
+    },
+    {
+        "char": "🌮",
+        "name": "taco food mexican"
+    },
+    {
+        "char": "🌯",
+        "name": "burrito food mexican"
+    },
+    {
+        "char": "🥙",
+        "name": "stuffed flatbread food flatbread stuffed gyro"
+    },
+    {
+        "char": "🧆",
+        "name": "falafel food"
+    },
+    {
+        "char": "🥚",
+        "name": "egg food chicken breakfast"
+    },
+    {
+        "char": "🍳",
+        "name": "cooking food breakfast kitchen egg"
+    },
+    {
+        "char": "🥘",
+        "name": "shallow pan of food food cooking casserole paella"
+    },
+    {
+        "char": "🍲",
+        "name": "pot of food food meat soup"
+    },
+    {
+        "char": "🥣",
+        "name": "bowl with spoon food breakfast cereal oatmeal porridge"
+    },
+    {
+        "char": "🥗",
+        "name": "green salad food healthy lettuce"
+    },
+    {
+        "char": "🍿",
+        "name": "popcorn food movie theater films snack"
+    },
+    {
+        "char": "🧈",
+        "name": "butter food cook"
+    },
+    {
+        "char": "🧂",
+        "name": "salt condiment shaker"
+    },
+    {
+        "char": "🥫",
+        "name": "canned food food soup"
+    },
+    {
+        "char": "🍱",
+        "name": "bento box food japanese box"
+    },
+    {
+        "char": "🍘",
+        "name": "rice cracker food japanese"
+    },
+    {
+        "char": "🍙",
+        "name": "rice ball food japanese"
+    },
+    {
+        "char": "🍚",
+        "name": "cooked rice food china asian"
+    },
+    {
+        "char": "🍛",
+        "name": "curry rice food spicy hot indian"
+    },
+    {
+        "char": "🍜",
+        "name": "steaming bowl food japanese noodle chopsticks"
+    },
+    {
+        "char": "🍝",
+        "name": "spaghetti food italian noodle"
+    },
+    {
+        "char": "🍠",
+        "name": "roasted sweet potato food nature"
+    },
+    {
+        "char": "🍢",
+        "name": "oden food japanese"
+    },
+    {
+        "char": "🍣",
+        "name": "sushi food fish japanese rice"
+    },
+    {
+        "char": "🍤",
+        "name": "fried shrimp food animal appetizer summer"
+    },
+    {
+        "char": "🍥",
+        "name": "fish cake with swirl food japan sea beach narutomaki pink swirl kamaboko surimi ramen"
+    },
+    {
+        "char": "🥮",
+        "name": "moon cake food autumn"
+    },
+    {
+        "char": "🍡",
+        "name": "dango food dessert sweet japanese barbecue meat"
+    },
+    {
+        "char": "🥟",
+        "name": "dumpling food empanada pierogi potsticker"
+    },
+    {
+        "char": "🥠",
+        "name": "fortune cookie food prophecy"
+    },
+    {
+        "char": "🥡",
+        "name": "takeout box food leftovers"
+    },
+    {
+        "char": "🦀",
+        "name": "crab animal crustacean"
+    },
+    {
+        "char": "🦞",
+        "name": "lobster animal nature bisque claws seafood"
+    },
+    {
+        "char": "🦐",
+        "name": "shrimp animal ocean nature seafood"
+    },
+    {
+        "char": "🦑",
+        "name": "squid animal nature ocean sea"
+    },
+    {
+        "char": "🦪",
+        "name": "oyster food"
+    },
+    {
+        "char": "🍦",
+        "name": "soft ice cream food hot dessert summer"
+    },
+    {
+        "char": "🍧",
+        "name": "shaved ice hot dessert summer"
+    },
+    {
+        "char": "🍨",
+        "name": "ice cream food hot dessert"
+    },
+    {
+        "char": "🍩",
+        "name": "doughnut food dessert snack sweet donut"
+    },
+    {
+        "char": "🍪",
+        "name": "cookie food snack oreo chocolate sweet dessert"
+    },
+    {
+        "char": "🎂",
+        "name": "birthday cake food dessert cake"
+    },
+    {
+        "char": "🍰",
+        "name": "shortcake food dessert"
+    },
+    {
+        "char": "🧁",
+        "name": "cupcake food dessert bakery sweet"
+    },
+    {
+        "char": "🥧",
+        "name": "pie food dessert pastry"
+    },
+    {
+        "char": "🍫",
+        "name": "chocolate bar food snack dessert sweet"
+    },
+    {
+        "char": "🍬",
+        "name": "candy snack dessert sweet lolly"
+    },
+    {
+        "char": "🍭",
+        "name": "lollipop food snack candy sweet"
+    },
+    {
+        "char": "🍮",
+        "name": "custard dessert food"
+    },
+    {
+        "char": "🍯",
+        "name": "honey pot bees sweet kitchen"
+    },
+    {
+        "char": "🍼",
+        "name": "baby bottle food container milk"
+    },
+    {
+        "char": "🥛",
+        "name": "glass of milk beverage drink cow"
+    },
+    {
+        "char": "☕",
+        "name": "hot beverage beverage caffeine latte espresso coffee"
+    },
+    {
+        "char": "🍵",
+        "name": "teacup without handle drink bowl breakfast green british"
+    },
+    {
+        "char": "🍶",
+        "name": "sake wine drink drunk beverage japanese alcohol booze"
+    },
+    {
+        "char": "🍾",
+        "name": "bottle with popping cork drink wine bottle celebration"
+    },
+    {
+        "char": "🍷",
+        "name": "wine glass drink beverage drunk alcohol booze"
+    },
+    {
+        "char": "🍸",
+        "name": "cocktail glass drink drunk alcohol beverage booze mojito"
+    },
+    {
+        "char": "🍹",
+        "name": "tropical drink beverage cocktail summer beach alcohol booze mojito"
+    },
+    {
+        "char": "🍺",
+        "name": "beer mug relax beverage drink drunk party pub summer alcohol booze"
+    },
+    {
+        "char": "🍻",
+        "name": "clinking beer mugs relax beverage drink drunk party pub summer alcohol booze"
+    },
+    {
+        "char": "🥂",
+        "name": "clinking glasses beverage drink party alcohol celebrate cheers wine champagne toast"
+    },
+    {
+        "char": "🥃",
+        "name": "tumbler glass drink beverage drunk alcohol liquor booze bourbon scotch whisky glass shot"
+    },
+    {
+        "char": "🥤",
+        "name": "cup with straw drink soda"
+    },
+    {
+        "char": "🧃",
+        "name": "beverage box drink"
+    },
+    {
+        "char": "🧉",
+        "name": "mate drink tea beverage"
+    },
+    {
+        "char": "🧊",
+        "name": "ice water cold"
+    },
+    {
+        "char": "🥢",
+        "name": "chopsticks food"
+    },
+    {
+        "char": "🍽️",
+        "name": "fork and knife with plate food eat meal lunch dinner restaurant"
+    },
+    {
+        "char": "🍴",
+        "name": "fork and knife cutlery kitchen"
+    },
+    {
+        "char": "🥄",
+        "name": "spoon cutlery kitchen tableware"
+    },
+    {
+        "char": "🔪",
+        "name": "kitchen knife knife blade cutlery kitchen weapon"
+    },
+    {
+        "char": "🏺",
+        "name": "amphora vase jar"
+    },
+    {
+        "char": "🌍",
+        "name": "globe showing europe africa globe world international"
+    },
+    {
+        "char": "🌎",
+        "name": "globe showing americas globe world USA international"
+    },
+    {
+        "char": "🌏",
+        "name": "globe showing asia australia globe world east international"
+    },
+    {
+        "char": "🌐",
+        "name": "globe with meridians earth international world internet interweb i18n"
+    },
+    {
+        "char": "🗺️",
+        "name": "world map location direction"
+    },
+    {
+        "char": "🗾",
+        "name": "map of japan nation country japanese asia"
+    },
+    {
+        "char": "🧭",
+        "name": "compass magnetic navigation orienteering"
+    },
+    {
+        "char": "🏔️",
+        "name": "snow capped mountain photo nature environment winter cold"
+    },
+    {
+        "char": "⛰️",
+        "name": "mountain photo nature environment"
+    },
+    {
+        "char": "🌋",
+        "name": "volcano photo nature disaster"
+    },
+    {
+        "char": "🗻",
+        "name": "mount fuji photo mountain nature japanese"
+    },
+    {
+        "char": "🏕️",
+        "name": "camping photo outdoors tent"
+    },
+    {
+        "char": "🏖️",
+        "name": "beach with umbrella weather summer sunny sand mojito"
+    },
+    {
+        "char": "🏜️",
+        "name": "desert photo warm saharah"
+    },
+    {
+        "char": "🏝️",
+        "name": "desert island photo tropical mojito"
+    },
+    {
+        "char": "🏞️",
+        "name": "national park photo environment nature"
+    },
+    {
+        "char": "🏟️",
+        "name": "stadium photo place sports concert venue"
+    },
+    {
+        "char": "🏛️",
+        "name": "classical building art culture history"
+    },
+    {
+        "char": "🏗️",
+        "name": "building construction wip working progress"
+    },
+    {
+        "char": "🧱",
+        "name": "brick bricks"
+    },
+    {
+        "char": "🏘️",
+        "name": "houses buildings photo"
+    },
+    {
+        "char": "🏚️",
+        "name": "derelict house abandon evict broken building"
+    },
+    {
+        "char": "🏠",
+        "name": "house building home"
+    },
+    {
+        "char": "🏡",
+        "name": "house with garden home plant nature"
+    },
+    {
+        "char": "🏢",
+        "name": "office building building bureau work"
+    },
+    {
+        "char": "🏣",
+        "name": "japanese post office building envelope communication"
+    },
+    {
+        "char": "🏤",
+        "name": "post office building email"
+    },
+    {
+        "char": "🏥",
+        "name": "hospital building health surgery doctor"
+    },
+    {
+        "char": "🏦",
+        "name": "bank building money sales cash business enterprise"
+    },
+    {
+        "char": "🏨",
+        "name": "hotel building accomodation checkin"
+    },
+    {
+        "char": "🏩",
+        "name": "love hotel like affection dating"
+    },
+    {
+        "char": "🏪",
+        "name": "convenience store building shopping groceries"
+    },
+    {
+        "char": "🏫",
+        "name": "school building student education learn teach"
+    },
+    {
+        "char": "🏬",
+        "name": "department store building shopping mall"
+    },
+    {
+        "char": "🏭",
+        "name": "factory building industry pollution smoke"
+    },
+    {
+        "char": "🏯",
+        "name": "japanese castle photo building"
+    },
+    {
+        "char": "🏰",
+        "name": "castle building royalty history"
+    },
+    {
+        "char": "💒",
+        "name": "wedding love like affection couple marriage bride groom"
+    },
+    {
+        "char": "🗼",
+        "name": "tokyo tower photo japanese"
+    },
+    {
+        "char": "🗽",
+        "name": "statue of liberty american newyork"
+    },
+    {
+        "char": "⛪",
+        "name": "church building religion christ"
+    },
+    {
+        "char": "🕌",
+        "name": "mosque islam worship minaret"
+    },
+    {
+        "char": "🛕",
+        "name": "hindu temple religion"
+    },
+    {
+        "char": "🕍",
+        "name": "synagogue judaism worship temple jewish"
+    },
+    {
+        "char": "⛩️",
+        "name": "shinto shrine temple japan kyoto"
+    },
+    {
+        "char": "🕋",
+        "name": "kaaba mecca mosque islam"
+    },
+    {
+        "char": "⛲",
+        "name": "fountain photo summer water fresh"
+    },
+    {
+        "char": "⛺",
+        "name": "tent photo camping outdoors"
+    },
+    {
+        "char": "🌁",
+        "name": "foggy photo mountain"
+    },
+    {
+        "char": "🌃",
+        "name": "night with stars evening city downtown"
+    },
+    {
+        "char": "🏙️",
+        "name": "cityscape photo night life urban"
+    },
+    {
+        "char": "🌄",
+        "name": "sunrise over mountains view vacation photo"
+    },
+    {
+        "char": "🌅",
+        "name": "sunrise morning view vacation photo"
+    },
+    {
+        "char": "🌆",
+        "name": "cityscape at dusk photo evening sky buildings"
+    },
+    {
+        "char": "🌇",
+        "name": "sunset photo good morning dawn"
+    },
+    {
+        "char": "🌉",
+        "name": "bridge at night photo sanfrancisco"
+    },
+    {
+        "char": "♨️",
+        "name": "hot springs bath warm relax"
+    },
+    {
+        "char": "🎠",
+        "name": "carousel horse photo carnival"
+    },
+    {
+        "char": "🎡",
+        "name": "ferris wheel photo carnival londoneye"
+    },
+    {
+        "char": "🎢",
+        "name": "roller coaster carnival playground photo fun"
+    },
+    {
+        "char": "💈",
+        "name": "barber pole hair salon style"
+    },
+    {
+        "char": "🎪",
+        "name": "circus tent festival carnival party"
+    },
+    {
+        "char": "🚂",
+        "name": "locomotive transportation vehicle train"
+    },
+    {
+        "char": "🚃",
+        "name": "railway car transportation vehicle"
+    },
+    {
+        "char": "🚄",
+        "name": "high speed train transportation vehicle"
+    },
+    {
+        "char": "🚅",
+        "name": "bullet train transportation vehicle speed fast public travel"
+    },
+    {
+        "char": "🚆",
+        "name": "train transportation vehicle"
+    },
+    {
+        "char": "🚇",
+        "name": "metro transportation blue-square mrt underground tube"
+    },
+    {
+        "char": "🚈",
+        "name": "light rail transportation vehicle"
+    },
+    {
+        "char": "🚉",
+        "name": "station transportation vehicle public"
+    },
+    {
+        "char": "🚊",
+        "name": "tram transportation vehicle"
+    },
+    {
+        "char": "🚝",
+        "name": "monorail transportation vehicle"
+    },
+    {
+        "char": "🚞",
+        "name": "mountain railway transportation vehicle"
+    },
+    {
+        "char": "🚋",
+        "name": "tram car transportation vehicle carriage public travel"
+    },
+    {
+        "char": "🚌",
+        "name": "bus car vehicle transportation"
+    },
+    {
+        "char": "🚍",
+        "name": "oncoming bus vehicle transportation"
+    },
+    {
+        "char": "🚎",
+        "name": "trolleybus bart transportation vehicle"
+    },
+    {
+        "char": "🚐",
+        "name": "minibus vehicle car transportation"
+    },
+    {
+        "char": "🚑",
+        "name": "ambulance health 911 hospital"
+    },
+    {
+        "char": "🚒",
+        "name": "fire engine transportation cars vehicle"
+    },
+    {
+        "char": "🚓",
+        "name": "police car vehicle cars transportation law legal enforcement"
+    },
+    {
+        "char": "🚔",
+        "name": "oncoming police car vehicle law legal enforcement 911"
+    },
+    {
+        "char": "🚕",
+        "name": "taxi uber vehicle cars transportation"
+    },
+    {
+        "char": "🚖",
+        "name": "oncoming taxi vehicle cars uber"
+    },
+    {
+        "char": "🚗",
+        "name": "automobile red transportation vehicle"
+    },
+    {
+        "char": "🚘",
+        "name": "oncoming automobile car vehicle transportation"
+    },
+    {
+        "char": "🚙",
+        "name": "sport utility vehicle transportation vehicle"
+    },
+    {
+        "char": "🚚",
+        "name": "delivery truck cars transportation"
+    },
+    {
+        "char": "🚛",
+        "name": "articulated lorry vehicle cars transportation express"
+    },
+    {
+        "char": "🚜",
+        "name": "tractor vehicle car farming agriculture"
+    },
+    {
+        "char": "🏎️",
+        "name": "racing car sports race fast formula f1"
+    },
+    {
+        "char": "🏍️",
+        "name": "motorcycle race sports fast"
+    },
+    {
+        "char": "🛵",
+        "name": "motor scooter vehicle vespa sasha"
+    },
+    {
+        "char": "🦽",
+        "name": "manual wheelchair accessibility"
+    },
+    {
+        "char": "🦼",
+        "name": "motorized wheelchair accessibility"
+    },
+    {
+        "char": "🛺",
+        "name": "auto rickshaw move transportation"
+    },
+    {
+        "char": "🚲",
+        "name": "bicycle sports bicycle exercise hipster"
+    },
+    {
+        "char": "🛴",
+        "name": "kick scooter vehicle kick razor"
+    },
+    {
+        "char": "🛹",
+        "name": "skateboard board"
+    },
+    {
+        "char": "🚏",
+        "name": "bus stop transportation wait"
+    },
+    {
+        "char": "🛣️",
+        "name": "motorway road cupertino interstate highway"
+    },
+    {
+        "char": "🛤️",
+        "name": "railway track train transportation"
+    },
+    {
+        "char": "🛢️",
+        "name": "oil drum barrell"
+    },
+    {
+        "char": "⛽",
+        "name": "fuel pump gas station petroleum"
+    },
+    {
+        "char": "🚨",
+        "name": "police car light police ambulance 911 emergency alert error pinged law legal"
+    },
+    {
+        "char": "🚥",
+        "name": "horizontal traffic light transportation signal"
+    },
+    {
+        "char": "🚦",
+        "name": "vertical traffic light transportation driving"
+    },
+    {
+        "char": "🛑",
+        "name": "stop sign stop"
+    },
+    {
+        "char": "🚧",
+        "name": "construction wip progress caution warning"
+    },
+    {
+        "char": "⚓",
+        "name": "anchor ship ferry sea boat"
+    },
+    {
+        "char": "⛵",
+        "name": "sailboat ship summer transportation water sailing"
+    },
+    {
+        "char": "🛶",
+        "name": "canoe boat paddle water ship"
+    },
+    {
+        "char": "🚤",
+        "name": "speedboat ship transportation vehicle summer"
+    },
+    {
+        "char": "🛳️",
+        "name": "passenger ship yacht cruise ferry"
+    },
+    {
+        "char": "⛴️",
+        "name": "ferry boat ship yacht"
+    },
+    {
+        "char": "🛥️",
+        "name": "motor boat ship"
+    },
+    {
+        "char": "🚢",
+        "name": "ship transportation titanic deploy"
+    },
+    {
+        "char": "✈️",
+        "name": "airplane vehicle transportation flight fly"
+    },
+    {
+        "char": "🛩️",
+        "name": "small airplane flight transportation fly vehicle"
+    },
+    {
+        "char": "🛫",
+        "name": "airplane departure airport flight landing"
+    },
+    {
+        "char": "🛬",
+        "name": "airplane arrival airport flight boarding"
+    },
+    {
+        "char": "🪂",
+        "name": "parachute fly glide"
+    },
+    {
+        "char": "💺",
+        "name": "seat sit airplane transport bus flight fly"
+    },
+    {
+        "char": "🚁",
+        "name": "helicopter transportation vehicle fly"
+    },
+    {
+        "char": "🚟",
+        "name": "suspension railway vehicle transportation"
+    },
+    {
+        "char": "🚠",
+        "name": "mountain cableway transportation vehicle ski"
+    },
+    {
+        "char": "🚡",
+        "name": "aerial tramway transportation vehicle ski"
+    },
+    {
+        "char": "🛰️",
+        "name": "satellite communication gps orbit spaceflight NASA ISS"
+    },
+    {
+        "char": "🚀",
+        "name": "rocket launch ship staffmode NASA outer space outer space fly"
+    },
+    {
+        "char": "🛸",
+        "name": "flying saucer transportation vehicle ufo"
+    },
+    {
+        "char": "🛎️",
+        "name": "bellhop bell service"
+    },
+    {
+        "char": "🧳",
+        "name": "luggage packing travel"
+    },
+    {
+        "char": "⌛",
+        "name": "hourglass done time clock oldschool limit exam quiz test"
+    },
+    {
+        "char": "⏳",
+        "name": "hourglass not done oldschool time countdown"
+    },
+    {
+        "char": "⌚",
+        "name": "watch time accessories"
+    },
+    {
+        "char": "⏰",
+        "name": "alarm clock time wake"
+    },
+    {
+        "char": "⏱️",
+        "name": "stopwatch time deadline"
+    },
+    {
+        "char": "⏲️",
+        "name": "timer clock alarm"
+    },
+    {
+        "char": "🕰️",
+        "name": "mantelpiece clock time"
+    },
+    {
+        "char": "🕛",
+        "name": "twelve o clock time noon midnight midday late early schedule"
+    },
+    {
+        "char": "🕧",
+        "name": "twelve thirty time late early schedule"
+    },
+    {
+        "char": "🕐",
+        "name": "one o clock time late early schedule"
+    },
+    {
+        "char": "🕜",
+        "name": "one thirty time late early schedule"
+    },
+    {
+        "char": "🕑",
+        "name": "two o clock time late early schedule"
+    },
+    {
+        "char": "🕝",
+        "name": "two thirty time late early schedule"
+    },
+    {
+        "char": "🕒",
+        "name": "three o clock time late early schedule"
+    },
+    {
+        "char": "🕞",
+        "name": "three thirty time late early schedule"
+    },
+    {
+        "char": "🕓",
+        "name": "four o clock time late early schedule"
+    },
+    {
+        "char": "🕟",
+        "name": "four thirty time late early schedule"
+    },
+    {
+        "char": "🕔",
+        "name": "five o clock time late early schedule"
+    },
+    {
+        "char": "🕠",
+        "name": "five thirty time late early schedule"
+    },
+    {
+        "char": "🕕",
+        "name": "six o clock time late early schedule dawn dusk"
+    },
+    {
+        "char": "🕡",
+        "name": "six thirty time late early schedule"
+    },
+    {
+        "char": "🕖",
+        "name": "seven o clock time late early schedule"
+    },
+    {
+        "char": "🕢",
+        "name": "seven thirty time late early schedule"
+    },
+    {
+        "char": "🕗",
+        "name": "eight o clock time late early schedule"
+    },
+    {
+        "char": "🕣",
+        "name": "eight thirty time late early schedule"
+    },
+    {
+        "char": "🕘",
+        "name": "nine o clock time late early schedule"
+    },
+    {
+        "char": "🕤",
+        "name": "nine thirty time late early schedule"
+    },
+    {
+        "char": "🕙",
+        "name": "ten o clock time late early schedule"
+    },
+    {
+        "char": "🕥",
+        "name": "ten thirty time late early schedule"
+    },
+    {
+        "char": "🕚",
+        "name": "eleven o clock time late early schedule"
+    },
+    {
+        "char": "🕦",
+        "name": "eleven thirty time late early schedule"
+    },
+    {
+        "char": "🌑",
+        "name": "new moon nature twilight planet space night evening sleep"
+    },
+    {
+        "char": "🌒",
+        "name": "waxing crescent moon nature twilight planet space night evening sleep"
+    },
+    {
+        "char": "🌓",
+        "name": "first quarter moon nature twilight planet space night evening sleep"
+    },
+    {
+        "char": "🌔",
+        "name": "waxing gibbous moon nature night sky gray twilight planet space evening sleep"
+    },
+    {
+        "char": "🌕",
+        "name": "full moon nature yellow twilight planet space night evening sleep"
+    },
+    {
+        "char": "🌖",
+        "name": "waning gibbous moon nature twilight planet space night evening sleep waxing gibbous moon"
+    },
+    {
+        "char": "🌗",
+        "name": "last quarter moon nature twilight planet space night evening sleep"
+    },
+    {
+        "char": "🌘",
+        "name": "waning crescent moon nature twilight planet space night evening sleep"
+    },
+    {
+        "char": "🌙",
+        "name": "crescent moon night sleep sky evening magic"
+    },
+    {
+        "char": "🌚",
+        "name": "new moon face nature twilight planet space night evening sleep"
+    },
+    {
+        "char": "🌛",
+        "name": "first quarter moon face nature twilight planet space night evening sleep"
+    },
+    {
+        "char": "🌜",
+        "name": "last quarter moon face nature twilight planet space night evening sleep"
+    },
+    {
+        "char": "🌡️",
+        "name": "thermometer weather temperature hot cold"
+    },
+    {
+        "char": "☀️",
+        "name": "sun weather nature brightness summer beach spring"
+    },
+    {
+        "char": "🌝",
+        "name": "full moon face nature twilight planet space night evening sleep"
+    },
+    {
+        "char": "🌞",
+        "name": "sun with face nature morning sky"
+    },
+    {
+        "char": "🪐",
+        "name": "ringed planet outerspace"
+    },
+    {
+        "char": "⭐",
+        "name": "star night yellow"
+    },
+    {
+        "char": "🌟",
+        "name": "glowing star night sparkle awesome good magic"
+    },
+    {
+        "char": "🌠",
+        "name": "shooting star night photo"
+    },
+    {
+        "char": "🌌",
+        "name": "milky way photo space stars"
+    },
+    {
+        "char": "☁️",
+        "name": "cloud weather sky"
+    },
+    {
+        "char": "⛅",
+        "name": "sun behind cloud weather nature cloudy morning fall spring"
+    },
+    {
+        "char": "⛈️",
+        "name": "cloud with lightning and rain weather lightning"
+    },
+    {
+        "char": "🌤️",
+        "name": "sun behind small cloud weather"
+    },
+    {
+        "char": "🌥️",
+        "name": "sun behind large cloud weather"
+    },
+    {
+        "char": "🌦️",
+        "name": "sun behind rain cloud weather"
+    },
+    {
+        "char": "🌧️",
+        "name": "cloud with rain weather"
+    },
+    {
+        "char": "🌨️",
+        "name": "cloud with snow weather"
+    },
+    {
+        "char": "🌩️",
+        "name": "cloud with lightning weather thunder"
+    },
+    {
+        "char": "🌪️",
+        "name": "tornado weather cyclone twister"
+    },
+    {
+        "char": "🌫️",
+        "name": "fog weather"
+    },
+    {
+        "char": "🌬️",
+        "name": "wind face gust air"
+    },
+    {
+        "char": "🌀",
+        "name": "cyclone weather swirl blue cloud vortex spiral whirlpool spin tornado hurricane typhoon"
+    },
+    {
+        "char": "🌈",
+        "name": "rainbow nature happy unicorn face photo sky spring"
+    },
+    {
+        "char": "🌂",
+        "name": "closed umbrella weather rain drizzle"
+    },
+    {
+        "char": "☂️",
+        "name": "umbrella weather spring"
+    },
+    {
+        "char": "☔",
+        "name": "umbrella with rain drops rainy weather spring"
+    },
+    {
+        "char": "⛱️",
+        "name": "umbrella on ground weather summer"
+    },
+    {
+        "char": "⚡",
+        "name": "high voltage thunder weather lightning bolt fast"
+    },
+    {
+        "char": "❄️",
+        "name": "snowflake winter season cold weather christmas xmas"
+    },
+    {
+        "char": "☃️",
+        "name": "snowman winter season cold weather christmas xmas frozen"
+    },
+    {
+        "char": "⛄",
+        "name": "snowman without snow winter season cold weather christmas xmas frozen without snow"
+    },
+    {
+        "char": "☄️",
+        "name": "comet space"
+    },
+    {
+        "char": "🔥",
+        "name": "fire hot cook flame"
+    },
+    {
+        "char": "💧",
+        "name": "droplet water drip faucet spring"
+    },
+    {
+        "char": "🌊",
+        "name": "water wave sea water wave nature tsunami disaster"
+    },
+    {
+        "char": "🎃",
+        "name": "jack o lantern halloween light pumpkin creepy fall"
+    },
+    {
+        "char": "🎄",
+        "name": "christmas tree festival vacation december xmas celebration"
+    },
+    {
+        "char": "🎆",
+        "name": "fireworks photo festival carnival congratulations"
+    },
+    {
+        "char": "🎇",
+        "name": "sparkler stars night shine"
+    },
+    {
+        "char": "🧨",
+        "name": "firecracker dynamite boom explode explosion explosive"
+    },
+    {
+        "char": "✨",
+        "name": "sparkles stars shine shiny cool awesome good magic"
+    },
+    {
+        "char": "🎈",
+        "name": "balloon party celebration birthday circus"
+    },
+    {
+        "char": "🎉",
+        "name": "party popper party congratulations birthday magic circus celebration tada"
+    },
+    {
+        "char": "🎊",
+        "name": "confetti ball festival party birthday circus"
+    },
+    {
+        "char": "🎋",
+        "name": "tanabata tree plant nature branch summer"
+    },
+    {
+        "char": "🎍",
+        "name": "pine decoration plant nature vegetable panda pine decoration"
+    },
+    {
+        "char": "🎎",
+        "name": "japanese dolls japanese toy kimono"
+    },
+    {
+        "char": "🎏",
+        "name": "carp streamer fish japanese koinobori carp banner"
+    },
+    {
+        "char": "🎐",
+        "name": "wind chime nature ding spring bell"
+    },
+    {
+        "char": "🎑",
+        "name": "moon viewing ceremony photo japan asia tsukimi"
+    },
+    {
+        "char": "🧧",
+        "name": "red envelope gift"
+    },
+    {
+        "char": "🎀",
+        "name": "ribbon decoration pink girl bowtie"
+    },
+    {
+        "char": "🎁",
+        "name": "wrapped gift present birthday christmas xmas"
+    },
+    {
+        "char": "🎗️",
+        "name": "reminder ribbon sports cause support awareness"
+    },
+    {
+        "char": "🎟️",
+        "name": "admission tickets sports concert entrance"
+    },
+    {
+        "char": "🎫",
+        "name": "ticket event concert pass"
+    },
+    {
+        "char": "🎖️",
+        "name": "military medal award winning army"
+    },
+    {
+        "char": "🏆",
+        "name": "trophy win award contest place ftw ceremony"
+    },
+    {
+        "char": "🏅",
+        "name": "sports medal award winning"
+    },
+    {
+        "char": "🥇",
+        "name": "1st place medal award winning first"
+    },
+    {
+        "char": "🥈",
+        "name": "2nd place medal award second"
+    },
+    {
+        "char": "🥉",
+        "name": "3rd place medal award third"
+    },
+    {
+        "char": "⚽",
+        "name": "soccer ball sports football"
+    },
+    {
+        "char": "⚾",
+        "name": "baseball sports balls"
+    },
+    {
+        "char": "🥎",
+        "name": "softball sports balls"
+    },
+    {
+        "char": "🏀",
+        "name": "basketball sports balls NBA"
+    },
+    {
+        "char": "🏐",
+        "name": "volleyball sports balls"
+    },
+    {
+        "char": "🏈",
+        "name": "american football sports balls NFL"
+    },
+    {
+        "char": "🏉",
+        "name": "rugby football sports team"
+    },
+    {
+        "char": "🎾",
+        "name": "tennis sports balls green"
+    },
+    {
+        "char": "🥏",
+        "name": "flying disc sports frisbee ultimate"
+    },
+    {
+        "char": "🎳",
+        "name": "bowling sports fun play"
+    },
+    {
+        "char": "🏏",
+        "name": "cricket game sports"
+    },
+    {
+        "char": "🏑",
+        "name": "field hockey sports"
+    },
+    {
+        "char": "🏒",
+        "name": "ice hockey sports"
+    },
+    {
+        "char": "🥍",
+        "name": "lacrosse sports ball stick"
+    },
+    {
+        "char": "🏓",
+        "name": "ping pong sports pingpong"
+    },
+    {
+        "char": "🏸",
+        "name": "badminton sports"
+    },
+    {
+        "char": "🥊",
+        "name": "boxing glove sports fighting"
+    },
+    {
+        "char": "🥋",
+        "name": "martial arts uniform judo karate taekwondo"
+    },
+    {
+        "char": "🥅",
+        "name": "goal net sports"
+    },
+    {
+        "char": "⛳",
+        "name": "flag in hole sports business flag hole summer"
+    },
+    {
+        "char": "⛸️",
+        "name": "ice skate sports"
+    },
+    {
+        "char": "🎣",
+        "name": "fishing pole food hobby summer"
+    },
+    {
+        "char": "🤿",
+        "name": "diving mask sport ocean"
+    },
+    {
+        "char": "🎽",
+        "name": "running shirt play pageant"
+    },
+    {
+        "char": "🎿",
+        "name": "skis sports winter cold snow"
+    },
+    {
+        "char": "🛷",
+        "name": "sled sleigh luge toboggan"
+    },
+    {
+        "char": "🥌",
+        "name": "curling stone sports"
+    },
+    {
+        "char": "🎯",
+        "name": "direct hit game play bar target bullseye"
+    },
+    {
+        "char": "🪀",
+        "name": "yo yo toy"
+    },
+    {
+        "char": "🪁",
+        "name": "kite wind fly"
+    },
+    {
+        "char": "🎱",
+        "name": "pool 8 ball pool hobby game luck magic"
+    },
+    {
+        "char": "🔮",
+        "name": "crystal ball disco party magic circus fortune teller"
+    },
+    {
+        "char": "🧿",
+        "name": "nazar amulet bead charm"
+    },
+    {
+        "char": "🎮",
+        "name": "video game play console PS4 Wii GameCube controller"
+    },
+    {
+        "char": "🕹️",
+        "name": "joystick game play"
+    },
+    {
+        "char": "🎰",
+        "name": "slot machine bet gamble vegas fruit machine luck casino"
+    },
+    {
+        "char": "🎲",
+        "name": "game die dice random tabletop play luck"
+    },
+    {
+        "char": "🧩",
+        "name": "puzzle piece interlocking puzzle piece"
+    },
+    {
+        "char": "🧸",
+        "name": "teddy bear plush stuffed"
+    },
+    {
+        "char": "♠️",
+        "name": "spade suit poker cards suits magic"
+    },
+    {
+        "char": "♥️",
+        "name": "heart suit poker cards magic suits"
+    },
+    {
+        "char": "♦️",
+        "name": "diamond suit poker cards magic suits"
+    },
+    {
+        "char": "♣️",
+        "name": "club suit poker cards magic suits"
+    },
+    {
+        "char": "♟️",
+        "name": "chess pawn expendable"
+    },
+    {
+        "char": "🃏",
+        "name": "joker poker cards game play magic"
+    },
+    {
+        "char": "🀄",
+        "name": "mahjong red dragon game play chinese kanji"
+    },
+    {
+        "char": "🎴",
+        "name": "flower playing cards game sunset red"
+    },
+    {
+        "char": "🎭",
+        "name": "performing arts acting theater drama"
+    },
+    {
+        "char": "🖼️",
+        "name": "framed picture photography"
+    },
+    {
+        "char": "🎨",
+        "name": "artist palette design paint draw colors"
+    },
+    {
+        "char": "🧵",
+        "name": "thread needle sewing spool string"
+    },
+    {
+        "char": "🧶",
+        "name": "yarn ball crochet knit"
+    },
+    {
+        "char": "👓",
+        "name": "glasses fashion accessories eyesight nerdy dork geek"
+    },
+    {
+        "char": "🕶️",
+        "name": "sunglasses face cool accessories"
+    },
+    {
+        "char": "🥽",
+        "name": "goggles eyes protection safety"
+    },
+    {
+        "char": "🥼",
+        "name": "lab coat doctor experiment scientist chemist"
+    },
+    {
+        "char": "🦺",
+        "name": "safety vest protection"
+    },
+    {
+        "char": "👔",
+        "name": "necktie shirt suitup formal fashion cloth business"
+    },
+    {
+        "char": "👕",
+        "name": "t shirt fashion cloth casual shirt tee"
+    },
+    {
+        "char": "👖",
+        "name": "jeans fashion shopping"
+    },
+    {
+        "char": "🧣",
+        "name": "scarf neck winter clothes"
+    },
+    {
+        "char": "🧤",
+        "name": "gloves hands winter clothes"
+    },
+    {
+        "char": "🧥",
+        "name": "coat jacket"
+    },
+    {
+        "char": "🧦",
+        "name": "socks stockings clothes"
+    },
+    {
+        "char": "👗",
+        "name": "dress clothes fashion shopping"
+    },
+    {
+        "char": "👘",
+        "name": "kimono dress fashion women female japanese"
+    },
+    {
+        "char": "🥻",
+        "name": "sari dress"
+    },
+    {
+        "char": "🩱",
+        "name": "one piece swimsuit fashion"
+    },
+    {
+        "char": "🩲",
+        "name": "briefs clothing"
+    },
+    {
+        "char": "🩳",
+        "name": "shorts clothing"
+    },
+    {
+        "char": "👙",
+        "name": "bikini swimming female woman girl fashion beach summer"
+    },
+    {
+        "char": "👚",
+        "name": "woman s clothes fashion shopping bags female"
+    },
+    {
+        "char": "👛",
+        "name": "purse fashion accessories money sales shopping"
+    },
+    {
+        "char": "👜",
+        "name": "handbag fashion accessory accessories shopping"
+    },
+    {
+        "char": "👝",
+        "name": "clutch bag bag accessories shopping"
+    },
+    {
+        "char": "🛍️",
+        "name": "shopping bags mall buy purchase"
+    },
+    {
+        "char": "🎒",
+        "name": "backpack student education bag backpack"
+    },
+    {
+        "char": "👞",
+        "name": "man s shoe fashion male"
+    },
+    {
+        "char": "👟",
+        "name": "running shoe shoes sports sneakers"
+    },
+    {
+        "char": "🥾",
+        "name": "hiking boot backpacking camping hiking"
+    },
+    {
+        "char": "🥿",
+        "name": "flat shoe ballet slip-on slipper"
+    },
+    {
+        "char": "👠",
+        "name": "high heeled shoe fashion shoes female pumps stiletto"
+    },
+    {
+        "char": "👡",
+        "name": "woman s sandal shoes fashion flip flops"
+    },
+    {
+        "char": "🩰",
+        "name": "ballet shoes dance"
+    },
+    {
+        "char": "👢",
+        "name": "woman s boot shoes fashion"
+    },
+    {
+        "char": "👑",
+        "name": "crown king kod leader royalty lord"
+    },
+    {
+        "char": "👒",
+        "name": "woman s hat fashion accessories female lady spring"
+    },
+    {
+        "char": "🎩",
+        "name": "top hat magic gentleman classy circus"
+    },
+    {
+        "char": "🎓",
+        "name": "graduation cap school college degree university graduation cap hat legal learn education"
+    },
+    {
+        "char": "🧢",
+        "name": "billed cap cap baseball"
+    },
+    {
+        "char": "⛑️",
+        "name": "rescue worker s helmet construction build"
+    },
+    {
+        "char": "📿",
+        "name": "prayer beads dhikr religious"
+    },
+    {
+        "char": "💄",
+        "name": "lipstick female girl fashion woman"
+    },
+    {
+        "char": "💍",
+        "name": "ring wedding propose marriage valentines diamond fashion jewelry gem engagement"
+    },
+    {
+        "char": "💎",
+        "name": "gem stone blue ruby diamond jewelry"
+    },
+    {
+        "char": "🔇",
+        "name": "muted speaker sound volume silence quiet"
+    },
+    {
+        "char": "🔈",
+        "name": "speaker low volume sound volume silence broadcast"
+    },
+    {
+        "char": "🔉",
+        "name": "speaker medium volume volume speaker broadcast"
+    },
+    {
+        "char": "🔊",
+        "name": "speaker high volume volume noise noisy speaker broadcast"
+    },
+    {
+        "char": "📢",
+        "name": "loudspeaker volume sound"
+    },
+    {
+        "char": "📣",
+        "name": "megaphone sound speaker volume"
+    },
+    {
+        "char": "📯",
+        "name": "postal horn instrument music"
+    },
+    {
+        "char": "🔔",
+        "name": "bell sound notification christmas xmas chime"
+    },
+    {
+        "char": "🔕",
+        "name": "bell with slash sound volume mute quiet silent"
+    },
+    {
+        "char": "🎼",
+        "name": "musical score treble clef compose"
+    },
+    {
+        "char": "🎵",
+        "name": "musical note score tone sound"
+    },
+    {
+        "char": "🎶",
+        "name": "musical notes music score"
+    },
+    {
+        "char": "🎙️",
+        "name": "studio microphone sing recording artist talkshow"
+    },
+    {
+        "char": "🎚️",
+        "name": "level slider scale"
+    },
+    {
+        "char": "🎛️",
+        "name": "control knobs dial"
+    },
+    {
+        "char": "🎤",
+        "name": "microphone sound music PA sing talkshow"
+    },
+    {
+        "char": "🎧",
+        "name": "headphone music score gadgets"
+    },
+    {
+        "char": "📻",
+        "name": "radio communication music podcast program"
+    },
+    {
+        "char": "🎷",
+        "name": "saxophone music instrument jazz blues"
+    },
+    {
+        "char": "🎸",
+        "name": "guitar music instrument"
+    },
+    {
+        "char": "🎹",
+        "name": "musical keyboard piano instrument compose"
+    },
+    {
+        "char": "🎺",
+        "name": "trumpet music brass"
+    },
+    {
+        "char": "🎻",
+        "name": "violin music instrument orchestra symphony"
+    },
+    {
+        "char": "🪕",
+        "name": "banjo music instructment"
+    },
+    {
+        "char": "🥁",
+        "name": "drum music instrument drumsticks snare"
+    },
+    {
+        "char": "📱",
+        "name": "mobile phone technology apple gadgets dial"
+    },
+    {
+        "char": "📲",
+        "name": "mobile phone with arrow iphone incoming"
+    },
+    {
+        "char": "☎️",
+        "name": "telephone technology communication dial telephone"
+    },
+    {
+        "char": "📞",
+        "name": "telephone receiver technology communication dial"
+    },
+    {
+        "char": "📟",
+        "name": "pager bbcall oldschool 90s"
+    },
+    {
+        "char": "📠",
+        "name": "fax machine communication technology"
+    },
+    {
+        "char": "🔋",
+        "name": "battery power energy sustain"
+    },
+    {
+        "char": "🔌",
+        "name": "electric plug charger power"
+    },
+    {
+        "char": "💻",
+        "name": "laptop technology laptop screen display monitor"
+    },
+    {
+        "char": "🖥️",
+        "name": "desktop computer technology computing screen"
+    },
+    {
+        "char": "🖨️",
+        "name": "printer paper ink"
+    },
+    {
+        "char": "⌨️",
+        "name": "keyboard technology computer type input text"
+    },
+    {
+        "char": "🖱️",
+        "name": "computer mouse click"
+    },
+    {
+        "char": "🖲️",
+        "name": "trackball technology trackpad"
+    },
+    {
+        "char": "💽",
+        "name": "computer disk technology record data disk 90s"
+    },
+    {
+        "char": "💾",
+        "name": "floppy disk oldschool technology save 90s 80s"
+    },
+    {
+        "char": "💿",
+        "name": "optical disk technology dvd disk disc 90s"
+    },
+    {
+        "char": "📀",
+        "name": "dvd cd disk disc"
+    },
+    {
+        "char": "🧮",
+        "name": "abacus calculation"
+    },
+    {
+        "char": "🎥",
+        "name": "movie camera film record"
+    },
+    {
+        "char": "🎞️",
+        "name": "film frames movie"
+    },
+    {
+        "char": "📽️",
+        "name": "film projector video tape record movie"
+    },
+    {
+        "char": "🎬",
+        "name": "clapper board movie film record"
+    },
+    {
+        "char": "📺",
+        "name": "television technology program oldschool show television"
+    },
+    {
+        "char": "📷",
+        "name": "camera gadgets photography"
+    },
+    {
+        "char": "📸",
+        "name": "camera with flash photography gadgets"
+    },
+    {
+        "char": "📹",
+        "name": "video camera film record"
+    },
+    {
+        "char": "📼",
+        "name": "videocassette record video oldschool 90s 80s"
+    },
+    {
+        "char": "🔍",
+        "name": "magnifying glass tilted left search zoom find detective"
+    },
+    {
+        "char": "🔎",
+        "name": "magnifying glass tilted right search zoom find detective"
+    },
+    {
+        "char": "🕯️",
+        "name": "candle fire wax"
+    },
+    {
+        "char": "💡",
+        "name": "light bulb light electricity idea"
+    },
+    {
+        "char": "🔦",
+        "name": "flashlight dark camping sight night"
+    },
+    {
+        "char": "🏮",
+        "name": "red paper lantern light paper halloween spooky"
+    },
+    {
+        "char": "🪔",
+        "name": "diya lamp lighting"
+    },
+    {
+        "char": "📔",
+        "name": "notebook with decorative cover classroom notes record paper study"
+    },
+    {
+        "char": "📕",
+        "name": "closed book read library knowledge textbook learn"
+    },
+    {
+        "char": "📖",
+        "name": "open book book read library knowledge literature learn study"
+    },
+    {
+        "char": "📗",
+        "name": "green book read library knowledge study"
+    },
+    {
+        "char": "📘",
+        "name": "blue book read library knowledge learn study"
+    },
+    {
+        "char": "📙",
+        "name": "orange book read library knowledge textbook study"
+    },
+    {
+        "char": "📚",
+        "name": "books literature library study"
+    },
+    {
+        "char": "📓",
+        "name": "notebook stationery record notes paper study"
+    },
+    {
+        "char": "📒",
+        "name": "ledger notes paper"
+    },
+    {
+        "char": "📃",
+        "name": "page with curl documents office paper"
+    },
+    {
+        "char": "📜",
+        "name": "scroll documents ancient history paper"
+    },
+    {
+        "char": "📄",
+        "name": "page facing up documents office paper information"
+    },
+    {
+        "char": "📰",
+        "name": "newspaper press headline"
+    },
+    {
+        "char": "🗞️",
+        "name": "rolled up newspaper press headline"
+    },
+    {
+        "char": "📑",
+        "name": "bookmark tabs favorite save order tidy"
+    },
+    {
+        "char": "🔖",
+        "name": "bookmark favorite label save"
+    },
+    {
+        "char": "🏷️",
+        "name": "label sale tag"
+    },
+    {
+        "char": "💰",
+        "name": "money bag dollar payment coins sale"
+    },
+    {
+        "char": "💴",
+        "name": "yen banknote money sales japanese dollar currency"
+    },
+    {
+        "char": "💵",
+        "name": "dollar banknote money sales bill currency"
+    },
+    {
+        "char": "💶",
+        "name": "euro banknote money sales dollar currency"
+    },
+    {
+        "char": "💷",
+        "name": "pound banknote british sterling money sales bills uk england currency"
+    },
+    {
+        "char": "💸",
+        "name": "money with wings dollar bills payment sale"
+    },
+    {
+        "char": "💳",
+        "name": "credit card money sales dollar bill payment shopping"
+    },
+    {
+        "char": "🧾",
+        "name": "receipt accounting expenses"
+    },
+    {
+        "char": "💹",
+        "name": "chart increasing with yen green-square graph presentation stats"
+    },
+    {
+        "char": "💱",
+        "name": "currency exchange money sales dollar travel"
+    },
+    {
+        "char": "💲",
+        "name": "heavy dollar sign money sales payment currency buck"
+    },
+    {
+        "char": "✉️",
+        "name": "envelope letter postal inbox communication"
+    },
+    {
+        "char": "📧",
+        "name": "e mail communication inbox"
+    },
+    {
+        "char": "📨",
+        "name": "incoming envelope email inbox"
+    },
+    {
+        "char": "📩",
+        "name": "envelope with arrow email communication"
+    },
+    {
+        "char": "📤",
+        "name": "outbox tray inbox email"
+    },
+    {
+        "char": "📥",
+        "name": "inbox tray email documents"
+    },
+    {
+        "char": "📦",
+        "name": "package mail gift cardboard box moving"
+    },
+    {
+        "char": "📫",
+        "name": "closed mailbox with raised flag email inbox communication"
+    },
+    {
+        "char": "📪",
+        "name": "closed mailbox with lowered flag email communication inbox"
+    },
+    {
+        "char": "📬",
+        "name": "open mailbox with raised flag email inbox communication"
+    },
+    {
+        "char": "📭",
+        "name": "open mailbox with lowered flag email inbox"
+    },
+    {
+        "char": "📮",
+        "name": "postbox email letter envelope"
+    },
+    {
+        "char": "🗳️",
+        "name": "ballot box with ballot election vote"
+    },
+    {
+        "char": "✏️",
+        "name": "pencil stationery write paper writing school study"
+    },
+    {
+        "char": "✒️",
+        "name": "black nib pen stationery writing write"
+    },
+    {
+        "char": "🖋️",
+        "name": "fountain pen stationery writing write"
+    },
+    {
+        "char": "🖊️",
+        "name": "pen stationery writing write"
+    },
+    {
+        "char": "🖌️",
+        "name": "paintbrush drawing creativity art"
+    },
+    {
+        "char": "🖍️",
+        "name": "crayon drawing creativity"
+    },
+    {
+        "char": "📝",
+        "name": "memo write documents stationery pencil paper writing legal exam quiz test study compose"
+    },
+    {
+        "char": "💼",
+        "name": "briefcase business documents work law legal job career"
+    },
+    {
+        "char": "📁",
+        "name": "file folder documents business office"
+    },
+    {
+        "char": "📂",
+        "name": "open file folder documents load"
+    },
+    {
+        "char": "🗂️",
+        "name": "card index dividers organizing business stationery"
+    },
+    {
+        "char": "📅",
+        "name": "calendar calendar schedule"
+    },
+    {
+        "char": "📆",
+        "name": "tear off calendar schedule date planning"
+    },
+    {
+        "char": "🗒️",
+        "name": "spiral notepad memo stationery"
+    },
+    {
+        "char": "🗓️",
+        "name": "spiral calendar date schedule planning"
+    },
+    {
+        "char": "📇",
+        "name": "card index business stationery"
+    },
+    {
+        "char": "📈",
+        "name": "chart increasing graph presentation stats recovery business economics money sales good success"
+    },
+    {
+        "char": "📉",
+        "name": "chart decreasing graph presentation stats recession business economics money sales bad failure"
+    },
+    {
+        "char": "📊",
+        "name": "bar chart graph presentation stats"
+    },
+    {
+        "char": "📋",
+        "name": "clipboard stationery documents"
+    },
+    {
+        "char": "📌",
+        "name": "pushpin stationery mark here"
+    },
+    {
+        "char": "📍",
+        "name": "round pushpin stationery location map here"
+    },
+    {
+        "char": "📎",
+        "name": "paperclip documents stationery"
+    },
+    {
+        "char": "🖇️",
+        "name": "linked paperclips documents stationery"
+    },
+    {
+        "char": "📏",
+        "name": "straight ruler stationery calculate length math school drawing architect sketch"
+    },
+    {
+        "char": "📐",
+        "name": "triangular ruler stationery math architect sketch"
+    },
+    {
+        "char": "✂️",
+        "name": "scissors stationery cut"
+    },
+    {
+        "char": "🗃️",
+        "name": "card file box business stationery"
+    },
+    {
+        "char": "🗄️",
+        "name": "file cabinet filing organizing"
+    },
+    {
+        "char": "🗑️",
+        "name": "wastebasket bin trash rubbish garbage toss"
+    },
+    {
+        "char": "🔒",
+        "name": "locked security password padlock"
+    },
+    {
+        "char": "🔓",
+        "name": "unlocked privacy security"
+    },
+    {
+        "char": "🔏",
+        "name": "locked with pen security secret"
+    },
+    {
+        "char": "🔐",
+        "name": "locked with key security privacy"
+    },
+    {
+        "char": "🔑",
+        "name": "key lock door password"
+    },
+    {
+        "char": "🗝️",
+        "name": "old key lock door password"
+    },
+    {
+        "char": "🔨",
+        "name": "hammer tools build create"
+    },
+    {
+        "char": "🪓",
+        "name": "axe tool chop cut"
+    },
+    {
+        "char": "⛏️",
+        "name": "pick tools dig"
+    },
+    {
+        "char": "⚒️",
+        "name": "hammer and pick tools build create"
+    },
+    {
+        "char": "🛠️",
+        "name": "hammer and wrench tools build create"
+    },
+    {
+        "char": "🗡️",
+        "name": "dagger weapon"
+    },
+    {
+        "char": "⚔️",
+        "name": "crossed swords weapon"
+    },
+    {
+        "char": "🔫",
+        "name": "pistol violence weapon pistol revolver"
+    },
+    {
+        "char": "🏹",
+        "name": "bow and arrow sports"
+    },
+    {
+        "char": "🛡️",
+        "name": "shield protection security"
+    },
+    {
+        "char": "🔧",
+        "name": "wrench tools diy ikea fix maintainer"
+    },
+    {
+        "char": "🔩",
+        "name": "nut and bolt handy tools fix"
+    },
+    {
+        "char": "⚙️",
+        "name": "gear cog"
+    },
+    {
+        "char": "🗜️",
+        "name": "clamp tool"
+    },
+    {
+        "char": "⚖️",
+        "name": "balance scale law fairness weight"
+    },
+    {
+        "char": "🦯",
+        "name": "probing cane accessibility"
+    },
+    {
+        "char": "🔗",
+        "name": "link rings url"
+    },
+    {
+        "char": "⛓️",
+        "name": "chains lock arrest"
+    },
+    {
+        "char": "🧰",
+        "name": "toolbox tools diy fix maintainer mechanic"
+    },
+    {
+        "char": "🧲",
+        "name": "magnet attraction magnetic"
+    },
+    {
+        "char": "⚗️",
+        "name": "alembic distilling science experiment chemistry"
+    },
+    {
+        "char": "🧪",
+        "name": "test tube chemistry experiment lab science"
+    },
+    {
+        "char": "🧫",
+        "name": "petri dish bacteria biology culture lab"
+    },
+    {
+        "char": "🧬",
+        "name": "dna biologist genetics life"
+    },
+    {
+        "char": "🔬",
+        "name": "microscope laboratory experiment zoomin science study"
+    },
+    {
+        "char": "🔭",
+        "name": "telescope stars space zoom science astronomy"
+    },
+    {
+        "char": "📡",
+        "name": "satellite antenna communication future radio space"
+    },
+    {
+        "char": "💉",
+        "name": "syringe health hospital drugs blood medicine needle doctor nurse"
+    },
+    {
+        "char": "🩸",
+        "name": "drop of blood period hurt harm wound"
+    },
+    {
+        "char": "💊",
+        "name": "pill health medicine doctor pharmacy drug"
+    },
+    {
+        "char": "🩹",
+        "name": "adhesive bandage heal"
+    },
+    {
+        "char": "🩺",
+        "name": "stethoscope health"
+    },
+    {
+        "char": "🚪",
+        "name": "door house entry exit"
+    },
+    {
+        "char": "🛏️",
+        "name": "bed sleep rest"
+    },
+    {
+        "char": "🛋️",
+        "name": "couch and lamp read chill"
+    },
+    {
+        "char": "🪑",
+        "name": "chair sit furniture"
+    },
+    {
+        "char": "🚽",
+        "name": "toilet restroom wc washroom bathroom potty"
+    },
+    {
+        "char": "🚿",
+        "name": "shower clean water bathroom"
+    },
+    {
+        "char": "🛁",
+        "name": "bathtub clean shower bathroom"
+    },
+    {
+        "char": "🪒",
+        "name": "razor cut"
+    },
+    {
+        "char": "🧴",
+        "name": "lotion bottle moisturizer sunscreen"
+    },
+    {
+        "char": "🧷",
+        "name": "safety pin diaper"
+    },
+    {
+        "char": "🧹",
+        "name": "broom cleaning sweeping witch"
+    },
+    {
+        "char": "🧺",
+        "name": "basket laundry"
+    },
+    {
+        "char": "🧻",
+        "name": "roll of paper roll"
+    },
+    {
+        "char": "🧼",
+        "name": "soap bar bathing cleaning lather"
+    },
+    {
+        "char": "🧽",
+        "name": "sponge absorbing cleaning porous"
+    },
+    {
+        "char": "🧯",
+        "name": "fire extinguisher quench"
+    },
+    {
+        "char": "🛒",
+        "name": "shopping cart trolley"
+    },
+    {
+        "char": "🚬",
+        "name": "cigarette kills tobacco cigarette joint smoke"
+    },
+    {
+        "char": "⚰️",
+        "name": "coffin vampire dead die death rip graveyard cemetery casket funeral box"
+    },
+    {
+        "char": "⚱️",
+        "name": "funeral urn dead die death rip ashes"
+    },
+    {
+        "char": "🗿",
+        "name": "moai rock easter island moai"
+    },
+    {
+        "char": "🏧",
+        "name": "atm sign money sales cash blue-square payment bank"
+    },
+    {
+        "char": "🚮",
+        "name": "litter in bin sign blue-square sign human info"
+    },
+    {
+        "char": "🚰",
+        "name": "potable water blue-square liquid restroom cleaning faucet"
+    },
+    {
+        "char": "♿",
+        "name": "wheelchair symbol blue-square disabled accessibility"
+    },
+    {
+        "char": "🚹",
+        "name": "men s room toilet restroom wc blue-square gender male"
+    },
+    {
+        "char": "🚺",
+        "name": "women s room purple-square woman female toilet loo restroom gender"
+    },
+    {
+        "char": "🚻",
+        "name": "restroom blue-square toilet refresh wc gender"
+    },
+    {
+        "char": "🚼",
+        "name": "baby symbol orange-square child"
+    },
+    {
+        "char": "🚾",
+        "name": "water closet toilet restroom blue-square"
+    },
+    {
+        "char": "🛂",
+        "name": "passport control custom blue-square"
+    },
+    {
+        "char": "🛃",
+        "name": "customs passport border blue-square"
+    },
+    {
+        "char": "🛄",
+        "name": "baggage claim blue-square airport transport"
+    },
+    {
+        "char": "🛅",
+        "name": "left luggage blue-square travel"
+    },
+    {
+        "char": "⚠️",
+        "name": "warning exclamation wip alert error problem issue"
+    },
+    {
+        "char": "🚸",
+        "name": "children crossing school warning danger sign driving yellow-diamond"
+    },
+    {
+        "char": "⛔",
+        "name": "no entry limit security privacy bad denied stop circle"
+    },
+    {
+        "char": "🚫",
+        "name": "prohibited forbid stop limit denied disallow circle"
+    },
+    {
+        "char": "🚳",
+        "name": "no bicycles cyclist prohibited circle"
+    },
+    {
+        "char": "🚭",
+        "name": "no smoking cigarette blue-square smell smoke"
+    },
+    {
+        "char": "🚯",
+        "name": "no littering trash bin garbage circle"
+    },
+    {
+        "char": "🚱",
+        "name": "non potable water drink faucet tap circle"
+    },
+    {
+        "char": "🚷",
+        "name": "no pedestrians rules crossing walking circle"
+    },
+    {
+        "char": "📵",
+        "name": "no mobile phones iphone mute circle"
+    },
+    {
+        "char": "🔞",
+        "name": "no one under eighteen 18 drink pub night minor circle"
+    },
+    {
+        "char": "☢️",
+        "name": "radioactive nuclear danger"
+    },
+    {
+        "char": "☣️",
+        "name": "biohazard danger"
+    },
+    {
+        "char": "⬆️",
+        "name": "up arrow blue-square continue top direction"
+    },
+    {
+        "char": "↗️",
+        "name": "up right arrow blue-square point direction diagonal northeast"
+    },
+    {
+        "char": "➡️",
+        "name": "right arrow blue-square next"
+    },
+    {
+        "char": "↘️",
+        "name": "down right arrow blue-square direction diagonal southeast"
+    },
+    {
+        "char": "⬇️",
+        "name": "down arrow blue-square direction bottom"
+    },
+    {
+        "char": "↙️",
+        "name": "down left arrow blue-square direction diagonal southwest"
+    },
+    {
+        "char": "⬅️",
+        "name": "left arrow blue-square previous back"
+    },
+    {
+        "char": "↖️",
+        "name": "up left arrow blue-square point direction diagonal northwest"
+    },
+    {
+        "char": "↕️",
+        "name": "up down arrow blue-square direction way vertical"
+    },
+    {
+        "char": "↔️",
+        "name": "left right arrow shape direction horizontal sideways"
+    },
+    {
+        "char": "↩️",
+        "name": "right arrow curving left back return blue-square undo enter"
+    },
+    {
+        "char": "↪️",
+        "name": "left arrow curving right blue-square return rotate direction"
+    },
+    {
+        "char": "⤴️",
+        "name": "right arrow curving up blue-square direction top"
+    },
+    {
+        "char": "⤵️",
+        "name": "right arrow curving down blue-square direction bottom"
+    },
+    {
+        "char": "🔃",
+        "name": "clockwise vertical arrows sync cycle round repeat"
+    },
+    {
+        "char": "🔄",
+        "name": "counterclockwise arrows button blue-square sync cycle"
+    },
+    {
+        "char": "🔙",
+        "name": "back arrow arrow words return"
+    },
+    {
+        "char": "🔚",
+        "name": "end arrow words arrow"
+    },
+    {
+        "char": "🔛",
+        "name": "on arrow arrow words"
+    },
+    {
+        "char": "🔜",
+        "name": "soon arrow arrow words"
+    },
+    {
+        "char": "🔝",
+        "name": "top arrow words blue-square"
+    },
+    {
+        "char": "🛐",
+        "name": "place of worship religion church temple prayer"
+    },
+    {
+        "char": "⚛️",
+        "name": "atom symbol science physics chemistry"
+    },
+    {
+        "char": "🕉️",
+        "name": "om hinduism buddhism sikhism jainism"
+    },
+    {
+        "char": "✡️",
+        "name": "star of david judaism"
+    },
+    {
+        "char": "☸️",
+        "name": "wheel of dharma hinduism buddhism sikhism jainism"
+    },
+    {
+        "char": "☯️",
+        "name": "yin yang balance"
+    },
+    {
+        "char": "✝️",
+        "name": "latin cross christianity"
+    },
+    {
+        "char": "☦️",
+        "name": "orthodox cross suppedaneum religion"
+    },
+    {
+        "char": "☪️",
+        "name": "star and crescent islam"
+    },
+    {
+        "char": "☮️",
+        "name": "peace symbol hippie"
+    },
+    {
+        "char": "🕎",
+        "name": "menorah hanukkah candles jewish"
+    },
+    {
+        "char": "🔯",
+        "name": "dotted six pointed star purple-square religion jewish hexagram"
+    },
+    {
+        "char": "♈",
+        "name": "aries sign purple-square zodiac astrology"
+    },
+    {
+        "char": "♉",
+        "name": "taurus purple-square sign zodiac astrology"
+    },
+    {
+        "char": "♊",
+        "name": "gemini sign zodiac purple-square astrology"
+    },
+    {
+        "char": "♋",
+        "name": "cancer sign zodiac purple-square astrology"
+    },
+    {
+        "char": "♌",
+        "name": "leo sign purple-square zodiac astrology"
+    },
+    {
+        "char": "♍",
+        "name": "virgo sign zodiac purple-square astrology"
+    },
+    {
+        "char": "♎",
+        "name": "libra sign purple-square zodiac astrology"
+    },
+    {
+        "char": "♏",
+        "name": "scorpio sign zodiac purple-square astrology scorpio"
+    },
+    {
+        "char": "♐",
+        "name": "sagittarius sign zodiac purple-square astrology"
+    },
+    {
+        "char": "♑",
+        "name": "capricorn sign zodiac purple-square astrology"
+    },
+    {
+        "char": "♒",
+        "name": "aquarius sign purple-square zodiac astrology"
+    },
+    {
+        "char": "♓",
+        "name": "pisces purple-square sign zodiac astrology"
+    },
+    {
+        "char": "⛎",
+        "name": "ophiuchus sign purple-square constellation astrology"
+    },
+    {
+        "char": "🔀",
+        "name": "shuffle tracks button blue-square shuffle music random"
+    },
+    {
+        "char": "🔁",
+        "name": "repeat button loop record"
+    },
+    {
+        "char": "🔂",
+        "name": "repeat single button blue-square loop"
+    },
+    {
+        "char": "▶️",
+        "name": "play button blue-square right direction play"
+    },
+    {
+        "char": "⏩",
+        "name": "fast forward button blue-square play speed continue"
+    },
+    {
+        "char": "⏭️",
+        "name": "next track button forward next blue-square"
+    },
+    {
+        "char": "⏯️",
+        "name": "play or pause button blue-square play pause"
+    },
+    {
+        "char": "◀️",
+        "name": "reverse button blue-square left direction"
+    },
+    {
+        "char": "⏪",
+        "name": "fast reverse button play blue-square"
+    },
+    {
+        "char": "⏮️",
+        "name": "last track button backward"
+    },
+    {
+        "char": "🔼",
+        "name": "upwards button blue-square triangle direction point forward top"
+    },
+    {
+        "char": "⏫",
+        "name": "fast up button blue-square direction top"
+    },
+    {
+        "char": "🔽",
+        "name": "downwards button blue-square direction bottom"
+    },
+    {
+        "char": "⏬",
+        "name": "fast down button blue-square direction bottom"
+    },
+    {
+        "char": "⏸️",
+        "name": "pause button pause blue-square"
+    },
+    {
+        "char": "⏹️",
+        "name": "stop button blue-square"
+    },
+    {
+        "char": "⏺️",
+        "name": "record button blue-square"
+    },
+    {
+        "char": "⏏️",
+        "name": "eject button blue-square"
+    },
+    {
+        "char": "🎦",
+        "name": "cinema blue-square record film movie curtain stage theater"
+    },
+    {
+        "char": "🔅",
+        "name": "dim button sun afternoon warm summer"
+    },
+    {
+        "char": "🔆",
+        "name": "bright button sun light"
+    },
+    {
+        "char": "📶",
+        "name": "antenna bars blue-square reception phone internet connection wifi bluetooth bars"
+    },
+    {
+        "char": "📳",
+        "name": "vibration mode orange-square phone"
+    },
+    {
+        "char": "📴",
+        "name": "mobile phone off mute orange-square silence quiet"
+    },
+    {
+        "char": "♀️",
+        "name": "female sign woman women lady girl"
+    },
+    {
+        "char": "♂️",
+        "name": "male sign man boy men"
+    },
+    {
+        "char": "⚕️",
+        "name": "medical symbol health hospital"
+    },
+    {
+        "char": "♾️",
+        "name": "infinity forever"
+    },
+    {
+        "char": "♻️",
+        "name": "recycling symbol arrow environment garbage trash"
+    },
+    {
+        "char": "⚜️",
+        "name": "fleur de lis decorative scout"
+    },
+    {
+        "char": "🔱",
+        "name": "trident emblem weapon spear"
+    },
+    {
+        "char": "📛",
+        "name": "name badge fire forbid"
+    },
+    {
+        "char": "🔰",
+        "name": "japanese symbol for beginner badge shield"
+    },
+    {
+        "char": "⭕",
+        "name": "hollow red circle circle round"
+    },
+    {
+        "char": "✅",
+        "name": "check mark button green-square ok agree vote election answer tick"
+    },
+    {
+        "char": "☑️",
+        "name": "check box with check ok agree confirm black-square vote election yes tick"
+    },
+    {
+        "char": "✔️",
+        "name": "check mark ok nike answer yes tick"
+    },
+    {
+        "char": "✖️",
+        "name": "multiplication sign math calculation"
+    },
+    {
+        "char": "❌",
+        "name": "cross mark no delete remove cancel red"
+    },
+    {
+        "char": "❎",
+        "name": "cross mark button x green-square no deny"
+    },
+    {
+        "char": "➕",
+        "name": "plus sign math calculation addition more increase"
+    },
+    {
+        "char": "➖",
+        "name": "minus sign math calculation subtract less"
+    },
+    {
+        "char": "➗",
+        "name": "division sign divide math calculation"
+    },
+    {
+        "char": "➰",
+        "name": "curly loop scribble draw shape squiggle"
+    },
+    {
+        "char": "➿",
+        "name": "double curly loop tape cassette"
+    },
+    {
+        "char": "〽️",
+        "name": "part alternation mark graph presentation stats business economics bad"
+    },
+    {
+        "char": "✳️",
+        "name": "eight spoked asterisk star sparkle green-square"
+    },
+    {
+        "char": "✴️",
+        "name": "eight pointed star orange-square shape polygon"
+    },
+    {
+        "char": "❇️",
+        "name": "sparkle stars green-square awesome good fireworks"
+    },
+    {
+        "char": "‼️",
+        "name": "double exclamation mark exclamation surprise"
+    },
+    {
+        "char": "⁉️",
+        "name": "exclamation question mark wat punctuation surprise"
+    },
+    {
+        "char": "❓",
+        "name": "question mark doubt confused"
+    },
+    {
+        "char": "❔",
+        "name": "white question mark doubts gray huh confused"
+    },
+    {
+        "char": "❕",
+        "name": "white exclamation mark surprise punctuation gray wow warning"
+    },
+    {
+        "char": "❗",
+        "name": "exclamation mark heavy exclamation mark danger surprise punctuation wow warning"
+    },
+    {
+        "char": "〰️",
+        "name": "wavy dash draw line moustache mustache squiggle scribble"
+    },
+    {
+        "char": "©️",
+        "name": "copyright ip license circle law legal"
+    },
+    {
+        "char": "®️",
+        "name": "registered alphabet circle"
+    },
+    {
+        "char": "™️",
+        "name": "trade mark trademark brand law legal"
+    },
+    {
+        "char": "#️⃣",
+        "name": "keycap  symbol blue-square twitter"
+    },
+    {
+        "char": "*️⃣",
+        "name": "keycap  star keycap"
+    },
+    {
+        "char": "0️⃣",
+        "name": "keycap 0 0 numbers blue-square null"
+    },
+    {
+        "char": "1️⃣",
+        "name": "keycap 1 blue-square numbers 1"
+    },
+    {
+        "char": "2️⃣",
+        "name": "keycap 2 numbers 2 prime blue-square"
+    },
+    {
+        "char": "3️⃣",
+        "name": "keycap 3 3 numbers prime blue-square"
+    },
+    {
+        "char": "4️⃣",
+        "name": "keycap 4 4 numbers blue-square"
+    },
+    {
+        "char": "5️⃣",
+        "name": "keycap 5 5 numbers blue-square prime"
+    },
+    {
+        "char": "6️⃣",
+        "name": "keycap 6 6 numbers blue-square"
+    },
+    {
+        "char": "7️⃣",
+        "name": "keycap 7 7 numbers blue-square prime"
+    },
+    {
+        "char": "8️⃣",
+        "name": "keycap 8 8 blue-square numbers"
+    },
+    {
+        "char": "9️⃣",
+        "name": "keycap 9 blue-square numbers 9"
+    },
+    {
+        "char": "🔟",
+        "name": "keycap 10 numbers 10 blue-square"
+    },
+    {
+        "char": "🔠",
+        "name": "input latin uppercase alphabet words blue-square"
+    },
+    {
+        "char": "🔡",
+        "name": "input latin lowercase blue-square alphabet"
+    },
+    {
+        "char": "🔢",
+        "name": "input numbers numbers blue-square"
+    },
+    {
+        "char": "🔣",
+        "name": "input symbols blue-square music note ampersand percent glyphs characters"
+    },
+    {
+        "char": "🔤",
+        "name": "input latin letters blue-square alphabet"
+    },
+    {
+        "char": "🅰️",
+        "name": "a button red-square alphabet letter"
+    },
+    {
+        "char": "🆎",
+        "name": "ab button red-square alphabet"
+    },
+    {
+        "char": "🅱️",
+        "name": "b button red-square alphabet letter"
+    },
+    {
+        "char": "🆑",
+        "name": "cl button alphabet words red-square"
+    },
+    {
+        "char": "🆒",
+        "name": "cool button words blue-square"
+    },
+    {
+        "char": "🆓",
+        "name": "free button blue-square words"
+    },
+    {
+        "char": "ℹ️",
+        "name": "information blue-square alphabet letter"
+    },
+    {
+        "char": "🆔",
+        "name": "id button purple-square words"
+    },
+    {
+        "char": "Ⓜ️",
+        "name": "circled m alphabet blue-circle letter"
+    },
+    {
+        "char": "🆕",
+        "name": "new button blue-square words start"
+    },
+    {
+        "char": "🆖",
+        "name": "ng button blue-square words shape icon"
+    },
+    {
+        "char": "🅾️",
+        "name": "o button alphabet red-square letter"
+    },
+    {
+        "char": "🆗",
+        "name": "ok button good agree yes blue-square"
+    },
+    {
+        "char": "🅿️",
+        "name": "p button cars blue-square alphabet letter"
+    },
+    {
+        "char": "🆘",
+        "name": "sos button help red-square words emergency 911"
+    },
+    {
+        "char": "🆙",
+        "name": "up button blue-square above high"
+    },
+    {
+        "char": "🆚",
+        "name": "vs button words orange-square"
+    },
+    {
+        "char": "🈁",
+        "name": "japanese here button blue-square here katakana japanese destination"
+    },
+    {
+        "char": "🈂️",
+        "name": "japanese service charge button japanese blue-square katakana"
+    },
+    {
+        "char": "🈷️",
+        "name": "japanese monthly amount button chinese month moon japanese orange-square kanji"
+    },
+    {
+        "char": "🈶",
+        "name": "japanese not free of charge button orange-square chinese have kanji"
+    },
+    {
+        "char": "🈯",
+        "name": "japanese reserved button chinese point green-square kanji"
+    },
+    {
+        "char": "🉐",
+        "name": "japanese bargain button chinese kanji obtain get circle"
+    },
+    {
+        "char": "🈹",
+        "name": "japanese discount button cut divide chinese kanji pink-square"
+    },
+    {
+        "char": "🈚",
+        "name": "japanese free of charge button nothing chinese kanji japanese orange-square"
+    },
+    {
+        "char": "🈲",
+        "name": "japanese prohibited button kanji japanese chinese forbidden limit restricted red-square"
+    },
+    {
+        "char": "🉑",
+        "name": "japanese acceptable button ok good chinese kanji agree yes orange-circle"
+    },
+    {
+        "char": "🈸",
+        "name": "japanese application button chinese japanese kanji orange-square"
+    },
+    {
+        "char": "🈴",
+        "name": "japanese passing grade button japanese chinese join kanji red-square"
+    },
+    {
+        "char": "🈳",
+        "name": "japanese vacancy button kanji japanese chinese empty sky blue-square"
+    },
+    {
+        "char": "㊗️",
+        "name": "japanese congratulations button chinese kanji japanese red-circle"
+    },
+    {
+        "char": "㊙️",
+        "name": "japanese secret button privacy chinese sshh kanji red-circle"
+    },
+    {
+        "char": "🈺",
+        "name": "japanese open for business button japanese opening hours orange-square"
+    },
+    {
+        "char": "🈵",
+        "name": "japanese no vacancy button full chinese japanese red-square kanji"
+    },
+    {
+        "char": "🔴",
+        "name": "red circle shape error danger"
+    },
+    {
+        "char": "🟠",
+        "name": "orange circle round"
+    },
+    {
+        "char": "🟡",
+        "name": "yellow circle round"
+    },
+    {
+        "char": "🟢",
+        "name": "green circle round"
+    },
+    {
+        "char": "🔵",
+        "name": "blue circle shape icon button"
+    },
+    {
+        "char": "🟣",
+        "name": "purple circle round"
+    },
+    {
+        "char": "🟤",
+        "name": "brown circle round"
+    },
+    {
+        "char": "⚫",
+        "name": "black circle shape button round"
+    },
+    {
+        "char": "⚪",
+        "name": "white circle shape round"
+    },
+    {
+        "char": "🟥",
+        "name": "red square"
+    },
+    {
+        "char": "🟧",
+        "name": "orange square"
+    },
+    {
+        "char": "🟨",
+        "name": "yellow square"
+    },
+    {
+        "char": "🟩",
+        "name": "green square"
+    },
+    {
+        "char": "🟦",
+        "name": "blue square"
+    },
+    {
+        "char": "🟪",
+        "name": "purple square"
+    },
+    {
+        "char": "🟫",
+        "name": "brown square"
+    },
+    {
+        "char": "⬛",
+        "name": "black large square shape icon button"
+    },
+    {
+        "char": "⬜",
+        "name": "white large square shape icon stone button"
+    },
+    {
+        "char": "◼️",
+        "name": "black medium square shape button icon"
+    },
+    {
+        "char": "◻️",
+        "name": "white medium square shape stone icon"
+    },
+    {
+        "char": "◾",
+        "name": "black medium small square icon shape button"
+    },
+    {
+        "char": "◽",
+        "name": "white medium small square shape stone icon button"
+    },
+    {
+        "char": "▪️",
+        "name": "black small square shape icon"
+    },
+    {
+        "char": "▫️",
+        "name": "white small square shape icon"
+    },
+    {
+        "char": "🔶",
+        "name": "large orange diamond shape jewel gem"
+    },
+    {
+        "char": "🔷",
+        "name": "large blue diamond shape jewel gem"
+    },
+    {
+        "char": "🔸",
+        "name": "small orange diamond shape jewel gem"
+    },
+    {
+        "char": "🔹",
+        "name": "small blue diamond shape jewel gem"
+    },
+    {
+        "char": "🔺",
+        "name": "red triangle pointed up shape direction up top"
+    },
+    {
+        "char": "🔻",
+        "name": "red triangle pointed down shape direction bottom"
+    },
+    {
+        "char": "💠",
+        "name": "diamond with a dot jewel blue gem crystal fancy"
+    },
+    {
+        "char": "🔘",
+        "name": "radio button input old music circle"
+    },
+    {
+        "char": "🔳",
+        "name": "white square button shape input"
+    },
+    {
+        "char": "🔲",
+        "name": "black square button shape input frame"
+    },
+    {
+        "char": "🏁",
+        "name": "chequered flag contest finishline race gokart"
+    },
+    {
+        "char": "🚩",
+        "name": "triangular flag mark milestone place"
+    },
+    {
+        "char": "🎌",
+        "name": "crossed flags japanese nation country border"
+    },
+    {
+        "char": "🏴",
+        "name": "black flag pirate"
+    },
+    {
+        "char": "🏳️",
+        "name": "white flag losing loser lost surrender give up fail"
+    },
+    {
+        "char": "🏳️‍🌈",
+        "name": "rainbow flag flag rainbow pride gay lgbt glbt queer homosexual lesbian bisexual transgender"
+    },
+    {
+        "char": "🏴‍☠️",
+        "name": "pirate flag skull crossbones flag banner"
+    },
+    {
+        "char": "🇦🇨",
+        "name": "flag ascension island"
+    },
+    {
+        "char": "🇦🇩",
+        "name": "flag andorra ad flag nation country banner andorra"
+    },
+    {
+        "char": "🇦🇪",
+        "name": "flag united arab emirates united arab emirates flag nation country banner united arab emirates"
+    },
+    {
+        "char": "🇦🇫",
+        "name": "flag afghanistan af flag nation country banner afghanistan"
+    },
+    {
+        "char": "🇦🇬",
+        "name": "flag antigua barbuda antigua barbuda flag nation country banner antigua barbuda"
+    },
+    {
+        "char": "🇦🇮",
+        "name": "flag anguilla ai flag nation country banner anguilla"
+    },
+    {
+        "char": "🇦🇱",
+        "name": "flag albania al flag nation country banner albania"
+    },
+    {
+        "char": "🇦🇲",
+        "name": "flag armenia am flag nation country banner armenia"
+    },
+    {
+        "char": "🇦🇴",
+        "name": "flag angola ao flag nation country banner angola"
+    },
+    {
+        "char": "🇦🇶",
+        "name": "flag antarctica aq flag nation country banner antarctica"
+    },
+    {
+        "char": "🇦🇷",
+        "name": "flag argentina ar flag nation country banner argentina"
+    },
+    {
+        "char": "🇦🇸",
+        "name": "flag american samoa american ws flag nation country banner american samoa"
+    },
+    {
+        "char": "🇦🇹",
+        "name": "flag austria at flag nation country banner austria"
+    },
+    {
+        "char": "🇦🇺",
+        "name": "flag australia au flag nation country banner australia"
+    },
+    {
+        "char": "🇦🇼",
+        "name": "flag aruba aw flag nation country banner aruba"
+    },
+    {
+        "char": "🇦🇽",
+        "name": "flag aland islands Åland islands flag nation country banner aland islands"
+    },
+    {
+        "char": "🇦🇿",
+        "name": "flag azerbaijan az flag nation country banner azerbaijan"
+    },
+    {
+        "char": "🇧🇦",
+        "name": "flag bosnia herzegovina bosnia herzegovina flag nation country banner bosnia herzegovina"
+    },
+    {
+        "char": "🇧🇧",
+        "name": "flag barbados bb flag nation country banner barbados"
+    },
+    {
+        "char": "🇧🇩",
+        "name": "flag bangladesh bd flag nation country banner bangladesh"
+    },
+    {
+        "char": "🇧🇪",
+        "name": "flag belgium be flag nation country banner belgium"
+    },
+    {
+        "char": "🇧🇫",
+        "name": "flag burkina faso burkina faso flag nation country banner burkina faso"
+    },
+    {
+        "char": "🇧🇬",
+        "name": "flag bulgaria bg flag nation country banner bulgaria"
+    },
+    {
+        "char": "🇧🇭",
+        "name": "flag bahrain bh flag nation country banner bahrain"
+    },
+    {
+        "char": "🇧🇮",
+        "name": "flag burundi bi flag nation country banner burundi"
+    },
+    {
+        "char": "🇧🇯",
+        "name": "flag benin bj flag nation country banner benin"
+    },
+    {
+        "char": "🇧🇱",
+        "name": "flag st barthelemy saint barthélemy flag nation country banner st barthelemy"
+    },
+    {
+        "char": "🇧🇲",
+        "name": "flag bermuda bm flag nation country banner bermuda"
+    },
+    {
+        "char": "🇧🇳",
+        "name": "flag brunei bn darussalam flag nation country banner brunei"
+    },
+    {
+        "char": "🇧🇴",
+        "name": "flag bolivia bo flag nation country banner bolivia"
+    },
+    {
+        "char": "🇧🇶",
+        "name": "flag caribbean netherlands bonaire flag nation country banner caribbean netherlands"
+    },
+    {
+        "char": "🇧🇷",
+        "name": "flag brazil br flag nation country banner brazil"
+    },
+    {
+        "char": "🇧🇸",
+        "name": "flag bahamas bs flag nation country banner bahamas"
+    },
+    {
+        "char": "🇧🇹",
+        "name": "flag bhutan bt flag nation country banner bhutan"
+    },
+    {
+        "char": "🇧🇻",
+        "name": "flag bouvet island norway"
+    },
+    {
+        "char": "🇧🇼",
+        "name": "flag botswana bw flag nation country banner botswana"
+    },
+    {
+        "char": "🇧🇾",
+        "name": "flag belarus by flag nation country banner belarus"
+    },
+    {
+        "char": "🇧🇿",
+        "name": "flag belize bz flag nation country banner belize"
+    },
+    {
+        "char": "🇨🇦",
+        "name": "flag canada ca flag nation country banner canada"
+    },
+    {
+        "char": "🇨🇨",
+        "name": "flag cocos islands cocos keeling islands flag nation country banner cocos islands"
+    },
+    {
+        "char": "🇨🇩",
+        "name": "flag congo kinshasa congo democratic republic flag nation country banner congo kinshasa"
+    },
+    {
+        "char": "🇨🇫",
+        "name": "flag central african republic central african republic flag nation country banner central african republic"
+    },
+    {
+        "char": "🇨🇬",
+        "name": "flag congo brazzaville congo flag nation country banner congo brazzaville"
+    },
+    {
+        "char": "🇨🇭",
+        "name": "flag switzerland ch flag nation country banner switzerland"
+    },
+    {
+        "char": "🇨🇮",
+        "name": "flag cote d ivoire ivory coast flag nation country banner cote d ivoire"
+    },
+    {
+        "char": "🇨🇰",
+        "name": "flag cook islands cook islands flag nation country banner cook islands"
+    },
+    {
+        "char": "🇨🇱",
+        "name": "flag chile flag nation country banner chile"
+    },
+    {
+        "char": "🇨🇲",
+        "name": "flag cameroon cm flag nation country banner cameroon"
+    },
+    {
+        "char": "🇨🇳",
+        "name": "flag china china chinese prc flag country nation banner china"
+    },
+    {
+        "char": "🇨🇴",
+        "name": "flag colombia co flag nation country banner colombia"
+    },
+    {
+        "char": "🇨🇵",
+        "name": "flag clipperton island"
+    },
+    {
+        "char": "🇨🇷",
+        "name": "flag costa rica costa rica flag nation country banner costa rica"
+    },
+    {
+        "char": "🇨🇺",
+        "name": "flag cuba cu flag nation country banner cuba"
+    },
+    {
+        "char": "🇨🇻",
+        "name": "flag cape verde cabo verde flag nation country banner cape verde"
+    },
+    {
+        "char": "🇨🇼",
+        "name": "flag curacao curaçao flag nation country banner curacao"
+    },
+    {
+        "char": "🇨🇽",
+        "name": "flag christmas island christmas island flag nation country banner christmas island"
+    },
+    {
+        "char": "🇨🇾",
+        "name": "flag cyprus cy flag nation country banner cyprus"
+    },
+    {
+        "char": "🇨🇿",
+        "name": "flag czechia cz flag nation country banner czechia"
+    },
+    {
+        "char": "🇩🇪",
+        "name": "flag germany german nation flag country banner germany"
+    },
+    {
+        "char": "🇩🇬",
+        "name": "flag diego garcia"
+    },
+    {
+        "char": "🇩🇯",
+        "name": "flag djibouti dj flag nation country banner djibouti"
+    },
+    {
+        "char": "🇩🇰",
+        "name": "flag denmark dk flag nation country banner denmark"
+    },
+    {
+        "char": "🇩🇲",
+        "name": "flag dominica dm flag nation country banner dominica"
+    },
+    {
+        "char": "🇩🇴",
+        "name": "flag dominican republic dominican republic flag nation country banner dominican republic"
+    },
+    {
+        "char": "🇩🇿",
+        "name": "flag algeria dz flag nation country banner algeria"
+    },
+    {
+        "char": "🇪🇦",
+        "name": "flag ceuta melilla"
+    },
+    {
+        "char": "🇪🇨",
+        "name": "flag ecuador ec flag nation country banner ecuador"
+    },
+    {
+        "char": "🇪🇪",
+        "name": "flag estonia ee flag nation country banner estonia"
+    },
+    {
+        "char": "🇪🇬",
+        "name": "flag egypt eg flag nation country banner egypt"
+    },
+    {
+        "char": "🇪🇭",
+        "name": "flag western sahara western sahara flag nation country banner western sahara"
+    },
+    {
+        "char": "🇪🇷",
+        "name": "flag eritrea er flag nation country banner eritrea"
+    },
+    {
+        "char": "🇪🇸",
+        "name": "flag spain spain flag nation country banner spain"
+    },
+    {
+        "char": "🇪🇹",
+        "name": "flag ethiopia et flag nation country banner ethiopia"
+    },
+    {
+        "char": "🇪🇺",
+        "name": "flag european union european union flag banner"
+    },
+    {
+        "char": "🇫🇮",
+        "name": "flag finland fi flag nation country banner finland"
+    },
+    {
+        "char": "🇫🇯",
+        "name": "flag fiji fj flag nation country banner fiji"
+    },
+    {
+        "char": "🇫🇰",
+        "name": "flag falkland islands falkland islands malvinas flag nation country banner falkland islands"
+    },
+    {
+        "char": "🇫🇲",
+        "name": "flag micronesia micronesia federated states flag nation country banner micronesia"
+    },
+    {
+        "char": "🇫🇴",
+        "name": "flag faroe islands faroe islands flag nation country banner faroe islands"
+    },
+    {
+        "char": "🇫🇷",
+        "name": "flag france banner flag nation france french country france"
+    },
+    {
+        "char": "🇬🇦",
+        "name": "flag gabon ga flag nation country banner gabon"
+    },
+    {
+        "char": "🇬🇧",
+        "name": "flag united kingdom united kingdom great britain northern ireland flag nation country banner british UK english england union jack united kingdom"
+    },
+    {
+        "char": "🇬🇩",
+        "name": "flag grenada gd flag nation country banner grenada"
+    },
+    {
+        "char": "🇬🇪",
+        "name": "flag georgia ge flag nation country banner georgia"
+    },
+    {
+        "char": "🇬🇫",
+        "name": "flag french guiana french guiana flag nation country banner french guiana"
+    },
+    {
+        "char": "🇬🇬",
+        "name": "flag guernsey gg flag nation country banner guernsey"
+    },
+    {
+        "char": "🇬🇭",
+        "name": "flag ghana gh flag nation country banner ghana"
+    },
+    {
+        "char": "🇬🇮",
+        "name": "flag gibraltar gi flag nation country banner gibraltar"
+    },
+    {
+        "char": "🇬🇱",
+        "name": "flag greenland gl flag nation country banner greenland"
+    },
+    {
+        "char": "🇬🇲",
+        "name": "flag gambia gm flag nation country banner gambia"
+    },
+    {
+        "char": "🇬🇳",
+        "name": "flag guinea gn flag nation country banner guinea"
+    },
+    {
+        "char": "🇬🇵",
+        "name": "flag guadeloupe gp flag nation country banner guadeloupe"
+    },
+    {
+        "char": "🇬🇶",
+        "name": "flag equatorial guinea equatorial gn flag nation country banner equatorial guinea"
+    },
+    {
+        "char": "🇬🇷",
+        "name": "flag greece gr flag nation country banner greece"
+    },
+    {
+        "char": "🇬🇸",
+        "name": "flag south georgia south sandwich islands south georgia sandwich islands flag nation country banner south georgia south sandwich islands"
+    },
+    {
+        "char": "🇬🇹",
+        "name": "flag guatemala gt flag nation country banner guatemala"
+    },
+    {
+        "char": "🇬🇺",
+        "name": "flag guam gu flag nation country banner guam"
+    },
+    {
+        "char": "🇬🇼",
+        "name": "flag guinea bissau gw bissau flag nation country banner guinea bissau"
+    },
+    {
+        "char": "🇬🇾",
+        "name": "flag guyana gy flag nation country banner guyana"
+    },
+    {
+        "char": "🇭🇰",
+        "name": "flag hong kong sar china hong kong flag nation country banner hong kong sar china"
+    },
+    {
+        "char": "🇭🇲",
+        "name": "flag heard mcdonald islands"
+    },
+    {
+        "char": "🇭🇳",
+        "name": "flag honduras hn flag nation country banner honduras"
+    },
+    {
+        "char": "🇭🇷",
+        "name": "flag croatia hr flag nation country banner croatia"
+    },
+    {
+        "char": "🇭🇹",
+        "name": "flag haiti ht flag nation country banner haiti"
+    },
+    {
+        "char": "🇭🇺",
+        "name": "flag hungary hu flag nation country banner hungary"
+    },
+    {
+        "char": "🇮🇨",
+        "name": "flag canary islands canary islands flag nation country banner canary islands"
+    },
+    {
+        "char": "🇮🇩",
+        "name": "flag indonesia flag nation country banner indonesia"
+    },
+    {
+        "char": "🇮🇪",
+        "name": "flag ireland ie flag nation country banner ireland"
+    },
+    {
+        "char": "🇮🇱",
+        "name": "flag israel il flag nation country banner israel"
+    },
+    {
+        "char": "🇮🇲",
+        "name": "flag isle of man isle man flag nation country banner isle of man"
+    },
+    {
+        "char": "🇮🇳",
+        "name": "flag india in flag nation country banner india"
+    },
+    {
+        "char": "🇮🇴",
+        "name": "flag british indian ocean territory british indian ocean territory flag nation country banner british indian ocean territory"
+    },
+    {
+        "char": "🇮🇶",
+        "name": "flag iraq iq flag nation country banner iraq"
+    },
+    {
+        "char": "🇮🇷",
+        "name": "flag iran iran islamic republic flag nation country banner iran"
+    },
+    {
+        "char": "🇮🇸",
+        "name": "flag iceland is flag nation country banner iceland"
+    },
+    {
+        "char": "🇮🇹",
+        "name": "flag italy italy flag nation country banner italy"
+    },
+    {
+        "char": "🇯🇪",
+        "name": "flag jersey je flag nation country banner jersey"
+    },
+    {
+        "char": "🇯🇲",
+        "name": "flag jamaica jm flag nation country banner jamaica"
+    },
+    {
+        "char": "🇯🇴",
+        "name": "flag jordan jo flag nation country banner jordan"
+    },
+    {
+        "char": "🇯🇵",
+        "name": "flag japan japanese nation flag country banner japan"
+    },
+    {
+        "char": "🇰🇪",
+        "name": "flag kenya ke flag nation country banner kenya"
+    },
+    {
+        "char": "🇰🇬",
+        "name": "flag kyrgyzstan kg flag nation country banner kyrgyzstan"
+    },
+    {
+        "char": "🇰🇭",
+        "name": "flag cambodia kh flag nation country banner cambodia"
+    },
+    {
+        "char": "🇰🇮",
+        "name": "flag kiribati ki flag nation country banner kiribati"
+    },
+    {
+        "char": "🇰🇲",
+        "name": "flag comoros km flag nation country banner comoros"
+    },
+    {
+        "char": "🇰🇳",
+        "name": "flag st kitts nevis saint kitts nevis flag nation country banner st kitts nevis"
+    },
+    {
+        "char": "🇰🇵",
+        "name": "flag north korea north korea nation flag country banner north korea"
+    },
+    {
+        "char": "🇰🇷",
+        "name": "flag south korea south korea nation flag country banner south korea"
+    },
+    {
+        "char": "🇰🇼",
+        "name": "flag kuwait kw flag nation country banner kuwait"
+    },
+    {
+        "char": "🇰🇾",
+        "name": "flag cayman islands cayman islands flag nation country banner cayman islands"
+    },
+    {
+        "char": "🇰🇿",
+        "name": "flag kazakhstan kz flag nation country banner kazakhstan"
+    },
+    {
+        "char": "🇱🇦",
+        "name": "flag laos lao democratic republic flag nation country banner laos"
+    },
+    {
+        "char": "🇱🇧",
+        "name": "flag lebanon lb flag nation country banner lebanon"
+    },
+    {
+        "char": "🇱🇨",
+        "name": "flag st lucia saint lucia flag nation country banner st lucia"
+    },
+    {
+        "char": "🇱🇮",
+        "name": "flag liechtenstein li flag nation country banner liechtenstein"
+    },
+    {
+        "char": "🇱🇰",
+        "name": "flag sri lanka sri lanka flag nation country banner sri lanka"
+    },
+    {
+        "char": "🇱🇷",
+        "name": "flag liberia lr flag nation country banner liberia"
+    },
+    {
+        "char": "🇱🇸",
+        "name": "flag lesotho ls flag nation country banner lesotho"
+    },
+    {
+        "char": "🇱🇹",
+        "name": "flag lithuania lt flag nation country banner lithuania"
+    },
+    {
+        "char": "🇱🇺",
+        "name": "flag luxembourg lu flag nation country banner luxembourg"
+    },
+    {
+        "char": "🇱🇻",
+        "name": "flag latvia lv flag nation country banner latvia"
+    },
+    {
+        "char": "🇱🇾",
+        "name": "flag libya ly flag nation country banner libya"
+    },
+    {
+        "char": "🇲🇦",
+        "name": "flag morocco ma flag nation country banner morocco"
+    },
+    {
+        "char": "🇲🇨",
+        "name": "flag monaco mc flag nation country banner monaco"
+    },
+    {
+        "char": "🇲🇩",
+        "name": "flag moldova moldova republic flag nation country banner moldova"
+    },
+    {
+        "char": "🇲🇪",
+        "name": "flag montenegro me flag nation country banner montenegro"
+    },
+    {
+        "char": "🇲🇫",
+        "name": "flag st martin"
+    },
+    {
+        "char": "🇲🇬",
+        "name": "flag madagascar mg flag nation country banner madagascar"
+    },
+    {
+        "char": "🇲🇭",
+        "name": "flag marshall islands marshall islands flag nation country banner marshall islands"
+    },
+    {
+        "char": "🇲🇰",
+        "name": "flag north macedonia macedonia flag nation country banner north macedonia"
+    },
+    {
+        "char": "🇲🇱",
+        "name": "flag mali ml flag nation country banner mali"
+    },
+    {
+        "char": "🇲🇲",
+        "name": "flag myanmar mm flag nation country banner myanmar"
+    },
+    {
+        "char": "🇲🇳",
+        "name": "flag mongolia mn flag nation country banner mongolia"
+    },
+    {
+        "char": "🇲🇴",
+        "name": "flag macao sar china macao flag nation country banner macao sar china"
+    },
+    {
+        "char": "🇲🇵",
+        "name": "flag northern mariana islands northern mariana islands flag nation country banner northern mariana islands"
+    },
+    {
+        "char": "🇲🇶",
+        "name": "flag martinique mq flag nation country banner martinique"
+    },
+    {
+        "char": "🇲🇷",
+        "name": "flag mauritania mr flag nation country banner mauritania"
+    },
+    {
+        "char": "🇲🇸",
+        "name": "flag montserrat ms flag nation country banner montserrat"
+    },
+    {
+        "char": "🇲🇹",
+        "name": "flag malta mt flag nation country banner malta"
+    },
+    {
+        "char": "🇲🇺",
+        "name": "flag mauritius mu flag nation country banner mauritius"
+    },
+    {
+        "char": "🇲🇻",
+        "name": "flag maldives mv flag nation country banner maldives"
+    },
+    {
+        "char": "🇲🇼",
+        "name": "flag malawi mw flag nation country banner malawi"
+    },
+    {
+        "char": "🇲🇽",
+        "name": "flag mexico mx flag nation country banner mexico"
+    },
+    {
+        "char": "🇲🇾",
+        "name": "flag malaysia my flag nation country banner malaysia"
+    },
+    {
+        "char": "🇲🇿",
+        "name": "flag mozambique mz flag nation country banner mozambique"
+    },
+    {
+        "char": "🇳🇦",
+        "name": "flag namibia na flag nation country banner namibia"
+    },
+    {
+        "char": "🇳🇨",
+        "name": "flag new caledonia new caledonia flag nation country banner new caledonia"
+    },
+    {
+        "char": "🇳🇪",
+        "name": "flag niger ne flag nation country banner niger"
+    },
+    {
+        "char": "🇳🇫",
+        "name": "flag norfolk island norfolk island flag nation country banner norfolk island"
+    },
+    {
+        "char": "🇳🇬",
+        "name": "flag nigeria flag nation country banner nigeria"
+    },
+    {
+        "char": "🇳🇮",
+        "name": "flag nicaragua ni flag nation country banner nicaragua"
+    },
+    {
+        "char": "🇳🇱",
+        "name": "flag netherlands nl flag nation country banner netherlands"
+    },
+    {
+        "char": "🇳🇴",
+        "name": "flag norway no flag nation country banner norway"
+    },
+    {
+        "char": "🇳🇵",
+        "name": "flag nepal np flag nation country banner nepal"
+    },
+    {
+        "char": "🇳🇷",
+        "name": "flag nauru nr flag nation country banner nauru"
+    },
+    {
+        "char": "🇳🇺",
+        "name": "flag niue nu flag nation country banner niue"
+    },
+    {
+        "char": "🇳🇿",
+        "name": "flag new zealand new zealand flag nation country banner new zealand"
+    },
+    {
+        "char": "🇴🇲",
+        "name": "flag oman om symbol flag nation country banner oman"
+    },
+    {
+        "char": "🇵🇦",
+        "name": "flag panama pa flag nation country banner panama"
+    },
+    {
+        "char": "🇵🇪",
+        "name": "flag peru pe flag nation country banner peru"
+    },
+    {
+        "char": "🇵🇫",
+        "name": "flag french polynesia french polynesia flag nation country banner french polynesia"
+    },
+    {
+        "char": "🇵🇬",
+        "name": "flag papua new guinea papua new guinea flag nation country banner papua new guinea"
+    },
+    {
+        "char": "🇵🇭",
+        "name": "flag philippines ph flag nation country banner philippines"
+    },
+    {
+        "char": "🇵🇰",
+        "name": "flag pakistan pk flag nation country banner pakistan"
+    },
+    {
+        "char": "🇵🇱",
+        "name": "flag poland pl flag nation country banner poland"
+    },
+    {
+        "char": "🇵🇲",
+        "name": "flag st pierre miquelon saint pierre miquelon flag nation country banner st pierre miquelon"
+    },
+    {
+        "char": "🇵🇳",
+        "name": "flag pitcairn islands pitcairn flag nation country banner pitcairn islands"
+    },
+    {
+        "char": "🇵🇷",
+        "name": "flag puerto rico puerto rico flag nation country banner puerto rico"
+    },
+    {
+        "char": "🇵🇸",
+        "name": "flag palestinian territories palestine palestinian territories flag nation country banner palestinian territories"
+    },
+    {
+        "char": "🇵🇹",
+        "name": "flag portugal pt flag nation country banner portugal"
+    },
+    {
+        "char": "🇵🇼",
+        "name": "flag palau pw flag nation country banner palau"
+    },
+    {
+        "char": "🇵🇾",
+        "name": "flag paraguay py flag nation country banner paraguay"
+    },
+    {
+        "char": "🇶🇦",
+        "name": "flag qatar qa flag nation country banner qatar"
+    },
+    {
+        "char": "🇷🇪",
+        "name": "flag reunion réunion flag nation country banner reunion"
+    },
+    {
+        "char": "🇷🇴",
+        "name": "flag romania ro flag nation country banner romania"
+    },
+    {
+        "char": "🇷🇸",
+        "name": "flag serbia rs flag nation country banner serbia"
+    },
+    {
+        "char": "🇷🇺",
+        "name": "flag russia russian federation flag nation country banner russia"
+    },
+    {
+        "char": "🇷🇼",
+        "name": "flag rwanda rw flag nation country banner rwanda"
+    },
+    {
+        "char": "🇸🇦",
+        "name": "flag saudi arabia flag nation country banner saudi arabia"
+    },
+    {
+        "char": "🇸🇧",
+        "name": "flag solomon islands solomon islands flag nation country banner solomon islands"
+    },
+    {
+        "char": "🇸🇨",
+        "name": "flag seychelles sc flag nation country banner seychelles"
+    },
+    {
+        "char": "🇸🇩",
+        "name": "flag sudan sd flag nation country banner sudan"
+    },
+    {
+        "char": "🇸🇪",
+        "name": "flag sweden se flag nation country banner sweden"
+    },
+    {
+        "char": "🇸🇬",
+        "name": "flag singapore sg flag nation country banner singapore"
+    },
+    {
+        "char": "🇸🇭",
+        "name": "flag st helena saint helena ascension tristan cunha flag nation country banner st helena"
+    },
+    {
+        "char": "🇸🇮",
+        "name": "flag slovenia si flag nation country banner slovenia"
+    },
+    {
+        "char": "🇸🇯",
+        "name": "flag svalbard jan mayen"
+    },
+    {
+        "char": "🇸🇰",
+        "name": "flag slovakia sk flag nation country banner slovakia"
+    },
+    {
+        "char": "🇸🇱",
+        "name": "flag sierra leone sierra leone flag nation country banner sierra leone"
+    },
+    {
+        "char": "🇸🇲",
+        "name": "flag san marino san marino flag nation country banner san marino"
+    },
+    {
+        "char": "🇸🇳",
+        "name": "flag senegal sn flag nation country banner senegal"
+    },
+    {
+        "char": "🇸🇴",
+        "name": "flag somalia so flag nation country banner somalia"
+    },
+    {
+        "char": "🇸🇷",
+        "name": "flag suriname sr flag nation country banner suriname"
+    },
+    {
+        "char": "🇸🇸",
+        "name": "flag south sudan south sd flag nation country banner south sudan"
+    },
+    {
+        "char": "🇸🇹",
+        "name": "flag sao tome principe sao tome principe flag nation country banner sao tome principe"
+    },
+    {
+        "char": "🇸🇻",
+        "name": "flag el salvador el salvador flag nation country banner el salvador"
+    },
+    {
+        "char": "🇸🇽",
+        "name": "flag sint maarten sint maarten dutch flag nation country banner sint maarten"
+    },
+    {
+        "char": "🇸🇾",
+        "name": "flag syria syrian arab republic flag nation country banner syria"
+    },
+    {
+        "char": "🇸🇿",
+        "name": "flag eswatini sz flag nation country banner eswatini"
+    },
+    {
+        "char": "🇹🇦",
+        "name": "flag tristan da cunha"
+    },
+    {
+        "char": "🇹🇨",
+        "name": "flag turks caicos islands turks caicos islands flag nation country banner turks caicos islands"
+    },
+    {
+        "char": "🇹🇩",
+        "name": "flag chad td flag nation country banner chad"
+    },
+    {
+        "char": "🇹🇫",
+        "name": "flag french southern territories french southern territories flag nation country banner french southern territories"
+    },
+    {
+        "char": "🇹🇬",
+        "name": "flag togo tg flag nation country banner togo"
+    },
+    {
+        "char": "🇹🇭",
+        "name": "flag thailand th flag nation country banner thailand"
+    },
+    {
+        "char": "🇹🇯",
+        "name": "flag tajikistan tj flag nation country banner tajikistan"
+    },
+    {
+        "char": "🇹🇰",
+        "name": "flag tokelau tk flag nation country banner tokelau"
+    },
+    {
+        "char": "🇹🇱",
+        "name": "flag timor leste timor leste flag nation country banner timor leste"
+    },
+    {
+        "char": "🇹🇲",
+        "name": "flag turkmenistan flag nation country banner turkmenistan"
+    },
+    {
+        "char": "🇹🇳",
+        "name": "flag tunisia tn flag nation country banner tunisia"
+    },
+    {
+        "char": "🇹🇴",
+        "name": "flag tonga to flag nation country banner tonga"
+    },
+    {
+        "char": "🇹🇷",
+        "name": "flag turkey turkey flag nation country banner turkey"
+    },
+    {
+        "char": "🇹🇹",
+        "name": "flag trinidad tobago trinidad tobago flag nation country banner trinidad tobago"
+    },
+    {
+        "char": "🇹🇻",
+        "name": "flag tuvalu flag nation country banner tuvalu"
+    },
+    {
+        "char": "🇹🇼",
+        "name": "flag taiwan tw flag nation country banner taiwan"
+    },
+    {
+        "char": "🇹🇿",
+        "name": "flag tanzania tanzania united republic flag nation country banner tanzania"
+    },
+    {
+        "char": "🇺🇦",
+        "name": "flag ukraine ua flag nation country banner ukraine"
+    },
+    {
+        "char": "🇺🇬",
+        "name": "flag uganda ug flag nation country banner uganda"
+    },
+    {
+        "char": "🇺🇲",
+        "name": "flag u s outlying islands"
+    },
+    {
+        "char": "🇺🇳",
+        "name": "flag united nations un flag banner"
+    },
+    {
+        "char": "🇺🇸",
+        "name": "flag united states united states america flag nation country banner united states"
+    },
+    {
+        "char": "🇺🇾",
+        "name": "flag uruguay uy flag nation country banner uruguay"
+    },
+    {
+        "char": "🇺🇿",
+        "name": "flag uzbekistan uz flag nation country banner uzbekistan"
+    },
+    {
+        "char": "🇻🇦",
+        "name": "flag vatican city vatican city flag nation country banner vatican city"
+    },
+    {
+        "char": "🇻🇨",
+        "name": "flag st vincent grenadines saint vincent grenadines flag nation country banner st vincent grenadines"
+    },
+    {
+        "char": "🇻🇪",
+        "name": "flag venezuela ve bolivarian republic flag nation country banner venezuela"
+    },
+    {
+        "char": "🇻🇬",
+        "name": "flag british virgin islands british virgin islands bvi flag nation country banner british virgin islands"
+    },
+    {
+        "char": "🇻🇮",
+        "name": "flag u s virgin islands virgin islands us flag nation country banner u s virgin islands"
+    },
+    {
+        "char": "🇻🇳",
+        "name": "flag vietnam viet nam flag nation country banner vietnam"
+    },
+    {
+        "char": "🇻🇺",
+        "name": "flag vanuatu vu flag nation country banner vanuatu"
+    },
+    {
+        "char": "🇼🇫",
+        "name": "flag wallis futuna wallis futuna flag nation country banner wallis futuna"
+    },
+    {
+        "char": "🇼🇸",
+        "name": "flag samoa ws flag nation country banner samoa"
+    },
+    {
+        "char": "🇽🇰",
+        "name": "flag kosovo xk flag nation country banner kosovo"
+    },
+    {
+        "char": "🇾🇪",
+        "name": "flag yemen ye flag nation country banner yemen"
+    },
+    {
+        "char": "🇾🇹",
+        "name": "flag mayotte yt flag nation country banner mayotte"
+    },
+    {
+        "char": "🇿🇦",
+        "name": "flag south africa south africa flag nation country banner south africa"
+    },
+    {
+        "char": "🇿🇲",
+        "name": "flag zambia zm flag nation country banner zambia"
+    },
+    {
+        "char": "🇿🇼",
+        "name": "flag zimbabwe zw flag nation country banner zimbabwe"
+    },
+    {
+        "char": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+        "name": "flag england flag english"
+    },
+    {
+        "char": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+        "name": "flag scotland flag scottish"
+    },
+    {
+        "char": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
+        "name": "flag wales flag welsh"
+    },
+    {
+        "char": "🥲",
+        "name": "smiling face with tear sad cry pretend"
+    },
+    {
+        "char": "🥸",
+        "name": "disguised face pretent brows glasses moustache"
+    },
+    {
+        "char": "🤌",
+        "name": "pinched fingers size tiny small"
+    },
+    {
+        "char": "🫀",
+        "name": "anatomical heart health heartbeat"
+    },
+    {
+        "char": "🫁",
+        "name": "lungs breathe"
+    },
+    {
+        "char": "🥷",
+        "name": "ninja ninjutsu skills japanese"
+    },
+    {
+        "char": "🤵‍♂️",
+        "name": "man in tuxedo formal fashion"
+    },
+    {
+        "char": "🤵‍♀️",
+        "name": "woman in tuxedo formal fashion"
+    },
+    {
+        "char": "👰‍♂️",
+        "name": "man with veil wedding marriage"
+    },
+    {
+        "char": "👰‍♀️",
+        "name": "woman with veil wedding marriage"
+    },
+    {
+        "char": "👩‍🍼",
+        "name": "woman feeding baby birth food"
+    },
+    {
+        "char": "👨‍🍼",
+        "name": "man feeding baby birth food"
+    },
+    {
+        "char": "🧑‍🍼",
+        "name": "person feeding baby birth food"
+    },
+    {
+        "char": "🧑‍🎄",
+        "name": "mx claus christmas"
+    },
+    {
+        "char": "🫂",
+        "name": "people hugging care"
+    },
+    {
+        "char": "🐈‍⬛",
+        "name": "black cat superstition luck"
+    },
+    {
+        "char": "🦬",
+        "name": "bison ox"
+    },
+    {
+        "char": "🦣",
+        "name": "mammoth elephant tusks"
+    },
+    {
+        "char": "🦫",
+        "name": "beaver animal rodent"
+    },
+    {
+        "char": "🐻‍❄️",
+        "name": "polar bear animal arctic"
+    },
+    {
+        "char": "🦤",
+        "name": "dodo animal bird"
+    },
+    {
+        "char": "🪶",
+        "name": "feather bird fly"
+    },
+    {
+        "char": "🦭",
+        "name": "seal animal creature sea"
+    },
+    {
+        "char": "🪲",
+        "name": "beetle insect"
+    },
+    {
+        "char": "🪳",
+        "name": "cockroach insect pests"
+    },
+    {
+        "char": "🪰",
+        "name": "fly insect"
+    },
+    {
+        "char": "🪱",
+        "name": "worm animal"
+    },
+    {
+        "char": "🪴",
+        "name": "potted plant greenery house"
+    },
+    {
+        "char": "🫐",
+        "name": "blueberries fruit"
+    },
+    {
+        "char": "🫒",
+        "name": "olive fruit"
+    },
+    {
+        "char": "🫑",
+        "name": "bell pepper fruit plant"
+    },
+    {
+        "char": "🫓",
+        "name": "flatbread flour food"
+    },
+    {
+        "char": "🫔",
+        "name": "tamale food masa"
+    },
+    {
+        "char": "🫕",
+        "name": "fondue cheese pot food"
+    },
+    {
+        "char": "🫖",
+        "name": "teapot drink hot"
+    },
+    {
+        "char": "🧋",
+        "name": "bubble tea taiwan boba milk tea straw"
+    },
+    {
+        "char": "🪨",
+        "name": "rock stone"
+    },
+    {
+        "char": "🪵",
+        "name": "wood nature timber trunk"
+    },
+    {
+        "char": "🛖",
+        "name": "hut house structure"
+    },
+    {
+        "char": "🛻",
+        "name": "pickup truck car transportation"
+    },
+    {
+        "char": "🛼",
+        "name": "roller skate footwear sports"
+    },
+    {
+        "char": "🪄",
+        "name": "magic wand supernature power"
+    },
+    {
+        "char": "🪅",
+        "name": "pinata mexico candy celebration"
+    },
+    {
+        "char": "🪆",
+        "name": "nesting dolls matryoshka toy"
+    },
+    {
+        "char": "🪡",
+        "name": "sewing needle stitches"
+    },
+    {
+        "char": "🪢",
+        "name": "knot rope scout"
+    },
+    {
+        "char": "🩴",
+        "name": "thong sandal footwear summer"
+    },
+    {
+        "char": "🪖",
+        "name": "military helmet army protection"
+    },
+    {
+        "char": "🪗",
+        "name": "accordion music"
+    },
+    {
+        "char": "🪘",
+        "name": "long drum music"
+    },
+    {
+        "char": "🪙",
+        "name": "coin money currency"
+    },
+    {
+        "char": "🪃",
+        "name": "boomerang weapon"
+    },
+    {
+        "char": "🪚",
+        "name": "carpentry saw cut chop"
+    },
+    {
+        "char": "🪛",
+        "name": "screwdriver tools"
+    },
+    {
+        "char": "🪝",
+        "name": "hook tools"
+    },
+    {
+        "char": "🪜",
+        "name": "ladder tools"
+    },
+    {
+        "char": "🛗",
+        "name": "elevator lift"
+    },
+    {
+        "char": "🪞",
+        "name": "mirror reflection"
+    },
+    {
+        "char": "🪟",
+        "name": "window scenery"
+    },
+    {
+        "char": "🪠",
+        "name": "plunger toilet"
+    },
+    {
+        "char": "🪤",
+        "name": "mouse trap cheese"
+    },
+    {
+        "char": "🪣",
+        "name": "bucket water container"
+    },
+    {
+        "char": "🪥",
+        "name": "toothbrush hygiene dental"
+    },
+    {
+        "char": "🪦",
+        "name": "headstone death rip grave"
+    },
+    {
+        "char": "🪧",
+        "name": "placard announcement"
+    },
+    {
+        "char": "⚧️",
+        "name": "transgender symbol lgbtq"
+    },
+    {
+        "char": "🏳️‍⚧️",
+        "name": "transgender flag lgbtq"
+    },
+    {
+        "char": "😶‍🌫️",
+        "name": "face in clouds shower steam dream"
+    },
+    {
+        "char": "😮‍💨",
+        "name": "face exhaling relieve relief tired sigh"
+    },
+    {
+        "char": "😵‍💫",
+        "name": "face with spiral eyes sick ill confused nauseous nausea"
+    },
+    {
+        "char": "❤️‍🔥",
+        "name": "heart on fire passionate enthusiastic"
+    },
+    {
+        "char": "❤️‍🩹",
+        "name": "mending heart broken heart bandage wounded"
+    },
+    {
+        "char": "🧔‍♂️",
+        "name": "man beard facial hair"
+    },
+    {
+        "char": "🧔‍♀️",
+        "name": "woman beard facial hair"
+    },
+    {
+        "char": "🫠",
+        "name": "melting face hot heat"
+    },
+    {
+        "char": "🫢",
+        "name": "face with open eyes and hand over mouth silence secret shock surprise"
+    },
+    {
+        "char": "🫣",
+        "name": "face with peeking eye scared frightening embarrassing"
+    },
+    {
+        "char": "🫡",
+        "name": "saluting face respect salute"
+    },
+    {
+        "char": "🫥",
+        "name": "dotted line face invisible lonely isolation depression"
+    },
+    {
+        "char": "🫤",
+        "name": "face with diagonal mouth skeptic confuse frustrated indifferent"
+    },
+    {
+        "char": "🥹",
+        "name": "face holding back tears touched gratitude"
+    },
+    {
+        "char": "🫱",
+        "name": "rightwards hand palm offer"
+    },
+    {
+        "char": "🫲",
+        "name": "leftwards hand palm offer"
+    },
+    {
+        "char": "🫳",
+        "name": "palm down hand palm drop"
+    },
+    {
+        "char": "🫴",
+        "name": "palm up hand lift offer demand"
+    },
+    {
+        "char": "🫰",
+        "name": "hand with index finger and thumb crossed heart love money expensive"
+    },
+    {
+        "char": "🫵",
+        "name": "index pointing at the viewer you recruit"
+    },
+    {
+        "char": "🫶",
+        "name": "heart hands love appreciation support"
+    },
+    {
+        "char": "🫦",
+        "name": "biting lip flirt sexy pain worry"
+    },
+    {
+        "char": "🫅",
+        "name": "person with crown royalty power"
+    },
+    {
+        "char": "🫃",
+        "name": "pregnant man baby belly"
+    },
+    {
+        "char": "🫄",
+        "name": "pregnant person baby belly"
+    },
+    {
+        "char": "🧌",
+        "name": "troll mystical monster"
+    },
+    {
+        "char": "🪸",
+        "name": "coral ocean sea reef"
+    },
+    {
+        "char": "🪷",
+        "name": "lotus flower calm meditation"
+    },
+    {
+        "char": "🪹",
+        "name": "empty nest bird"
+    },
+    {
+        "char": "🪺",
+        "name": "nest with eggs bird"
+    },
+    {
+        "char": "🫘",
+        "name": "beans food"
+    },
+    {
+        "char": "🫗",
+        "name": "pouring liquid cup water"
+    },
+    {
+        "char": "🫙",
+        "name": "jar container sauce"
+    },
+    {
+        "char": "🛝",
+        "name": "playground slide fun park"
+    },
+    {
+        "char": "🛞",
+        "name": "wheel car transport"
+    },
+    {
+        "char": "🛟",
+        "name": "ring buoy life saver life preserver"
+    },
+    {
+        "char": "🪬",
+        "name": "hamsa religion protection"
+    },
+    {
+        "char": "🪩",
+        "name": "mirror ball disco dance party"
+    },
+    {
+        "char": "🪫",
+        "name": "low battery drained dead"
+    },
+    {
+        "char": "🩼",
+        "name": "crutch accessibility assist"
+    },
+    {
+        "char": "🩻",
+        "name": "x-ray skeleton medicine"
+    },
+    {
+        "char": "🫧",
+        "name": "bubbles soap fun carbonation sparkling"
+    },
+    {
+        "char": "🪪",
+        "name": "identification card document"
+    },
+    {
+        "char": "🟰",
+        "name": "heavy equals sign math"
+    },
+    {
+        "char": "¿?",
+        "name": "question upside down reversed spanish"
+    },
+    {
+        "char": "←",
+        "name": "left arrow"
+    },
+    {
+        "char": "↑",
+        "name": "up arrow"
+    },
+    {
+        "char": "→",
+        "name": "right arrow"
+    },
+    {
+        "char": "↓",
+        "name": "down arrow"
+    },
+    {
+        "char": "←↑→↓",
+        "name": "all directions up down left right arrows"
+    },
+    {
+        "char": "AH↗️HA↘️HA↗️HA↘️",
+        "name": "pekora arrows hahaha rabbit"
+    },
+    {
+        "char": "•",
+        "name": "dot circle separator"
+    },
+    {
+        "char": "「」",
+        "name": "japanese quote square bracket"
+    },
+    {
+        "char": "¯\\_(ツ)_/¯",
+        "name": "shrug idk i dont know"
+    },
+    {
+        "char": "↵",
+        "name": "enter key return"
+    },
+    {
+        "char": "𝕏",
+        "name": " twitter x logo"
+    },
+    {
+        "char": "👉👈",
+        "name": "etou ughhhhhhh shy"
+    },
+    {
+        "char": "👉👌",
+        "name": "put it in imagination perv"
+    },
+    {
+        "char": "🫨",
+        "name": "shaking face tremble shake shocked"
+    },
+    {
+        "char": "🩷",
+        "name": "pink heart love"
+    },
+    {
+        "char": "🩵",
+        "name": "light blue heart love cyan"
+    },
+    {
+        "char": "🩶",
+        "name": "grey heart gray love"
+    },
+    {
+        "char": "🫷",
+        "name": "leftwards pushing hand stop halt left"
+    },
+    {
+        "char": "🫸",
+        "name": "rightwards pushing hand stop halt right"
+    },
+    {
+        "char": "🫎",
+        "name": "moose animal antlers"
+    },
+    {
+        "char": "🫏",
+        "name": "donkey animal mule ass"
+    },
+    {
+        "char": "🪽",
+        "name": "wing bird feather fly"
+    },
+    {
+        "char": "🐦‍⬛",
+        "name": "black bird crow raven rook"
+    },
+    {
+        "char": "🪿",
+        "name": "goose bird honk"
+    },
+    {
+        "char": "🪼",
+        "name": "jellyfish sea ocean sting"
+    },
+    {
+        "char": "🪻",
+        "name": "hyacinth flower spring"
+    },
+    {
+        "char": "🫚",
+        "name": "ginger root spice food"
+    },
+    {
+        "char": "🫛",
+        "name": "pea pod peas vegetable food"
+    },
+    {
+        "char": "🪭",
+        "name": "folding hand fan fan cool"
+    },
+    {
+        "char": "🪮",
+        "name": "hair pick afro comb"
+    },
+    {
+        "char": "🪇",
+        "name": "maracas instrument music shake"
+    },
+    {
+        "char": "🪈",
+        "name": "flute instrument music"
+    },
+    {
+        "char": "🪯",
+        "name": "khanda sikh religion symbol"
+    },
+    {
+        "char": "🛜",
+        "name": "wireless wifi wi-fi internet network"
+    },
+    {
+        "char": "🙂‍↔️",
+        "name": "head shaking horizontally no shake"
+    },
+    {
+        "char": "🙂‍↕️",
+        "name": "head shaking vertically yes nod"
+    },
+    {
+        "char": "🚶‍➡️",
+        "name": "person walking facing right walk"
+    },
+    {
+        "char": "🚶‍♀️‍➡️",
+        "name": "woman walking facing right walk"
+    },
+    {
+        "char": "🚶‍♂️‍➡️",
+        "name": "man walking facing right walk"
+    },
+    {
+        "char": "🧎‍➡️",
+        "name": "person kneeling facing right kneel"
+    },
+    {
+        "char": "🧎‍♀️‍➡️",
+        "name": "woman kneeling facing right kneel"
+    },
+    {
+        "char": "🧎‍♂️‍➡️",
+        "name": "man kneeling facing right kneel"
+    },
+    {
+        "char": "🧑‍🦯‍➡️",
+        "name": "person with white cane facing right accessibility blind"
+    },
+    {
+        "char": "👨‍🦯‍➡️",
+        "name": "man with white cane facing right accessibility blind"
+    },
+    {
+        "char": "👩‍🦯‍➡️",
+        "name": "woman with white cane facing right accessibility blind"
+    },
+    {
+        "char": "🧑‍🦼‍➡️",
+        "name": "person in motorized wheelchair facing right accessibility"
+    },
+    {
+        "char": "👨‍🦼‍➡️",
+        "name": "man in motorized wheelchair facing right accessibility"
+    },
+    {
+        "char": "👩‍🦼‍➡️",
+        "name": "woman in motorized wheelchair facing right accessibility"
+    },
+    {
+        "char": "🧑‍🦽‍➡️",
+        "name": "person in manual wheelchair facing right accessibility"
+    },
+    {
+        "char": "👨‍🦽‍➡️",
+        "name": "man in manual wheelchair facing right accessibility"
+    },
+    {
+        "char": "👩‍🦽‍➡️",
+        "name": "woman in manual wheelchair facing right accessibility"
+    },
+    {
+        "char": "🏃‍➡️",
+        "name": "person running facing right run"
+    },
+    {
+        "char": "🏃‍♀️‍➡️",
+        "name": "woman running facing right run"
+    },
+    {
+        "char": "🏃‍♂️‍➡️",
+        "name": "man running facing right run"
+    },
+    {
+        "char": "🧑‍🧑‍🧒",
+        "name": "family adult adult child parents"
+    },
+    {
+        "char": "🧑‍🧑‍🧒‍🧒",
+        "name": "family adult adult child child parents"
+    },
+    {
+        "char": "🧑‍🧒",
+        "name": "family adult child parent"
+    },
+    {
+        "char": "🧑‍🧒‍🧒",
+        "name": "family adult child child parent"
+    },
+    {
+        "char": "🐦‍🔥",
+        "name": "phoenix fire bird rebirth"
+    },
+    {
+        "char": "🍋‍🟩",
+        "name": "lime fruit citrus green"
+    },
+    {
+        "char": "🍄‍🟫",
+        "name": "brown mushroom fungi"
+    },
+    {
+        "char": "⛓️‍💥",
+        "name": "broken chain snap shatter"
+    },
+    {
+        "char": "🫩",
+        "name": "face with bags under eyes tired sleepy exhausted"
+    },
+    {
+        "char": "🫆",
+        "name": "fingerprint id biometric"
+    },
+    {
+        "char": "🪾",
+        "name": "leafless tree barren dead winter"
+    },
+    {
+        "char": "🫜",
+        "name": "root vegetable food turnip radish"
+    },
+    {
+        "char": "🪉",
+        "name": "harp instrument music"
+    },
+    {
+        "char": "🪏",
+        "name": "shovel dig tool"
+    },
+    {
+        "char": "🫟",
+        "name": "splatter splash stain mess"
+    },
+    {
+        "char": "🇨🇶",
+        "name": "flag sark"
+    },
+    {
+        "char": "🫪",
+        "name": "distorted face anxiety shocked panic"
+    },
+    {
+        "char": "🫯",
+        "name": "fight cloud comic brawl dust"
+    },
+    {
+        "char": "🫈",
+        "name": "hairy creature sasquatch bigfoot"
+    },
+    {
+        "char": "🧑‍🩰",
+        "name": "ballet dancer dance ballerina"
+    },
+    {
+        "char": "🫍",
+        "name": "orca killer whale"
+    },
+    {
+        "char": "🛘",
+        "name": "landslide rockfall disaster"
+    },
+    {
+        "char": "🪊",
+        "name": "trombone instrument music"
+    },
+    {
+        "char": "🪎",
+        "name": "treasure chest gold loot pirate"
+    }
+]
