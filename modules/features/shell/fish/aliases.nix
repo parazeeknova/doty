@@ -88,6 +88,50 @@
         cgb = "cargo build";
         cgr = "cargo run";
 
+        # -- Docker / Podman --
+        dk = "docker";
+        dkps = "docker ps";
+        dka = "docker ps -a";
+        dkimg = "docker images";
+        dkst = "docker stop";
+        dkrm = "docker rm";
+        dkrmi = "docker rmi";
+        dkc = "docker compose";
+        dkcu = "docker compose up";
+        dkcd = "docker compose down";
+        dkcl = "docker compose logs -f";
+        dkcb = "docker compose build";
+        dkcr = "docker compose restart";
+        pm = "podman";
+        pmps = "podman ps";
+        pma = "podman ps -a";
+        pmimg = "podman images";
+        pmst = "podman stop";
+        pmrm = "podman rm";
+        pmrmi = "podman rmi";
+        pmc = "podman compose";
+        pmcu = "podman compose up";
+        pmcd = "podman compose down";
+        pmcl = "podman compose logs -f";
+        pmcb = "podman compose build";
+        pmcr = "podman compose restart";
+
+        # -- Nix --
+        nrs = "sudo nixos-rebuild switch --flake .#apostrophe";
+        nrt = "sudo nixos-rebuild test --flake .#apostrophe";
+        nfu = "nix flake update";
+        nfc = "nix flake check";
+        nfsh = "nix flake show";
+        nsh = "nix shell";
+        npl = "nix profile list";
+        npr = "nix profile remove";
+        nps = "nix profile sync";
+        ncg = "nix-collect-garbage -d";
+        nso = "nix store optimise";
+        nb = "nix build";
+        nr = "nix run";
+        ne = "nix eval";
+
         # -- Archives --
         tarnow = "tar -acf ";
         untar = "tar -zxvf ";
