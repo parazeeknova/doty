@@ -12,6 +12,7 @@
       self.nixosModules.parazeeknovaStarship
       self.nixosModules.parazeeknovaTmux
       self.nixosModules.parazeeknovaZoxide
+      self.nixosModules.parazeeknovaHyprland
     ];
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];

@@ -18,18 +18,6 @@
         end
       '';
       shellInit = ''
-        if status is-login
-            if test (tty) = /dev/tty1
-                if not set -q HYPRLAND_INSTANCE_SIGNATURE
-                    if command -v uwsm >/dev/null 2>&1
-                        exec uwsm start hyprland.desktop
-                    else
-                        exec start-hyprland
-                    end
-                end
-            end
-        end
-
         if test -f ~/.fish_profile
             source ~/.fish_profile
         end
