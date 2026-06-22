@@ -23,8 +23,13 @@
 
       # -- Nix --
       nix-output-monitor
-      nixfmt-rfc-style
+      nixfmt
       nil
+      
+      # -- Apps --
+      vscode
+      ghostty
+      kitty
 
       # -- API Tools --
       httpie

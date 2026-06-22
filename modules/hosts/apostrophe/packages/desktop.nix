@@ -4,12 +4,15 @@
 
     environment.systemPackages = with pkgs; [
       vivaldi
-      vscode
-      ghostty
-      kitty
+      vivaldi-ffmpeg-codecs
+
+      # -- Thunar Supermacy --
       thunar
-      xfce.thunar-archive-plugin
-      xfce.thunar-volman
+      thunar-volman
+      thunar-archive-plugin
+      thunar-vcs-plugin
+      thunar-shares-plugin
+      thunar-media-tags-plugin
 
       # -- Wayland / Hyprland --
       uwsm
@@ -29,7 +32,6 @@
       cliphist
       mako
       tesseract
-      tesseract-data-eng
       brightnessctl
       wlr-randr
       wl-gammactl

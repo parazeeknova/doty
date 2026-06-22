@@ -97,13 +97,14 @@
       shellAbbrs = {
         # -- Git --
         g = "git";
-        ga = "git add";
-        gc = "git commit";
+        ga = "git add .";
         gco = "git checkout";
-        gd = "git diff";
+        gd = "git diff --output-indicator-new=' ' --output-indicator-old=' '";
         gl = "git log --oneline --graph --decorate -20";
         gp = "git push";
-        gs = "git status";
+        gs = "git status --short";
+        gap = "git add --patch";
+        gcns = "git -c commit.gpgsign=false commit -m"
 
         # -- TMUX --
         t = "tmux";
