@@ -23,7 +23,7 @@
 
       # -- Qt / GTK Themes --
       qt6Packages.qt6ct
-      qt5ct
+      libsForQt5.qt5ct
       kvantum
       papirus-icon-theme
       papirus-folders
