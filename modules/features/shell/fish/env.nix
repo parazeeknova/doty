@@ -21,9 +21,6 @@
         set -U __done_min_cmd_duration 10000
         set -U __done_notification_urgency_level low
 
-        # -- Docker --
-        export DOCKER_COMPOSE_PROVIDER_WARNING=0
-
         # -- Paths --
         fish_add_path ~/.local/bin
         fish_add_path ~/.cargo/bin
@@ -35,11 +32,6 @@
         set -Ux WABI_VM_SCAN_ROOT ""
         set -Ux WABI_GITHUB_USER "parazeeknova"
         set -Ux WABI_PRESETS_DIR "$HOME/doty/.config/hypr/wabi/presets"
-
-        # -- Node Version Manager --
-        set --query XDG_DATA_HOME || set --local XDG_DATA_HOME ~/.local/share
-        set --query nvm_mirror || set --global nvm_mirror https://nodejs.org/dist
-        set --query nvm_data || set --global nvm_data $XDG_DATA_HOME/nvm
       '';
     };
   };
