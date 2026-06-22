@@ -28,9 +28,9 @@
       # -- Text Processing --
       jq
       yq
-      sed
-      awk
-      grep
+      gnused
+      gawk
+      gnugrep
       ripgrep
 
       # -- System Utils --
