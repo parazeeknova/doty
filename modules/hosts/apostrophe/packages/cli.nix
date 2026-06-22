@@ -24,6 +24,7 @@
       file
       which
       tree-sitter
+      yazi
 
       # -- Text Processing --
       jq
@@ -31,6 +32,8 @@
       gnused
       gawk
       gnugrep
+      file
+      xclip
 
       # -- System Utils --
       htop
@@ -41,6 +44,9 @@
       lshw
       fastfetch
       neofetch
+      killall
+      pciutils
+      usbutils
 
       # -- Network Utils --
       nmap
@@ -48,10 +54,21 @@
       socat
       dnsutils
       iperf3
+      curl
+      wget
+
+      # -- Archive Utils --
+      unzip
+      p7zip
+      unrar
+      gnutar
+      gzip
 
       # -- Dev Tools --
       lazygit
       gitkraken
+      difftastic
+      diff-so-fancy
 
       # -- Misc --
       tmux

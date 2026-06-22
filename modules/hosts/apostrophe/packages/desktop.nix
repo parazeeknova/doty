@@ -6,6 +6,7 @@
       # -- Browsers --
       firefox
       vivaldi
+      zen-browser
 
       # -- Editors (GUI) --
       vscode
@@ -17,6 +18,7 @@
       # -- File Managers --
       thunar
       xfce.thunar-archive-plugin
+      xfce.thunar-volman
 
       # -- Wayland / Hyprland --
       uwsm
@@ -26,10 +28,12 @@
       hyprshot
       hyprpicker
       hyprsunset
+      hyprpaper
       pyprland
       quickshell
       swaylock
       swayidle
+      swaybg
       grim
       slurp
       swappy
@@ -38,12 +42,22 @@
       mako
       tesseract
       tesseract-data-eng
+      brightnessctl
+      wlr-randr
+      wl-gammactl
 
-      # -- Media --
+      # -- Audio / Media --
       playerctl
       imv
       mpv
       pavucontrol
+      pamixer
+      cava
+
+      # -- System Tray / Applets --
+      networkmanagerapplet
+      blueman
+      brightnessctl
 
       # -- Qt / GTK Themes --
       qt6Packages.qt6ct
@@ -52,11 +66,18 @@
       papirus-icon-theme
       papirus-folders
       capitaine-cursors
+      nwg-look
 
       # -- System Tools --
       udiskie
       lm_sensors
       pciutils
+      htop
+      btop
+
+      # -- Security --
+      seahorse
+      gnome-keyring
 
       # -- Fonts --
       noto-fonts
@@ -69,6 +90,13 @@
 
       # -- Documents --
       zathura
+      evince
+      libreoffice
+
+      # -- Communication --
+      vesktop
+      signal-desktop
+      telegram-desktop
     ];
   };
 }
