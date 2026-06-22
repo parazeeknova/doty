@@ -1,0 +1,14 @@
+# Rose Pine — main variant (dark)
+# Source palette: https://rosepinetheme.com
+
+[colors]
+surface = "#191724"
+surface_container = "#1f1d2e"
+surface_variant = "#26233a"
+on_surface = "#e0def4"
+on_surface_variant = "#908caa"
+primary = "#c4a7e7"
+primary_container = "#9ccfd8"
+secondary = "#31748f"
+tertiary = "#f6c177"
+error = "#eb6f92"

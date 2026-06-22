@@ -1,8 +1,0 @@
-{
-    "recordAudio": false,
-    "recordCodec": "h264",
-    "recordFps": "native",
-    "recordMic": false,
-    "recordPreset": "ultrafast",
-    "recordQuality": "lossless"
-}

@@ -1,0 +1,14 @@
+# Solarized Dark
+# Source: https://ethanschoonover.com/solarized
+
+[colors]
+surface = "#002b36"
+surface_container = "#073642"
+surface_variant = "#586e75"
+on_surface = "#93a1a1"
+on_surface_variant = "#839496"
+primary = "#268bd2"
+primary_container = "#2aa198"
+secondary = "#859900"
+tertiary = "#b58900"
+error = "#dc322f"

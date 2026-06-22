@@ -1,0 +1,15 @@
+# Gruvbox Dark Hard — matugen-style palette
+# Used as a fallback when no wallpaper is active.
+# Field names mirror matugen's color keys (surface, on_surface, primary, ...).
+
+[colors]
+surface = "#1d2021"
+surface_container = "#282828"
+surface_variant = "#3c3836"
+on_surface = "#ebdbb2"
+on_surface_variant = "#d5c4a1"
+primary = "#a9b665"
+primary_container = "#b8bb26"
+secondary = "#7daea3"
+tertiary = "#d8a657"
+error = "#cc241d"

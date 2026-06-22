@@ -1,0 +1,14 @@
+# Monokai — classic Sublime Text variant
+# Source: https://monokai.pro
+
+[colors]
+surface = "#272822"
+surface_container = "#1e1f1c"
+surface_variant = "#3e3d32"
+on_surface = "#f8f8f2"
+on_surface_variant = "#75715e"
+primary = "#a6e22e"
+primary_container = "#ae81ff"
+secondary = "#e6db74"
+tertiary = "#fd971f"
+error = "#f92672"

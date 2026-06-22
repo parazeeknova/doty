@@ -1,0 +1,14 @@
+# Nord — dark variant
+# Source: https://www.nordtheme.com
+
+[colors]
+surface = "#2e3440"
+surface_container = "#3b4252"
+surface_variant = "#434c5e"
+on_surface = "#eceff4"
+on_surface_variant = "#d8dee9"
+primary = "#88c0d0"
+primary_container = "#81a1c1"
+secondary = "#8fbcbb"
+tertiary = "#ebcb8b"
+error = "#bf616a"

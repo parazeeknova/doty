@@ -1,0 +1,154 @@
+[package]
+name = "wabi"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.150"
+toml = "0.8"
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+[dev-dependencies]
+tempfile = "3"
+
+[lib]
+name = "wabi"
+path = "src/lib.rs"
+
+[[bin]]
+name = "get_audio_status"
+path = "src/bin/status/audio.rs"
+
+[[bin]]
+name = "get_battery_status"
+path = "src/bin/status/battery.rs"
+
+[[bin]]
+name = "get_bluetooth_status"
+path = "src/bin/status/bluetooth.rs"
+
+[[bin]]
+name = "get_brightness_status"
+path = "src/bin/status/brightness.rs"
+
+[[bin]]
+name = "get_github_graph"
+path = "src/bin/status/github.rs"
+
+[[bin]]
+name = "get_media_status"
+path = "src/bin/status/media.rs"
+
+[[bin]]
+name = "get_network_status"
+path = "src/bin/status/network.rs"
+
+[[bin]]
+name = "get_notif_status"
+path = "src/bin/status/notif.rs"
+
+[[bin]]
+name = "get_ports_status"
+path = "src/bin/status/ports.rs"
+
+[[bin]]
+name = "get_sunset_status"
+path = "src/bin/status/sunset.rs"
+
+[[bin]]
+name = "get_podman_status"
+path = "src/bin/status/podman.rs"
+
+[[bin]]
+name = "get_sysmon_status"
+path = "src/bin/status/sysmon.rs"
+
+[[bin]]
+name = "get_vm_status"
+path = "src/bin/status/vm.rs"
+
+[[bin]]
+name = "log_battery"
+path = "src/bin/utils/battery_log.rs"
+
+[[bin]]
+name = "osdctl"
+path = "src/bin/utils/osdctl.rs"
+
+[[bin]]
+name = "waybar_toggle"
+path = "src/bin/utils/waybar_toggle.rs"
+
+[[bin]]
+name = "toggle_widgets"
+path = "src/bin/utils/toggle_widgets.rs"
+
+[[bin]]
+name = "tray_count"
+path = "src/bin/utils/tray_count.rs"
+
+[[bin]]
+name = "parse_binds"
+path = "src/bin/utils/parse_binds.rs"
+
+[[bin]]
+name = "caffeine"
+path = "src/bin/utils/caffeine.rs"
+
+
+[[bin]]
+name = "theme_switcher"
+path = "src/bin/theme/switcher.rs"
+
+[[bin]]
+name = "wallpaper_thumb_watcher"
+path = "src/bin/theme/watcher.rs"
+
+[[bin]]
+name = "presets_lister"
+path = "src/bin/theme/presets_lister.rs"
+
+[[bin]]
+name = "battery_daemon"
+path = "src/bin/status/battery_daemon.rs"
+
+[[bin]]
+name = "set_wallpaper"
+path = "src/bin/theme/set_wallpaper.rs"
+
+[[bin]]
+name = "screentime_daemon"
+path = "src/bin/status/screentime_daemon.rs"
+
+[[bin]]
+name = "get_screentime_status"
+path = "src/bin/status/get_screentime_status.rs"
+
+[[bin]]
+name = "check_daemons"
+path = "src/bin/status/check_daemons.rs"
+
+[[bin]]
+name = "get_apps_list"
+path = "src/bin/status/apps.rs"
+
+[[bin]]
+name = "get_recents_list"
+path = "src/bin/status/recents.rs"
+
+[[bin]]
+name = "get_github_repos"
+path = "src/bin/status/github_repos.rs"
+
+[[bin]]
+name = "wabi_power"
+path = "src/bin/utils/power.rs"
+
+[[bin]]
+name = "kbd_aura"
+path = "src/bin/utils/kbd_aura.rs"
+
+[[bin]]
+name = "mtp_notify"
+path = "src/bin/utils/mtp_notify.rs"
