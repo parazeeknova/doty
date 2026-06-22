@@ -7,6 +7,8 @@
       self.nixosModules.parazeeknovaFishFunctions
     ];
 
+    programs.fish.enable = true;
+
     home-manager.users.parazeeknova.programs.fish = {
       enable = true;
       interactiveShellInit = ''

@@ -15,8 +15,6 @@
       self.nixosModules.parazeeknovaHyprland
     ];
 
-    nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
     # -- Boot --
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
@@ -79,19 +77,14 @@
     # -- User --
     users.users."parazeeknova" = {
       isNormalUser = true;
-      description = "Harsh Sahu";
+      description = "przknv.cc";
       extraGroups = [ "networkmanager" "wheel" ];
       shell = pkgs.fish;
     };
 
-    # -- Shell --
-    programs.fish.enable = true;
-
     # -- Misc --
-    programs.firefox.enable = true;
     nixpkgs.config.allowUnfree = true;
     programs.nix-ld.enable = true;
-
     system.stateVersion = "26.05";
   };
 }
