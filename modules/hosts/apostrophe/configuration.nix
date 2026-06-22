@@ -15,6 +15,8 @@
       self.nixosModules.parazeeknovaHyprland
     ];
 
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
     # -- Boot --
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
