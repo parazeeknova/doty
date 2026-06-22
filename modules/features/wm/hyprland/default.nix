@@ -9,6 +9,10 @@
       portalPackage = pkgs.xdg-desktop-portal-hyprland;
     };
 
+    environment.systemPackages = [
+      inputs.hyprland-preview-share-picker.packages.${pkgs.stdenv.hostPlatform.system}.default
+    ];
+
     # -- Electron Apps (Wayland) --
     environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
