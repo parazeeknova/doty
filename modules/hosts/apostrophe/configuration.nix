@@ -7,6 +7,7 @@
       self.nixosModules.parazeeknovaHome
       self.nixosModules.parazeeknovaGit
       self.nixosModules.parazeeknovaFish
+      self.nixosModules.parazeeknovaBash
       self.nixosModules.parazeeknovaStarship
       self.nixosModules.parazeeknovaTmux
       self.nixosModules.parazeeknovaZoxide
