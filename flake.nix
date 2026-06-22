@@ -8,7 +8,7 @@
     };
 
     hyprland-preview-share-picker = {
-      url = "github:WhySoBad/hyprland-preview-share-picker";
+      url = "github:WhySoBad/hyprland-preview-share-picker?submodules=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

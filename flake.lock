@@ -38,6 +38,27 @@
         "type": "github"
       }
     },
+    "hyprland-preview-share-picker": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782052593,
+        "narHash": "sha256-g7LF8CKQ4hWvbWbaZmBb0yXqi3WbE5jT6T/sWrAR7gQ=",
+        "owner": "WhySoBad",
+        "repo": "hyprland-preview-share-picker",
+        "rev": "e2f30ff85486e557018523da45ccbc846e3a499c",
+        "submodules": true,
+        "type": "github"
+      },
+      "original": {
+        "owner": "WhySoBad",
+        "repo": "hyprland-preview-share-picker",
+        "type": "github"
+      }
+    },
     "import-tree": {
       "locked": {
         "lastModified": 1778781969,
@@ -88,6 +109,7 @@
       "inputs": {
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
+        "hyprland-preview-share-picker": "hyprland-preview-share-picker",
         "import-tree": "import-tree",
         "nixpkgs": "nixpkgs"
       }
