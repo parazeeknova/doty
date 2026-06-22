@@ -3,18 +3,12 @@
   flake.nixosModules.apostrophePackagesDesktop = { config, pkgs, lib, ... }: {
 
     environment.systemPackages = with pkgs; [
-      # -- Browsers --
-      firefox
-      chromium
-
-      # -- Editors (GUI) --
+      # -- General --
+      vivaldi
       vscode
-
-      # -- Terminal Emulators --
-      ghostty
       kitty
 
-      # -- Wayland / Hyprland --
+      # -- Hyprland --
       waybar
       wofi
       swaylock
@@ -24,32 +18,25 @@
       wl-clipboard
       cliphist
       mako
-      dunst
       hyprshot
       hyprpicker
 
-      # -- Qt / GTK --
+      # -- Qt / GTK Themes --
       qt6ct
       qt5ct
       kvantum
       papirus-icon-theme
+      papirus-folders
       capitaine-cursors
 
-      # -- Media (GUI) --
-      obs-studio
-      gimp
-      inkscape
-      file-roller
-
-      # -- Documents --
-      zathura
-      evince
-      libreoffice
-
-      # -- Communication --
-      vesktop
-      telegram-desktop
-      signal-desktop
+      # -- Fonts --
+      noto-fonts
+      noto-fonts-emoji
+      nerd-fonts.fira-code
+      nerd-fonts.noto
+      nerd-fonts.hack
+      nerd-fonts.iosevka
+      nerd-fonts.victor-mono
     ];
   };
 }

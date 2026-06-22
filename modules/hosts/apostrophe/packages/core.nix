@@ -15,7 +15,6 @@
       pciutils
       lshw
       inxi
-      htop
       btop
       fastfetch
 
@@ -31,27 +30,10 @@
       gnutar
       gzip
 
-      # -- Networking --
-      wget
-      curl
-      openssh
-      nettools
-      nmap
-      dig
-
       # -- Media --
       ffmpeg
       mpv
-      imv
       pavucontrol
-
-      # -- Fonts --
-      noto-fonts
-      noto-fonts-cjk-sans
-      noto-fonts-emoji
-      jetbrains-mono
-      fira-code
-      cascadia-code
     ];
   };
 }

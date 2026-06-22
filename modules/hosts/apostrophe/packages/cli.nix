@@ -10,6 +10,7 @@
       bash
       fishPlugins.fzf
       fishPlugins.done
+      fishPlugins.hydro
       fishPlugins.puffer
       fishPlugins.sponge
       fishPlugins.autopair
@@ -56,7 +57,6 @@
       less
       man-db
       tldr
-      neofetch
       cmatrix
       sl
       fortune
