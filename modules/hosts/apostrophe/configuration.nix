@@ -93,6 +93,7 @@
       isNormalUser = true;
       description = "Harsh Sahu";
       extraGroups = [ "networkmanager" "wheel" ];
+      shell = pkgs.fish;
     };
 
     # -- Misc --
