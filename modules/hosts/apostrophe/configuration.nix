@@ -4,6 +4,7 @@
     imports = [
       self.nixosModules.apostropheHardware
       inputs.home-manager.nixosModules.home-manager
+      self.nixosModules.apostrophePackages
       self.nixosModules.parazeeknovaHome
       self.nixosModules.parazeeknovaGit
       self.nixosModules.parazeeknovaFish
@@ -83,13 +84,6 @@
 
     programs.firefox.enable = true;
     nixpkgs.config.allowUnfree = true;
-    environment.systemPackages = with pkgs; [
-      vim
-      git
-      pciutils
-      nodejs
-      vscode
-    ];
 
     programs.nix-ld.enable = true;
 
