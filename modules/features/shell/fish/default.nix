@@ -25,7 +25,7 @@
             if test (tty) = /dev/tty1
                 if not set -q HYPRLAND_INSTANCE_SIGNATURE
                     if command -v uwsm >/dev/null 2>&1
-                        exec uwsm start hyprland.desktop
+                        exec uwsm start hyprland-uwsm.desktop
                     else
                         exec Hyprland
                     end
