@@ -5,6 +5,11 @@
       self.nixosModules.apostropheHardware
       inputs.home-manager.nixosModules.home-manager
       self.nixosModules.parazeeknovaHome
+      self.nixosModules.parazeeknovaGit
+      self.nixosModules.parazeeknovaFish
+      self.nixosModules.parazeeknovaStarship
+      self.nixosModules.parazeeknovaTmux
+      self.nixosModules.parazeeknovaZoxide
     ];
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
