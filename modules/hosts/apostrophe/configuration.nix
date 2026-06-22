@@ -51,11 +51,8 @@
     # -- Electron Apps (Wayland) --
     environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
-    # -- Auto Login --
-    services.displayManager.autoLogin = {
-      enable = true;
-      user = "parazeeknova";
-    };
+    # -- Auto Login (TTY) --
+    services.getty.autologinUser = "parazeeknova";
 
     # -- Audio --
     services.pulseaudio.enable = false;
