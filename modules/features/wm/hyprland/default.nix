@@ -71,19 +71,22 @@
     };
 
     # -- Hyprland Config files (excluding hyprland.lua, which is managed by Home Manager) --
-    home-manager.users.parazeeknova.xdg.configFile = {
-      "hypr/hypridle.conf".source = ./hypr/hypridle.conf;
-      "hypr/hyprlock.conf".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/hyprlock.conf";
-      "hypr/hyprlock.conf.template".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/hyprlock.conf.template";
-      "hypr/hyprsunset.conf".source = ./hypr/hyprsunset.conf;
-      "hypr/modules".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/modules";
-      "hypr/plugins".source = ./plugins;
-      "hypr/sunset.state".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/sunset.state";
-      "hypr/xdph.conf".source = ./hypr/xdph.conf;
-      "uwsm/env".source = "${config.home-manager.users.parazeeknova.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
+    home-manager.users.parazeeknova = { config, ... }: {
+      xdg.configFile = {
+        "hypr/hypridle.conf".source = ./hypr/hypridle.conf;
+        "hypr/hyprlock.conf".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/hyprlock.conf";
+        "hypr/hyprlock.conf.template".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/hyprlock.conf.template";
+        "hypr/hyprsunset.conf".source = ./hypr/hyprsunset.conf;
+        "hypr/modules".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/modules";
+        "hypr/plugins".source = ./plugins;
+        "hypr/sunset.state".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/sunset.state";
+        "hypr/xdph.conf".source = ./hypr/xdph.conf;
+      };
+
+      # -- Quickshell Config --
+      xdg.configFile."quickshell".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/quickshell";
     };
 
-    # -- Quickshell Config --
-    home-manager.users.parazeeknova.xdg.configFile."quickshell".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/quickshell";
+    home-manager.users.parazeeknova.xdg.configFile."uwsm/env".source = "${config.home-manager.users.parazeeknova.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
   };
 }
