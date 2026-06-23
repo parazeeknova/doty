@@ -47,12 +47,14 @@ fn main() {
     print_step("Checking Git working tree status...");
     match get_cmd_output("git", &["status", "--porcelain"]) {
         Ok(status) => {
-            // Ignore the 'rebuild' binary itself or rebuild.rs if untracked, but let's be safe.
-            // If there are other files modified or untracked:
+            // Filter out untracked rebuild binary, rebuild.rs, and gitignores to keep things clean.
             let lines: Vec<&str> = status.lines()
                 .filter(|line| {
                     let trim_line = line.trim();
-                    !trim_line.is_empty() && !trim_line.ends_with("rebuild") && !trim_line.ends_with("rebuild.rs")
+                    !trim_line.is_empty() 
+                        && !trim_line.ends_with("rebuild") 
+                        && !trim_line.ends_with("rebuild.rs")
+                        && !trim_line.ends_with(".gitignore")
                 })
                 .collect();
 
@@ -70,7 +72,7 @@ fn main() {
     }
 
     // Step 1: Lint, format, and build wabi
-    print_step("Linting, formatting, and building wabi...");
+    print_step("Linting, formatting, and building wabi... ");
     
     println!("-> wabi: cargo clippy --all-targets -- -D warnings");
     match run_cmd_in_dir("cargo", &["clippy", "--all-targets", "--", "-D", "warnings"], "wabi") {
@@ -169,7 +171,10 @@ fn main() {
             let lines: Vec<&str> = status.lines()
                 .filter(|line| {
                     let trim_line = line.trim();
-                    !trim_line.is_empty() && !trim_line.ends_with("rebuild") && !trim_line.ends_with("rebuild.rs")
+                    !trim_line.is_empty() 
+                        && !trim_line.ends_with("rebuild") 
+                        && !trim_line.ends_with("rebuild.rs")
+                        && !trim_line.ends_with(".gitignore")
                 })
                 .collect();
 
