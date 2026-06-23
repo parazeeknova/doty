@@ -99,9 +99,6 @@
         # -- Documents --
         zathura
         evince
-
-        # -- Communication --
-        vesktop
       ];
     };
 }
