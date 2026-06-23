@@ -2,7 +2,7 @@
 
 let
   repo = "/home/parazeeknova/doty";
-  zathuraDir = "${repo}/modules/features/shell/zathura";
+  zathuraDir = "${repo}/modules/features/applications/zathura";
 in
 {
 

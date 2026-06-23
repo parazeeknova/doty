@@ -678,8 +678,8 @@ fn main() {
             "modules/features/shell/vim/colors/matugen.vim",
         ),
         (
-            "modules/features/shell/zathura/zathurarc.template",
-            "modules/features/shell/zathura/zathurarc",
+            "modules/features/applications/zathura/zathurarc.template",
+            "modules/features/applications/zathura/zathurarc",
         ),
         ("modules/features/shell/mpv/mpv.conf.template", "modules/features/shell/mpv/mpv.conf"),
         (
