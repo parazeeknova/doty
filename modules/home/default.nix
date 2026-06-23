@@ -32,6 +32,7 @@
               Type = "simple";
               Environment = "SSH_AUTH_SOCK=%t/ssh-agent.socket";
               ExecStart = "${pkgs.openssh}/bin/ssh-agent -D -a %t/ssh-agent.socket";
+              ExecStartPost = "${pkgs.openssh}/bin/ssh-add %h/.ssh/github_signing_key";
             };
             Install = {
               WantedBy = [ "default.target" ];

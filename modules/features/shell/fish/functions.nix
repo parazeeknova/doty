@@ -14,29 +14,7 @@
           fish_greeting = {
             body = "";
           };
-          __ssh_agent_start = {
-            body = ''
-              if not pgrep -u (id -u) ssh-agent >/dev/null
-                  eval (ssh-agent -c) >/dev/null
-                  set -Ux SSH_AGENT_PID $SSH_AGENT_PID
-                  set -Ux SSH_AUTH_SOCK $SSH_AUTH_SOCK
-              end
-            '';
-          };
-          ssh = {
-            wraps = "ssh";
-            body = ''
-              __ssh_agent_start
-              command ssh $argv
-            '';
-          };
-          git = {
-            wraps = "git";
-            body = ''
-              __ssh_agent_start
-              command git $argv
-            '';
-          };
+
           __history_previous_command = {
             body = ''
               switch (commandline -t)
