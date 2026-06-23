@@ -1,7 +1,0 @@
-[Unit]
-Description=Log battery discharge rate to history.json
-After=basic.target
-
-[Service]
-Type=oneshot
-ExecStart=%h/.config/quickshell/battery_popup/log_battery
