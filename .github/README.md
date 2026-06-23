@@ -10,14 +10,22 @@
 </div>
 
 ### doty
-dotfiles, quickshell widgets, rust daemons, and configs for my daily setup.  
-stow-based. arch-first but mostly distro-agnostic.
+Daily driver configurations, custom desktop widgets, and companion daemons.
+
+This repository supports two setups depending on the branch:
+- **[NixOS Setup (main branch)](https://github.com/parazeeknova/doty/tree/main)** (Current): A fully declarative system-level and user-level configuration powered by Nix flakes, NixOS modules, and Home Manager.
+- **[Arch Linux Setup (arch-dots branch)](https://github.com/parazeeknova/doty/tree/arch-dots)** (Legacy): A GNU Stow-based, distro-agnostic configuration tailored for Arch-based distributions.
 
 #### what's inside
 
-- **quickshell** - widgets (dashboard, popups, bla bla)
-- **rust daemons** - background services wired to the widgets  
-- **configs** - shell, editor, wm, and misc dotfiles
+- **quickshell** - Custom interactive desktop widgets (including dashboard, popups, volume/brightness OSD, and notification overlays) written in Qt/QML and Javascript.
+- **rust daemons** - Lightweight companion background services and utilities written in Rust (located under `wabi/`) to drive widgets, clipboard decoding, and system rebuild tasks efficiently.
+- **configs & modules** - Declarative setup declarations (on `main`) or dotfiles (on `arch-dots`) covering:
+  - **Window Manager**: Hyprland, Waybar, Mako (notifications), Cava (audio visualizer).
+  - **Shell & Terminal**: Fish shell (fully configured), Starship prompt, Kitty & Ghostty terminals.
+  - **Applications**: Zen Browser, Vesktop (Discord client), Spicetify (Spotify theming), and Zathura (document viewer).
+  - **Theming**: Dynamic color generation and unified styling using GTK, Qt, Kvantum, and Matugen.
+
 
 <div align="center">
 
