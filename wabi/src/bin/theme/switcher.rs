@@ -613,8 +613,8 @@ fn main() {
             "modules/features/shell/eza/theme.yml",
         ),
         (
-            ".config/opencode/themes/matugen.json.template",
-            ".config/opencode/themes/matugen.json",
+            "modules/features/shell/opencode/themes/matugen.json.template",
+            "modules/features/shell/opencode/themes/matugen.json",
         ),
         (
             "modules/features/wm/quickshell/Theme.qml.template",
@@ -683,12 +683,12 @@ fn main() {
         ),
         ("modules/features/shell/mpv/mpv.conf.template", "modules/features/shell/mpv/mpv.conf"),
         (
-            ".config/spicetify/Themes/wabi/color.ini.template",
-            ".config/spicetify/Themes/wabi/color.ini",
+            "modules/features/applications/spicetify/Themes/wabi/color.ini.template",
+            "modules/features/applications/spicetify/Themes/wabi/color.ini",
         ),
         (
-            ".config/vesktop/settings/quickCss.css.template",
-            ".config/vesktop/settings/quickCss.css",
+            "modules/features/applications/vesktop/settings/quickCss.css.template",
+            "modules/features/applications/vesktop/settings/quickCss.css",
         ),
         (
             "modules/features/wm/hyprland-preview-share-picker/style.css.template",

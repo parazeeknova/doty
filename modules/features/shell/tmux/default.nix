@@ -16,6 +16,7 @@ in
       xdg.configFile = {
         "tmux/tmux.conf".source = mkOutOfStoreSymlink "${tmuxDir}/tmux.conf";
         "tmux/tmux.conf.template".source = mkOutOfStoreSymlink "${tmuxDir}/tmux.conf.template";
+        "tmux/.tmux".source = mkOutOfStoreSymlink "${tmuxDir}/.tmux";
       };
     };
   };

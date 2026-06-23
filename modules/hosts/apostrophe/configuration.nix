@@ -34,6 +34,10 @@
       self.nixosModules.parazeeknovaSatty
       self.nixosModules.parazeeknovaSwappy
       self.nixosModules.parazeeknovaZathura
+      self.nixosModules.parazeeknovaPypr
+      self.nixosModules.parazeeknovaOpencode
+      self.nixosModules.parazeeknovaSpicetify
+      self.nixosModules.parazeeknovaVesktop
     ];
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
