@@ -1,0 +1,13 @@
+{
+  "automation_enabled": true,
+  "low_battery_threshold": 25,
+  "low_profile": "Quiet",
+  "bat_profile": "Balanced",
+  "ac_profile": "Performance",
+  "bat_screen_brightness": 70,
+  "bat_kbd_brightness": 33,
+  "ac_screen_brightness": 100,
+  "ac_kbd_brightness": 90,
+  "low_screen_brightness": 30,
+  "low_kbd_brightness": 0
+}

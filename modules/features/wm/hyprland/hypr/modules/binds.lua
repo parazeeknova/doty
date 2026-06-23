@@ -5,7 +5,7 @@ local mainMod = "SUPER"
 local terminal = "uwsm app -- ghostty"
 local fileManager = "uwsm app -- thunar"
 local dotfiles = os.getenv("WABI_DOTFILES_DIR") or (os.getenv("HOME") .. "/doty")
-local osdctl = dotfiles .. "/.config/quickshell/osd/bin/osdctl"
+local osdctl = os.getenv("HOME") .. "/.config/quickshell/osd/bin/osdctl"
 
 ---------------------
 ---  Applications ---
@@ -302,7 +302,7 @@ hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd(
 ---------------------
 
 -- Widget toggle
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(dotfiles .. "/.config/waybar/scripts/toggle_widgets"))
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/waybar/scripts/toggle_widgets"))
 
 -- Lock screen
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock -c ~/.config/hypr/hyprlock.conf"))

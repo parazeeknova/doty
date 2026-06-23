@@ -11,11 +11,11 @@ if status is-interactive
     "--scrollbar=▏▕ " \
     "--separator=─ " \
     "--ansi " \
-    "--color=bg+:#3c3836,bg:#1d2021,spinner:#7daea3,hl:#d8a657 " \
-    "--color=fg:#ebdbb2,header:#d5c4a1,info:#7daea3,pointer:#a9b665 " \
-    "--color=marker:#d8a657,fg+:#ebdbb2,prompt:#a9b665,hl+:#a9b665 " \
-    "--color=border:#3c3836,query:#ebdbb2,label:#d5c4a1,preview-bg:#282828 " \
-    "--color=preview-fg:#ebdbb2,preview-label:#a9b665 " \
-    "--color=preview-border:#3c3836,preview-scrollbar:#3c3836 " \
-    "--color=gutter:#282828,scrollbar:#3c3836"
+    "--color=bg+:#4c4639,bg:#16130b,spinner:#d5c5a0,hl:#adcfad " \
+    "--color=fg:#eae1d4,header:#cfc5b4,info:#d5c5a0,pointer:#e4c36c " \
+    "--color=marker:#adcfad,fg+:#eae1d4,prompt:#e4c36c,hl+:#e4c36c " \
+    "--color=border:#4c4639,query:#eae1d4,label:#cfc5b4,preview-bg:#231f17 " \
+    "--color=preview-fg:#eae1d4,preview-label:#e4c36c " \
+    "--color=preview-border:#4c4639,preview-scrollbar:#4c4639 " \
+    "--color=gutter:#231f17,scrollbar:#4c4639"
 end

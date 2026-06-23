@@ -22,14 +22,15 @@ hl.on("hyprland.start", function()
         "sh -lc 'if command -v quickshell >/dev/null 2>&1; then uwsm app -- quickshell --config github_graph; elif command -v qs >/dev/null 2>&1; then uwsm app -- qs --config github_graph; fi'")
     hl.exec_cmd(
         "sh -lc 'if command -v quickshell >/dev/null 2>&1; then uwsm app -- quickshell --config workspace_overview; elif command -v qs >/dev/null 2>&1; then uwsm app -- qs --config workspace_overview; fi'")
-    -- Restore waybar state from persistent cache to tmpfs and start Waybar if enabled
+    -- Restore waybar + widget state from persistent cache to tmpfs
     hl.exec_cmd(
-        "sh -c 'VAL=$(cat ~/.cache/quickshell/waybar_state 2>/dev/null || echo true); echo \"$VAL\" > /tmp/quickshell_waybar_state; if [ \"$VAL\" = \"true\" ]; then uwsm app -- waybar; fi'")
+        "sh -c 'cat ~/.cache/quickshell/waybar_state 2>/dev/null > /tmp/quickshell_waybar_state || printf true > /tmp/quickshell_waybar_state'")
     hl.exec_cmd(
         "sh -c 'cat ~/.cache/quickshell/widgets_state 2>/dev/null > /tmp/quickshell_widgets_state || printf true > /tmp/quickshell_widgets_state'")
     hl.exec_cmd(
         "sh -c 'cat ~/.cache/quickshell/widgets_config 2>/dev/null > /tmp/quickshell_widgets_config || printf default > /tmp/quickshell_widgets_config'")
-    hl.exec_cmd("sh -c 'sleep 2 && " .. dotfiles .. "/.config/waybar/scripts/toggle_widgets restore'")
+    -- Single entry point for waybar + quickshell widgets (avoids double-launch race)
+    hl.exec_cmd("sh -c 'sleep 2 && ~/.config/waybar/scripts/toggle_widgets restore'")
     hl.exec_cmd("sh -c '" .. dotfiles ..
                     "/scripts/set_wallpaper \"$(cat ~/.cache/last_wallpaper 2>/dev/null || echo \"" .. dotfiles .. "/modules/backgrounds/gray_lien.jpg\")\"'")
     hl.exec_cmd("uwsm app -- hyprsunset")
