@@ -52,10 +52,7 @@ in
         "gtk-4.0/settings.ini".source = mkOutOfStoreSymlink "${theming}/.config/gtk-4.0/settings.ini";
 
         # -- Kvantum (writable for theme_switcher) --
-        "Kvantum/kvantum.kvconfig".text = ''
-          [General]
-          theme=wabi
-        '';
+        "Kvantum/kvantum.kvconfig".source = mkOutOfStoreSymlink "${theming}/.config/Kvantum/kvantum.kvconfig";
         "Kvantum/wabi".source = mkOutOfStoreSymlink "${theming}/.config/Kvantum/wabi";
 
         # -- Qt5ct (writable for theme_switcher) --
