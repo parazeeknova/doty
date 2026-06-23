@@ -30,7 +30,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd(
         "sh -c 'cat ~/.cache/quickshell/widgets_config 2>/dev/null > /tmp/quickshell_widgets_config || printf default > /tmp/quickshell_widgets_config'")
     -- Single entry point for waybar + quickshell widgets (avoids double-launch race)
-    hl.exec_cmd("sh -c 'sleep 2 && ~/.config/waybar/scripts/toggle_widgets restore'")
+    hl.exec_cmd("~/.config/waybar/scripts/toggle_widgets restore")
     hl.exec_cmd("sh -c '" .. dotfiles ..
                     "/modules/scripts/set_wallpaper \"$(cat ~/.cache/last_wallpaper 2>/dev/null || echo \"" .. dotfiles .. "/modules/backgrounds/gray_lien.jpg\")\"'")
     hl.exec_cmd("uwsm app -- hyprsunset")

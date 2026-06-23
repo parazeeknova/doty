@@ -7,94 +7,39 @@ QtObject {
 
     property ThemeCache.Colors c: ThemeCache.Colors {}
 
+    property bool animationsEnabled: false
+    Component.onCompleted: {
+        animationsEnabled = true;
+    }
+
     property color bg: c.bg
-    Behavior on bg {
-        ColorAnimation {
-            duration: 350
-            easing.type: Easing.InOutQuad
-        }
-    }
+    Behavior on bg { enabled: theme.animationsEnabled; ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
     property color bg_dark: c.bg_dark
-    Behavior on bg_dark {
-        ColorAnimation {
-            duration: 350
-            easing.type: Easing.InOutQuad
-        }
-    }
+    Behavior on bg_dark { enabled: theme.animationsEnabled; ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
     property color bg_light: c.bg_light
-    Behavior on bg_light {
-        ColorAnimation {
-            duration: 350
-            easing.type: Easing.InOutQuad
-        }
-    }
+    Behavior on bg_light { enabled: theme.animationsEnabled; ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
     property color fg: c.fg
-    Behavior on fg {
-        ColorAnimation {
-            duration: 350
-            easing.type: Easing.InOutQuad
-        }
-    }
+    Behavior on fg { enabled: theme.animationsEnabled; ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
     property color fg_light: c.fg_light
-    Behavior on fg_light {
-        ColorAnimation {
-            duration: 350
-            easing.type: Easing.InOutQuad
-        }
-    }
+    Behavior on fg_light { enabled: theme.animationsEnabled; ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
     property color accent: c.accent
-    Behavior on accent {
-        ColorAnimation {
-            duration: 350
-            easing.type: Easing.InOutQuad
-        }
-    }
+    Behavior on accent { enabled: theme.animationsEnabled; ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
     property color secondary: c.secondary
-    Behavior on secondary {
-        ColorAnimation {
-            duration: 350
-            easing.type: Easing.InOutQuad
-        }
-    }
+    Behavior on secondary { enabled: theme.animationsEnabled; ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
     property color tertiary: c.tertiary
-    Behavior on tertiary {
-        ColorAnimation {
-            duration: 350
-            easing.type: Easing.InOutQuad
-        }
-    }
+    Behavior on tertiary { enabled: theme.animationsEnabled; ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
     property color error: c.error
-    Behavior on error {
-        ColorAnimation {
-            duration: 350
-            easing.type: Easing.InOutQuad
-        }
-    }
+    Behavior on error { enabled: theme.animationsEnabled; ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
 
     property bool glassEnabled: true
     property color popupBgColor: glassEnabled ? Qt.rgba(bg.r, bg.g, bg.b, 0.5) : bg
-    Behavior on popupBgColor {
-        ColorAnimation {
-            duration: 350
-            easing.type: Easing.InOutQuad
-        }
-    }
+    Behavior on popupBgColor { enabled: theme.animationsEnabled; ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
 
     property color podmanBgColor: glassEnabled ? Qt.rgba(bg.r, bg.g, bg.b, 0.9) : bg
-    Behavior on podmanBgColor {
-        ColorAnimation {
-            duration: 350
-            easing.type: Easing.InOutQuad
-        }
-    }
+    Behavior on podmanBgColor { enabled: theme.animationsEnabled; ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
 
     property color trayBgColor: glassEnabled ? Qt.rgba(bg.r, bg.g, bg.b, 0.95) : bg
-    Behavior on trayBgColor {
-        ColorAnimation {
-            duration: 350
-            easing.type: Easing.InOutQuad
-        }
-    }
+    Behavior on trayBgColor { enabled: theme.animationsEnabled; ColorAnimation { duration: 350; easing.type: Easing.InOutQuad } }
     property FileView glassState
 
     glassState: FileView {
