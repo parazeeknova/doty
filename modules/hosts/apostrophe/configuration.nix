@@ -29,6 +29,11 @@
       self.nixosModules.parazeeknovaYazi
       self.nixosModules.parazeeknovaVim
       self.nixosModules.parazeeknovaNvim
+      self.nixosModules.parazeeknovaMpd
+      self.nixosModules.parazeeknovaMpv
+      self.nixosModules.parazeeknovaSatty
+      self.nixosModules.parazeeknovaSwappy
+      self.nixosModules.parazeeknovaZathura
     ];
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];

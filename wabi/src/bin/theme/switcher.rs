@@ -669,8 +669,8 @@ fn main() {
         ),
         ("modules/features/shell/cava/config.template", "modules/features/shell/cava/config"),
         (
-            ".config/satty/config.toml.template",
-            ".config/satty/config.toml",
+            "modules/features/wm/satty/config.toml.template",
+            "modules/features/wm/satty/config.toml",
         ),
         ("modules/features/shell/nvim/init.lua.template", "modules/features/shell/nvim/init.lua"),
         (
@@ -678,10 +678,10 @@ fn main() {
             "modules/features/shell/vim/colors/matugen.vim",
         ),
         (
-            ".config/zathura/zathurarc.template",
-            ".config/zathura/zathurarc",
+            "modules/features/shell/zathura/zathurarc.template",
+            "modules/features/shell/zathura/zathurarc",
         ),
-        (".config/mpv/mpv.conf.template", ".config/mpv/mpv.conf"),
+        ("modules/features/shell/mpv/mpv.conf.template", "modules/features/shell/mpv/mpv.conf"),
         (
             ".config/spicetify/Themes/wabi/color.ini.template",
             ".config/spicetify/Themes/wabi/color.ini",
