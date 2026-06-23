@@ -7,7 +7,43 @@ import Quickshell.Wayland
 Scope {
     id: root
 
-    property bool isVisible: true
+    property bool isVisible: false
+    property string widgetsState: "true"
+    property string widgetsConfig: "default"
+
+    function updateVisibility() {
+        if (widgetsState === "false") {
+            root.isVisible = false;
+        } else {
+            root.isVisible = (widgetsConfig === "both" || widgetsConfig === "github" || widgetsConfig === "default");
+        }
+    }
+
+    FileView {
+        id: stateWatcher
+        path: "file://" + root.homeDir + "/.cache/quickshell/widgets_state"
+        onLoaded: {
+            root.widgetsState = this.text().trim();
+            root.updateVisibility();
+        }
+        onFileChanged: {
+            root.widgetsState = this.text().trim();
+            root.updateVisibility();
+        }
+    }
+
+    FileView {
+        id: configWatcher
+        path: "file://" + root.homeDir + "/.cache/quickshell/widgets_config"
+        onLoaded: {
+            root.widgetsConfig = this.text().trim();
+            root.updateVisibility();
+        }
+        onFileChanged: {
+            root.widgetsConfig = this.text().trim();
+            root.updateVisibility();
+        }
+    }
     property string homeDir: Quickshell.env("HOME")
     property string username: "parazeeknova"
     property int totalContributions: 0
