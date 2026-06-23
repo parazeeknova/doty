@@ -18,6 +18,28 @@
 
       home-manager.users.parazeeknova.programs.fish = {
         enable = true;
+        plugins = with pkgs.fishPlugins; [
+          {
+            name = "fzf";
+            src = fzf.src;
+          }
+          {
+            name = "done";
+            src = done.src;
+          }
+          {
+            name = "puffer";
+            src = puffer.src;
+          }
+          {
+            name = "sponge";
+            src = sponge.src;
+          }
+          {
+            name = "autopair";
+            src = autopair.src;
+          }
+        ];
         interactiveShellInit = ''
           starship init fish | source
           zoxide init --cmd cd fish | source
