@@ -137,7 +137,7 @@ hl.layer_rule({
 
 -- Workspace assignments for specific applications using exact class names (anchored regex)
 local workspace_assignments = {
-    ["1"] = {"^zen$", "^[Vv]ivaldi.*$", "^brave-origin-nightly$"},
+    ["1"] = {"^zen.*$", "^[Vv]ivaldi.*$", "^brave-origin-nightly$"},
     ["2"] = {"^code-insiders$", "^dev\\.warp\\.Warp$"},
     ["3"] = {"^thunar$", "^Code$", "^code$"},
     ["4"] = {"^com\\.mitchellh\\.ghostty$"},
@@ -220,7 +220,7 @@ hl.window_rule({
 hl.window_rule({
     name = "zen-starting-width",
     match = {
-        class = "^zen$"
+        class = "^zen.*$"
     },
     scrolling_width = 0.7
 })
