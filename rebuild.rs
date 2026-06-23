@@ -112,7 +112,7 @@ fn main() {
     println!("-> Formatting QML files...");
     let qml_format_status = run_cmd(
         "nix-shell",
-        &["-p", "qt6.qtdeclarative", "--run", "find modules/features/wm/quickshell -name '*.qml' -exec qmlformat -i {} +"]
+        &["-p", "qt6.qtdeclarative", "--run", "find modules/features/wm/quickshell -type f -name '*.qml' -exec qmlformat -i {} +"]
     );
     if qml_format_status.is_err() || !qml_format_status.unwrap().success() {
         print_error("QML formatting failed.");
@@ -122,7 +122,7 @@ fn main() {
     println!("-> Linting QML files...");
     let qml_lint_status = run_cmd(
         "nix-shell",
-        &["-p", "qt6.qtdeclarative", "--run", "find modules/features/wm/quickshell -name '*.qml' -exec qmllint {} +"]
+        &["-p", "qt6.qtdeclarative", "--run", "find modules/features/wm/quickshell -type f -name '*.qml' -exec qmllint {} +"]
     );
     if qml_lint_status.is_err() || !qml_lint_status.unwrap().success() {
         print_warning("QML lint exited with non-zero or warning, but proceeding.");
