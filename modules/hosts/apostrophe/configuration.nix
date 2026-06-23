@@ -23,6 +23,9 @@
       self.nixosModules.parazeeknovaEza
       self.nixosModules.parazeeknovaFastfetch
       self.nixosModules.parazeeknovaGhostty
+      self.nixosModules.parazeeknovaMatugen
+      self.nixosModules.parazeeknovaLazygit
+      self.nixosModules.parazeeknovaHyprlandPreviewSharePicker
     ];
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];

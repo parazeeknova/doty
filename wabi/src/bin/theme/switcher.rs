@@ -589,8 +589,8 @@ fn main() {
             "modules/home/programs/git/colors",
         ),
         (
-            ".config/lazygit/config.yml.template",
-            ".config/lazygit/config.yml",
+            "modules/features/shell/lazygit/config.yml.template",
+            "modules/features/shell/lazygit/config.yml",
         ),
         (
             "modules/features/shell/btop/themes/matugen.theme.template",
@@ -691,8 +691,8 @@ fn main() {
             ".config/vesktop/settings/quickCss.css",
         ),
         (
-            ".config/hyprland-preview-share-picker/style.css.template",
-            ".config/hyprland-preview-share-picker/style.css",
+            "modules/features/wm/hyprland-preview-share-picker/style.css.template",
+            "modules/features/wm/hyprland-preview-share-picker/style.css",
         ),
     ];
 
