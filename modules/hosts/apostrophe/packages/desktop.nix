@@ -67,6 +67,7 @@
         # -- Audio / Media --
         spotify
         spicetify-cli
+        wf-recorder
         vlc
         playerctl
         imv

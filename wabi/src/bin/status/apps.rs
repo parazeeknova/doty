@@ -743,12 +743,33 @@ fn main() {
 
             let mut apps: HashMap<String, AppInfo> = HashMap::new();
 
-            let paths = [
-                "/usr/share/applications".to_string(),
-                format!("{}/.local/share/applications", home),
-                "/var/lib/flatpak/exports/share/applications".to_string(),
-                format!("{}/.local/share/flatpak/exports/share/applications", home),
-            ];
+            let mut paths = Vec::new();
+
+            // 1. XDG_DATA_HOME / ~/.local/share/applications (Highest priority)
+            let xdg_data_home =
+                std::env::var("XDG_DATA_HOME").unwrap_or_else(|_| format!("{}/.local/share", home));
+            paths.push(format!("{}/applications", xdg_data_home));
+
+            // 2. Flatpak user applications
+            paths.push(format!(
+                "{}/.local/share/flatpak/exports/share/applications",
+                home
+            ));
+
+            // 3. XDG_DATA_DIRS (System and user profile paths)
+            if let Ok(xdg_data_dirs) = std::env::var("XDG_DATA_DIRS") {
+                for dir in xdg_data_dirs.split(':') {
+                    if !dir.is_empty() {
+                        paths.push(format!("{}/applications", dir));
+                    }
+                }
+            } else {
+                paths.push("/usr/local/share/applications".to_string());
+                paths.push("/usr/share/applications".to_string());
+            }
+
+            // 4. Flatpak system applications
+            paths.push("/var/lib/flatpak/exports/share/applications".to_string());
 
             for dir_path in &paths {
                 let path = Path::new(dir_path);
@@ -766,7 +787,7 @@ fn main() {
                                     if let Some(&count) = usage_map.get(&app_info.name) {
                                         app_info.count = count;
                                     }
-                                    apps.insert(file_name.to_string(), app_info);
+                                    apps.entry(file_name.to_string()).or_insert(app_info);
                                 }
                             }
                         }

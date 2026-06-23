@@ -178,7 +178,7 @@ Scope {
     Process {
         id: decodeScript
 
-        command: [root.homeDir + "/.config/quickshell/clipboard_popup/decode_cliphist.sh"]
+        command: [root.homeDir + "/.config/quickshell/clipboard_popup/decode_cliphist"]
         running: false
         onExited: {
             // Once decoding is done, query the cliphist list

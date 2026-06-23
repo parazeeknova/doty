@@ -21,7 +21,7 @@ install: build
 	-pkill -f screentime_daemon 2>/dev/null || true
 	-pkill -f mtp_notify 2>/dev/null || true
 	@sleep 0.5
-	mkdir -p ../modules/features/wm/quickshell/battery_popup ../modules/features/wm/quickshell/volume_popup ../modules/features/wm/quickshell/osd/bin ../modules/features/wm/quickshell/network_popup ../modules/features/wm/quickshell/bluetooth_popup ../modules/features/wm/quickshell/brightness_popup ../modules/features/wm/quickshell/notif_popup ../modules/features/wm/quickshell/sysmon_popup ../modules/features/wm/quickshell/podman_popup ../modules/features/wm/quickshell/media_popup ../modules/features/wm/quickshell/vm_popup ../modules/features/wm/quickshell/ports_popup ../modules/features/wm/quickshell/sunset_popup ../modules/features/wm/quickshell/apps_popup ../modules/features/wm/quickshell/recents_popup ../modules/features/wm/quickshell/wallpaper_switcher ../modules/features/wm/quickshell/github_graph ../modules/features/wm/quickshell/shortcut_popup ../modules/features/wm/quickshell/volume_popup ../modules/features/wm/waybar/scripts ../modules/features/wm/theming/scripts ../modules/scripts
+	mkdir -p ../modules/features/wm/quickshell/battery_popup ../modules/features/wm/quickshell/volume_popup ../modules/features/wm/quickshell/osd/bin ../modules/features/wm/quickshell/network_popup ../modules/features/wm/quickshell/clipboard_popup ../modules/features/wm/quickshell/bluetooth_popup ../modules/features/wm/quickshell/brightness_popup ../modules/features/wm/quickshell/notif_popup ../modules/features/wm/quickshell/sysmon_popup ../modules/features/wm/quickshell/podman_popup ../modules/features/wm/quickshell/media_popup ../modules/features/wm/quickshell/vm_popup ../modules/features/wm/quickshell/ports_popup ../modules/features/wm/quickshell/sunset_popup ../modules/features/wm/quickshell/apps_popup ../modules/features/wm/quickshell/recents_popup ../modules/features/wm/quickshell/wallpaper_switcher ../modules/features/wm/quickshell/github_graph ../modules/features/wm/quickshell/shortcut_popup ../modules/features/wm/quickshell/volume_popup ../modules/features/wm/waybar/scripts ../modules/features/wm/theming/scripts ../modules/scripts
 	cp target/release/get_battery_status ../modules/features/wm/quickshell/battery_popup/get_battery_status
 	cp target/release/log_battery ../modules/features/wm/quickshell/battery_popup/log_battery
 	cp target/release/battery_daemon ../modules/features/wm/quickshell/battery_popup/battery_daemon
@@ -52,6 +52,8 @@ install: build
 	cp target/release/set_wallpaper ../modules/scripts/set_wallpaper_bin
 	cp target/release/parse_binds ../modules/features/wm/quickshell/shortcut_popup/parse_binds
 	cp target/release/caffeine ../modules/features/wm/quickshell/brightness_popup/caffeine
+	cp target/release/decode_cliphist ../modules/features/wm/quickshell/clipboard_popup/decode_cliphist
+	cp target/release/ghostty_tmux ../modules/scripts/ghostty_tmux
 	mkdir -p $(HOME)/.local/bin
 	cp target/release/screentime_daemon $(HOME)/.local/bin/screentime_daemon
 	cp target/release/get_screentime_status $(HOME)/.local/bin/get_screentime_status

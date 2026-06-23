@@ -152,3 +152,11 @@ path = "src/bin/utils/kbd_aura.rs"
 [[bin]]
 name = "mtp_notify"
 path = "src/bin/utils/mtp_notify.rs"
+
+[[bin]]
+name = "decode_cliphist"
+path = "src/bin/utils/decode_cliphist.rs"
+
+[[bin]]
+name = "ghostty_tmux"
+path = "src/bin/utils/ghostty_tmux.rs"

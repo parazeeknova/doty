@@ -40,7 +40,7 @@ in
           home.packages = [ ghostty-tmux ];
 
           home.file = {
-            "scripts/ghostty-tmux.sh".source = mkOutOfStoreSymlink "${scriptsDir}/ghostty-tmux.sh";
+            "scripts/ghostty-tmux".source = mkOutOfStoreSymlink "${scriptsDir}/ghostty_tmux";
             "scripts/kbd_aura".source = mkOutOfStoreSymlink "${scriptsDir}/kbd_aura";
             "scripts/presets_lister".source = mkOutOfStoreSymlink "${scriptsDir}/presets_lister";
             "scripts/set_wallpaper".source = mkOutOfStoreSymlink "${scriptsDir}/set_wallpaper";
