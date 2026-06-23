@@ -31,7 +31,7 @@ hl.on("hyprland.start", function()
         "sh -c 'cat ~/.cache/quickshell/widgets_config 2>/dev/null > /tmp/quickshell_widgets_config || printf default > /tmp/quickshell_widgets_config'")
     hl.exec_cmd("sh -c 'sleep 2 && " .. dotfiles .. "/.config/waybar/scripts/toggle_widgets restore'")
     hl.exec_cmd("sh -c '" .. dotfiles ..
-                    "/scripts/set_wallpaper \"$(cat ~/.cache/last_wallpaper 2>/dev/null || echo \"$HOME/Pictures/Anime/grey_lain_wallpaper.jpg\")\"'")
+                    "/scripts/set_wallpaper \"$(cat ~/.cache/last_wallpaper 2>/dev/null || echo \"" .. dotfiles .. "/modules/backgrounds/gray_lien.jpg\")\"'")
     hl.exec_cmd("uwsm app -- hyprsunset")
     hl.exec_cmd("uwsm app -- hypridle")
     hl.exec_cmd("uwsm app -- pypr")

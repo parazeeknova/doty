@@ -48,7 +48,7 @@ install: build
 	cp target/release/get_github_graph ../modules/features/wm/quickshell/github_graph/get_github_graph
 	cp target/release/theme_switcher scripts/theme_switcher
 	cp target/release/kbd_aura scripts/kbd_aura
-	cp target/release/set_wallpaper_bin scripts/set_wallpaper_bin
+	cp target/release/set_wallpaper scripts/set_wallpaper_bin
 	cp target/release/parse_binds ../modules/features/wm/quickshell/shortcut_popup/parse_binds
 	cp target/release/caffeine ../modules/features/wm/quickshell/brightness_popup/caffeine
 	mkdir -p $(HOME)/.local/bin

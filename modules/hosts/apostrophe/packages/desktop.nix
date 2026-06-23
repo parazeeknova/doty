@@ -16,6 +16,7 @@
 
       # -- Wayland / Hyprland --
       uwsm
+      awww
       waybar
       hyprlock
       hypridle

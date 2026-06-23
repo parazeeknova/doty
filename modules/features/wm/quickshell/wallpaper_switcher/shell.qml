@@ -9,7 +9,7 @@ Scope {
     id: root
 
     property string homeDir: Quickshell.env("HOME")
-    property string animeDir: homeDir + "/Pictures/Anime"
+    property string animeDir: homeDir + "/doty/modules/backgrounds"
     property var wallpapers: []
     property string activeWallpaper: ""
     property string lastWallpaperPath: ""

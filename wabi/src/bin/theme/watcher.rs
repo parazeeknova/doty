@@ -45,7 +45,7 @@ fn watch_dirs() -> Vec<PathBuf> {
 
     let home = home_dir();
     vec![
-        home.join("doty/Pictures/Anime"),
+        home.join("doty/modules/backgrounds"),
         home.join("Pictures").join("Anime"),
     ]
 }
@@ -354,7 +354,7 @@ fn cleanup_stale(cache_dir: &Path, live_thumbs: &BTreeSet<PathBuf>) {
 }
 
 fn link_anime_wallpapers() {
-    let doty_dir = home_dir().join("doty/Pictures/Anime");
+    let doty_dir = home_dir().join("doty/modules/backgrounds");
     let home_dir_anime = home_dir().join("Pictures").join("Anime");
 
     if !doty_dir.is_dir() || !home_dir_anime.is_dir() {
