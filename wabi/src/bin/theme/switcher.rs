@@ -594,8 +594,8 @@ fn main() {
             ".config/btop/themes/matugen.theme",
         ),
         (
-            ".config/bat/themes/matugen.tmTheme.template",
-            ".config/bat/themes/matugen.tmTheme",
+            "modules/features/shell/bat/themes/matugen.tmTheme.template",
+            "modules/features/shell/bat/themes/matugen.tmTheme",
         ),
         (
             ".config/fish/conf.d/matugen-colors.fish.template",
