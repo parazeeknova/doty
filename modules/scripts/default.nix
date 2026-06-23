@@ -37,7 +37,6 @@ in
         "scripts/presets_lister".source = mkOutOfStoreSymlink "${scriptsDir}/presets_lister";
         "scripts/set_wallpaper".source = mkOutOfStoreSymlink "${scriptsDir}/set_wallpaper";
         "scripts/set_wallpaper_bin".source = mkOutOfStoreSymlink "${scriptsDir}/set_wallpaper_bin";
-        "scripts/setup-zen-autoconfig.sh".source = mkOutOfStoreSymlink "${scriptsDir}/setup-zen-autoconfig.sh";
         "scripts/theme_switcher".source = mkOutOfStoreSymlink "${scriptsDir}/theme_switcher";
         "scripts/tmux-sessionizer".source = mkOutOfStoreSymlink "${scriptsDir}/tmux-sessionizer";
       };

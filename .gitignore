@@ -21,9 +21,10 @@ modules/features/wm/quickshell/apps_popup/launcher.db-wal
 .config/gtk-3.0/bookmarks
 
 # -- Zen Browser Profiles --
-.config/zen/Profile Groups/
-.config/zen/installs.ini
-.config/zen/profiles.ini
+modules/features/applications/zen/u7b24p71.Default Profile/
+modules/features/applications/zen/Profile Groups/
+modules/features/applications/zen/installs.ini
+modules/features/applications/zen/profiles.ini
 
 ref/
 vm_password

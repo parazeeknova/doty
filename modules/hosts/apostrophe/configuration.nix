@@ -39,6 +39,7 @@
       self.nixosModules.parazeeknovaSpicetify
       self.nixosModules.parazeeknovaVesktop
       self.nixosModules.parazeeknovaScripts
+      self.nixosModules.parazeeknovaZen
     ];
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];

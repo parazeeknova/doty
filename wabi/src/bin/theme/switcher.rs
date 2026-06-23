@@ -722,7 +722,7 @@ fn main() {
         let chrome_dir = zen_profile.join("chrome");
         let _ = fs::create_dir_all(&chrome_dir);
 
-        let css_tmpl = doty.join(".config/zen/userChrome.css.template");
+        let css_tmpl = doty.join("modules/features/applications/zen/userChrome.css.template");
         let css_dest = chrome_dir.join("userChrome.css");
         if css_tmpl.exists() && render_template(&css_tmpl, &css_dest, &vars) {
             println!(
@@ -731,7 +731,7 @@ fn main() {
             );
         }
 
-        let content_css_tmpl = doty.join(".config/zen/userContent.css.template");
+        let content_css_tmpl = doty.join("modules/features/applications/zen/userContent.css.template");
         let content_css_dest = chrome_dir.join("userContent.css");
         if content_css_tmpl.exists() && render_template(&content_css_tmpl, &content_css_dest, &vars)
         {
@@ -763,7 +763,7 @@ fn main() {
         // hostname matches the host. This is needed because
         // @-moz-document rules are ignored in <style> elements
         // injected at runtime (they only work in userContent.css).
-        let github_tmpl = doty.join(".config/zen/userContent.github.template");
+        let github_tmpl = doty.join("modules/features/applications/zen/userContent.github.template");
         let github_dest = chrome_dir.join("matugen-userstyles-github.css");
         if github_tmpl.exists() && render_template(&github_tmpl, &github_dest, &vars) {
             println!(
@@ -772,7 +772,7 @@ fn main() {
             );
         }
 
-        let js_src = doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/matugen-bridge.uc.js");
+        let js_src = doty.join("modules/features/applications/zen/fx-autoconfig/profile/chrome/JS/matugen-bridge.uc.js");
         let js_dest = chrome_dir.join("JS").join("matugen-bridge.uc.js");
         if js_src.exists() {
             let _ = fs::create_dir_all(chrome_dir.join("JS"));
@@ -785,7 +785,7 @@ fn main() {
         }
 
         let actor_parent_src =
-            doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/Matugen/MatugenParent.sys.mjs");
+            doty.join("modules/features/applications/zen/fx-autoconfig/profile/chrome/JS/Matugen/MatugenParent.sys.mjs");
         let actor_parent_dest = chrome_dir
             .join("JS")
             .join("Matugen")
@@ -796,7 +796,7 @@ fn main() {
         }
 
         let actor_child_src =
-            doty.join(".config/zen/fx-autoconfig/profile/chrome/JS/Matugen/MatugenChild.sys.mjs");
+            doty.join("modules/features/applications/zen/fx-autoconfig/profile/chrome/JS/Matugen/MatugenChild.sys.mjs");
         let actor_child_dest = chrome_dir
             .join("JS")
             .join("Matugen")
@@ -841,7 +841,7 @@ fn main() {
 
         // Sync fx-autoconfig utils (chrome.manifest, boot.sys.mjs, etc.)
         // Remove stale files first so renames in source (e.g. fs.jsm -> fs.sys.mjs) don't linger.
-        let utils_src = doty.join(".config/zen/fx-autoconfig/profile/chrome/utils");
+        let utils_src = doty.join("modules/features/applications/zen/fx-autoconfig/profile/chrome/utils");
         let utils_dst = chrome_dir.join("utils");
         if utils_src.exists() {
             let _ = fs::create_dir_all(&utils_dst);
@@ -864,7 +864,7 @@ fn main() {
             }
         }
 
-        let userjs_tmpl = doty.join(".config/zen/user.js.template");
+        let userjs_tmpl = doty.join("modules/features/applications/zen/user.js.template");
         let userjs_dest = zen_profile.join("user.js");
         if userjs_tmpl.exists() && render_template(&userjs_tmpl, &userjs_dest, &vars) {
             println!(
