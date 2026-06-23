@@ -21,8 +21,27 @@ in
           inherit (config.lib.file) mkOutOfStoreSymlink;
         in
         {
+          programs.tmux = {
+            enable = true;
+            plugins = with pkgs.tmuxPlugins; [
+              cpu
+              yank
+              battery
+              continuum
+              resurrect
+              catppuccin
+              sessionist
+              tmux-floax
+              online-status
+              tmux-sessionx
+              vim-tmux-navigator
+            ];
+            extraConfig = ''
+              source-file ${tmuxDir}/tmux.conf
+            '';
+          };
+
           xdg.configFile = {
-            "tmux/tmux.conf".source = mkOutOfStoreSymlink "${tmuxDir}/tmux.conf";
             "tmux/tmux.conf.template".source = mkOutOfStoreSymlink "${tmuxDir}/tmux.conf.template";
             "tmux/.tmux".source = mkOutOfStoreSymlink "${tmuxDir}/.tmux";
           };
