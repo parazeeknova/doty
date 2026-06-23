@@ -65,6 +65,7 @@
       qt6Packages.qt6ct
       libsForQt5.qt5ct
       libsForQt5.qtstyleplugin-kvantum
+      kdePackages.qtmultimedia
       qt5.qtmultimedia
       qt6.qtmultimedia
       qt6Packages.qtmultimedia
