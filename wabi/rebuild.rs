@@ -20,11 +20,44 @@ fn print_error(msg: &str) {
     println!("\x1b[31mError: {}\x1b[0m", msg);
 }
 
-fn run_cmd_in_dir(cmd: &str, args: &[&str], dir: &str) -> std::io::Result<ExitStatus> {
-    Command::new(cmd)
-        .args(args)
-        .current_dir(dir)
-        .status()
+fn run_cmd_silent(cmd: &str, args: &[&str]) -> bool {
+    match Command::new(cmd).args(args).output() {
+        Ok(output) if output.status.success() => true,
+        Ok(output) => {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            if !stderr.trim().is_empty() {
+                eprintln!("{}", stderr);
+            } else if !stdout.trim().is_empty() {
+                println!("{}", stdout);
+            }
+            false
+        }
+        Err(e) => {
+            eprintln!("Failed to execute command '{}': {}", cmd, e);
+            false
+        }
+    }
+}
+
+fn run_cmd_silent_in_dir(cmd: &str, args: &[&str], dir: &str) -> bool {
+    match Command::new(cmd).args(args).current_dir(dir).output() {
+        Ok(output) if output.status.success() => true,
+        Ok(output) => {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            if !stderr.trim().is_empty() {
+                eprintln!("{}", stderr);
+            } else if !stdout.trim().is_empty() {
+                println!("{}", stdout);
+            }
+            false
+        }
+        Err(e) => {
+            eprintln!("Failed to execute command '{}' in '{}': {}", cmd, dir, e);
+            false
+        }
+    }
 }
 
 fn run_cmd(cmd: &str, args: &[&str]) -> std::io::Result<ExitStatus> {
@@ -72,62 +105,69 @@ fn main() {
     }
 
     // Step 1: Lint, format, and build wabi
-    print_step("Linting, formatting, and building wabi... ");
+    print_step("Linting, formatting, and building wabi...");
     
     println!("-> wabi: cargo clippy --all-targets -- -D warnings");
-    match run_cmd_in_dir("cargo", &["clippy", "--all-targets", "--", "-D", "warnings"], "wabi") {
-        Ok(status) if status.success() => print_success("wabi clippy passed."),
-        _ => {
-            print_error("wabi clippy failed.");
-            std::process::exit(1);
-        }
+    if run_cmd_silent_in_dir("cargo", &["clippy", "--all-targets", "--", "-D", "warnings"], "wabi") {
+        print_success("wabi clippy passed.");
+    } else {
+        print_error("wabi clippy failed.");
+        std::process::exit(1);
     }
 
     println!("-> wabi: cargo fmt --all");
-    match run_cmd_in_dir("cargo", &["fmt", "--all", "--", "--check"], "wabi") {
-        Ok(status) if status.success() => print_success("wabi formatting is correct."),
-        _ => {
-            print_error("wabi formatting check failed. Run 'cargo fmt --all' in wabi directory.");
-            std::process::exit(1);
-        }
+    if run_cmd_silent_in_dir("cargo", &["fmt", "--all", "--", "--check"], "wabi") {
+        print_success("wabi formatting is correct.");
+    } else {
+        print_error("wabi formatting check failed. Run 'cargo fmt --all' in wabi directory.");
+        std::process::exit(1);
     }
 
     println!("-> wabi: cargo build --release + make install");
-    match run_cmd_in_dir("cargo", &["build", "--release"], "wabi") {
-        Ok(status) if status.success() => {},
-        _ => {
-            print_error("wabi build failed.");
-            std::process::exit(1);
-        }
+    if !run_cmd_silent_in_dir("cargo", &["build", "--release"], "wabi") {
+        print_error("wabi build failed.");
+        std::process::exit(1);
     }
-    match run_cmd_in_dir("make", &["install"], "wabi") {
-        Ok(status) if status.success() => print_success("wabi built and installed successfully."),
-        _ => {
-            print_error("wabi install failed.");
-            std::process::exit(1);
-        }
+    if run_cmd_silent_in_dir("make", &["install"], "wabi") {
+        print_success("wabi built and installed successfully.");
+    } else {
+        print_error("wabi install failed.");
+        std::process::exit(1);
     }
 
     // Step 2: Format QML files and run nixfmt
     print_step("Formatting and linting QML / Nix files...");
     
     println!("-> Formatting QML files...");
-    let qml_format_status = run_cmd(
+    if run_cmd_silent(
         "nix-shell",
         &["-p", "qt6.qtdeclarative", "--run", "find modules/features/wm/quickshell -type f -name '*.qml' -exec qmlformat -i {} +"]
-    );
-    if qml_format_status.is_err() || !qml_format_status.unwrap().success() {
+    ) {
+        print_success("QML files formatted.");
+    } else {
         print_error("QML formatting failed.");
         std::process::exit(1);
     }
 
     println!("-> Linting QML files...");
-    let qml_lint_status = run_cmd(
-        "nix-shell",
-        &["-p", "qt6.qtdeclarative", "--run", "find modules/features/wm/quickshell -type f -name '*.qml' -exec qmllint {} +"]
-    );
-    if qml_lint_status.is_err() || !qml_lint_status.unwrap().success() {
-        print_warning("QML lint exited with non-zero or warning, but proceeding.");
+    // We capture qmllint output and only treat non-zero exits as structural errors
+    let qml_lint_output = Command::new("nix-shell")
+        .args(&["-p", "qt6.qtdeclarative", "--run", "find modules/features/wm/quickshell -type f -name '*.qml' -exec qmllint {} +"])
+        .output();
+    match qml_lint_output {
+        Ok(output) if output.status.success() => {
+            print_success("QML lint passed.");
+        }
+        Ok(output) => {
+            // It returned non-zero (meaning there were syntax errors)
+            print_error("QML lint found syntax errors:");
+            eprintln!("{}", String::from_utf8_lossy(&output.stderr));
+            std::process::exit(1);
+        }
+        Err(e) => {
+            print_error(&format!("Failed to run qmllint: {}", e));
+            std::process::exit(1);
+        }
     }
 
     println!("-> Formatting Nix files...");
@@ -136,8 +176,9 @@ fn main() {
         let file_list: Vec<&str> = files.lines().filter(|s| !s.is_empty()).collect();
         if !file_list.is_empty() {
             let mut args = file_list.clone();
-            let format_status = Command::new("nixfmt").args(&args).status();
-            if format_status.is_err() || !format_status.unwrap().success() {
+            if run_cmd_silent("nixfmt", &args) {
+                print_success("Nix files formatted.");
+            } else {
                 print_error("nixfmt formatting failed.");
                 std::process::exit(1);
             }
@@ -145,23 +186,22 @@ fn main() {
             println!("-> Checking Nix formatting...");
             let mut check_args = vec!["-c"];
             check_args.extend(file_list);
-            let check_status = Command::new("nixfmt").args(&check_args).status();
-            if check_status.is_err() || !check_status.unwrap().success() {
+            if run_cmd_silent("nixfmt", &check_args) {
+                print_success("Nix formatting check passed.");
+            } else {
                 print_error("nixfmt formatting check failed.");
                 std::process::exit(1);
             }
         }
     }
-    print_success("QML and Nix formatting / linting completed.");
 
     // Step 3: Nix flake check
     print_step("Running nix flake check...");
-    match run_cmd("nix", &["flake", "check"]) {
-        Ok(status) if status.success() => print_success("nix flake check passed."),
-        _ => {
-            print_error("nix flake check failed.");
-            std::process::exit(1);
-        }
+    if run_cmd_silent("nix", &["flake", "check"]) {
+        print_success("nix flake check passed.");
+    } else {
+        print_error("nix flake check failed.");
+        std::process::exit(1);
     }
 
     // Step 4: Git clean check & commit formatting changes if any
@@ -180,8 +220,8 @@ fn main() {
 
             if !lines.is_empty() {
                 print_warning("Formatting changed some files. Committing formatting updates...");
-                if run_cmd("git", &["add", "-A"]).is_ok() 
-                    && run_cmd("git", &["commit", "--no-gpg-sign", "-m", "style: auto-format Nix and QML files"]).is_ok() {
+                if run_cmd_silent("git", &["add", "-A"]) 
+                    && run_cmd_silent("git", &["commit", "--no-gpg-sign", "-m", "style: auto-format Nix and QML files"]) {
                     print_success("Formatting changes committed successfully.");
                 } else {
                     print_error("Failed to commit formatting changes.");
