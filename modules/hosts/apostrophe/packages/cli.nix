@@ -17,6 +17,7 @@
       fishPlugins.puffer
       fishPlugins.sponge
       fishPlugins.autopair
+      stow
 
       # -- File Utils --
       ripgrep
