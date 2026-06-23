@@ -3,39 +3,39 @@
 # Loaded automatically because fish auto-sources every *.fish under conf.d/.
 
 if status is-interactive
-    set -g fish_color_normal              "#eee0d4"
-    set -g fish_color_command             "#f8bb71"
-    set -g fish_color_keyword             "#f8bb71" --bold
-    set -g fish_color_quote               "#bbcd9e"
-    set -g fish_color_redirection         "#dfc2a2"
-    set -g fish_color_end                 "#dfc2a2" --bold
-    set -g fish_color_error               "#ffb4ab" --bold
-    set -g fish_color_param               "#d4c4b5"
-    set -g fish_color_option              "#dfc2a2"
-    set -g fish_color_comment             "#504539" --italics
-    set -g fish_color_selection           --background="#251e17" --bold
-    set -g fish_color_operator            "#f8bb71"
-    set -g fish_color_escape              "#bbcd9e"
-    set -g fish_color_autosuggestion      "#504539"
-    set -g fish_color_cwd                 "#f8bb71" --bold
-    set -g fish_color_cwd_root            "#ffb4ab" --bold
-    set -g fish_color_user                "#dfc2a2"
-    set -g fish_color_host                "#f8bb71"
-    set -g fish_color_host_remote         "#bbcd9e"
-    set -g fish_color_status              "#ffb4ab"
-    set -g fish_color_cancel              "#ffb4ab" --reverse
-    set -g fish_color_search_match        --background="#251e17" "#bbcd9e" --bold
-    set -g fish_color_history_current     "#f8bb71" --bold
+    set -g fish_color_normal              "#ebdbb2"
+    set -g fish_color_command             "#a9b665"
+    set -g fish_color_keyword             "#a9b665" --bold
+    set -g fish_color_quote               "#d8a657"
+    set -g fish_color_redirection         "#7daea3"
+    set -g fish_color_end                 "#7daea3" --bold
+    set -g fish_color_error               "#cc241d" --bold
+    set -g fish_color_param               "#d5c4a1"
+    set -g fish_color_option              "#7daea3"
+    set -g fish_color_comment             "#3c3836" --italics
+    set -g fish_color_selection           --background="#282828" --bold
+    set -g fish_color_operator            "#a9b665"
+    set -g fish_color_escape              "#d8a657"
+    set -g fish_color_autosuggestion      "#3c3836"
+    set -g fish_color_cwd                 "#a9b665" --bold
+    set -g fish_color_cwd_root            "#cc241d" --bold
+    set -g fish_color_user                "#7daea3"
+    set -g fish_color_host                "#a9b665"
+    set -g fish_color_host_remote         "#d8a657"
+    set -g fish_color_status              "#cc241d"
+    set -g fish_color_cancel              "#cc241d" --reverse
+    set -g fish_color_search_match        --background="#282828" "#d8a657" --bold
+    set -g fish_color_history_current     "#a9b665" --bold
     set -g fish_color_valid_path          --underline
-    set -g fish_color_match               "#bbcd9e" --bold
+    set -g fish_color_match               "#d8a657" --bold
 
-    set -g fish_pager_color_progress      "#18120c" --background="#f8bb71"
-    set -g fish_pager_color_background    --background="#18120c"
-    set -g fish_pager_color_prefix        "#f8bb71" --bold
-    set -g fish_pager_color_completion    "#eee0d4"
-    set -g fish_pager_color_description   "#d4c4b5" --italics
-    set -g fish_pager_color_selected_background --background="#251e17"
-    set -g fish_pager_color_selected_prefix "#f8bb71" --bold
-    set -g fish_pager_color_selected_completion "#eee0d4" --bold
-    set -g fish_pager_color_selected_description "#dfc2a2" --italics
+    set -g fish_pager_color_progress      "#1d2021" --background="#a9b665"
+    set -g fish_pager_color_background    --background="#1d2021"
+    set -g fish_pager_color_prefix        "#a9b665" --bold
+    set -g fish_pager_color_completion    "#ebdbb2"
+    set -g fish_pager_color_description   "#d5c4a1" --italics
+    set -g fish_pager_color_selected_background --background="#282828"
+    set -g fish_pager_color_selected_prefix "#a9b665" --bold
+    set -g fish_pager_color_selected_completion "#ebdbb2" --bold
+    set -g fish_pager_color_selected_description "#7daea3" --italics
 end

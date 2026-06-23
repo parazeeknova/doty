@@ -119,7 +119,7 @@ fn default_palette() -> HashMap<String, String> {
 
 fn load_preset_palette(name: &str) -> Option<HashMap<String, String>> {
     let path = home_dir()
-        .join("doty/.config/hypr/wabi/presets")
+        .join("doty/wabi/presets")
         .join(format!("{}.toml", name));
 
     let content = fs::read_to_string(&path).ok()?;
@@ -492,7 +492,7 @@ fn main() {
     let palette = match mode.as_str() {
         "preset" => load_preset_palette(&value).unwrap_or_else(|| {
             eprintln!(
-                "Unknown preset '{}': no file at ~/.config/hypr/wabi/presets/{}.toml",
+                "Unknown preset '{}': no file at ~/doty/wabi/presets/{}.toml",
                 value, value
             );
             std::process::exit(1);
@@ -524,7 +524,7 @@ fn main() {
     if let Ok(json_str) = serde_json::to_string(&vars) {
         let _ = fs::write(colors_json_dest, json_str);
     }
-    let colors_tmpl = doty.join(".config/quickshell/colors.qml.template");
+    let colors_tmpl = doty.join("modules/features/wm/quickshell/colors.qml.template");
     let colors_dest = cache_colors_dir.join("Colors.qml");
     if colors_tmpl.exists() && render_template(&colors_tmpl, &colors_dest, &vars) {
         println!("Rendered cache Colors.qml (early)");
@@ -611,8 +611,8 @@ fn main() {
             ".config/opencode/themes/matugen.json",
         ),
         (
-            ".config/quickshell/Theme.qml.template",
-            ".config/quickshell/Theme.qml",
+            "modules/features/wm/quickshell/Theme.qml.template",
+            "modules/features/wm/quickshell/Theme.qml",
         ),
         (
             ".config/gtk-3.0/colors.css.template",

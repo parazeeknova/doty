@@ -140,7 +140,7 @@ Scope {
     FileView {
         id: presetsDirWatcher
 
-        path: "file://" + root.homeDir + "/doty/.config/hypr/wabi/presets"
+        path: "file://" + root.homeDir + "/doty/wabi/presets"
         watchChanges: true
         onFileChanged: presetsLister.running = true
         onLoaded: presetsLister.running = true
