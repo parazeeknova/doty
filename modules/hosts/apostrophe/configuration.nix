@@ -100,6 +100,11 @@
 
       # -- Services --
       services.gnome.gnome-keyring.enable = true;
+      services.blueman.enable = true;
+      services.upower.enable = true;
+
+      # -- Bluetooth --
+      hardware.bluetooth.enable = true;
 
       # -- Graphics --
       services.xserver.videoDrivers = [ "nvidia" ];
@@ -128,9 +133,11 @@
 
       # -- Environment --
       environment.sessionVariables = {
-        GBM_BACKEND = "nvidia-drm";
-        __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-        WLR_NO_HARDWARE_CURSORS = "1";
+        # On Optimus (Intel + NVIDIA) offload mode, the Wayland compositor should run on the integrated GPU (Intel).
+        # Setting these globally forces Hyprland onto the NVIDIA GPU, causing frequent crashes/freezes.
+        # GBM_BACKEND = "nvidia-drm";
+        # __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+        # WLR_NO_HARDWARE_CURSORS = "1";
       };
 
       # -- User --
