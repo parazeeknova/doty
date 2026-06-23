@@ -1,6 +1,6 @@
 hl.config({
     general = {
-        layout = "dwindle"
+        layout = "scrolling"
     },
     scrolling = {
         column_width = 0.6,
