@@ -41,6 +41,11 @@ in
         gtk4.theme = config.gtk.theme;
       };
 
+      home.file = {
+        ".themes/wabi".source = mkOutOfStoreSymlink "${theming}/.themes/wabi";
+        ".local/share/themes/wabi".source = mkOutOfStoreSymlink "${theming}/.themes/wabi";
+      };
+
       xdg.configFile = {
         # -- GTK Overrides (writable for theme_switcher) --
         "gtk-3.0/gtk.css".source = mkOutOfStoreSymlink "${theming}/.config/gtk-3.0/gtk.css";
