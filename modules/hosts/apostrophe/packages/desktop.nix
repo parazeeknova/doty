@@ -17,6 +17,7 @@
       # -- Wayland / Hyprland --
       uwsm
       awww
+      mpvpaper
       waybar
       hyprlock
       hypridle
@@ -35,6 +36,9 @@
       brightnessctl
       wlr-randr
       wl-gammactl
+      matugen
+      libnotify
+      imagemagick
 
       # -- Audio / Media --
       playerctl

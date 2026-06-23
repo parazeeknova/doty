@@ -43,10 +43,8 @@ fn watch_dirs() -> Vec<PathBuf> {
             .collect();
     }
 
-    let home = home_dir();
     vec![
-        home.join("doty/modules/backgrounds"),
-        home.join("Pictures").join("Anime"),
+        home_dir().join("doty/modules/backgrounds"),
     ]
 }
 
@@ -353,53 +351,7 @@ fn cleanup_stale(cache_dir: &Path, live_thumbs: &BTreeSet<PathBuf>) {
     }
 }
 
-fn link_anime_wallpapers() {
-    let doty_dir = home_dir().join("doty/modules/backgrounds");
-    let home_dir_anime = home_dir().join("Pictures").join("Anime");
 
-    if !doty_dir.is_dir() || !home_dir_anime.is_dir() {
-        return;
-    }
-
-    let Ok(entries) = fs::read_dir(&doty_dir) else {
-        return;
-    };
-
-    for entry in entries.flatten() {
-        let path = entry.path();
-        if !is_supported_wallpaper(&path) {
-            continue;
-        }
-        let Some(file_name) = path.file_name() else {
-            continue;
-        };
-        let target_link = home_dir_anime.join(file_name);
-
-        let needs_creation = match fs::read_link(&target_link) {
-            Ok(_existing_target) => {
-                let resolved_existing = fs::canonicalize(&target_link).ok();
-                let resolved_src = fs::canonicalize(&path).ok();
-                resolved_existing != resolved_src
-            }
-            Err(_) => !target_link.exists(),
-        };
-
-        if needs_creation {
-            if target_link.exists() || fs::symlink_metadata(&target_link).is_ok() {
-                let _ = fs::remove_file(&target_link);
-            }
-            if let Err(err) = std::os::unix::fs::symlink(&path, &target_link) {
-                eprintln!(
-                    "failed to create symlink from {} to {}: {err}",
-                    path.display(),
-                    target_link.display()
-                );
-            } else {
-                println!("linked {} -> {}", target_link.display(), path.display());
-            }
-        }
-    }
-}
 
 fn auto_optimize_video(path: &Path) {
     let Some(ext) = path.extension().and_then(|e| e.to_str()) else {
@@ -527,7 +479,6 @@ fn auto_optimize_video(path: &Path) {
 }
 
 fn sync_once(dirs: &[PathBuf], cache_dir: &Path, clean: bool) {
-    link_anime_wallpapers();
     let wallpapers = scan_wallpapers(dirs);
     let mut live_thumbs = BTreeSet::new();
 
@@ -565,7 +516,6 @@ fn interval() -> Duration {
 }
 
 fn print_wallpapers(dirs: &[PathBuf], cache_dir: &Path) {
-    link_anime_wallpapers();
     let wallpapers = scan_wallpapers(dirs);
     for wallpaper in wallpapers.values() {
         let thumb = thumb_path(cache_dir, &wallpaper.path);
