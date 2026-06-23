@@ -56,6 +56,23 @@ fn spawn_command_robust(cmd: &str, args: &[&str]) -> std::io::Result<std::proces
     }
 }
 
+fn is_waybar_running() -> bool {
+    // NixOS wraps waybar as `.waybar-wrapped`, so `pgrep -x waybar` never matches.
+    // Use `pgrep -f` against the cmdline path instead.
+    Command::new("pgrep")
+        .args(["-f", "bin/waybar"])
+        .stdout(std::process::Stdio::null())
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false)
+}
+
+fn kill_waybar() {
+    let _ = Command::new("pkill")
+        .args(["-f", "bin/waybar"])
+        .status();
+}
+
 fn apply_state(github_visible: bool, workspace_visible: bool, waybar_visible: bool) {
     let _ = run_command_robust("quickshell", &["-c", "github_graph", "ipc", "call", "github_graph", if github_visible { "onShow" } else { "onHide" }]);
     let _ = run_command_robust("quickshell", &["-c", "workspace_overview", "ipc", "call", "workspace_overview", if workspace_visible { "onShow" } else { "onHide" }]);
@@ -64,18 +81,13 @@ fn apply_state(github_visible: bool, workspace_visible: bool, waybar_visible: bo
     if waybar_visible {
         let _ = fs::write(TMPFS_WAYBAR, "true");
         let _ = fs::write(pwaybar, "true");
-        let check_waybar = run_command_robust("pgrep", &["-x", "waybar"]);
-        if let Ok(status) = check_waybar {
-            if !status.success() {
-                let _ = spawn_command_robust("uwsm", &["app", "--", "waybar"]);
-            }
-        } else {
+        if !is_waybar_running() {
             let _ = spawn_command_robust("uwsm", &["app", "--", "waybar"]);
         }
     } else {
         let _ = fs::write(TMPFS_WAYBAR, "false");
         let _ = fs::write(pwaybar, "false");
-        let _ = run_command_robust("pkill", &["-x", "waybar"]);
+        kill_waybar();
     }
 }
 

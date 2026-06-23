@@ -881,11 +881,11 @@ fn main() {
         .arg("prefer-dark")
         .status();
     let _ = Command::new("hyprctl").arg("reload").status();
-    let _ = Command::new("killall").arg("-USR2").arg("waybar").status();
+    let _ = Command::new("pkill").args(["-USR2", "-f", "bin/waybar"]).status();
     let _ = Command::new("makoctl").arg("reload").status();
     if Command::new("pgrep")
-        .arg("-x")
-        .arg("thunar")
+        .arg("-f")
+        .arg("bin/thunar")
         .output()
         .map(|o| o.status.success())
         .unwrap_or(false)
@@ -1067,7 +1067,7 @@ fn apply_glass_state() {
     }
 
     let _ = Command::new("makoctl").arg("reload").status();
-    let _ = Command::new("pkill").args(["-USR2", "-x", "waybar"]).status();
+    let _ = Command::new("pkill").args(["-USR2", "-f", "bin/waybar"]).status();
 
     let hypr_eval = format!(
         "hl.config({{ decoration = {{ active_opacity = {}, inactive_opacity = {}, blur = {{ enabled = {} }} }} }}); if hl.plugin.hyprglass then hl.plugin.hyprglass.config({{ enabled = {} }}) end",
