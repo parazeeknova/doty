@@ -175,8 +175,7 @@ fn main() {
     if let Ok(files) = nix_files_output {
         let file_list: Vec<&str> = files.lines().filter(|s| !s.is_empty()).collect();
         if !file_list.is_empty() {
-            let mut args = file_list.clone();
-            if run_cmd_silent("nixfmt", &args) {
+            if run_cmd_silent("nixfmt", &file_list) {
                 print_success("Nix files formatted.");
             } else {
                 print_error("nixfmt formatting failed.");
