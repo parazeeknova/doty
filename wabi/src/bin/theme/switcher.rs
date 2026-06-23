@@ -577,8 +577,8 @@ fn main() {
             "modules/features/shell/kitty/current-theme.conf",
         ),
         (
-            ".config/ghostty/theme.template",
-            ".config/ghostty/themes/theme",
+            "modules/features/shell/ghostty/theme.template",
+            "modules/features/shell/ghostty/themes/theme",
         ),
         (
             ".config/yazi/theme.toml.template",
@@ -605,7 +605,10 @@ fn main() {
             ".config/fish/conf.d/fzf-colors.fish.template",
             ".config/fish/conf.d/fzf-colors.fish",
         ),
-        (".config/eza/theme.yml.template", ".config/eza/theme.yml"),
+        (
+            "modules/features/shell/eza/theme.yml.template",
+            "modules/features/shell/eza/theme.yml",
+        ),
         (
             ".config/opencode/themes/matugen.json.template",
             ".config/opencode/themes/matugen.json",
@@ -658,8 +661,8 @@ fn main() {
         ("modules/features/shell/starship/starship.toml.template", "modules/features/shell/starship/starship.toml"),
         (".config/tmux/tmux.conf.template", ".config/tmux/tmux.conf"),
         (
-            ".config/fastfetch/config.jsonc.template",
-            ".config/fastfetch/config.jsonc",
+            "modules/features/shell/fastfetch/config.jsonc.template",
+            "modules/features/shell/fastfetch/config.jsonc",
         ),
         ("modules/features/shell/cava/config.template", "modules/features/shell/cava/config"),
         (

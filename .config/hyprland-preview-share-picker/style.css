@@ -1,22 +1,22 @@
 * {
   all: unset;
   font-family: "FiraCode Nerd", monospace;
-  color: #dee4de;
+  color: #e4e1e9;
   font-weight: bold;
   font-size: 9pt;
 }
 
 .window {
   border-radius: 0px;
-  background-color: #0f1512;
-  border: solid 2px #404944;
+  background-color: #131318;
+  border: solid 2px #46464f;
   margin: 2px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 tabs {
   padding: 0.4rem 0.6rem;
-  border-bottom: 1px solid #404944;
+  border-bottom: 1px solid #46464f;
 }
 
 tabs > tab {
@@ -25,17 +25,17 @@ tabs > tab {
 }
 
 .tab-label {
-  color: #bfc9c2;
+  color: #c7c5d0;
   transition: all 0.15s ease-in-out;
 }
 
 tabs > tab:checked > .tab-label, tabs > tab:active > .tab-label {
-  color: #8cd5b4;
-  border-bottom: 2px solid #8cd5b4;
+  color: #bcc3ff;
+  border-bottom: 2px solid #bcc3ff;
 }
 
 tabs > tab:hover > .tab-label {
-  color: #dee4de;
+  color: #e4e1e9;
 }
 
 .page {
@@ -45,28 +45,28 @@ tabs > tab:hover > .tab-label {
 .image-label {
   font-size: 8pt;
   padding: 0.2rem 0.1rem 0.1rem 0.1rem;
-  color: #dee4de;
+  color: #e4e1e9;
   font-weight: 500;
 }
 
 flowboxchild > .card, button > .card {
   transition: all 0.15s ease-in-out;
   border: solid 1px transparent;
-  border-color: #1b211e;
+  border-color: #1f1f25;
   border-radius: 0px;
-  background-color: #1b211e;
+  background-color: #1f1f25;
   padding: 3px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 flowboxchild:hover > .card, button:hover > .card {
-  background-color: #404944;
-  border-color: #404944;
+  background-color: #46464f;
+  border-color: #46464f;
 }
 
 flowboxchild:active > .card, flowboxchild:selected > .card, button:active > .card, button:selected > .card, button:focus > .card {
-  border: solid 1px #8cd5b4;
-  background-color: #404944;
+  border: solid 1px #bcc3ff;
+  background-color: #46464f;
 }
 
 .image {
@@ -76,24 +76,24 @@ flowboxchild:active > .card, flowboxchild:selected > .card, button:active > .car
 .region-button {
   padding: 0.4rem 0.8rem;
   border-radius: 0px;
-  background-color: #8cd5b4;
-  color: #0f1512;
+  background-color: #bcc3ff;
+  color: #131318;
   font-weight: bold;
   transition: all 0.15s ease-in-out;
 }
 
 .region-button:not(:disabled):hover, .region-button:not(:disabled):focus {
-  background-color: #b3ccbe;
-  color: #1b211e;
+  background-color: #c4c5dd;
+  color: #1f1f25;
 }
 
 .region-button:disabled {
-  background-color: #404944;
-  color: #bfc9c2;
+  background-color: #46464f;
+  color: #c7c5d0;
   opacity: 0.6;
 }
 
 .restore-button {
   padding: 0.3rem;
-  color: #bfc9c2;
+  color: #c7c5d0;
 }
