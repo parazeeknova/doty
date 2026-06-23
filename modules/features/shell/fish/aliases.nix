@@ -81,7 +81,7 @@
           dkcr = "docker compose restart";
 
           # -- Nix --
-          doty = "cd ~/doty && sudo nixos-rebuild switch --flake .#apostrophe";
+          doty = "cd ~/doty && make rebuild";
           dotes = "cd ~/doty && sudo nixos-rebuild test --flake .#apostrophe";
           nfu = "nix flake update";
           nfc = "nix flake check";
