@@ -2,7 +2,7 @@
 
 let
   repo = "/home/parazeeknova/doty";
-  matugenDir = "${repo}/modules/features/shell/matugen";
+  matugenDir = "${repo}/modules/features/wm/matugen";
 in
 {
 
