@@ -15,13 +15,13 @@ Scope {
     property int activeSignal: 0
     property bool warpConnected: false
     property var details: ({
-        "ip_address": "",
-        "gateway": "",
-        "dns": "",
-        "subnet": "",
-        "security": "",
-        "bssid": ""
-    })
+            "ip_address": "",
+            "gateway": "",
+            "dns": "",
+            "subnet": "",
+            "security": "",
+            "bssid": ""
+        })
     property var networks: []
     property var vpns: []
     property bool detailsExpanded: false
@@ -30,7 +30,7 @@ Scope {
     property int lastActiveSubIndex: 0
     property bool isKeyboardTriggered: Quickshell.env("QS_KEYBOARD") === "1"
 
-    signal requestClose()
+    signal requestClose
 
     function getNetworkSectionItemsCount() {
         // Connect, Forget, Auto buttons
@@ -40,7 +40,6 @@ Scope {
             count++; // the header row
             if (root.expandedNetworkSsid === root.networks[i].ssid)
                 count += 3;
-
         }
         return count;
     }
@@ -50,35 +49,35 @@ Scope {
         for (var i = 0; i < root.networks.length; i++) {
             if (current === subIndex)
                 return {
-                "type": "header",
-                "netIndex": i,
-                "netData": root.networks[i]
-            };
+                    "type": "header",
+                    "netIndex": i,
+                    "netData": root.networks[i]
+                };
 
             current++;
             if (root.expandedNetworkSsid === root.networks[i].ssid) {
                 if (current === subIndex)
                     return {
-                    "type": "connect",
-                    "netIndex": i,
-                    "netData": root.networks[i]
-                };
+                        "type": "connect",
+                        "netIndex": i,
+                        "netData": root.networks[i]
+                    };
 
                 current++;
                 if (current === subIndex)
                     return {
-                    "type": "forget",
-                    "netIndex": i,
-                    "netData": root.networks[i]
-                };
+                        "type": "forget",
+                        "netIndex": i,
+                        "netData": root.networks[i]
+                    };
 
                 current++;
                 if (current === subIndex)
                     return {
-                    "type": "auto",
-                    "netIndex": i,
-                    "netData": root.networks[i]
-                };
+                        "type": "auto",
+                        "netIndex": i,
+                        "netData": root.networks[i]
+                    };
 
                 current++;
             }
@@ -121,7 +120,7 @@ Scope {
             try {
                 var raw = focusStateFile.text().trim();
                 if (raw === "")
-                    return ;
+                    return;
 
                 var parsed = JSON.parse(raw);
                 if (parsed.activeSection !== undefined)
@@ -129,7 +128,6 @@ Scope {
 
                 if (parsed.activeSubIndex !== undefined)
                     root.lastActiveSubIndex = parsed.activeSubIndex;
-
             } catch (e) {
                 console.log("Failed to parse network focus state: " + e);
             }
@@ -166,13 +164,13 @@ Scope {
                     root.activeSignal = data.active_signal || 0;
                     root.warpConnected = data.warp_connected || false;
                     root.details = data.details || ({
-                        "ip_address": "",
-                        "gateway": "",
-                        "dns": "",
-                        "subnet": "",
-                        "security": "",
-                        "bssid": ""
-                    });
+                            "ip_address": "",
+                            "gateway": "",
+                            "dns": "",
+                            "subnet": "",
+                            "security": "",
+                            "bssid": ""
+                        });
                     root.networks = data.networks || [];
                     root.vpns = data.vpns || [];
                 } catch (e) {
@@ -180,7 +178,6 @@ Scope {
                 }
             }
         }
-
     }
 
     // Timer to wait and refresh status after actions
@@ -207,7 +204,6 @@ Scope {
         onTriggered: {
             if (!checkStatusProc.running)
                 checkStatusProc.running = true;
-
         }
     }
 
@@ -264,7 +260,6 @@ Scope {
                     } else if (win.activeSection === 1) {
                         if (win.activeSubIndex === 0)
                             root.detailsExpanded = !root.detailsExpanded;
-
                     } else if (win.activeSection === 2) {
                         if (win.activeSubIndex === 0) {
                             if (root.warpConnected)
@@ -324,7 +319,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -333,12 +328,10 @@ Scope {
                 onActiveSectionChanged: {
                     if (isLoaded)
                         root.saveFocusState(activeSection, activeSubIndex);
-
                 }
                 onActiveSubIndexChanged: {
                     if (isLoaded)
                         root.saveFocusState(activeSection, activeSubIndex);
-
                 }
                 screen: modelData
                 color: "transparent"
@@ -390,7 +383,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Slide-out + fade-out
@@ -416,7 +408,6 @@ Scope {
                         duration: 100
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -436,7 +427,7 @@ Scope {
                     radius: 0
                     antialiasing: false
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
@@ -513,9 +504,7 @@ Scope {
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
                                 }
-
                             }
-
                         }
 
                         Rectangle {
@@ -560,7 +549,6 @@ Scope {
                                         root.triggerRefresh();
                                     }
                                 }
-
                             }
 
                             // Airplane Mode Button
@@ -593,9 +581,7 @@ Scope {
                                         root.triggerRefresh();
                                     }
                                 }
-
                             }
-
                         }
 
                         Rectangle {
@@ -630,7 +616,6 @@ Scope {
                                         root.detailsExpanded = !root.detailsExpanded;
                                     }
                                 }
-
                             }
 
                             Column {
@@ -685,7 +670,6 @@ Scope {
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
                                 }
-
                             }
 
                             Text {
@@ -697,7 +681,6 @@ Scope {
                                 renderType: Text.NativeRendering
                                 visible: root.detailsExpanded && !root.connected
                             }
-
                         }
 
                         // --- SECTION 4: VPN SECTION ---
@@ -755,9 +738,7 @@ Scope {
                                             root.triggerRefresh();
                                         }
                                     }
-
                                 }
-
                             }
 
                             Column {
@@ -810,13 +791,9 @@ Scope {
                                                     root.triggerRefresh();
                                                 }
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             Text {
@@ -828,7 +805,6 @@ Scope {
                                 renderType: Text.NativeRendering
                                 visible: root.vpns.length === 0
                             }
-
                         }
 
                         // --- SECTION 5: SCANNED NETWORK LIST ---
@@ -884,7 +860,6 @@ Scope {
                                                     width: 140
                                                     renderType: Text.NativeRendering
                                                 }
-
                                             }
 
                                             // Signal Strength Bars
@@ -917,7 +892,6 @@ Scope {
                                                         root.expandedNetworkSsid = modelData.ssid;
                                                 }
                                             }
-
                                         }
 
                                         // Expanded connection/forget/auto-connect options
@@ -967,7 +941,6 @@ Scope {
                                                             root.triggerRefresh();
                                                         }
                                                     }
-
                                                 }
 
                                                 Text {
@@ -1002,7 +975,6 @@ Scope {
                                                             root.triggerRefresh();
                                                         }
                                                     }
-
                                                 }
 
                                                 Text {
@@ -1037,9 +1009,7 @@ Scope {
                                                             root.triggerRefresh();
                                                         }
                                                     }
-
                                                 }
-
                                             }
 
                                             // Additional details for scanned network
@@ -1052,15 +1022,10 @@ Scope {
                                                 font.pixelSize: 7
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // --- SECTION 6: FOOTER ACTIONS ---
@@ -1094,7 +1059,6 @@ Scope {
                                         win.closePopup(); // Close popup when launching settings editor
                                     }
                                 }
-
                             }
 
                             // Restart WiFi
@@ -1125,19 +1089,11 @@ Scope {
                                         root.triggerRefresh();
                                     }
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

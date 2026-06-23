@@ -42,7 +42,11 @@ fn send_notification(started: &[String], restarted: &[String]) {
         if started.len() == 1 {
             parts.push(format!("Started: {}", started[0]));
         } else {
-            parts.push(format!("Started {} daemons:\n{}", started.len(), started.join(", ")));
+            parts.push(format!(
+                "Started {} daemons:\n{}",
+                started.len(),
+                started.join(", ")
+            ));
         }
     }
     if !restarted.is_empty() {
@@ -86,8 +90,7 @@ fn main() {
         Daemon {
             name: "Wallpaper Watcher",
             process_name: "wallpaper_thumb_watcher",
-            start_command:
-                "uwsm app -- ~/.config/quickshell/wallpaper_switcher/wallpaper_thumb_watcher",
+            start_command: "uwsm app -- ~/.config/quickshell/wallpaper_switcher/wallpaper_thumb_watcher",
             ipc_socket: None,
         },
         Daemon {

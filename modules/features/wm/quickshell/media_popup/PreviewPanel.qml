@@ -50,7 +50,6 @@ Rectangle {
         Component.onCompleted: {
             if (visible)
                 videoPlayer.play();
-
         }
     }
 
@@ -62,5 +61,4 @@ Rectangle {
         font.family: "FiraCode Nerd Font"
         font.pixelSize: 8
     }
-
 }

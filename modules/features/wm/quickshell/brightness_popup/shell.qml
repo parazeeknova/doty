@@ -21,7 +21,7 @@ Scope {
     property int lastActiveSubIndex: 0
     property bool isKeyboardTriggered: Quickshell.env("QS_KEYBOARD") === "1"
 
-    signal requestClose()
+    signal requestClose
 
     function triggerRefresh() {
         delayRefreshTimer.restart();
@@ -58,7 +58,7 @@ Scope {
             try {
                 var raw = focusStateFile.text().trim();
                 if (raw === "")
-                    return ;
+                    return;
 
                 var parsed = JSON.parse(raw);
                 if (parsed.activeSection !== undefined)
@@ -66,7 +66,6 @@ Scope {
 
                 if (parsed.activeSubIndex !== undefined)
                     root.lastActiveSubIndex = parsed.activeSubIndex;
-
             } catch (e) {
                 console.log("Failed to parse brightness focus state: " + e);
             }
@@ -138,7 +137,6 @@ Scope {
                 }
             }
         }
-
     }
 
     // Periodic polling every 3 seconds
@@ -153,7 +151,6 @@ Scope {
             if (pendingScreenVol === -1 && pendingKbdVol === -1) {
                 if (!checkStatusProc.running)
                     checkStatusProc.running = true;
-
             }
         }
     }
@@ -263,7 +260,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -272,12 +269,10 @@ Scope {
                 onActiveSectionChanged: {
                     if (isLoaded)
                         root.saveFocusState(activeSection, activeSubIndex);
-
                 }
                 onActiveSubIndexChanged: {
                     if (isLoaded)
                         root.saveFocusState(activeSection, activeSubIndex);
-
                 }
                 screen: modelData
                 color: "transparent"
@@ -329,7 +324,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Slide-out + fade-out
@@ -355,7 +349,6 @@ Scope {
                         duration: 100
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -375,7 +368,7 @@ Scope {
                     radius: 0
                     antialiasing: false
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
@@ -448,7 +441,6 @@ Scope {
                                     font.bold: true
                                     renderType: Text.NativeRendering
                                 }
-
                             }
 
                             // Brightness Slider
@@ -483,9 +475,7 @@ Scope {
                                             width: (screenSliderBlocks.width - (screenSliderBlocks.spacing * (screenSliderBlocks.totalBlocks - 1))) / screenSliderBlocks.totalBlocks
                                             color: (index < Math.round(screenSliderBlocks.currentVal * screenSliderBlocks.totalBlocks)) ? theme.accent : theme.bg_light
                                         }
-
                                     }
-
                                 }
 
                                 MouseArea {
@@ -498,22 +488,20 @@ Scope {
 
                                     anchors.fill: parent
                                     preventStealing: true
-                                    onWheel: (wheel) => {
+                                    onWheel: wheel => {
                                         var change = wheel.angleDelta.y > 0 ? 5 : -5;
                                         var newVol = Math.max(0, Math.min(root.screenBrightness + change, 100));
                                         root.screenBrightness = newVol;
                                         root.pendingScreenVol = newVol;
                                     }
-                                    onPressed: (mouse) => {
+                                    onPressed: mouse => {
                                         updateVol(mouse.x);
                                     }
-                                    onPositionChanged: (mouse) => {
+                                    onPositionChanged: mouse => {
                                         updateVol(mouse.x);
                                     }
                                 }
-
                             }
-
                         }
 
                         Rectangle {
@@ -542,7 +530,6 @@ Scope {
                                     font.bold: true
                                     renderType: Text.NativeRendering
                                 }
-
                             }
 
                             // Keyboard Slider
@@ -577,9 +564,7 @@ Scope {
                                             width: (kbdSliderBlocks.width - (kbdSliderBlocks.spacing * (kbdSliderBlocks.totalBlocks - 1))) / kbdSliderBlocks.totalBlocks
                                             color: (index < Math.round(kbdSliderBlocks.currentVal * kbdSliderBlocks.totalBlocks)) ? theme.accent : theme.bg_light
                                         }
-
                                     }
-
                                 }
 
                                 MouseArea {
@@ -601,22 +586,20 @@ Scope {
 
                                     anchors.fill: parent
                                     preventStealing: true
-                                    onWheel: (wheel) => {
+                                    onWheel: wheel => {
                                         var change = wheel.angleDelta.y > 0 ? 33 : -33;
                                         var newVol = Math.max(0, Math.min(root.kbdBrightness + change, 100));
                                         root.kbdBrightness = newVol;
                                         root.pendingKbdVol = newVol;
                                     }
-                                    onPressed: (mouse) => {
+                                    onPressed: mouse => {
                                         updateVol(mouse.x);
                                     }
-                                    onPositionChanged: (mouse) => {
+                                    onPositionChanged: mouse => {
                                         updateVol(mouse.x);
                                     }
                                 }
-
                             }
-
                         }
 
                         Rectangle {
@@ -684,7 +667,6 @@ Scope {
                                             root.triggerRefresh();
                                         }
                                     }
-
                                 }
 
                                 // Off Button
@@ -718,9 +700,7 @@ Scope {
                                             root.triggerRefresh();
                                         }
                                     }
-
                                 }
-
                             }
 
                             // Temperature Slider (visible when not Auto/Off, or drag changes state to a custom temperature)
@@ -739,7 +719,6 @@ Scope {
                                     opacity: 0.8
                                     renderType: Text.NativeRendering
                                 }
-
                             }
 
                             Item {
@@ -784,9 +763,7 @@ Scope {
                                             width: (tempSliderBlocks.width - (tempSliderBlocks.spacing * (tempSliderBlocks.totalBlocks - 1))) / tempSliderBlocks.totalBlocks
                                             color: (index < Math.round(tempSliderBlocks.currentVal * tempSliderBlocks.totalBlocks)) ? theme.accent : theme.bg_light
                                         }
-
                                     }
-
                                 }
 
                                 MouseArea {
@@ -803,23 +780,21 @@ Scope {
 
                                     anchors.fill: parent
                                     preventStealing: true
-                                    onWheel: (wheel) => {
+                                    onWheel: wheel => {
                                         var current = tempSliderBlocks.parsedTemp;
                                         var change = wheel.angleDelta.y > 0 ? 250 : -250;
                                         var target = Math.max(2800, Math.min(current + change, 6500));
                                         root.sunsetState = String(target);
                                         root.pendingSunsetTemp = target;
                                     }
-                                    onPressed: (mouse) => {
+                                    onPressed: mouse => {
                                         updateTemp(mouse.x);
                                     }
-                                    onPositionChanged: (mouse) => {
+                                    onPositionChanged: mouse => {
                                         updateTemp(mouse.x);
                                     }
                                 }
-
                             }
-
                         }
 
                         Rectangle {
@@ -866,7 +841,6 @@ Scope {
                                         root.triggerRefresh();
                                     }
                                 }
-
                             }
 
                             // Sleep/Inhibit status
@@ -881,17 +855,10 @@ Scope {
                                 opacity: 0.6
                                 renderType: Text.NativeRendering
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

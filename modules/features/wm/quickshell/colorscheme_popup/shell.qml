@@ -34,13 +34,13 @@ Scope {
             root.presetFocusIndex = maxPreset;
     }
 
-    signal requestClose()
+    signal requestClose
 
     // Apply both the actual wallpaper (awww) and the color scheme (theme_switcher).
     // These MUST be in sync — if only one runs, the screen and the colors drift apart.
     function applyWallpaper(path) {
         if (path === "")
-            return ;
+            return;
         root.currentWallpaperPath = path;
         root.currentThemeMode = "wallpaper";
         // set_wallpaper first (sets the visible wallpaper), then theme_switcher (matugen from the same file).
@@ -50,9 +50,11 @@ Scope {
     }
 
     function getWallpaperThumb(path) {
-        if (path === "") return "";
+        if (path === "")
+            return "";
         var isVideo = path.endsWith(".mp4") || path.endsWith(".webm");
-        if (!isVideo) return path;
+        if (!isVideo)
+            return path;
 
         for (var i = 0; i < root.wallpapers.length; i++) {
             if (root.wallpapers[i].path === path) {
@@ -135,7 +137,6 @@ Scope {
         onFileChanged: reload()
     }
 
-
     // Watch presets dir for add/remove (directory mtime changes when entries change)
     FileView {
         id: presetsDirWatcher
@@ -169,13 +170,11 @@ Scope {
                                 "path": parts[0],
                                 "thumb": parts[1]
                             });
-
                     }
                 }
                 root.wallpapers = list;
             }
         }
-
     }
 
     // Presets list process
@@ -189,7 +188,7 @@ Scope {
             onStreamFinished: {
                 // Skip reassignment if the data hasn't changed — avoids Repeater rebuilds.
                 if (this.text === root.lastPresetsJson)
-                    return ;
+                    return;
                 root.lastPresetsJson = this.text;
                 try {
                     var parsed = JSON.parse(this.text);
@@ -201,7 +200,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Variants {
@@ -218,7 +216,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -271,7 +269,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Slide-out + fade-out
@@ -297,7 +294,6 @@ Scope {
                         duration: 100
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -317,11 +313,11 @@ Scope {
                     radius: 0
                     antialiasing: false
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
-                            return ;
+                            return;
                         }
                         if (event.key === Qt.Key_Right || event.key === Qt.Key_L) {
                             if (wallpaperTimeline.count > 0) {
@@ -457,11 +453,8 @@ Scope {
                                                     height: 8
                                                     color: modelData
                                                 }
-
                                             }
-
                                         }
-
                                     }
 
                                     gradient: Gradient {
@@ -475,9 +468,7 @@ Scope {
                                             position: 1
                                             color: Qt.rgba(theme.bg.r, theme.bg.g, theme.bg.b, 0.85)
                                         }
-
                                     }
-
                                 }
 
                                 MouseArea {
@@ -489,9 +480,7 @@ Scope {
                                         }
                                     }
                                 }
-
                             }
-
                         }
 
                         // --- SECTION 2: WALLPAPER TIMELINE ---
@@ -517,9 +506,18 @@ Scope {
 
                                 gradient: Gradient {
                                     orientation: Gradient.Horizontal
-                                    GradientStop { position: 0.0; color: Qt.rgba(theme.bg_dark.r, theme.bg_dark.g, theme.bg_dark.b, 0.55) }
-                                    GradientStop { position: 0.5; color: Qt.rgba(theme.bg_light.r, theme.bg_light.g, theme.bg_light.b, 0.2) }
-                                    GradientStop { position: 1.0; color: Qt.rgba(theme.bg_dark.r, theme.bg_dark.g, theme.bg_dark.b, 0.55) }
+                                    GradientStop {
+                                        position: 0.0
+                                        color: Qt.rgba(theme.bg_dark.r, theme.bg_dark.g, theme.bg_dark.b, 0.55)
+                                    }
+                                    GradientStop {
+                                        position: 0.5
+                                        color: Qt.rgba(theme.bg_light.r, theme.bg_light.g, theme.bg_light.b, 0.2)
+                                    }
+                                    GradientStop {
+                                        position: 1.0
+                                        color: Qt.rgba(theme.bg_dark.r, theme.bg_dark.g, theme.bg_dark.b, 0.55)
+                                    }
                                 }
 
                                 Row {
@@ -557,10 +555,15 @@ Scope {
                                         orientation: ListView.Horizontal
                                         spacing: 6
                                         clip: true
-                                        model: root.wallpapers.filter(function(wp) { return wp.path !== root.currentWallpaperPath; })
+                                        model: root.wallpapers.filter(function (wp) {
+                                            return wp.path !== root.currentWallpaperPath;
+                                        })
 
                                         Behavior on contentX {
-                                            NumberAnimation { duration: 180; easing.type: Easing.OutQuad }
+                                            NumberAnimation {
+                                                duration: 180
+                                                easing.type: Easing.OutQuad
+                                            }
                                         }
 
                                         delegate: Rectangle {
@@ -575,7 +578,9 @@ Scope {
                                             opacity: (root.currentWallpaperPath === modelData.path || hoverMouseArea.containsMouse || root.wallpaperFocusIndex === index) ? 1.0 : 0.7
 
                                             Behavior on opacity {
-                                                NumberAnimation { duration: 150 }
+                                                NumberAnimation {
+                                                    duration: 150
+                                                }
                                             }
 
                                             Image {
@@ -644,7 +649,6 @@ Scope {
                                                     font.pixelSize: 10
                                                     renderType: Text.NativeRendering
                                                 }
-
                                             }
 
                                             MouseArea {
@@ -659,9 +663,7 @@ Scope {
                                                     win.closePopup();
                                                 }
                                             }
-
                                         }
-
                                     }
 
                                     Rectangle {
@@ -688,7 +690,6 @@ Scope {
                                     }
                                 }
                             }
-
                         }
 
                         // --- SECTION 3: PRESETS ---
@@ -857,9 +858,7 @@ Scope {
                                                     duration: 150
                                                     easing.type: Easing.OutQuad
                                                 }
-
                                             }
-
                                         }
 
                                         Behavior on color {
@@ -867,11 +866,8 @@ Scope {
                                                 duration: 150
                                             }
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             MouseArea {
@@ -917,9 +913,7 @@ Scope {
                                                     duration: 150
                                                     easing.type: Easing.OutQuad
                                                 }
-
                                             }
-
                                         }
 
                                         Behavior on color {
@@ -927,11 +921,8 @@ Scope {
                                                 duration: 150
                                             }
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             // --- SECTION 5: DESKTOP WIDGETS ---
@@ -1193,17 +1184,10 @@ Scope {
                                     }
                                 }
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

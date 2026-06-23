@@ -15,7 +15,9 @@ fn main() {
         "sleep" => "systemctl suspend",
         "reboot" => "systemctl reboot",
         "poweroff" => "systemctl poweroff",
-        "logout" => "if command -v uwsm >/dev/null 2>&1 && uwsm check is-active; then uwsm stop; else hyprctl dispatch exit || pkill -x Hyprland; fi",
+        "logout" => {
+            "if command -v uwsm >/dev/null 2>&1 && uwsm check is-active; then uwsm stop; else hyprctl dispatch exit || pkill -x Hyprland; fi"
+        }
         _ => {
             eprintln!("Unknown action: {}", action);
             std::process::exit(1);

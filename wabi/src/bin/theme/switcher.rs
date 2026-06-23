@@ -648,7 +648,10 @@ fn main() {
             "modules/features/wm/theming/.config/qt6ct/style-colors.conf.template",
             "modules/features/wm/theming/.config/qt6ct/style-colors.conf",
         ),
-        ("modules/features/wm/mako/config.template", "modules/features/wm/mako/config"),
+        (
+            "modules/features/wm/mako/config.template",
+            "modules/features/wm/mako/config",
+        ),
         (
             "modules/features/wm/hyprland/hypr/hyprlock.conf.template",
             "modules/features/wm/hyprland/hypr/hyprlock.conf",
@@ -661,18 +664,30 @@ fn main() {
             "modules/features/wm/theming/.config/color-schemes/Kvantum.colors.template",
             "modules/features/wm/theming/.config/color-schemes/Kvantum.colors",
         ),
-        ("modules/features/shell/starship/starship.toml.template", "modules/features/shell/starship/starship.toml"),
-        ("modules/features/shell/tmux/tmux.conf.template", "modules/features/shell/tmux/tmux.conf"),
+        (
+            "modules/features/shell/starship/starship.toml.template",
+            "modules/features/shell/starship/starship.toml",
+        ),
+        (
+            "modules/features/shell/tmux/tmux.conf.template",
+            "modules/features/shell/tmux/tmux.conf",
+        ),
         (
             "modules/features/shell/fastfetch/config.jsonc.template",
             "modules/features/shell/fastfetch/config.jsonc",
         ),
-        ("modules/features/shell/cava/config.template", "modules/features/shell/cava/config"),
+        (
+            "modules/features/shell/cava/config.template",
+            "modules/features/shell/cava/config",
+        ),
         (
             "modules/features/wm/satty/config.toml.template",
             "modules/features/wm/satty/config.toml",
         ),
-        ("modules/features/shell/nvim/init.lua.template", "modules/features/shell/nvim/init.lua"),
+        (
+            "modules/features/shell/nvim/init.lua.template",
+            "modules/features/shell/nvim/init.lua",
+        ),
         (
             "modules/features/shell/vim/colors/matugen.vim.template",
             "modules/features/shell/vim/colors/matugen.vim",
@@ -681,7 +696,10 @@ fn main() {
             "modules/features/applications/zathura/zathurarc.template",
             "modules/features/applications/zathura/zathurarc",
         ),
-        ("modules/features/shell/mpv/mpv.conf.template", "modules/features/shell/mpv/mpv.conf"),
+        (
+            "modules/features/shell/mpv/mpv.conf.template",
+            "modules/features/shell/mpv/mpv.conf",
+        ),
         (
             "modules/features/applications/spicetify/Themes/wabi/color.ini.template",
             "modules/features/applications/spicetify/Themes/wabi/color.ini",
@@ -731,7 +749,8 @@ fn main() {
             );
         }
 
-        let content_css_tmpl = doty.join("modules/features/applications/zen/userContent.css.template");
+        let content_css_tmpl =
+            doty.join("modules/features/applications/zen/userContent.css.template");
         let content_css_dest = chrome_dir.join("userContent.css");
         if content_css_tmpl.exists() && render_template(&content_css_tmpl, &content_css_dest, &vars)
         {
@@ -763,7 +782,8 @@ fn main() {
         // hostname matches the host. This is needed because
         // @-moz-document rules are ignored in <style> elements
         // injected at runtime (they only work in userContent.css).
-        let github_tmpl = doty.join("modules/features/applications/zen/userContent.github.template");
+        let github_tmpl =
+            doty.join("modules/features/applications/zen/userContent.github.template");
         let github_dest = chrome_dir.join("matugen-userstyles-github.css");
         if github_tmpl.exists() && render_template(&github_tmpl, &github_dest, &vars) {
             println!(
@@ -841,7 +861,8 @@ fn main() {
 
         // Sync fx-autoconfig utils (chrome.manifest, boot.sys.mjs, etc.)
         // Remove stale files first so renames in source (e.g. fs.jsm -> fs.sys.mjs) don't linger.
-        let utils_src = doty.join("modules/features/applications/zen/fx-autoconfig/profile/chrome/utils");
+        let utils_src =
+            doty.join("modules/features/applications/zen/fx-autoconfig/profile/chrome/utils");
         let utils_dst = chrome_dir.join("utils");
         if utils_src.exists() {
             let _ = fs::create_dir_all(&utils_dst);
@@ -895,7 +916,9 @@ fn main() {
         .arg("prefer-dark")
         .status();
     let _ = Command::new("hyprctl").arg("reload").status();
-    let _ = Command::new("pkill").args(["-USR2", "-f", "bin/waybar"]).status();
+    let _ = Command::new("pkill")
+        .args(["-USR2", "-f", "bin/waybar"])
+        .status();
     let _ = Command::new("makoctl").arg("reload").status();
     if Command::new("pgrep")
         .arg("-f")
@@ -920,7 +943,13 @@ fn main() {
     let spicetify_path = home_dir().join(".spicetify").join("spicetify");
     if spicetify_path.exists() {
         let _ = Command::new(&spicetify_path).args(["apply", "-n"]).status();
-        if Command::new("pgrep").arg("-x").arg("spotify").status().map(|s| s.success()).unwrap_or(false) {
+        if Command::new("pgrep")
+            .arg("-x")
+            .arg("spotify")
+            .status()
+            .map(|s| s.success())
+            .unwrap_or(false)
+        {
             let _ = Command::new("pkill").arg("-x").arg("spotify").status();
             std::thread::sleep(std::time::Duration::from_millis(500));
             let _ = Command::new("uwsm")
@@ -955,11 +984,9 @@ fn main() {
     if let Some(accent_hex) = vars.get("accent_hex") {
         let kbd_aura_path = doty.join("scripts/kbd_aura");
         let clean_hex = accent_hex.replace("#", "").to_uppercase();
-        
+
         let status = if kbd_aura_path.exists() {
-            Command::new(&kbd_aura_path)
-                .arg(&clean_hex)
-                .status()
+            Command::new(&kbd_aura_path).arg(&clean_hex).status()
         } else {
             Command::new("asusctl")
                 .args(["aura", "effect", "static", "--colour", &clean_hex])
@@ -1030,7 +1057,10 @@ fn toggle_glass() {
 
     let status = if new_state == "true" { "On" } else { "Off" };
     let color = if new_state == "true" { "good" } else { "bad" };
-    let osdctl = home.join(".config").join("quickshell").join("osd/bin/osdctl");
+    let osdctl = home
+        .join(".config")
+        .join("quickshell")
+        .join("osd/bin/osdctl");
     let _ = Command::new(&osdctl)
         .args(["show", &format!("Glass: {}", status), color, "1200"])
         .status();
@@ -1081,7 +1111,9 @@ fn apply_glass_state() {
     }
 
     let _ = Command::new("makoctl").arg("reload").status();
-    let _ = Command::new("pkill").args(["-USR2", "-f", "bin/waybar"]).status();
+    let _ = Command::new("pkill")
+        .args(["-USR2", "-f", "bin/waybar"])
+        .status();
 
     let hypr_eval = format!(
         "hl.config({{ decoration = {{ active_opacity = {}, inactive_opacity = {}, blur = {{ enabled = {} }} }} }}); if hl.plugin.hyprglass then hl.plugin.hyprglass.config({{ enabled = {} }}) end",
@@ -1234,8 +1266,6 @@ fn find_zen_profiles() -> Vec<PathBuf> {
     }
     profiles
 }
-
-
 
 #[cfg(test)]
 mod tests {

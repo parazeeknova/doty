@@ -96,7 +96,7 @@ Scope {
             try {
                 var raw = focusStateFile.text().trim();
                 if (raw === "")
-                    return ;
+                    return;
 
                 var parsed = JSON.parse(raw);
                 if (parsed.activeSection !== undefined)
@@ -104,7 +104,6 @@ Scope {
 
                 if (parsed.activeSubIndex !== undefined)
                     root.lastActiveSubIndex = parsed.activeSubIndex;
-
             } catch (e) {
                 console.log("Failed to parse battery focus state: " + e);
             }
@@ -120,7 +119,7 @@ Scope {
             try {
                 var txt = settingsWatcher.text().trim();
                 if (txt === "")
-                    return ;
+                    return;
 
                 var data = JSON.parse(txt);
                 root.automationEnabled = data.automation_enabled ?? true;
@@ -168,7 +167,6 @@ Scope {
                 }
             }
         }
-
     }
 
     // Timer to poll battery status every 5 seconds
@@ -192,7 +190,6 @@ Scope {
         onRunningChanged: {
             if (!running)
                 checkStatusProc.running = true;
-
         }
     }
 
@@ -272,7 +269,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -281,12 +278,10 @@ Scope {
                 onActiveSectionChanged: {
                     if (isLoaded)
                         root.saveFocusState(activeSection, activeSubIndex);
-
                 }
                 onActiveSubIndexChanged: {
                     if (isLoaded)
                         root.saveFocusState(activeSection, activeSubIndex);
-
                 }
                 screen: modelData
                 color: "transparent"
@@ -329,7 +324,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 ParallelAnimation {
@@ -354,7 +348,6 @@ Scope {
                         duration: 100
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -374,7 +367,7 @@ Scope {
                     radius: 0
                     antialiasing: false
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
@@ -506,11 +499,8 @@ Scope {
                                         color: theme.accent
                                         radius: 0
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // Separator 1
@@ -594,22 +584,16 @@ Scope {
                                                 duration: 150
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
-
                                     }
 
                                     Behavior on color {
                                         ColorAnimation {
                                             duration: 150
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
 
                         Column {
@@ -675,7 +659,6 @@ Scope {
                                             visible: root.isACActive
                                             renderType: Text.NativeRendering
                                         }
-
                                     }
 
                                     // Row 1: Profile Selector (stretch-aligned to full width)
@@ -713,13 +696,9 @@ Scope {
                                                             root.saveSettings();
                                                         }
                                                     }
-
                                                 }
-
                                             }
-
                                         }
-
                                     }
 
                                     // Row 2: Brightness controls (full width distribution via anchors)
@@ -773,7 +752,6 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
 
                                             Item {
@@ -803,7 +781,6 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
 
                                             Text {
@@ -815,7 +792,6 @@ Scope {
                                                 font.pixelSize: 7
                                                 horizontalAlignment: Text.AlignHCenter
                                             }
-
                                         }
 
                                         // Keyboard (Right half, fully anchored)
@@ -863,7 +839,6 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
 
                                             Item {
@@ -893,7 +868,6 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
 
                                             Text {
@@ -905,13 +879,9 @@ Scope {
                                                 font.pixelSize: 7
                                                 horizontalAlignment: Text.AlignHCenter
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             // 2. Battery Mode Card
@@ -967,7 +937,6 @@ Scope {
                                             visible: root.isBatActive
                                             renderType: Text.NativeRendering
                                         }
-
                                     }
 
                                     // Row 1: Profile Selector (stretch-aligned to full width)
@@ -1005,13 +974,9 @@ Scope {
                                                             root.saveSettings();
                                                         }
                                                     }
-
                                                 }
-
                                             }
-
                                         }
-
                                     }
 
                                     // Row 2: Brightness controls (full width distribution via anchors)
@@ -1065,7 +1030,6 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
 
                                             Item {
@@ -1095,7 +1059,6 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
 
                                             Text {
@@ -1107,7 +1070,6 @@ Scope {
                                                 font.pixelSize: 7
                                                 horizontalAlignment: Text.AlignHCenter
                                             }
-
                                         }
 
                                         // Keyboard (Right half, fully anchored)
@@ -1155,7 +1117,6 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
 
                                             Item {
@@ -1185,7 +1146,6 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
 
                                             Text {
@@ -1197,13 +1157,9 @@ Scope {
                                                 font.pixelSize: 7
                                                 horizontalAlignment: Text.AlignHCenter
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             // 3. Low Battery Mode Card
@@ -1286,7 +1242,6 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
 
                                             Text {
@@ -1321,11 +1276,8 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
-
                                         }
-
                                     }
 
                                     // Row 1: Profile Selector (stretch-aligned to full width)
@@ -1363,13 +1315,9 @@ Scope {
                                                             root.saveSettings();
                                                         }
                                                     }
-
                                                 }
-
                                             }
-
                                         }
-
                                     }
 
                                     // Row 2: Brightness controls (full width distribution via anchors)
@@ -1423,7 +1371,6 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
 
                                             Item {
@@ -1453,7 +1400,6 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
 
                                             Text {
@@ -1465,7 +1411,6 @@ Scope {
                                                 font.pixelSize: 7
                                                 horizontalAlignment: Text.AlignHCenter
                                             }
-
                                         }
 
                                         // Keyboard (Right half, fully anchored)
@@ -1513,7 +1458,6 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
 
                                             Item {
@@ -1543,7 +1487,6 @@ Scope {
                                                         root.saveSettings();
                                                     }
                                                 }
-
                                             }
 
                                             Text {
@@ -1555,15 +1498,10 @@ Scope {
                                                 font.pixelSize: 7
                                                 horizontalAlignment: Text.AlignHCenter
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // Separator 2
@@ -1611,7 +1549,6 @@ Scope {
                                 opacity: 0.5
                                 renderType: Text.NativeRendering
                             }
-
                         }
 
                         Row {
@@ -1667,7 +1604,6 @@ Scope {
                                     }
                                     onClicked: root.setProfile("Quiet")
                                 }
-
                             }
 
                             // Balanced Button
@@ -1714,7 +1650,6 @@ Scope {
                                     }
                                     onClicked: root.setProfile("Balanced")
                                 }
-
                             }
 
                             // Performance Button
@@ -1761,9 +1696,7 @@ Scope {
                                     }
                                     onClicked: root.setProfile("Performance")
                                 }
-
                             }
-
                         }
 
                         // Separator 3
@@ -1828,7 +1761,6 @@ Scope {
                                         root.runCmd(["sh", "-c", "hyprctl dispatch 'hl.dsp.exit()' || pkill -x Hyprland"]);
                                     }
                                 }
-
                             }
 
                             // Poweroff Button
@@ -1870,19 +1802,11 @@ Scope {
                                         root.runCmd(["systemctl", "poweroff"]);
                                     }
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

@@ -12,10 +12,9 @@ Scope {
     property var vms: []
     property var qemuVms: []
     // Per-VM transitioning state (e.g. starting/stopping) so we can disable the action button
-    property var pendingActions: ({
-    })
+    property var pendingActions: ({})
 
-    signal requestClose()
+    signal requestClose
 
     function refresh() {
         listProc.running = false;
@@ -37,7 +36,7 @@ Scope {
 
     function startVm(vmx) {
         if (root.pendingActions[vmx])
-            return ;
+            return;
 
         root.setPending(vmx, true);
         Quickshell.execDetached([root.helperPath, "start", vmx]);
@@ -46,7 +45,7 @@ Scope {
 
     function stopVm(vmx) {
         if (root.pendingActions[vmx])
-            return ;
+            return;
 
         root.setPending(vmx, true);
         Quickshell.execDetached([root.helperPath, "stop", vmx]);
@@ -55,7 +54,7 @@ Scope {
 
     function deleteVm(vmx) {
         if (root.pendingActions[vmx])
-            return ;
+            return;
 
         root.setPending(vmx, true);
         Quickshell.execDetached([root.helperPath, "delete", vmx]);
@@ -65,7 +64,7 @@ Scope {
     function startQemuVm(name) {
         var key = "qemu:" + name;
         if (root.pendingActions[key])
-            return ;
+            return;
 
         root.setPending(key, true);
         Quickshell.execDetached([root.helperPath, "qemu-start", name]);
@@ -75,7 +74,7 @@ Scope {
     function stopQemuVm(name) {
         var key = "qemu:" + name;
         if (root.pendingActions[key])
-            return ;
+            return;
 
         root.setPending(key, true);
         Quickshell.execDetached([root.helperPath, "qemu-stop", name]);
@@ -90,7 +89,7 @@ Scope {
     function deleteQemuVm(name) {
         var key = "qemu:" + name;
         if (root.pendingActions[key])
-            return ;
+            return;
 
         root.setPending(key, true);
         Quickshell.execDetached([root.helperPath, "qemu-delete", name]);
@@ -148,14 +147,12 @@ Scope {
                     root.vms = data.vms || [];
                     root.qemuVms = data.qemu_vms || [];
                     // Clear any stale pending flags - the VM may have transitioned successfully
-                    root.pendingActions = ({
-                    });
+                    root.pendingActions = ({});
                 } catch (e) {
                     console.log("Failed to parse VM list: " + e);
                 }
             }
         }
-
     }
 
     // Cooldown after start/stop before re-fetching
@@ -179,7 +176,6 @@ Scope {
         onTriggered: {
             if (!listProc.running && Object.keys(root.pendingActions).length === 0)
                 root.refresh();
-
         }
     }
 
@@ -197,7 +193,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -250,7 +246,6 @@ Scope {
                         duration: 140
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Slide-out + fade-out to the left
@@ -276,7 +271,6 @@ Scope {
                         duration: 110
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -296,10 +290,9 @@ Scope {
                     radius: 0
                     antialiasing: false
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape)
                             win.closePopup();
-
                     }
                     Component.onCompleted: {
                         forceActiveFocus();
@@ -356,7 +349,6 @@ Scope {
                                             win.closePopup();
                                         }
                                     }
-
                                 }
 
                                 Text {
@@ -379,9 +371,7 @@ Scope {
                                             win.closePopup();
                                         }
                                     }
-
                                 }
-
                             }
 
                             Text {
@@ -403,9 +393,7 @@ Scope {
                                     onExited: parent.opacity = 0.7
                                     onClicked: root.refresh()
                                 }
-
                             }
-
                         }
 
                         // Header / Info Row
@@ -423,7 +411,6 @@ Scope {
                                 font.bold: true
                                 renderType: Text.NativeRendering
                             }
-
                         }
 
                         // Empty state
@@ -505,7 +492,6 @@ Scope {
                                             onStatusChanged: {
                                                 if (status === Image.Ready)
                                                     hasLoaded = true;
-
                                             }
                                         }
 
@@ -537,7 +523,6 @@ Scope {
                                                 font.pixelSize: 12
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
 
                                         // Click on the thumbnail opens the VM in VMware
@@ -546,7 +531,6 @@ Scope {
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: root.openVmGui(modelData.vmx)
                                         }
-
                                     }
 
                                     // Right-side info
@@ -597,7 +581,6 @@ Scope {
                                                 width: 1
                                                 height: 1
                                             }
-
                                         }
 
                                         // Resources row
@@ -614,7 +597,6 @@ Scope {
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
 
                                         // Snapshots row
@@ -629,7 +611,6 @@ Scope {
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
 
                                         // Shared Folders row
@@ -638,7 +619,7 @@ Scope {
                                             visible: modelData.shared_folders && modelData.shared_folders.length > 0
 
                                             Text {
-                                                text: " : " + modelData.shared_folders.map(function(f) {
+                                                text: " : " + modelData.shared_folders.map(function (f) {
                                                     return f.guest_name + " ➜ " + f.host_path;
                                                 }).join(", ")
                                                 color: "#a89984"
@@ -646,7 +627,6 @@ Scope {
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
 
                                         // Action buttons
@@ -692,7 +672,6 @@ Scope {
                                                                 root.startVm(modelData.vmx);
                                                         }
                                                     }
-
                                                 }
 
                                                 Text {
@@ -713,7 +692,6 @@ Scope {
                                                         cursorShape: Qt.PointingHandCursor
                                                         onClicked: root.openVmGui(modelData.vmx)
                                                     }
-
                                                 }
 
                                                 Text {
@@ -735,19 +713,12 @@ Scope {
                                                         cursorShape: Qt.PointingHandCursor
                                                         onClicked: root.deleteVm(modelData.vmx)
                                                     }
-
                                                 }
-
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // Dotted separator between vmware and qemu/libvirt sections
@@ -842,7 +813,6 @@ Scope {
                                             onStatusChanged: {
                                                 if (status === Image.Ready)
                                                     hasLoaded = true;
-
                                             }
                                         }
 
@@ -874,7 +844,6 @@ Scope {
                                                 font.pixelSize: 12
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
 
                                         // Click opens VM GUI
@@ -883,7 +852,6 @@ Scope {
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: root.openQemuVmGui(modelData.name)
                                         }
-
                                     }
 
                                     // Right-side info
@@ -928,7 +896,6 @@ Scope {
                                                 font.pixelSize: 7
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
 
                                         // Resources row
@@ -945,7 +912,6 @@ Scope {
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
 
                                         // Connection URI row
@@ -959,7 +925,6 @@ Scope {
                                                 font.pixelSize: 8
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
 
                                         // Action buttons
@@ -1005,7 +970,6 @@ Scope {
                                                                 root.startQemuVm(modelData.name);
                                                         }
                                                     }
-
                                                 }
 
                                                 Text {
@@ -1026,7 +990,6 @@ Scope {
                                                         cursorShape: Qt.PointingHandCursor
                                                         onClicked: root.openQemuVmGui(modelData.name)
                                                     }
-
                                                 }
 
                                                 Text {
@@ -1048,29 +1011,16 @@ Scope {
                                                         cursorShape: Qt.PointingHandCursor
                                                         onClicked: root.deleteQemuVm(modelData.name)
                                                     }
-
                                                 }
-
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

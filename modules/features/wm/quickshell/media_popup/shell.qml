@@ -51,7 +51,7 @@ Scope {
     readonly property var recordPresetOptions: ["ultrafast", "superfast", "veryfast", "fast", "medium", "slow"]
 
     // Properties for popup behavior
-    signal requestClose()
+    signal requestClose
 
     function syncColors() {
         colorModel.clear();
@@ -62,7 +62,7 @@ Scope {
 
     function updateStatus() {
         if (statusProc.running)
-            return ;
+            return;
 
         statusProc.running = true;
     }
@@ -127,7 +127,6 @@ Scope {
                 var hay = (a.source_path + " " + a.tags.join(" ")).toLowerCase();
                 if (hay.indexOf(needle) === -1)
                     continue;
-
             }
             result.push(a);
         }
@@ -157,7 +156,6 @@ Scope {
             out.push(name);
             if (out.length >= 5)
                 break;
-
         }
         root.tagSuggestions = out;
     }
@@ -166,7 +164,6 @@ Scope {
         for (var i = 0; i < root.assets.length; i++) {
             if (root.assets[i].id === id)
                 return root.assets[i];
-
         }
         return null;
     }
@@ -319,15 +316,15 @@ Scope {
 
     function commitTagDraft(tagName) {
         if (root.expandedAssetId < 0)
-            return ;
+            return;
 
         var asset = root.assetById(root.expandedAssetId);
         if (!asset)
-            return ;
+            return;
 
         var name = (tagName || root.tagDraft).trim();
         if (name === "")
-            return ;
+            return;
 
         var newTags = asset.tags.slice();
         if (newTags.indexOf(name) === -1)
@@ -344,7 +341,6 @@ Scope {
         for (var i = 0; i < asset.tags.length; i++) {
             if (asset.tags[i] !== tagName)
                 newTags.push(asset.tags[i]);
-
         }
         Quickshell.execDetached([root.helperPath, "set-tags", asset.id.toString(), newTags.join(",")]);
         root.updateStatus();
@@ -409,7 +405,6 @@ Scope {
             property string recordQuality: "med"
             property string recordPreset: "fast"
         }
-
     }
 
     // Process to run the Rust helper and retrieve JSON status
@@ -423,7 +418,7 @@ Scope {
             onStreamFinished: {
                 var txt = this.text.trim();
                 if (txt === "")
-                    return ;
+                    return;
 
                 try {
                     var data = JSON.parse(txt);
@@ -443,13 +438,11 @@ Scope {
                     root.syncColors();
                     if (data.monitor_fps)
                         root.monitorFps = data.monitor_fps;
-
                 } catch (e) {
                     console.log("Failed to parse media status JSON: " + e + " | Content: '" + txt + "'");
                 }
             }
         }
-
     }
 
     // FileView watches a ping file; any change triggers an instant status refresh
@@ -472,18 +465,15 @@ Scope {
             onStreamFinished: {
                 var txt = this.text.trim();
                 if (txt === "")
-                    return ;
+                    return;
 
                 try {
                     var data = JSON.parse(txt);
                     if (data.is_recording !== undefined)
                         root.isRecording = data.is_recording;
-
-                } catch (e) {
-                }
+                } catch (e) {}
             }
         }
-
     }
 
     Timer {
@@ -496,7 +486,6 @@ Scope {
         onTriggered: {
             if (!recordingStatusProc.running)
                 recordingStatusProc.running = true;
-
         }
     }
 
@@ -516,7 +505,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Process {
@@ -534,7 +522,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Process {
@@ -548,10 +535,8 @@ Scope {
                 var file = this.text.trim();
                 if (file !== "")
                     Quickshell.execDetached(["sh", "-c", "TEXT=$(tesseract \"" + file + "\" stdout 2>/dev/null) && if [ ! -z \"$TEXT\" ]; then echo -n \"$TEXT\" | wl-copy && " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Text Extracted\" \"good\" 1200 && \"" + root.helperPath + "\" add ocr \"$TEXT\"; else notify-send -t 1500 -a \"OCR\" \"No text found\"; fi"]);
-
             }
         }
-
     }
 
     Variants {
@@ -570,7 +555,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -631,7 +616,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Slide-out + fade-out
@@ -657,7 +641,6 @@ Scope {
                         duration: 100
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 Rectangle {
@@ -670,18 +653,18 @@ Scope {
                     radius: 0
                     antialiasing: false
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (root.previewAsset !== null || root.previewOcrText !== "") {
                             if (event.key === Qt.Key_Escape || event.key === Qt.Key_Q) {
                                 root.closePreview();
                                 event.accepted = true;
                             }
-                            return ;
+                            return;
                         }
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
-                            return ;
+                            return;
                         }
                         if (event.key === Qt.Key_Tab) {
                             var numSections = (root.activeHistoryTab === "ALL") ? 7 : 6;
@@ -769,7 +752,7 @@ Scope {
                     MouseArea {
                         anchors.fill: parent
                         propagateComposedEvents: true
-                        onPressed: function(mouse) {
+                        onPressed: function (mouse) {
                             root.closePreview();
                             mouse.accepted = false;
                         }
@@ -826,7 +809,6 @@ Scope {
                                     onClicked: win.closePopup()
                                 }
                             }
-
                         }
 
                         // SCREENSHOTS SECTION
@@ -873,7 +855,6 @@ Scope {
                                             font.pixelSize: 7
                                             anchors.horizontalCenter: parent.horizontalCenter
                                         }
-
                                     }
 
                                     MouseArea {
@@ -887,7 +868,6 @@ Scope {
                                             Quickshell.execDetached(["sh", "-c", "mkdir -p \"" + root.screenshotDir + "\" && FILE=\"" + root.screenshotDir + "/Screenshot_$(date '+%Y-%m-%d_%H.%M.%S').png\" && grim -g \"$(" + slurp + ")\" \"$FILE\" && swappy -f \"$FILE\" -o \"$FILE\" && wl-copy < \"$FILE\" && \"" + root.helperPath + "\" add-asset screenshot \"$FILE\""]);
                                         }
                                     }
-
                                 }
 
                                 // Area (Clip)
@@ -917,7 +897,6 @@ Scope {
                                             font.pixelSize: 7
                                             anchors.horizontalCenter: parent.horizontalCenter
                                         }
-
                                     }
 
                                     MouseArea {
@@ -931,7 +910,6 @@ Scope {
                                             Quickshell.execDetached(["sh", "-c", "grim -g \"$(" + slurp + ")\" - | wl-copy"]);
                                         }
                                     }
-
                                 }
 
                                 // Full (Clip)
@@ -961,7 +939,6 @@ Scope {
                                             font.pixelSize: 7
                                             anchors.horizontalCenter: parent.horizontalCenter
                                         }
-
                                     }
 
                                     MouseArea {
@@ -974,7 +951,6 @@ Scope {
                                             Quickshell.execDetached(["sh", "-c", "grim -o \"$(hyprctl activeworkspace -j | jq -r '.monitor')\" - | wl-copy"]);
                                         }
                                     }
-
                                 }
 
                                 // Full (File)
@@ -1004,7 +980,6 @@ Scope {
                                             font.pixelSize: 7
                                             anchors.horizontalCenter: parent.horizontalCenter
                                         }
-
                                     }
 
                                     MouseArea {
@@ -1017,11 +992,8 @@ Scope {
                                             Quickshell.execDetached(["sh", "-c", "mkdir -p \"" + root.screenshotDir + "\" && FILE=\"" + root.screenshotDir + "/Screenshot_$(date '+%Y-%m-%d_%H.%M.%S').png\" && grim -o \"$(hyprctl activeworkspace -j | jq -r '.monitor')\" \"$FILE\" && wl-copy < \"$FILE\" && \"" + root.helperPath + "\" add-asset screenshot \"$FILE\""]);
                                         }
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // SCREEN RECORDING SECTION
@@ -1063,12 +1035,10 @@ Scope {
                                         onEntered: {
                                             if (!root.isRecording)
                                                 parent.border.color = theme.accent;
-
                                         }
                                         onExited: {
                                             if (!root.isRecording)
                                                 parent.border.color = "#504945";
-
                                         }
                                         onClicked: {
                                             if (root.isRecording) {
@@ -1087,7 +1057,6 @@ Scope {
                                             }
                                         }
                                     }
-
                                 }
 
                                 // Record Full (only visible if not recording)
@@ -1124,9 +1093,7 @@ Scope {
                                             Quickshell.execDetached(["sh", "-c", root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Recording Started\" \"bad\" 1200 && mkdir -p \"" + root.recordingDir + "\" && FILE=\"" + root.recordingDir + "/Recording_$(date '+%Y-%m-%d_%H.%M.%S').mp4\" && (wf-recorder " + audioArgs + " " + root.recorderExtraArgs() + " -f \"$FILE\" ; \"" + root.helperPath + "\" add-asset recording \"$FILE\")"]);
                                         }
                                     }
-
                                 }
-
                             }
 
                             // Audio & Mic configuration row
@@ -1157,7 +1124,6 @@ Scope {
                                         onExited: parent.border.color = flagsAdapter.recordAudio ? "#fe8019" : "#504945"
                                         onClicked: flagsAdapter.recordAudio = !flagsAdapter.recordAudio
                                     }
-
                                 }
 
                                 Rectangle {
@@ -1182,9 +1148,7 @@ Scope {
                                         onExited: parent.border.color = flagsAdapter.recordMic ? "#fe8019" : "#504945"
                                         onClicked: flagsAdapter.recordMic = !flagsAdapter.recordMic
                                     }
-
                                 }
-
                             }
 
                             // Recording options: 2x2 grid
@@ -1215,17 +1179,16 @@ Scope {
                                         font.pixelSize: 8
                                     }
 
-                                     MouseArea {
-                                         anchors.fill: parent
-                                         cursorShape: Qt.PointingHandCursor
-                                         onClicked: {
-                                             var arr = root.recordFpsOptions;
-                                             var i = arr.indexOf(flagsAdapter.recordFps);
-                                             flagsAdapter.recordFps = arr[(i + 1) % arr.length];
-                                         }
-                                     }
-
-                                 }
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            var arr = root.recordFpsOptions;
+                                            var i = arr.indexOf(flagsAdapter.recordFps);
+                                            flagsAdapter.recordFps = arr[(i + 1) % arr.length];
+                                        }
+                                    }
+                                }
 
                                 Rectangle {
                                     id: qualityRect
@@ -1237,28 +1200,27 @@ Scope {
                                     border.color: (root.focusSection === root.sectionRecording && root.focusIndex === 5) ? theme.accent : "transparent"
                                     radius: 2
 
-                                     Text {
-                                         id: qualityText
- 
-                                         anchors.centerIn: parent
-                                         text: "󰊢 Quality: " + flagsAdapter.recordQuality
-                                         color: theme.accent
-                                         font.family: "FiraCode Nerd Font"
-                                         font.pixelSize: 8
-                                     }
- 
-                                     MouseArea {
-                                         anchors.fill: parent
-                                         cursorShape: Qt.PointingHandCursor
-                                         onClicked: {
-                                             var arr = root.recordQualityOptions;
-                                             var i = arr.indexOf(flagsAdapter.recordQuality);
-                                             flagsAdapter.recordQuality = arr[(i + 1) % arr.length];
-                                         }
-                                     }
- 
-                                 }
- 
+                                    Text {
+                                        id: qualityText
+
+                                        anchors.centerIn: parent
+                                        text: "󰊢 Quality: " + flagsAdapter.recordQuality
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            var arr = root.recordQualityOptions;
+                                            var i = arr.indexOf(flagsAdapter.recordQuality);
+                                            flagsAdapter.recordQuality = arr[(i + 1) % arr.length];
+                                        }
+                                    }
+                                }
+
                                 Rectangle {
                                     id: codecRect
                                     Layout.preferredWidth: codecText.implicitWidth + 8
@@ -1269,28 +1231,27 @@ Scope {
                                     border.color: (root.focusSection === root.sectionRecording && root.focusIndex === 6) ? theme.accent : "transparent"
                                     radius: 2
 
-                                     Text {
-                                         id: codecText
- 
-                                         anchors.centerIn: parent
-                                         text: "󰈙 Codec: " + flagsAdapter.recordCodec
-                                         color: theme.accent
-                                         font.family: "FiraCode Nerd Font"
-                                         font.pixelSize: 8
-                                     }
- 
-                                     MouseArea {
-                                         anchors.fill: parent
-                                         cursorShape: Qt.PointingHandCursor
-                                         onClicked: {
-                                             var arr = root.recordCodecs;
-                                             var i = arr.indexOf(flagsAdapter.recordCodec);
-                                             flagsAdapter.recordCodec = arr[(i + 1) % arr.length];
-                                         }
-                                     }
- 
-                                 }
- 
+                                    Text {
+                                        id: codecText
+
+                                        anchors.centerIn: parent
+                                        text: "󰈙 Codec: " + flagsAdapter.recordCodec
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            var arr = root.recordCodecs;
+                                            var i = arr.indexOf(flagsAdapter.recordCodec);
+                                            flagsAdapter.recordCodec = arr[(i + 1) % arr.length];
+                                        }
+                                    }
+                                }
+
                                 Rectangle {
                                     id: presetRect
                                     Layout.preferredWidth: presetText.implicitWidth + 8
@@ -1301,28 +1262,26 @@ Scope {
                                     border.color: (root.focusSection === root.sectionRecording && root.focusIndex === 7) ? theme.accent : "transparent"
                                     radius: 2
 
-                                     Text {
-                                         id: presetText
- 
-                                         anchors.centerIn: parent
-                                         text: "󰓣 Preset: " + flagsAdapter.recordPreset
-                                         color: theme.accent
-                                         font.family: "FiraCode Nerd Font"
-                                         font.pixelSize: 8
-                                     }
- 
-                                     MouseArea {
-                                         anchors.fill: parent
-                                         cursorShape: Qt.PointingHandCursor
-                                         onClicked: {
-                                             var arr = root.recordPresetOptions;
-                                             var i = arr.indexOf(flagsAdapter.recordPreset);
-                                             flagsAdapter.recordPreset = arr[(i + 1) % arr.length];
-                                         }
-                                     }
- 
-                                 }
+                                    Text {
+                                        id: presetText
 
+                                        anchors.centerIn: parent
+                                        text: "󰓣 Preset: " + flagsAdapter.recordPreset
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            var arr = root.recordPresetOptions;
+                                            var i = arr.indexOf(flagsAdapter.recordPreset);
+                                            flagsAdapter.recordPreset = arr[(i + 1) % arr.length];
+                                        }
+                                    }
+                                }
                             }
 
                             // COLOR PICKER + HISTORY
@@ -1376,7 +1335,6 @@ Scope {
                                                 root.updateStatus();
                                             }
                                         }
-
                                     }
 
                                     Item {
@@ -1408,9 +1366,7 @@ Scope {
                                                 root.updateStatus();
                                             }
                                         }
-
                                     }
-
                                 }
 
                                 Row {
@@ -1445,7 +1401,6 @@ Scope {
                                                 Quickshell.execDetached([root.helperPath, "pick-color"]);
                                             }
                                         }
-
                                     }
 
                                     // Color history swatches
@@ -1503,11 +1458,8 @@ Scope {
                                                     root.updateStatus();
                                                 }
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 Text {
@@ -1518,9 +1470,7 @@ Scope {
                                     font.pixelSize: 7
                                     font.italic: true
                                 }
-
                             }
-
                         }
 
                         // OCR TEXT EXTRACTION SECTION
@@ -1567,7 +1517,6 @@ Scope {
                                             Quickshell.execDetached(["sh", "-c", "grim -g \"$(" + slurp + ")\" /tmp/ocr_image.png && TEXT=$(tesseract /tmp/ocr_image.png stdout 2>/dev/null) && rm /tmp/ocr_image.png && if [ ! -z \"$TEXT\" ]; then echo -n \"$TEXT\" | wl-copy && " + root.homeDir + "/.config/quickshell/osd/bin/osdctl show \"Text Extracted\" \"good\" 1200 && \"" + root.helperPath + "\" add ocr \"$TEXT\"; else notify-send -t 1500 -a \"OCR\" \"No text found\"; fi"]);
                                         }
                                     }
-
                                 }
 
                                 // OCR Image File
@@ -1595,11 +1544,8 @@ Scope {
                                             ocrImagePickerProc.running = true;
                                         }
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // SETTINGS SECTION
@@ -1631,7 +1577,6 @@ Scope {
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: targetDirHeader.expanded = !targetDirHeader.expanded
                                 }
-
                             }
 
                             Column {
@@ -1704,7 +1649,6 @@ Scope {
                                             onActiveFocusChanged: {
                                                 if (!activeFocus)
                                                     scrBox.editing = false;
-
                                             }
                                         }
 
@@ -1727,7 +1671,6 @@ Scope {
                                             height: 1
                                             color: theme.bg_light
                                         }
-
                                     }
 
                                     Rectangle {
@@ -1750,9 +1693,7 @@ Scope {
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: browseScreenshotProc.running = true
                                         }
-
                                     }
-
                                 }
 
                                 // Recording location
@@ -1818,7 +1759,6 @@ Scope {
                                             onActiveFocusChanged: {
                                                 if (!activeFocus)
                                                     recBox.editing = false;
-
                                             }
                                         }
 
@@ -1841,7 +1781,6 @@ Scope {
                                             height: 1
                                             color: theme.bg_light
                                         }
-
                                     }
 
                                     Rectangle {
@@ -1864,9 +1803,7 @@ Scope {
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: browseRecordingProc.running = true
                                         }
-
                                     }
-
                                 }
 
                                 Behavior on height {
@@ -1874,7 +1811,6 @@ Scope {
                                         duration: 180
                                         easing.type: Easing.InOutQuad
                                     }
-
                                 }
 
                                 Behavior on opacity {
@@ -1882,11 +1818,8 @@ Scope {
                                         duration: 180
                                         easing.type: Easing.InOutQuad
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // Separator before history
@@ -1924,7 +1857,6 @@ Scope {
                                                 root.closeEditor();
                                             }
                                         }
-
                                     }
 
                                     Text {
@@ -1941,9 +1873,7 @@ Scope {
                                                 root.closeEditor();
                                             }
                                         }
-
                                     }
-
                                 }
 
                                 Text {
@@ -1961,9 +1891,7 @@ Scope {
                                             root.updateStatus();
                                         }
                                     }
-
                                 }
-
                             }
 
                             // ALL tab: filter bar + asset grid
@@ -2014,7 +1942,6 @@ Scope {
                                             height: 1
                                             color: theme.bg_light
                                         }
-
                                     }
 
                                     // Tag chip row
@@ -2053,11 +1980,8 @@ Scope {
                                                         root.closeEditor();
                                                     }
                                                 }
-
                                             }
-
                                         }
-
                                     }
 
                                     // Clear filter link
@@ -2076,9 +2000,7 @@ Scope {
                                                 searchField.text = "";
                                             }
                                         }
-
                                     }
-
                                 }
 
                                 // Asset grid
@@ -2158,7 +2080,6 @@ Scope {
                                                         font.pixelSize: 6
                                                         font.bold: true
                                                     }
-
                                                 }
 
                                                 // Tag strip on hover
@@ -2196,9 +2117,7 @@ Scope {
                                                                     font.family: "FiraCode Nerd Font"
                                                                     font.pixelSize: 6
                                                                 }
-
                                                             }
-
                                                         }
 
                                                         Text {
@@ -2208,9 +2127,7 @@ Scope {
                                                             font.family: "FiraCode Nerd Font"
                                                             font.pixelSize: 6
                                                         }
-
                                                     }
-
                                                 }
 
                                                 MouseArea {
@@ -2219,20 +2136,19 @@ Scope {
                                                     anchors.fill: parent
                                                     hoverEnabled: true
                                                     acceptedButtons: Qt.LeftButton | Qt.RightButton
-                                                    onClicked: function(mouse) {
+                                                    onClicked: function (mouse) {
                                                         if (mouse.button === Qt.RightButton) {
                                                             root.previewAsset = modelData;
-                                                            return ;
+                                                            return;
                                                         }
                                                         if (modelData.deleted)
-                                                            return ;
+                                                            return;
 
                                                         Quickshell.execDetached(["sh", "-c", "echo -n '" + modelData.source_path + "' | wl-copy && notify-send -t 1000 -a 'Media' 'Copied path to clipboard'"]);
                                                         root.closePreview();
                                                         win.closePopup();
                                                     }
                                                 }
-
                                             }
 
                                             Text {
@@ -2244,11 +2160,8 @@ Scope {
                                                 font.pixelSize: 7
                                                 elide: Text.ElideRight
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 // Pagination controls
@@ -2272,7 +2185,6 @@ Scope {
                                                 root.closePreview();
                                             }
                                         }
-
                                     }
 
                                     Text {
@@ -2297,9 +2209,7 @@ Scope {
                                                 root.closePreview();
                                             }
                                         }
-
                                     }
-
                                 }
 
                                 // "Showing N of M" footer
@@ -2310,10 +2220,7 @@ Scope {
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 7
                                 }
-
                             }
-
-
 
                             // OCR History Tab
                             Column {
@@ -2322,7 +2229,7 @@ Scope {
                                 visible: root.activeHistoryTab === "OCR"
 
                                 Repeater {
-                                    model: root.history.filter(function(item) {
+                                    model: root.history.filter(function (item) {
                                         return item.type === "ocr";
                                     })
 
@@ -2373,16 +2280,15 @@ Scope {
                                                     anchors.right: parent.right
                                                     anchors.verticalCenter: parent.verticalCenter
                                                 }
-
                                             }
 
                                             MouseArea {
                                                 anchors.fill: parent
                                                 acceptedButtons: Qt.LeftButton | Qt.RightButton
-                                                onClicked: function(mouse) {
+                                                onClicked: function (mouse) {
                                                     if (mouse.button === Qt.RightButton) {
                                                         root.previewOcrText = modelData.detail;
-                                                        return ;
+                                                        return;
                                                     }
                                                     if (root.expandedOcrIndex === index)
                                                         root.expandedOcrIndex = -1;
@@ -2390,7 +2296,6 @@ Scope {
                                                         root.expandedOcrIndex = index;
                                                 }
                                             }
-
                                         }
 
                                         // Expanded Text & Copy Row
@@ -2447,9 +2352,7 @@ Scope {
                                                             color: "#928374"
                                                             opacity: 0.6
                                                         }
-
                                                     }
-
                                                 }
 
                                                 // Copy Action Button
@@ -2478,23 +2381,14 @@ Scope {
                                                             Quickshell.execDetached(["sh", "-c", "echo -n '" + modelData.detail.replace(/'/g, "'\\''") + "' | wl-copy && notify-send -t 1000 -a 'OCR' 'Copied OCR text'"]);
                                                         }
                                                     }
-
                                                 }
-
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
 
                 Loader {
@@ -2508,11 +2402,7 @@ Scope {
                         item.themeObj = theme;
                     }
                 }
-
             }
-
         }
-
     }
-
 }

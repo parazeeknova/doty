@@ -33,7 +33,8 @@ PanelWindow {
         if (rootObj.previewAsset) {
             var w = rootObj.previewAsset.width || 300;
             var h = rootObj.previewAsset.height || 300;
-            if (w <= 0 || h <= 0) return 300;
+            if (w <= 0 || h <= 0)
+                return 300;
             var maxDim = 400;
             var minDim = 150;
             if (w > h) {
@@ -50,7 +51,8 @@ PanelWindow {
         if (rootObj.previewAsset) {
             var w = rootObj.previewAsset.width || 300;
             var h = rootObj.previewAsset.height || 300;
-            if (w <= 0 || h <= 0) return 300;
+            if (w <= 0 || h <= 0)
+                return 300;
             var maxDim = 400;
             var minDim = 150;
             if (h > w) {
@@ -139,7 +141,7 @@ PanelWindow {
             MouseArea {
                 anchors.fill: parent
                 acceptedButtons: Qt.NoButton // Let mouse events propagate for dragging
-                onWheel: function(wheel) {
+                onWheel: function (wheel) {
                     if (wheel.angleDelta.y > 0) {
                         previewFlickable.zoomScale = Math.min(5.0, previewFlickable.zoomScale + 0.15);
                     } else {
@@ -154,12 +156,12 @@ PanelWindow {
                 acceptedButtons: Qt.LeftButton
                 property int startX: 0
                 property int startY: 0
-                onPressed: function(mouse) {
+                onPressed: function (mouse) {
                     startX = mouse.x;
                     startY = mouse.y;
                     mouse.accepted = false; // Propagate press to Flickable
                 }
-                onReleased: function(mouse) {
+                onReleased: function (mouse) {
                     var dx = Math.abs(mouse.x - startX);
                     var dy = Math.abs(mouse.y - startY);
                     if (dx < 5 && dy < 5) {

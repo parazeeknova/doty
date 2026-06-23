@@ -18,7 +18,7 @@ Scope {
 
     readonly property string fontName: "FiraCode Nerd Font"
 
-    signal requestClose()
+    signal requestClose
 
     function updateFlatBinds() {
         var query = searchQuery.trim().toLowerCase();
@@ -27,11 +27,7 @@ Scope {
             var cat = bindsData[i];
             for (var j = 0; j < cat.binds.length; j++) {
                 var bind = cat.binds[j];
-                if (query === "" ||
-                    bind.keys.toLowerCase().indexOf(query) !== -1 ||
-                    bind.description.toLowerCase().indexOf(query) !== -1 ||
-                    cat.category.toLowerCase().indexOf(query) !== -1) {
-
+                if (query === "" || bind.keys.toLowerCase().indexOf(query) !== -1 || bind.description.toLowerCase().indexOf(query) !== -1 || cat.category.toLowerCase().indexOf(query) !== -1) {
                     temp.push({
                         keys: bind.keys,
                         description: bind.description,
@@ -96,7 +92,8 @@ Scope {
                 property real animOpacity: 0
 
                 function closePopup() {
-                    if (isClosing) return;
+                    if (isClosing)
+                        return;
                     isClosing = true;
                     exitAnim.start();
                 }
@@ -114,7 +111,9 @@ Scope {
                 }
 
                 Connections {
-                    function onRequestClose() { win.closePopup(); }
+                    function onRequestClose() {
+                        win.closePopup();
+                    }
                     target: root
                 }
 
@@ -130,15 +129,43 @@ Scope {
 
                 ParallelAnimation {
                     id: introAnim
-                    NumberAnimation { target: win; property: "animOffsetY"; from: -10; to: 4; duration: 100; easing.type: Easing.OutCubic }
-                    NumberAnimation { target: win; property: "animOpacity"; from: 0; to: 1; duration: 100; easing.type: Easing.OutCubic }
+                    NumberAnimation {
+                        target: win
+                        property: "animOffsetY"
+                        from: -10
+                        to: 4
+                        duration: 100
+                        easing.type: Easing.OutCubic
+                    }
+                    NumberAnimation {
+                        target: win
+                        property: "animOpacity"
+                        from: 0
+                        to: 1
+                        duration: 100
+                        easing.type: Easing.OutCubic
+                    }
                 }
 
                 ParallelAnimation {
                     id: exitAnim
                     onStopped: Qt.quit()
-                    NumberAnimation { target: win; property: "animOffsetY"; from: 4; to: -10; duration: 80; easing.type: Easing.InCubic }
-                    NumberAnimation { target: win; property: "animOpacity"; from: 1; to: 0; duration: 80; easing.type: Easing.InCubic }
+                    NumberAnimation {
+                        target: win
+                        property: "animOffsetY"
+                        from: 4
+                        to: -10
+                        duration: 80
+                        easing.type: Easing.InCubic
+                    }
+                    NumberAnimation {
+                        target: win
+                        property: "animOpacity"
+                        from: 1
+                        to: 0
+                        duration: 80
+                        easing.type: Easing.InCubic
+                    }
                 }
 
                 HyprlandFocusGrab {
@@ -156,7 +183,7 @@ Scope {
                     radius: 0
                     focus: true
 
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
@@ -247,7 +274,8 @@ Scope {
                                 Rectangle {
                                     Layout.fillWidth: true
                                     visible: {
-                                        if (index === 0) return true;
+                                        if (index === 0)
+                                            return true;
                                         if (index > 0 && root.flatBinds && index < root.flatBinds.length)
                                             return root.flatBinds[index].category !== root.flatBinds[index - 1].category;
                                         return false;
@@ -305,7 +333,7 @@ Scope {
                                         anchors.fill: parent
                                         hoverEnabled: true
                                         onEntered: root.selectedIndex = index
-                                        onClicked: (mouse) => {
+                                        onClicked: mouse => {
                                             if (mouse.button === Qt.RightButton) {
                                                 if (mouse.modifiers & Qt.ShiftModifier) {
                                                     copyProc.copyText = modelData.keys;

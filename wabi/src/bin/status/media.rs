@@ -82,10 +82,8 @@ fn is_wf_recorder_running() -> bool {
         for entry in entries.flatten() {
             let path = entry.path();
             let comm_path = path.join("comm");
-            if let Ok(comm) = fs::read_to_string(comm_path) {
-                if comm.trim() == "wf-recorder" {
-                    return true;
-                }
+            if fs::read_to_string(comm_path).is_ok_and(|comm| comm.trim() == "wf-recorder") {
+                return true;
             }
         }
     }
@@ -330,7 +328,7 @@ fn run() -> i32 {
         }
     }
 
-    let fps_thread = std::thread::spawn(|| detect_monitor_fps());
+    let fps_thread = std::thread::spawn(detect_monitor_fps);
 
     let conn = match media_db::open() {
         Ok(c) => c,

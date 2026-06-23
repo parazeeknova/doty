@@ -42,8 +42,16 @@ fn main() {
                         .and_then(|w| w.get("id"))
                         .and_then(|id| id.as_i64())
                 {
-                    let address = client.get("address").and_then(|a| a.as_str()).unwrap_or_default().to_string();
-                    let class = client.get("class").and_then(|c| c.as_str()).unwrap_or_default().to_string();
+                    let address = client
+                        .get("address")
+                        .and_then(|a| a.as_str())
+                        .unwrap_or_default()
+                        .to_string();
+                    let class = client
+                        .get("class")
+                        .and_then(|c| c.as_str())
+                        .unwrap_or_default()
+                        .to_string();
                     clients_list.push(ClientInfo {
                         address,
                         title: title.to_string(),
@@ -61,5 +69,10 @@ fn main() {
         clients: Vec<ClientInfo>,
     }
 
-    let _ = serde_json::to_writer(std::io::stdout(), &Response { clients: clients_list });
+    let _ = serde_json::to_writer(
+        std::io::stdout(),
+        &Response {
+            clients: clients_list,
+        },
+    );
 }

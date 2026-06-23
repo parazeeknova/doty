@@ -43,9 +43,7 @@ fn watch_dirs() -> Vec<PathBuf> {
             .collect();
     }
 
-    vec![
-        home_dir().join("doty/modules/backgrounds"),
-    ]
+    vec![home_dir().join("doty/modules/backgrounds")]
 }
 
 fn is_supported_wallpaper(path: &Path) -> bool {
@@ -350,8 +348,6 @@ fn cleanup_stale(cache_dir: &Path, live_thumbs: &BTreeSet<PathBuf>) {
         }
     }
 }
-
-
 
 fn auto_optimize_video(path: &Path) {
     let Some(ext) = path.extension().and_then(|e| e.to_str()) else {

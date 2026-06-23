@@ -139,7 +139,8 @@ fn find_or_separator(expr: &str) -> Option<usize> {
             in_single = !in_single;
         } else if c == '"' && !in_single {
             in_double = !in_double;
-        } else if !in_single && !in_double && c == 'o' && i + 1 < chars.len() && chars[i + 1] == 'r' {
+        } else if !in_single && !in_double && c == 'o' && i + 1 < chars.len() && chars[i + 1] == 'r'
+        {
             // Check word boundaries
             let before_ok = i == 0 || !chars[i - 1].is_alphanumeric();
             let after_ok = i + 2 >= chars.len() || !chars[i + 2].is_alphanumeric();
@@ -220,9 +221,8 @@ fn evaluate_lua_expr_single(expr: &str, variables: &HashMap<String, String>) -> 
             if part_trimmed.len() >= 2 {
                 resolved.push_str(&part_trimmed[1..part_trimmed.len() - 1]);
             }
-        } else if part_trimmed.starts_with("os.getenv(") {
+        } else if let Some(inner) = part_trimmed.strip_prefix("os.getenv(") {
             // Handle os.getenv("VAR") or os.getenv('VAR')
-            let inner = &part_trimmed[10..]; // after "os.getenv("
             let inner = inner.trim().trim_end_matches(')');
             let var_name = inner.trim_matches('"').trim_matches('\'');
             if let Ok(val) = std::env::var(var_name) {
@@ -467,7 +467,13 @@ fn parse_single_bind(
                     let capitalized: String = app_name
                         .chars()
                         .enumerate()
-                        .map(|(i, c)| if i == 0 { c.to_uppercase().to_string() } else { c.to_string() })
+                        .map(|(i, c)| {
+                            if i == 0 {
+                                c.to_uppercase().to_string()
+                            } else {
+                                c.to_string()
+                            }
+                        })
                         .collect();
                     description = format!("Launch/Focus {}", capitalized);
                 }
@@ -493,7 +499,12 @@ fn parse_single_bind(
                     in_double = !in_double;
                 }
                 // Track $(...) shell command substitution
-                if !in_single && !in_double && c == '$' && idx + 1 < inner_chars.len() && inner_chars[idx + 1] == '(' {
+                if !in_single
+                    && !in_double
+                    && c == '$'
+                    && idx + 1 < inner_chars.len()
+                    && inner_chars[idx + 1] == '('
+                {
                     dollar_paren_depth += 1;
                     idx += 1; // skip the '(' on next iteration
                 } else if !in_single && !in_double && dollar_paren_depth > 0 && c == '(' {
@@ -566,11 +577,23 @@ fn parse_single_bind(
             let mut y_val = "0";
             if let Some(x_idx) = action_expr.find("x =") {
                 let s = &action_expr[x_idx + 3..];
-                x_val = s.split(',').next().unwrap_or("0").trim().trim_end_matches('}').trim();
+                x_val = s
+                    .split(',')
+                    .next()
+                    .unwrap_or("0")
+                    .trim()
+                    .trim_end_matches('}')
+                    .trim();
             }
             if let Some(y_idx) = action_expr.find("y =") {
                 let s = &action_expr[y_idx + 3..];
-                y_val = s.split(',').next().unwrap_or("0").trim().trim_end_matches('}').trim();
+                y_val = s
+                    .split(',')
+                    .next()
+                    .unwrap_or("0")
+                    .trim()
+                    .trim_end_matches('}')
+                    .trim();
             }
             cmd = format!("hyprctl dispatch resizeactive {} {}", x_val, y_val);
             if description.is_empty() {
@@ -613,18 +636,31 @@ fn parse_single_bind(
                         if let Some(end_q) = after_start.find('"') {
                             after_start[..end_q].to_string()
                         } else {
-                            after_eq.trim_end_matches('}').trim().trim_matches('"').trim_matches('\'').trim().to_string()
+                            after_eq
+                                .trim_end_matches('}')
+                                .trim()
+                                .trim_matches('"')
+                                .trim_matches('\'')
+                                .trim()
+                                .to_string()
                         }
                     } else if let Some(start_q) = after_eq.find('\'') {
                         let after_start = &after_eq[start_q + 1..];
                         if let Some(end_q) = after_start.find('\'') {
                             after_start[..end_q].to_string()
                         } else {
-                            after_eq.trim_end_matches('}').trim().trim_matches('"').trim_matches('\'').trim().to_string()
+                            after_eq
+                                .trim_end_matches('}')
+                                .trim()
+                                .trim_matches('"')
+                                .trim_matches('\'')
+                                .trim()
+                                .to_string()
                         }
                     } else {
                         // Unquoted value (number)
-                        after_eq.split(|c: char| c == '}' || c == ')' || c == ',')
+                        after_eq
+                            .split(['}', ')', ','])
                             .next()
                             .unwrap_or("")
                             .trim()
@@ -664,17 +700,30 @@ fn parse_single_bind(
                         if let Some(end_q) = after_start.find('"') {
                             after_start[..end_q].to_string()
                         } else {
-                            after_eq.trim_end_matches('}').trim().trim_matches('"').trim_matches('\'').trim().to_string()
+                            after_eq
+                                .trim_end_matches('}')
+                                .trim()
+                                .trim_matches('"')
+                                .trim_matches('\'')
+                                .trim()
+                                .to_string()
                         }
                     } else if let Some(start_q) = after_eq.find('\'') {
                         let after_start = &after_eq[start_q + 1..];
                         if let Some(end_q) = after_start.find('\'') {
                             after_start[..end_q].to_string()
                         } else {
-                            after_eq.trim_end_matches('}').trim().trim_matches('"').trim_matches('\'').trim().to_string()
+                            after_eq
+                                .trim_end_matches('}')
+                                .trim()
+                                .trim_matches('"')
+                                .trim_matches('\'')
+                                .trim()
+                                .to_string()
                         }
                     } else {
-                        after_eq.split(|c: char| c == '}' || c == ')' || c == ',')
+                        after_eq
+                            .split(['}', ')', ','])
                             .next()
                             .unwrap_or("")
                             .trim()
@@ -694,14 +743,18 @@ fn parse_single_bind(
     } else if action_expr.contains("layout") {
         // Handle layout actions like swapcol
         if action_expr.contains("swapcol") {
-            let dir = if action_expr.contains("swapcol l") || action_expr.contains("swapcol \"l\"") {
+            let dir = if action_expr.contains("swapcol l") || action_expr.contains("swapcol \"l\"")
+            {
                 "left"
             } else if action_expr.contains("swapcol r") || action_expr.contains("swapcol \"r\"") {
                 "right"
             } else {
                 "column"
             };
-            cmd = format!("hyprctl dispatch swapcolumn {}", if dir == "left" { "l" } else { "r" });
+            cmd = format!(
+                "hyprctl dispatch swapcolumn {}",
+                if dir == "left" { "l" } else { "r" }
+            );
             if description.is_empty() {
                 description = format!("Swap column {}", dir);
             }
@@ -744,7 +797,10 @@ fn parse_single_bind(
         } else {
             description
         }
-    } else if bind_line.contains("Print") && bind_line.contains("grim") && !bind_line.contains("slurp") {
+    } else if bind_line.contains("Print")
+        && bind_line.contains("grim")
+        && !bind_line.contains("slurp")
+    {
         "Screenshot Full Screen".to_string()
     } else {
         description
@@ -776,7 +832,11 @@ fn expand_workspaces_loop(
                 let mut chars: Vec<char> = full_bind_line.chars().collect();
                 while idx < chars.len() && depth > 0 {
                     let c = chars[idx];
-                    if c == '(' { depth += 1; } else if c == ')' { depth -= 1; }
+                    if c == '(' {
+                        depth += 1;
+                    } else if c == ')' {
+                        depth -= 1;
+                    }
                     idx += 1;
                 }
 
@@ -789,7 +849,11 @@ fn expand_workspaces_loop(
                     chars = full_bind_line.chars().collect();
                     while idx < chars.len() && depth > 0 {
                         let c = chars[idx];
-                        if c == '(' { depth += 1; } else if c == ')' { depth -= 1; }
+                        if c == '(' {
+                            depth += 1;
+                        } else if c == ')' {
+                            depth -= 1;
+                        }
                         idx += 1;
                     }
                 }

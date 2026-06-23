@@ -35,7 +35,7 @@ Scope {
     property string rawSearchQuery: ""
     readonly property string fontName: "FiraCode Nerd Font"
 
-    signal requestClose()
+    signal requestClose
     signal resetSearchInput(string text)
 
     function filterApps() {
@@ -48,7 +48,6 @@ Scope {
                 var app = apps[i];
                 if (app.name.toLowerCase().indexOf(query) !== -1 || app.exec.toLowerCase().indexOf(query) !== -1)
                     temp.push(app);
-
             }
             filteredApps = temp;
         }
@@ -134,11 +133,11 @@ Scope {
 
     function launchWebSearch(query) {
         if (!query)
-            return ;
+            return;
 
         var q = query.trim();
         if (q === "!" || q === "!yt" || q === "!youtube" || q === "!g" || q === "!google" || q === "!gh" || q === "!github" || q === "!w" || q === "!wiki" || q === "!wikipedia")
-            return ;
+            return;
 
         var searchQuery = q.startsWith("!") ? q : "!" + q;
         Quickshell.execDetached([root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--web-search", searchQuery]);
@@ -147,14 +146,14 @@ Scope {
 
     function launchWebSearchItem(item) {
         if (!item || item.type !== "web_search")
-            return ;
+            return;
 
         root.launchWebSearch(root.getReconstructedQuery(item));
     }
 
     function launchFile(path) {
         if (!path)
-            return ;
+            return;
 
         Quickshell.execDetached([root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--open-file", path]);
         root.requestClose();
@@ -162,7 +161,7 @@ Scope {
 
     function launchGitRepo(url) {
         if (!url)
-            return ;
+            return;
 
         Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({workspace=1})"]);
         Quickshell.execDetached(["xdg-open", url]);
@@ -171,7 +170,7 @@ Scope {
 
     function launchBookmark(url) {
         if (!url)
-            return ;
+            return;
 
         Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({workspace=1})"]);
         Quickshell.execDetached(["xdg-open", url]);
@@ -180,14 +179,13 @@ Scope {
 
     function saveBookmark(url) {
         if (!url)
-            return ;
+            return;
 
         var originalUrl = url;
         if (root.rawSearchQuery.trim().startsWith("~")) {
             var inputUrl = root.rawSearchQuery.trim().substring(1).trim();
             if (inputUrl.toLowerCase() === url.toLowerCase())
                 originalUrl = inputUrl;
-
         }
         addBookmarkProc.running = false;
         addBookmarkProc.command = [root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--add-bookmark", originalUrl];
@@ -196,7 +194,7 @@ Scope {
 
     function deleteBookmark(url) {
         if (!url)
-            return ;
+            return;
 
         deleteBookmarkProc.running = false;
         deleteBookmarkProc.command = [root.homeDir + "/.config/quickshell/apps_popup/get_apps_list", "--delete-bookmark", url];
@@ -226,7 +224,6 @@ Scope {
                 var bm = root.bookmarks[idx];
                 if (bookmarkQuery === "" || bm.url.toLowerCase().indexOf(bookmarkQuery) !== -1 || bm.name.toLowerCase().indexOf(bookmarkQuery) !== -1)
                     matching.push(bm);
-
             }
             if (matching.length > 0) {
                 list.push({
@@ -254,10 +251,9 @@ Scope {
                 }
                 if (!alreadyBookmarked)
                     list.unshift({
-                    "type": "add_bookmark",
-                    "url": bookmarkQuery
-                });
-
+                        "type": "add_bookmark",
+                        "url": bookmarkQuery
+                    });
             } else if (matching.length === 0) {
                 list.push({
                     "type": "header",
@@ -293,10 +289,10 @@ Scope {
                     webSearch = root.parseWebSearch(root.searchQuery);
                 else if (root.activeTab === 1 && query !== "")
                     webSearch = {
-                    "engine": "duckduckgo",
-                    "url": "https://duckduckgo.com/?q=" + encodeURIComponent(query),
-                    "query": query
-                };
+                        "engine": "duckduckgo",
+                        "url": "https://duckduckgo.com/?q=" + encodeURIComponent(query),
+                        "query": query
+                    };
                 if (webSearch) {
                     list.push({
                         "type": "web_search",
@@ -482,11 +478,9 @@ Scope {
                     tlAddrStr = String(tlAddr).toLowerCase();
                     if (!tlAddrStr.startsWith("0x"))
                         tlAddrStr = "0x" + tlAddrStr;
-
                 }
                 if (tlAddrStr === targetAddr)
                     return tl;
-
             }
         }
         return null;
@@ -609,7 +603,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Process {
@@ -661,7 +654,6 @@ Scope {
         onRunningChanged: {
             if (!running)
                 root.webHistory = [];
-
         }
     }
 
@@ -702,7 +694,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Process {
@@ -721,7 +712,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Timer {
@@ -780,7 +770,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Process {
@@ -798,7 +787,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Process {
@@ -825,7 +813,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Variants {
@@ -842,7 +829,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -914,7 +901,6 @@ Scope {
                         duration: 180
                         easing.type: Easing.OutExpo
                     }
-
                 }
 
                 ParallelAnimation {
@@ -939,7 +925,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -962,7 +947,7 @@ Scope {
                     border.color: theme.accent
                     radius: 0
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
@@ -995,7 +980,6 @@ Scope {
 
                                     if (root.selectedActiveWindowIndex >= 0)
                                         activeWindowsList.positionViewAtIndex(root.selectedActiveWindowIndex, ListView.Contain);
-
                                 }
                             } else {
                                 root.selectedActiveWindowIndex = -1;
@@ -1013,7 +997,6 @@ Scope {
 
                                     if (root.selectedActiveWindowIndex >= 0)
                                         activeWindowsList.positionViewAtIndex(root.selectedActiveWindowIndex, ListView.Contain);
-
                                 }
                             } else {
                                 root.selectedActiveWindowIndex = -1;
@@ -1047,7 +1030,6 @@ Scope {
                                         var bmName = (selected.data && selected.data.name) ? selected.data.name.toLowerCase() : "";
                                         if (bmUrl.indexOf(queryLower) === -1 && bmName.indexOf(queryLower) === -1)
                                             isStaleBookmark = true;
-
                                     }
                                     var isStaleWebSearch = false;
                                     if (currentText.startsWith("!") && selected.type === "web_search" && !selected.is_history) {
@@ -1055,13 +1037,11 @@ Scope {
                                         var selQuery = selected.query || "";
                                         if (selQuery.toLowerCase() !== webQuery.toLowerCase())
                                             isStaleWebSearch = true;
-
                                     }
                                     if (currentText.startsWith("~") && (selected.type !== "bookmark" || isStaleBookmark) && selected.type !== "add_bookmark") {
                                         var urlToSave = currentText.substring(1).trim();
                                         if (urlToSave !== "")
                                             root.saveBookmark(urlToSave);
-
                                     } else if (currentText.startsWith("!") && (selected.type !== "web_search" || isStaleWebSearch)) {
                                         root.launchWebSearch(currentText);
                                     } else {
@@ -1083,7 +1063,6 @@ Scope {
                                         var urlToSave = currentText.substring(1).trim();
                                         if (urlToSave !== "")
                                             root.saveBookmark(urlToSave);
-
                                     } else if (currentText.startsWith("!")) {
                                         root.launchWebSearch(currentText);
                                     }
@@ -1138,7 +1117,6 @@ Scope {
                                     anchors.fill: parent
                                     verticalAlignment: Text.AlignVCenter
                                 }
-
                             }
 
                             // Underline
@@ -1153,11 +1131,8 @@ Scope {
                                         duration: 150
                                         easing.type: Easing.OutQuad
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // Active Windows Horizontal Row
@@ -1201,7 +1176,6 @@ Scope {
                                             height: 36
                                             constraintSize: Qt.size(width, height)
                                         }
-
                                     }
 
                                     // Workspace Badge on Top Right
@@ -1225,7 +1199,6 @@ Scope {
                                             font.bold: true
                                             renderType: Text.NativeRendering
                                         }
-
                                     }
 
                                     // App Icon Badge on Bottom Left
@@ -1244,7 +1217,6 @@ Scope {
                                             fillMode: Image.PreserveAspectFit
                                             source: root.getWindowIconPath(modelData)
                                         }
-
                                     }
 
                                     MouseArea {
@@ -1265,13 +1237,9 @@ Scope {
                                             duration: 150
                                             easing.type: Easing.OutQuad
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // Tab Switcher
@@ -1307,7 +1275,6 @@ Scope {
                                                 root.selectedIndex = 0;
                                             }
                                         }
-
                                     }
 
                                     Text {
@@ -1337,7 +1304,6 @@ Scope {
                                                 root.selectedIndex = 0;
                                             }
                                         }
-
                                     }
 
                                     Text {
@@ -1367,7 +1333,6 @@ Scope {
                                                 root.selectedIndex = 0;
                                             }
                                         }
-
                                     }
 
                                     Text {
@@ -1397,7 +1362,6 @@ Scope {
                                                 root.selectedIndex = 0;
                                             }
                                         }
-
                                     }
 
                                     Text {
@@ -1427,13 +1391,9 @@ Scope {
                                                 root.selectedIndex = 0;
                                             }
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // List view
@@ -1463,7 +1423,6 @@ Scope {
                                         font.bold: true
                                         renderType: Text.NativeRendering
                                     }
-
                                 }
 
                                 // 2. Separator Type
@@ -1499,9 +1458,7 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
-
                                     }
 
                                     Text {
@@ -1519,7 +1476,6 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
 
                                         Behavior on opacity {
@@ -1527,11 +1483,8 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 // 4. Web Search Type
@@ -1555,9 +1508,7 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
-
                                     }
 
                                     Text {
@@ -1574,11 +1525,8 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 // 5. File Type
@@ -1602,9 +1550,7 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
-
                                     }
 
                                     Text {
@@ -1630,7 +1576,6 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
 
                                         Behavior on opacity {
@@ -1638,11 +1583,8 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 // 6. Git Repo Type
@@ -1666,9 +1608,7 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
-
                                     }
 
                                     Text {
@@ -1702,7 +1642,6 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
 
                                         Behavior on opacity {
@@ -1710,11 +1649,8 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 // 7. Bookmark Type
@@ -1738,9 +1674,7 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
-
                                     }
 
                                     Text {
@@ -1765,7 +1699,6 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
 
                                         Behavior on opacity {
@@ -1773,11 +1706,8 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 // Small delete indicator or button on the right
@@ -1800,7 +1730,6 @@ Scope {
                                             root.deleteBookmark(modelData.data.url);
                                         }
                                     }
-
                                 }
 
                                 // 8. Add Bookmark Type
@@ -1824,9 +1753,7 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
-
                                     }
 
                                     Text {
@@ -1844,7 +1771,6 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
 
                                         Behavior on opacity {
@@ -1852,11 +1778,8 @@ Scope {
                                                 duration: 120
                                                 easing.type: Easing.OutQuad
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 MouseArea {
@@ -1888,11 +1811,8 @@ Scope {
                                         duration: 120
                                         easing.type: Easing.OutQuad
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // Container for the lists
@@ -1919,7 +1839,6 @@ Scope {
                                         duration: 180
                                         easing.type: Easing.OutCubic
                                     }
-
                                 }
 
                                 transform: Translate {
@@ -1930,11 +1849,8 @@ Scope {
                                             duration: 180
                                             easing.type: Easing.OutCubic
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             ListView {
@@ -1953,7 +1869,6 @@ Scope {
                                         duration: 180
                                         easing.type: Easing.OutCubic
                                     }
-
                                 }
 
                                 transform: Translate {
@@ -1964,11 +1879,8 @@ Scope {
                                             duration: 180
                                             easing.type: Easing.OutCubic
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             ListView {
@@ -1987,7 +1899,6 @@ Scope {
                                         duration: 180
                                         easing.type: Easing.OutCubic
                                     }
-
                                 }
 
                                 transform: Translate {
@@ -1998,11 +1909,8 @@ Scope {
                                             duration: 180
                                             easing.type: Easing.OutCubic
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             ListView {
@@ -2021,7 +1929,6 @@ Scope {
                                         duration: 180
                                         easing.type: Easing.OutCubic
                                     }
-
                                 }
 
                                 transform: Translate {
@@ -2032,11 +1939,8 @@ Scope {
                                             duration: 180
                                             easing.type: Easing.OutCubic
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             ListView {
@@ -2055,7 +1959,6 @@ Scope {
                                         duration: 180
                                         easing.type: Easing.OutCubic
                                     }
-
                                 }
 
                                 transform: Translate {
@@ -2066,11 +1969,8 @@ Scope {
                                             duration: 180
                                             easing.type: Easing.OutCubic
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             Behavior on implicitHeight {
@@ -2078,9 +1978,7 @@ Scope {
                                     duration: 180
                                     easing.type: Easing.OutCubic
                                 }
-
                             }
-
                         }
 
                         // Bottom Row
@@ -2116,7 +2014,6 @@ Scope {
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: clearBookmarksProc.running = true
                                 }
-
                             }
 
                             Text {
@@ -2133,7 +2030,6 @@ Scope {
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: clearHistoryProc.running = true
                                 }
-
                             }
 
                             Text {
@@ -2150,7 +2046,6 @@ Scope {
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: clearFileHistoryProc.running = true
                                 }
-
                             }
 
                             Text {
@@ -2167,13 +2062,9 @@ Scope {
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: gitRepoRefreshProc.running = true
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
 
                 Behavior on implicitHeight {
@@ -2181,13 +2072,8 @@ Scope {
                         duration: 180
                         easing.type: Easing.OutCubic
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

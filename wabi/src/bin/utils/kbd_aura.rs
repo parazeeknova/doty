@@ -70,13 +70,13 @@ fn hsl_to_rgb(h: f64, s: f64, l: f64) -> (u8, u8, u8) {
 fn tune_color_for_keyboard(hex: &str) -> String {
     let (r, g, b) = hex_to_rgb(hex).unwrap_or((255, 255, 255));
     let (h, s, l) = rgb_to_hsl(r, g, b);
-    
+
     // Saturation tuning: boost to avoid washed out / white look on LEDs
     let new_s = (s * 1.6).clamp(0.65, 1.0);
-    
+
     // Lightness tuning: scale down to make it a darker accent, but keep enough brightness to be visible
     let new_l = (l * 0.35).clamp(0.12, 0.28);
-    
+
     let (nr, ng, nb) = hsl_to_rgb(h, new_s, new_l);
     format!("{:02X}{:02X}{:02X}", nr, ng, nb)
 }
@@ -91,7 +91,10 @@ fn main() {
     let raw_color = args[1].trim_start_matches('#');
     let color = tune_color_for_keyboard(raw_color);
 
-    println!("Tuning color from {} to {} for keyboard backlight", raw_color, color);
+    println!(
+        "Tuning color from {} to {} for keyboard backlight",
+        raw_color, color
+    );
 
     match Command::new("asusctl")
         .args(["aura", "effect", "static", "--colour", &color])

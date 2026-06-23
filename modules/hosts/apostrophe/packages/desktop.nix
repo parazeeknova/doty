@@ -1,103 +1,113 @@
 { self, inputs, ... }: {
 
-  flake.nixosModules.apostrophePackagesDesktop = { config, pkgs, lib, ... }: {
+  flake.nixosModules.apostrophePackagesDesktop =
+    {
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
+    {
 
-    fonts.packages = with pkgs; [
-      noto-fonts
-      noto-fonts-color-emoji
-      nerd-fonts.fira-code
-      nerd-fonts.noto
-      nerd-fonts.hack
-      nerd-fonts.iosevka
-      nerd-fonts.victor-mono
-    ];
+      fonts.packages = with pkgs; [
+        noto-fonts
+        noto-fonts-color-emoji
+        nerd-fonts.fira-code
+        nerd-fonts.noto
+        nerd-fonts.hack
+        nerd-fonts.iosevka
+        nerd-fonts.victor-mono
+      ];
 
-    environment.systemPackages = with pkgs; [
-      vesktop
-      telegram-desktop
-      vivaldi
-      vivaldi-ffmpeg-codecs
+      environment.systemPackages = with pkgs; [
+        vesktop
+        telegram-desktop
+        vivaldi
+        vivaldi-ffmpeg-codecs
 
-      # -- Thunar Supermacy --
-      (thunar.overrideAttrs (oldAttrs: {
-        postPatch = (oldAttrs.postPatch or "") + ''
-          sed -i 's/#define BORDER_RADIUS 8/#define BORDER_RADIUS 0/g' thunar/thunar-util.c
-        '';
-      }))
-      thunar-volman
-      thunar-archive-plugin
-      thunar-vcs-plugin
-      thunar-shares-plugin
-      thunar-media-tags-plugin
+        # -- Thunar Supermacy --
+        (thunar.overrideAttrs (oldAttrs: {
+          postPatch = (oldAttrs.postPatch or "") + ''
+            sed -i 's/#define BORDER_RADIUS 8/#define BORDER_RADIUS 0/g' thunar/thunar-util.c
+          '';
+        }))
+        thunar-volman
+        thunar-archive-plugin
+        thunar-vcs-plugin
+        thunar-shares-plugin
+        thunar-media-tags-plugin
 
-      # -- Wayland / Hyprland --
-      uwsm
-      pyprland
-      awww
-      mpvpaper
-      waybar
-      hyprlock
-      hypridle
-      hyprshot
-      hyprpicker
-      hyprsunset
-      hyprpaper
-      pyprland
-      quickshell
-      grim
-      slurp
-      swappy
-      wl-clipboard
-      cliphist
-      tesseract
-      brightnessctl
-      wlr-randr
-      wl-gammactl
-      matugen
-      libnotify
-      imagemagick
+        # -- Wayland / Hyprland --
+        uwsm
+        pyprland
+        awww
+        mpvpaper
+        waybar
+        hyprlock
+        hypridle
+        hyprshot
+        hyprpicker
+        hyprsunset
+        hyprpaper
+        pyprland
+        quickshell
+        grim
+        slurp
+        swappy
+        wl-clipboard
+        cliphist
+        tesseract
+        brightnessctl
+        wlr-randr
+        wl-gammactl
+        matugen
+        libnotify
+        imagemagick
 
-      # -- Audio / Media --
-      spotify
-      spicetify-cli
-      vlc
-      playerctl
-      imv
-      mpv
-      pavucontrol
-      pamixer
+        # -- Audio / Media --
+        spotify
+        spicetify-cli
+        vlc
+        playerctl
+        imv
+        mpv
+        pavucontrol
+        pamixer
 
-      # -- System Tray / Applets --
-      networkmanagerapplet
-      blueman
+        # -- System Tray / Applets --
+        networkmanagerapplet
+        blueman
 
-      # -- Qt / GTK Themes --
-      qt6Packages.qt6ct
-      libsForQt5.qt5ct
-      libsForQt5.qtstyleplugin-kvantum
-      kdePackages.qtmultimedia
-      qt5.qtmultimedia
-      qt6.qtmultimedia
-      qt6Packages.qtmultimedia
-      libsForQt5.qtmultimedia
-      papirus-icon-theme
-      capitaine-cursors
-      nwg-look
+        # -- Qt / GTK Themes --
+        qt6Packages.qt6ct
+        libsForQt5.qt5ct
+        libsForQt5.qtstyleplugin-kvantum
+        kdePackages.qtmultimedia
+        kdePackages.qtdeclarative
+        qt5.qtmultimedia
+        qt6.qtmultimedia
+        qt6Packages.qtmultimedia
+        qt5.qtdeclarative
+        qt6.qtdeclarative
+        libsForQt5.qtmultimedia
+        papirus-icon-theme
+        capitaine-cursors
+        nwg-look
 
-      # -- System Tools --
-      udiskie
-      lm_sensors
+        # -- System Tools --
+        udiskie
+        lm_sensors
 
-      # -- Security --
-      seahorse
-      gnome-keyring
+        # -- Security --
+        seahorse
+        gnome-keyring
 
-      # -- Documents --
-      zathura
-      evince
+        # -- Documents --
+        zathura
+        evince
 
-      # -- Communication --
-      vesktop
-    ];
-  };
+        # -- Communication --
+        vesktop
+      ];
+    };
 }

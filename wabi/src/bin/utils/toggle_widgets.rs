@@ -68,14 +68,36 @@ fn is_waybar_running() -> bool {
 }
 
 fn kill_waybar() {
-    let _ = Command::new("pkill")
-        .args(["-f", "bin/waybar"])
-        .status();
+    let _ = Command::new("pkill").args(["-f", "bin/waybar"]).status();
 }
 
 fn apply_state(github_visible: bool, workspace_visible: bool, waybar_visible: bool) {
-    let _ = run_command_robust("quickshell", &["-c", "github_graph", "ipc", "call", "github_graph", if github_visible { "onShow" } else { "onHide" }]);
-    let _ = run_command_robust("quickshell", &["-c", "workspace_overview", "ipc", "call", "workspace_overview", if workspace_visible { "onShow" } else { "onHide" }]);
+    let _ = run_command_robust(
+        "quickshell",
+        &[
+            "-c",
+            "github_graph",
+            "ipc",
+            "call",
+            "github_graph",
+            if github_visible { "onShow" } else { "onHide" },
+        ],
+    );
+    let _ = run_command_robust(
+        "quickshell",
+        &[
+            "-c",
+            "workspace_overview",
+            "ipc",
+            "call",
+            "workspace_overview",
+            if workspace_visible {
+                "onShow"
+            } else {
+                "onHide"
+            },
+        ],
+    );
 
     let pwaybar = persistent_waybar_state();
     if waybar_visible {

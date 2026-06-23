@@ -115,7 +115,6 @@ Scope {
                 }
             }
         }
-
     }
 
     // Poll status every 2 seconds
@@ -129,7 +128,6 @@ Scope {
         onTriggered: {
             if (!checkStatusProc.running)
                 checkStatusProc.running = true;
-
         }
     }
 
@@ -147,7 +145,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -192,7 +190,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Slide-out + fade-out
@@ -218,7 +215,6 @@ Scope {
                         duration: 100
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -238,10 +234,9 @@ Scope {
                     radius: 0
                     antialiasing: false
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape)
                             win.closePopup();
-
                     }
                     Component.onCompleted: {
                         forceActiveFocus();
@@ -294,9 +289,7 @@ Scope {
                                         win.closePopup();
                                     }
                                 }
-
                             }
-
                         }
 
                         Column {
@@ -335,7 +328,6 @@ Scope {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         renderType: Text.NativeRendering
                                     }
-
                                 }
 
                                 // GPU Column (Right)
@@ -366,9 +358,7 @@ Scope {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         renderType: Text.NativeRendering
                                     }
-
                                 }
-
                             }
 
                             // 󰍛MEM label
@@ -437,7 +427,6 @@ Scope {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         renderType: Text.NativeRendering
                                     }
-
                                 }
 
                                 // NVMe 1 Column (Right)
@@ -468,21 +457,12 @@ Scope {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         renderType: Text.NativeRendering
                                     }
-
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

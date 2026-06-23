@@ -36,7 +36,9 @@ fn get_now_seconds() -> i64 {
 }
 
 fn db_conn() -> Result<Connection, rusqlite::Error> {
-    let db_path = wabi::quickshell_dir().join("notif_popup").join("screentime.db");
+    let db_path = wabi::quickshell_dir()
+        .join("notif_popup")
+        .join("screentime.db");
     if let Some(parent) = db_path.parent() {
         let _ = fs::create_dir_all(parent);
     }

@@ -81,7 +81,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -106,7 +106,6 @@ Scope {
                     if (visible)
                         keyHandler.forceActiveFocus();
                 }
-
 
                 onIsClosingChanged: {
                     if (isClosing) {
@@ -147,7 +146,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Slide-out + fade-out
@@ -173,7 +171,6 @@ Scope {
                         duration: 100
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 ParallelAnimation {
@@ -194,7 +191,6 @@ Scope {
                         duration: 150
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 ParallelAnimation {
@@ -220,7 +216,6 @@ Scope {
                         duration: 100
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -231,8 +226,6 @@ Scope {
                     }
                 }
 
-
-
                 Item {
                     id: keyHandler
 
@@ -240,7 +233,7 @@ Scope {
                     focus: true
                     activeFocusOnTab: true
 
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             if (win.isMenuOpen) {
                                 win.closeMenu();
@@ -375,7 +368,6 @@ Scope {
                                             font.pixelSize: 8
                                             visible: modelData.buttonType === 1 || modelData.buttonType === 2
                                         }
-
                                     }
 
                                     Text {
@@ -386,7 +378,6 @@ Scope {
                                         renderType: Text.NativeRendering
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
-
                                 }
 
                                 MouseArea {
@@ -402,13 +393,9 @@ Scope {
                                         }
                                     }
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
 
                 // Tray icons bar
@@ -440,7 +427,7 @@ Scope {
                         Repeater {
                             model: SystemTray.items
 
-                            delegate:                                 Rectangle {
+                            delegate: Rectangle {
                                 id: trayIconItem
 
                                 width: 18
@@ -460,7 +447,7 @@ Scope {
                                     anchors.fill: parent
                                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                                     hoverEnabled: true
-                                    onClicked: (mouse) => {
+                                    onClicked: mouse => {
                                         if (mouse.button === Qt.RightButton) {
                                             if (modelData.hasMenu) {
                                                 win.openMenu(modelData.menu, trayIconItem.mapToItem(win.contentItem, 0, 0).x);
@@ -475,19 +462,11 @@ Scope {
                                         }
                                     }
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

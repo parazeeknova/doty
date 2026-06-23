@@ -18,7 +18,7 @@ Scope {
     property bool lastWallpaperLoaded: false
     property bool allowVideoPreview: false
 
-    signal requestClose()
+    signal requestClose
 
     function setLastWallpaper(path) {
         root.lastWallpaperLoaded = true;
@@ -28,7 +28,7 @@ Scope {
 
     function selectLastWallpaper() {
         if (!root.lastWallpaperLoaded || root.wallpapers.length === 0)
-            return ;
+            return;
 
         var indexToSelect = 0;
         if (root.lastWallpaperPath !== "") {
@@ -125,16 +125,14 @@ Scope {
                         var parts = line.split("\t");
                         if (parts.length >= 2)
                             list.push({
-                            "path": parts[0],
-                            "thumb": parts[1]
-                        });
-
+                                "path": parts[0],
+                                "thumb": parts[1]
+                            });
                     }
                 }
                 root.wallpapers = list;
             }
         }
-
     }
 
     // Debounce wallpaper application so process spawning does not fight scroll animation.
@@ -147,7 +145,6 @@ Scope {
         onTriggered: {
             if (root.activeWallpaper !== "")
                 Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/set_wallpaper", root.activeWallpaper]);
-
         }
     }
 
@@ -166,7 +163,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
 
@@ -182,7 +179,7 @@ Scope {
 
                 function initializeAndStart() {
                     if (hasInitialized)
-                        return ;
+                        return;
 
                     hasInitialized = true;
                     restoreTimer.start();
@@ -191,7 +188,7 @@ Scope {
 
                 function restoreSelection() {
                     if (root.selectedIndex < 0 || root.selectedIndex >= root.wallpapers.length)
-                        return ;
+                        return;
 
                     listView.suppressApply = true;
                     listView.currentIndex = root.selectedIndex;
@@ -212,7 +209,6 @@ Scope {
                 Component.onCompleted: {
                     if (root.isReady)
                         win.initializeAndStart();
-
                 }
 
                 Connections {
@@ -223,7 +219,6 @@ Scope {
                     function onIsReadyChanged() {
                         if (root.isReady)
                             win.initializeAndStart();
-
                     }
 
                     target: root
@@ -266,7 +261,6 @@ Scope {
                         duration: 140
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Slide-out + fade-out to the left
@@ -292,7 +286,6 @@ Scope {
                         duration: 110
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -315,7 +308,7 @@ Scope {
                     x: win.animLeftMargin
                     opacity: win.animOpacity
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Up) {
                             listView.decrementCurrentIndex();
                             event.accepted = true;
@@ -368,13 +361,13 @@ Scope {
                             keyNavigationEnabled: false
                             onCurrentIndexChanged: {
                                 if (!isInitialized)
-                                    return ;
+                                    return;
 
                                 if (suppressApply)
-                                    return ;
+                                    return;
 
                                 if (root.selectedIndex === -2)
-                                    return ;
+                                    return;
 
                                 if (currentIndex >= 0 && currentIndex < root.wallpapers.length) {
                                     root.selectedIndex = currentIndex;
@@ -420,15 +413,14 @@ Scope {
                                         try {
                                             var textVal = colorReader.text().trim();
                                             if (textVal.length === 0)
-                                                return ;
+                                                return;
 
                                             var data = JSON.parse(textVal);
                                             if (data && data.colors) {
                                                 var c = data.colors;
                                                 delegateItem.colorsList = [c.primary ? c.primary.default.color : "#a9b665", c.secondary ? c.secondary.default.color : "#7daea3", c.tertiary ? c.tertiary.default.color : "#d8a657", c.error ? c.error.default.color : "#cc241d", c.surface ? c.surface.default.color : "#1d2021", c.on_surface ? c.on_surface.default.color : "#ebdbb2"];
                                             }
-                                        } catch (e) {
-                                        }
+                                        } catch (e) {}
                                     }
                                 }
 
@@ -477,7 +469,6 @@ Scope {
                                             loops: MediaPlayer.Infinite
                                             autoPlay: true
                                         }
-
                                     }
 
                                     // Animated Video Indicator on Top Right
@@ -504,7 +495,6 @@ Scope {
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                         }
-
                                     }
 
                                     // Wallpaper Name Overlay at the bottom
@@ -530,9 +520,7 @@ Scope {
                                             horizontalAlignment: Text.AlignHCenter
                                             renderType: Text.NativeRendering
                                         }
-
                                     }
-
                                 }
 
                                 Column {
@@ -553,9 +541,7 @@ Scope {
                                             border.width: 1
                                             border.color: "#30ffffff"
                                         }
-
                                     }
-
                                 }
 
                                 MouseArea {
@@ -575,7 +561,6 @@ Scope {
                                         duration: 150
                                         easing.type: Easing.OutCubic
                                     }
-
                                 }
 
                                 Behavior on opacity {
@@ -583,7 +568,6 @@ Scope {
                                         duration: 150
                                         easing.type: Easing.OutCubic
                                     }
-
                                 }
 
                                 Behavior on x {
@@ -591,21 +575,12 @@ Scope {
                                         duration: 150
                                         easing.type: Easing.OutCubic
                                     }
-
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

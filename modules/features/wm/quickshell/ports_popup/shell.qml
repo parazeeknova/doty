@@ -16,7 +16,7 @@ Scope {
     property int selectedIndex: 0
     readonly property string fontName: "FiraCode Nerd Font"
 
-    signal requestClose()
+    signal requestClose
 
     function filterPorts() {
         if (searchQuery.trim() === "") {
@@ -28,7 +28,6 @@ Scope {
                 var p = ports[i];
                 if (p.protocol.toLowerCase().indexOf(query) !== -1 || p.port.indexOf(query) !== -1 || p.process.toLowerCase().indexOf(query) !== -1 || p.pid.indexOf(query) !== -1)
                     temp.push(p);
-
             }
             filteredPorts = temp;
         }
@@ -71,7 +70,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Process {
@@ -108,7 +106,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -166,7 +164,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 ParallelAnimation {
@@ -191,7 +188,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -213,7 +209,7 @@ Scope {
                     border.color: theme.accent
                     radius: 0
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
@@ -279,7 +275,6 @@ Scope {
                                     anchors.fill: parent
                                     verticalAlignment: Text.AlignVCenter
                                 }
-
                             }
 
                             // Underline
@@ -289,7 +284,6 @@ Scope {
                                 height: 1
                                 color: searchInput.activeFocus ? theme.accent : theme.secondary
                             }
-
                         }
 
                         // List view
@@ -365,7 +359,6 @@ Scope {
                                         renderType: Text.NativeRendering
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
-
                                 }
 
                                 Rectangle {
@@ -375,7 +368,6 @@ Scope {
                                     color: theme.secondary
                                     opacity: 0.15
                                 }
-
                             }
 
                             delegate: Rectangle {
@@ -441,7 +433,6 @@ Scope {
                                         renderType: Text.NativeRendering
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
-
                                 }
 
                                 MouseArea {
@@ -450,9 +441,7 @@ Scope {
                                     onEntered: root.selectedIndex = index
                                     onClicked: root.killPort(modelData.pid)
                                 }
-
                             }
-
                         }
 
                         // Bottom Row (total ports & refresh)
@@ -493,19 +482,11 @@ Scope {
                                         getPortsProc.running = true;
                                     }
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

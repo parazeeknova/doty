@@ -6,21 +6,29 @@ let
 in
 {
 
-  flake.nixosModules.parazeeknovaZathura = { config, pkgs, lib, ... }: {
-
-    home-manager.users.parazeeknova = { config, pkgs, ... }:
-    let
-      inherit (config.lib.file) mkOutOfStoreSymlink;
-    in
+  flake.nixosModules.parazeeknovaZathura =
     {
-      programs.zathura = {
-        enable = true;
-      };
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
+    {
 
-      xdg.configFile = {
-        "zathura/zathurarc".source = mkOutOfStoreSymlink "${zathuraDir}/zathurarc";
-        "zathura/zathurarc.template".source = mkOutOfStoreSymlink "${zathuraDir}/zathurarc.template";
-      };
+      home-manager.users.parazeeknova =
+        { config, pkgs, ... }:
+        let
+          inherit (config.lib.file) mkOutOfStoreSymlink;
+        in
+        {
+          programs.zathura = {
+            enable = true;
+          };
+
+          xdg.configFile = {
+            "zathura/zathurarc".source = mkOutOfStoreSymlink "${zathuraDir}/zathurarc";
+            "zathura/zathurarc.template".source = mkOutOfStoreSymlink "${zathuraDir}/zathurarc.template";
+          };
+        };
     };
-  };
 }

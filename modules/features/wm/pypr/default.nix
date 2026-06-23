@@ -6,18 +6,26 @@ let
 in
 {
 
-  flake.nixosModules.parazeeknovaPypr = { config, pkgs, lib, ... }: {
-
-    home-manager.users.parazeeknova = { config, pkgs, ... }:
-    let
-      inherit (config.lib.file) mkOutOfStoreSymlink;
-    in
+  flake.nixosModules.parazeeknovaPypr =
     {
-      home.packages = [ pkgs.pyprland ];
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
+    {
 
-      xdg.configFile = {
-        "pypr/config.toml".source = mkOutOfStoreSymlink "${pyprDir}/config.toml";
-      };
+      home-manager.users.parazeeknova =
+        { config, pkgs, ... }:
+        let
+          inherit (config.lib.file) mkOutOfStoreSymlink;
+        in
+        {
+          home.packages = [ pkgs.pyprland ];
+
+          xdg.configFile = {
+            "pypr/config.toml".source = mkOutOfStoreSymlink "${pyprDir}/config.toml";
+          };
+        };
     };
-  };
 }

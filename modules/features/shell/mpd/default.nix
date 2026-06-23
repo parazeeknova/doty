@@ -6,31 +6,39 @@ let
 in
 {
 
-  flake.nixosModules.parazeeknovaMpd = { config, pkgs, lib, ... }: {
-
-    home-manager.users.parazeeknova = { config, pkgs, ... }:
-    let
-      inherit (config.lib.file) mkOutOfStoreSymlink;
-    in
+  flake.nixosModules.parazeeknovaMpd =
     {
-      home.packages = [ pkgs.mpd ];
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
+    {
 
-      systemd.user.services.mpd = {
-        Unit = {
-          Description = "Music Player Daemon";
-          After = [ "sound.target" ];
-        };
-        Service = {
-          ExecStart = "${pkgs.mpd}/bin/mpd --no-daemon %h/.config/mpd/mpd.conf";
-        };
-        Install = {
-          WantedBy = [ "default.target" ];
-        };
-      };
+      home-manager.users.parazeeknova =
+        { config, pkgs, ... }:
+        let
+          inherit (config.lib.file) mkOutOfStoreSymlink;
+        in
+        {
+          home.packages = [ pkgs.mpd ];
 
-      xdg.configFile = {
-        "mpd/mpd.conf".source = mkOutOfStoreSymlink "${mpdDir}/mpd.conf";
-      };
+          systemd.user.services.mpd = {
+            Unit = {
+              Description = "Music Player Daemon";
+              After = [ "sound.target" ];
+            };
+            Service = {
+              ExecStart = "${pkgs.mpd}/bin/mpd --no-daemon %h/.config/mpd/mpd.conf";
+            };
+            Install = {
+              WantedBy = [ "default.target" ];
+            };
+          };
+
+          xdg.configFile = {
+            "mpd/mpd.conf".source = mkOutOfStoreSymlink "${mpdDir}/mpd.conf";
+          };
+        };
     };
-  };
 }

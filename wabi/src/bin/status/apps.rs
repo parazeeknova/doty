@@ -1,4 +1,4 @@
-use rusqlite::{params, Connection};
+use rusqlite::{Connection, params};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
@@ -127,11 +127,7 @@ fn parse_web_search(query: &str) -> Option<WebHistoryItem> {
             search_text.to_string(),
         )
     } else {
-        let q_text = if first_space.is_none() {
-            q[1..].to_string()
-        } else {
-            q[1..].to_string()
-        };
+        let q_text = q[1..].to_string();
         (
             "duckduckgo".to_string(),
             "https://duckduckgo.com/?q=".to_string(),
@@ -194,10 +190,8 @@ fn parse_desktop_file(path: &Path) -> Option<AppInfo> {
                         icon = Some(val.to_string());
                     }
                 }
-                "NoDisplay" => {
-                    if val.to_lowercase() == "true" {
-                        no_display = true;
-                    }
+                "NoDisplay" if val.to_lowercase() == "true" => {
+                    no_display = true;
                 }
                 _ => {}
             }
@@ -267,26 +261,26 @@ fn migrate_if_needed(conn: &Connection, cache_dir: &Path) {
     let bookmarks_path = cache_dir.join("bookmarks.json");
     if bookmarks_path.exists() {
         let mut migrated = false;
-        if let Ok(content) = fs::read_to_string(&bookmarks_path) {
-            if let Ok(list) = serde_json::from_str::<Vec<BookmarkItem>>(&content) {
-                let now = std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap_or_default()
-                    .as_secs() as i64;
-                let mut success = true;
-                for (idx, item) in list.iter().enumerate() {
-                    let normalized = normalize_url(&item.url);
-                    if let Err(e) = conn.execute(
-                        "INSERT OR IGNORE INTO bookmarks (url, name, created_at) VALUES (?1, ?2, ?3)",
-                        params![normalized, item.name, now - idx as i64],
-                    ) {
-                        eprintln!("Error migrating bookmark: {}", e);
-                        success = false;
-                    }
+        if let Ok(content) = fs::read_to_string(&bookmarks_path)
+            && let Ok(list) = serde_json::from_str::<Vec<BookmarkItem>>(&content)
+        {
+            let now = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs() as i64;
+            let mut success = true;
+            for (idx, item) in list.iter().enumerate() {
+                let normalized = normalize_url(&item.url);
+                if let Err(e) = conn.execute(
+                    "INSERT OR IGNORE INTO bookmarks (url, name, created_at) VALUES (?1, ?2, ?3)",
+                    params![normalized, item.name, now - idx as i64],
+                ) {
+                    eprintln!("Error migrating bookmark: {}", e);
+                    success = false;
                 }
-                if success {
-                    migrated = true;
-                }
+            }
+            if success {
+                migrated = true;
             }
         }
         if migrated {
@@ -299,21 +293,21 @@ fn migrate_if_needed(conn: &Connection, cache_dir: &Path) {
     let file_history_path = cache_dir.join("file_history.json");
     if file_history_path.exists() {
         let mut migrated = false;
-        if let Ok(content) = fs::read_to_string(&file_history_path) {
-            if let Ok(list) = serde_json::from_str::<Vec<FileHistoryItem>>(&content) {
-                let mut success = true;
-                for item in list {
-                    if let Err(e) = conn.execute(
-                        "INSERT OR IGNORE INTO file_history (path, name, timestamp) VALUES (?1, ?2, ?3)",
-                        params![item.path, item.name, item.timestamp],
-                    ) {
-                        eprintln!("Error migrating file history: {}", e);
-                        success = false;
-                    }
+        if let Ok(content) = fs::read_to_string(&file_history_path)
+            && let Ok(list) = serde_json::from_str::<Vec<FileHistoryItem>>(&content)
+        {
+            let mut success = true;
+            for item in list {
+                if let Err(e) = conn.execute(
+                    "INSERT OR IGNORE INTO file_history (path, name, timestamp) VALUES (?1, ?2, ?3)",
+                    params![item.path, item.name, item.timestamp],
+                ) {
+                    eprintln!("Error migrating file history: {}", e);
+                    success = false;
                 }
-                if success {
-                    migrated = true;
-                }
+            }
+            if success {
+                migrated = true;
             }
         }
         if migrated {
@@ -326,25 +320,25 @@ fn migrate_if_needed(conn: &Connection, cache_dir: &Path) {
     let web_history_path = cache_dir.join("web_search_history.json");
     if web_history_path.exists() {
         let mut migrated = false;
-        if let Ok(content) = fs::read_to_string(&web_history_path) {
-            if let Ok(list) = serde_json::from_str::<Vec<WebHistoryItem>>(&content) {
-                let now = std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap_or_default()
-                    .as_secs() as i64;
-                let mut success = true;
-                for (idx, item) in list.iter().enumerate() {
-                    if let Err(e) = conn.execute(
-                        "INSERT OR IGNORE INTO web_search_history (query, engine, url, timestamp) VALUES (?1, ?2, ?3, ?4)",
-                        params![item.query, item.engine, item.url, now - idx as i64],
-                    ) {
-                        eprintln!("Error migrating web history: {}", e);
-                        success = false;
-                    }
+        if let Ok(content) = fs::read_to_string(&web_history_path)
+            && let Ok(list) = serde_json::from_str::<Vec<WebHistoryItem>>(&content)
+        {
+            let now = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs() as i64;
+            let mut success = true;
+            for (idx, item) in list.iter().enumerate() {
+                if let Err(e) = conn.execute(
+                    "INSERT OR IGNORE INTO web_search_history (query, engine, url, timestamp) VALUES (?1, ?2, ?3, ?4)",
+                    params![item.query, item.engine, item.url, now - idx as i64],
+                ) {
+                    eprintln!("Error migrating web history: {}", e);
+                    success = false;
                 }
-                if success {
-                    migrated = true;
-                }
+            }
+            if success {
+                migrated = true;
             }
         }
         if migrated {
@@ -357,21 +351,21 @@ fn migrate_if_needed(conn: &Connection, cache_dir: &Path) {
     let usage_path = cache_dir.join("app_usage.json");
     if usage_path.exists() {
         let mut migrated = false;
-        if let Ok(content) = fs::read_to_string(&usage_path) {
-            if let Ok(map) = serde_json::from_str::<HashMap<String, u32>>(&content) {
-                let mut success = true;
-                for (app_name, count) in map {
-                    if let Err(e) = conn.execute(
-                        "INSERT OR REPLACE INTO app_usage (app_name, count) VALUES (?1, ?2)",
-                        params![app_name, count],
-                    ) {
-                        eprintln!("Error migrating app usage: {}", e);
-                        success = false;
-                    }
+        if let Ok(content) = fs::read_to_string(&usage_path)
+            && let Ok(map) = serde_json::from_str::<HashMap<String, u32>>(&content)
+        {
+            let mut success = true;
+            for (app_name, count) in map {
+                if let Err(e) = conn.execute(
+                    "INSERT OR REPLACE INTO app_usage (app_name, count) VALUES (?1, ?2)",
+                    params![app_name, count],
+                ) {
+                    eprintln!("Error migrating app usage: {}", e);
+                    success = false;
                 }
-                if success {
-                    migrated = true;
-                }
+            }
+            if success {
+                migrated = true;
             }
         }
         if migrated {
@@ -572,35 +566,32 @@ fn main() {
             if let Err(e) = clear_web_history(&conn) {
                 eprintln!("Error clearing web search history: {}", e);
             }
-            return;
         }
         Some("--clear-file-history") => {
             if let Err(e) = clear_file_history(&conn) {
                 eprintln!("Error clearing file history: {}", e);
             }
-            return;
         }
         Some("--add-bookmark") => {
             if let Some(url) = args.get(2) {
-                if let Err(e) = add_bookmark(&conn, url) {
+                let res = add_bookmark(&conn, url);
+                if let Err(e) = res {
                     eprintln!("Error adding bookmark: {}", e);
                 }
             }
-            return;
         }
         Some("--delete-bookmark") => {
             if let Some(url) = args.get(2) {
-                if let Err(e) = delete_bookmark(&conn, url) {
+                let res = delete_bookmark(&conn, url);
+                if let Err(e) = res {
                     eprintln!("Error deleting bookmark: {}", e);
                 }
             }
-            return;
         }
         Some("--clear-bookmarks") => {
             if let Err(e) = clear_bookmarks(&conn) {
                 eprintln!("Error clearing bookmarks: {}", e);
             }
-            return;
         }
         Some("--index-files") => {
             let index_path = cache_dir.join("file_index.json");
@@ -644,7 +635,6 @@ fn main() {
                 }
                 println!("{}", serde_json::json!({"indexed": entries.len()}));
             }
-            return;
         }
         Some("--search-files") => {
             if let Some(query) = args.get(2) {
@@ -655,42 +645,36 @@ fn main() {
                     return;
                 }
 
-                if let Ok(content) = fs::read_to_string(&index_path) {
-                    if let Ok(entries) = serde_json::from_str::<Vec<FileIndexEntry>>(&content) {
-                        let mut fzf = Command::new("fzf")
-                            .args(["-f", query])
-                            .stdin(Stdio::piped())
-                            .stdout(Stdio::piped())
-                            .spawn()
-                            .ok();
+                if let Ok(content) = fs::read_to_string(&index_path)
+                    && let Ok(entries) = serde_json::from_str::<Vec<FileIndexEntry>>(&content)
+                {
+                    let mut fzf = Command::new("fzf")
+                        .args(["-f", query])
+                        .stdin(Stdio::piped())
+                        .stdout(Stdio::piped())
+                        .spawn()
+                        .ok();
 
-                        if let Some(ref mut child) = fzf {
-                            if let Some(ref mut stdin) = child.stdin {
-                                for entry in &entries {
-                                    let _ = writeln!(stdin, "{}", entry.path);
-                                }
-                            }
+                    if let Some(ref mut stdin) = fzf.as_mut().and_then(|f| f.stdin.as_mut()) {
+                        for entry in &entries {
+                            let _ = writeln!(stdin, "{}", entry.path);
                         }
+                    }
 
-                        if let Some(child) = fzf {
-                            if let Ok(output) = child.wait_with_output() {
-                                let results: Vec<FileIndexEntry> =
-                                    String::from_utf8_lossy(&output.stdout)
-                                        .lines()
-                                        .filter_map(|line| {
-                                            entries.iter().find(|e| e.path == line).cloned()
-                                        })
-                                        .take(50)
-                                        .collect();
-                                let _ = serde_json::to_writer(std::io::stdout(), &results);
-                                return;
-                            }
-                        }
+                    if let Some(child) = fzf
+                        && let Ok(output) = child.wait_with_output()
+                    {
+                        let results: Vec<FileIndexEntry> = String::from_utf8_lossy(&output.stdout)
+                            .lines()
+                            .filter_map(|line| entries.iter().find(|e| e.path == line).cloned())
+                            .take(50)
+                            .collect();
+                        let _ = serde_json::to_writer(std::io::stdout(), &results);
+                        return;
                     }
                 }
             }
             println!("[]");
-            return;
         }
         Some("--open-file") => {
             if let Some(file_path) = args.get(2) {
@@ -698,54 +682,52 @@ fn main() {
                     eprintln!("Error adding file to history: {}", e);
                 }
 
-                let open_path = if file_path.starts_with("~/") {
-                    format!("{}/{}", home, &file_path[2..])
+                let open_path = if let Some(stripped) = file_path.strip_prefix("~/") {
+                    format!("{}/{}", home, stripped)
                 } else {
                     file_path.to_string()
                 };
                 let _ = Command::new("thunar").arg(&open_path).status();
             }
-            return;
         }
         Some("--file-history") => {
             let history = get_file_history(&conn);
             let _ = serde_json::to_writer(std::io::stdout(), &history);
-            return;
         }
         Some("--launch") => {
             if let Some(app_name) = args.get(2) {
-                if let Err(e) = increment_app_usage(&conn, app_name) {
+                let res = increment_app_usage(&conn, app_name);
+                if let Err(e) = res {
                     eprintln!("Error incrementing app usage: {}", e);
                 }
             }
-            return;
         }
         Some("--web-search") => {
-            if let Some(query) = args.get(2) {
-                if let Some(item) = parse_web_search(query) {
-                    if let Err(e) = add_web_history(&conn, &item) {
-                        eprintln!("Error saving web search history: {}", e);
-                    }
-                    // Open in browser
-                    let _ = Command::new("xdg-open").arg(&item.url).status();
-
-                    // Switch to workspace 1
-                    let _ = Command::new("hyprctl")
-                        .args(["dispatch", "hl.dsp.focus({workspace=1})"])
-                        .status();
+            if let Some(item) = args.get(2).and_then(|q| parse_web_search(q)) {
+                let res = add_web_history(&conn, &item);
+                if let Err(e) = res {
+                    eprintln!("Error saving web search history: {}", e);
                 }
+                // Open in browser
+                let _ = Command::new("xdg-open").arg(&item.url).status();
+
+                // Switch to workspace 1
+                let _ = Command::new("hyprctl")
+                    .args(["dispatch", "hl.dsp.focus({workspace=1})"])
+                    .status();
             }
-            return;
         }
         Some("--web-search-item") => {
-            if let (Some(query), Some(engine), Some(url)) = (args.get(2), args.get(3), args.get(4)) {
+            if let (Some(query), Some(engine), Some(url)) = (args.get(2), args.get(3), args.get(4))
+            {
                 let item = WebHistoryItem {
                     query: query.to_string(),
                     engine: engine.to_string(),
                     url: url.to_string(),
                 };
                 if !item.query.trim().is_empty() && !item.url.trim().is_empty() {
-                    if let Err(e) = add_web_history(&conn, &item) {
+                    let res = add_web_history(&conn, &item);
+                    if let Err(e) = res {
                         eprintln!("Error saving web search history: {}", e);
                     }
                     let _ = Command::new("xdg-open").arg(&item.url).status();
@@ -754,7 +736,6 @@ fn main() {
                         .status();
                 }
             }
-            return;
         }
         _ => {
             // Load usage map
@@ -777,9 +758,11 @@ fn main() {
                 if let Ok(entries) = fs::read_dir(path) {
                     for entry in entries.flatten() {
                         let p = entry.path();
-                        if p.extension().map_or(false, |ext| ext == "desktop") {
-                            if let Some(file_name) = p.file_name().and_then(|f| f.to_str()) {
-                                if let Some(mut app_info) = parse_desktop_file(&p) {
+                        if p.extension().is_some_and(|ext| ext == "desktop") {
+                            let file_name_opt = p.file_name().and_then(|f| f.to_str());
+                            if let Some(file_name) = file_name_opt {
+                                let app_info_opt = parse_desktop_file(&p);
+                                if let Some(mut app_info) = app_info_opt {
                                     if let Some(&count) = usage_map.get(&app_info.name) {
                                         app_info.count = count;
                                     }
@@ -794,7 +777,7 @@ fn main() {
             let mut all_apps: Vec<AppInfo> = apps.into_values().collect();
 
             // Sort all apps alphabetically
-            all_apps.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+            all_apps.sort_by_key(|a| a.name.to_lowercase());
 
             // Get most used apps (count > 0), sorted descending by count, limited to 5
             let mut most_used: Vec<AppInfo> = all_apps

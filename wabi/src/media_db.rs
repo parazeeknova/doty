@@ -387,7 +387,8 @@ pub fn check_deleted(conn: &Connection) -> Result<(), String> {
     let now = now_millis();
     let limit_24h = now - 24 * 3600 * 1000;
 
-    conn.execute("BEGIN TRANSACTION", []).map_err(|e| e.to_string())?;
+    conn.execute("BEGIN TRANSACTION", [])
+        .map_err(|e| e.to_string())?;
 
     if let Err(e) = conn.execute(
         "DELETE FROM assets WHERE deleted_at IS NOT NULL AND deleted_at < ?1",
@@ -404,8 +405,8 @@ pub fn check_deleted(conn: &Connection) -> Result<(), String> {
             return Err(e.to_string());
         }
     };
-    let rows: Vec<(i64, String, Option<i64>)> = match stmt
-        .query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?))) {
+    let rows: Vec<(i64, String, Option<i64>)> =
+        match stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?))) {
             Ok(iter) => iter.filter_map(|r| r.ok()).collect(),
             Err(e) => {
                 let _ = conn.execute("ROLLBACK", []);
@@ -417,18 +418,20 @@ pub fn check_deleted(conn: &Connection) -> Result<(), String> {
     for (id, source, deleted_at) in rows {
         let exists = PathBuf::from(&source).exists();
         if exists && deleted_at.is_some() {
-            if let Err(e) = conn.execute(
+            let res = conn.execute(
                 "UPDATE assets SET deleted_at = NULL WHERE id = ?1",
                 params![id],
-            ) {
+            );
+            if let Err(e) = res {
                 let _ = conn.execute("ROLLBACK", []);
                 return Err(e.to_string());
             }
         } else if !exists && deleted_at.is_none() {
-            if let Err(e) = conn.execute(
+            let res = conn.execute(
                 "UPDATE assets SET deleted_at = ?1 WHERE id = ?2",
                 params![now, id],
-            ) {
+            );
+            if let Err(e) = res {
                 let _ = conn.execute("ROLLBACK", []);
                 return Err(e.to_string());
             }

@@ -6,17 +6,25 @@ let
 in
 {
 
-  flake.nixosModules.parazeeknovaMatugen = { config, pkgs, lib, ... }: {
-
-    home-manager.users.parazeeknova = { config, pkgs, ... }:
-    let
-      inherit (config.lib.file) mkOutOfStoreSymlink;
-    in
+  flake.nixosModules.parazeeknovaMatugen =
     {
-      xdg.configFile = {
-        "matugen/config.toml".source = mkOutOfStoreSymlink "${matugenDir}/config.toml";
-        "matugen/templates".source = mkOutOfStoreSymlink "${matugenDir}/templates";
-      };
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
+    {
+
+      home-manager.users.parazeeknova =
+        { config, pkgs, ... }:
+        let
+          inherit (config.lib.file) mkOutOfStoreSymlink;
+        in
+        {
+          xdg.configFile = {
+            "matugen/config.toml".source = mkOutOfStoreSymlink "${matugenDir}/config.toml";
+            "matugen/templates".source = mkOutOfStoreSymlink "${matugenDir}/templates";
+          };
+        };
     };
-  };
 }

@@ -89,7 +89,6 @@ Scope {
         for (var i = 0; i < root.mediaSources.length; i++) {
             if (root.mediaSources[i].name === root.currentMediaSource)
                 return i;
-
         }
         return -1;
     }
@@ -226,7 +225,6 @@ Scope {
 
             if (lower.includes("quiet") || lower.includes("power-saver") || lower.includes("power saver"))
                 return theme.secondary;
-
         }
         // Caps
         if (lower.includes("caps on"))
@@ -371,7 +369,7 @@ Scope {
             try {
                 var raw = pomoStateFile.text().trim();
                 if (raw === "")
-                    return ;
+                    return;
 
                 var parsed = JSON.parse(raw);
                 root.pomoActive = parsed.active ?? false;
@@ -438,7 +436,6 @@ Scope {
                 }
             }
         }
-
     }
 
     // Watch the current-player file. When the volume popup changes the active
@@ -674,7 +671,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Slide-out + fade-out
@@ -698,7 +694,6 @@ Scope {
                         duration: 100
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 Rectangle {
@@ -763,9 +758,7 @@ Scope {
                                         width: 5
                                         color: (index < Math.round(blockSlider.currentVal * blockSlider.totalBlocks)) ? theme.accent : theme.bg_light
                                     }
-
                                 }
-
                             }
 
                             Text {
@@ -776,7 +769,6 @@ Scope {
                                 renderType: Text.NativeRendering
                                 anchors.verticalCenter: parent.verticalCenter
                             }
-
                         }
 
                         // Two-line layout for keyboard backlight: label on top, bar + pct below
@@ -809,7 +801,6 @@ Scope {
                                     renderType: Text.NativeRendering
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
-
                             }
 
                             Row {
@@ -834,9 +825,7 @@ Scope {
                                             width: 5
                                             color: (index < Math.round(kbdBlockSlider.currentVal * kbdBlockSlider.totalBlocks)) ? theme.accent : theme.bg_light
                                         }
-
                                     }
-
                                 }
 
                                 Text {
@@ -847,9 +836,7 @@ Scope {
                                     renderType: Text.NativeRendering
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
-
                             }
-
                         }
 
                         Row {
@@ -879,7 +866,6 @@ Scope {
                                 renderType: Text.NativeRendering
                                 anchors.verticalCenter: parent.verticalCenter
                             }
-
                         }
 
                         // Separator
@@ -927,7 +913,6 @@ Scope {
                                     visible: !artImage.visible
                                     renderType: Text.NativeRendering
                                 }
-
                             }
 
                             // Media Info
@@ -971,11 +956,8 @@ Scope {
                                                 border.color: theme.accent
                                                 opacity: index === root.currentMediaSourceIndex() ? 1 : 0.55
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 Text {
@@ -988,9 +970,7 @@ Scope {
                                     elide: Text.ElideRight
                                     renderType: Text.NativeRendering
                                 }
-
                             }
-
                         }
 
                         // Separator for sunset
@@ -1027,17 +1007,11 @@ Scope {
                                 font.pixelSize: 8
                                 renderType: Text.NativeRendering
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
 
     Variants {
@@ -1089,16 +1063,13 @@ Scope {
                             renderType: Text.NativeRendering
                             anchors.verticalCenter: parent.verticalCenter
                         }
-
                     }
 
                     Behavior on opacity {
                         NumberAnimation {
                             duration: 150
                         }
-
                     }
-
                 }
 
                 MouseArea {
@@ -1113,11 +1084,8 @@ Scope {
                         root.resetPomoShowTimer();
                     }
                 }
-
             }
-
         }
-
     }
 
     Process {
@@ -1126,6 +1094,4 @@ Scope {
         command: ["pkill", "-RTMIN+5", "waybar"]
         running: false
     }
-
 }
-

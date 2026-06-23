@@ -6,16 +6,24 @@ let
 in
 {
 
-  flake.nixosModules.parazeeknovaSpicetify = { config, pkgs, lib, ... }: {
-
-    home-manager.users.parazeeknova = { config, pkgs, ... }:
-    let
-      inherit (config.lib.file) mkOutOfStoreSymlink;
-    in
+  flake.nixosModules.parazeeknovaSpicetify =
     {
-      xdg.configFile = {
-        "spicetify/Themes".source = mkOutOfStoreSymlink "${spicetifyDir}/Themes";
-      };
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
+    {
+
+      home-manager.users.parazeeknova =
+        { config, pkgs, ... }:
+        let
+          inherit (config.lib.file) mkOutOfStoreSymlink;
+        in
+        {
+          xdg.configFile = {
+            "spicetify/Themes".source = mkOutOfStoreSymlink "${spicetifyDir}/Themes";
+          };
+        };
     };
-  };
 }

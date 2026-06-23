@@ -10,12 +10,12 @@ Scope {
 
     property string homeDir: Quickshell.env("HOME")
     property var podmanData: ({
-        "containers": [],
-        "images": [],
-        "networks": []
-    })
+            "containers": [],
+            "images": [],
+            "networks": []
+        })
 
-    signal requestClose()
+    signal requestClose
 
     function refreshStatus() {
         checkStatusProc.running = false;
@@ -68,7 +68,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Variants {
@@ -85,7 +84,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -144,7 +143,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Slide-out + fade-out
@@ -170,7 +168,6 @@ Scope {
                         duration: 100
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -190,10 +187,9 @@ Scope {
                     border.color: theme.accent
                     radius: 0
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape)
                             win.closePopup();
-
                     }
                     Component.onCompleted: {
                         forceActiveFocus();
@@ -238,9 +234,7 @@ Scope {
                                     hoverEnabled: true
                                     onClicked: root.refreshStatus()
                                 }
-
                             }
-
                         }
 
                         // Scrollable section for data
@@ -310,7 +304,6 @@ Scope {
                                                         Layout.fillWidth: true
                                                         renderType: Text.NativeRendering
                                                     }
-
                                                 }
 
                                                 Text {
@@ -335,11 +328,11 @@ Scope {
 
                                                 Text {
                                                     visible: modelData.Ports && modelData.Ports.length > 0
-                                                    text: hoverArea.containsMouse ? "├── ports: " + (modelData.Ports ? modelData.Ports.map((p) => {
-                                                        return p.hostPort + "->" + p.containerPort;
-                                                    }).join(", ") : "") : "└── ports: " + (modelData.Ports ? modelData.Ports.map((p) => {
-                                                        return p.hostPort + "->" + p.containerPort;
-                                                    }).join(", ") : "")
+                                                    text: hoverArea.containsMouse ? "├── ports: " + (modelData.Ports ? modelData.Ports.map(p => {
+                                                            return p.hostPort + "->" + p.containerPort;
+                                                        }).join(", ") : "") : "└── ports: " + (modelData.Ports ? modelData.Ports.map(p => {
+                                                            return p.hostPort + "->" + p.containerPort;
+                                                        }).join(", ") : "")
                                                     color: theme.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
@@ -375,7 +368,6 @@ Scope {
                                                             hoverEnabled: true
                                                             onClicked: root.runAction("start", modelData.Id)
                                                         }
-
                                                     }
 
                                                     Text {
@@ -392,7 +384,6 @@ Scope {
                                                             hoverEnabled: true
                                                             onClicked: root.runAction("stop", modelData.Id)
                                                         }
-
                                                     }
 
                                                     Text {
@@ -411,7 +402,6 @@ Scope {
                                                             hoverEnabled: true
                                                             onClicked: root.runAction(parent.actName, modelData.Id)
                                                         }
-
                                                     }
 
                                                     Text {
@@ -428,15 +418,10 @@ Scope {
                                                             hoverEnabled: true
                                                             onClicked: root.runAction("rm", modelData.Id)
                                                         }
-
                                                     }
-
                                                 }
-
                                             }
-
                                         }
-
                                     }
 
                                     Text {
@@ -447,7 +432,6 @@ Scope {
                                         font.pixelSize: 8
                                         renderType: Text.NativeRendering
                                     }
-
                                 }
 
                                 // SECTION 2: NETWORKS
@@ -490,9 +474,7 @@ Scope {
                                                 Layout.fillWidth: true
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
-
                                     }
 
                                     Text {
@@ -503,7 +485,6 @@ Scope {
                                         font.pixelSize: 8
                                         renderType: Text.NativeRendering
                                     }
-
                                 }
 
                                 // SECTION 3: IMAGES
@@ -547,9 +528,7 @@ Scope {
                                                 Layout.fillWidth: true
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
-
                                     }
 
                                     Text {
@@ -560,21 +539,12 @@ Scope {
                                         font.pixelSize: 8
                                         renderType: Text.NativeRendering
                                     }
-
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

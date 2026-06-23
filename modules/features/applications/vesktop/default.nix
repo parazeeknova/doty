@@ -6,16 +6,24 @@ let
 in
 {
 
-  flake.nixosModules.parazeeknovaVesktop = { config, pkgs, lib, ... }: {
-
-    home-manager.users.parazeeknova = { config, pkgs, ... }:
-    let
-      inherit (config.lib.file) mkOutOfStoreSymlink;
-    in
+  flake.nixosModules.parazeeknovaVesktop =
     {
-      xdg.configFile = {
-        "vesktop/settings".source = mkOutOfStoreSymlink "${vesktopDir}/settings";
-      };
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
+    {
+
+      home-manager.users.parazeeknova =
+        { config, pkgs, ... }:
+        let
+          inherit (config.lib.file) mkOutOfStoreSymlink;
+        in
+        {
+          xdg.configFile = {
+            "vesktop/settings".source = mkOutOfStoreSymlink "${vesktopDir}/settings";
+          };
+        };
     };
-  };
 }

@@ -32,7 +32,7 @@ Scope {
     // Hover cell bg
     readonly property string fontName: "FiraCode Nerd Font"
 
-    signal requestClose()
+    signal requestClose
 
     function filterEmojis() {
         var temp = [];
@@ -44,7 +44,6 @@ Scope {
             } else {
                 if (item.name.indexOf(query) !== -1 || item.char.indexOf(query) !== -1)
                     temp.push(item);
-
             }
         }
         filteredEmojis = temp;
@@ -74,7 +73,6 @@ Scope {
                 }
             }
         }
-
     }
 
     IpcHandler {
@@ -113,7 +111,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -170,7 +168,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 ParallelAnimation {
@@ -195,7 +192,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -213,7 +209,7 @@ Scope {
                     border.color: theme.accent
                     radius: 0
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
@@ -280,7 +276,6 @@ Scope {
                                     anchors.fill: parent
                                     verticalAlignment: Text.AlignVCenter
                                 }
-
                             }
 
                             // Underline
@@ -290,7 +285,6 @@ Scope {
                                 height: 1
                                 color: searchInput.activeFocus ? theme.fg : theme.secondary
                             }
-
                         }
 
                         // Grid of Emojis
@@ -330,19 +324,11 @@ Scope {
                                         copyProc.running = true;
                                     }
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

@@ -10,12 +10,10 @@ Scope {
 
     // Hyprland states
     property var windowList: []
-    property var windowByAddress: ({
-    })
+    property var windowByAddress: ({})
     property var activeWorkspaceId: 1
     property var monitors: []
-    property var monitorById: ({
-    })
+    property var monitorById: ({})
     property string activeWindowAddress: ""
     property var visibleWorkspaceIds: [1, 2]
     // Drag and Drop States
@@ -44,7 +42,7 @@ Scope {
     // High contrast hover color
     readonly property string fontName: "FiraCode Nerd Font"
 
-    signal requestClose()
+    signal requestClose
 
     // Update Hyprland info
     function updateAll() {
@@ -56,8 +54,16 @@ Scope {
 
     function toRoman(num) {
         var lookup = {
-            1: "i", 2: "ii", 3: "iii", 4: "iv", 5: "v",
-            6: "vi", 7: "vii", 8: "viii", 9: "ix", 10: "x"
+            1: "i",
+            2: "ii",
+            3: "iii",
+            4: "iv",
+            5: "v",
+            6: "vi",
+            7: "vii",
+            8: "viii",
+            9: "ix",
+            10: "x"
         };
         return lookup[num] || String(num);
     }
@@ -74,8 +80,7 @@ Scope {
     }
 
     function rebuildVisibleWorkspaceIds() {
-        var workspaceMap = {
-        };
+        var workspaceMap = {};
         var activeId = Math.max(1, root.activeWorkspaceId);
         var maxId = activeId;
         workspaceMap[activeId] = true;
@@ -97,7 +102,6 @@ Scope {
         for (var id = 1; id <= maxId; id++) {
             if (workspaceMap[id])
                 ids.push(id);
-
         }
         root.visibleWorkspaceIds = ids.length > 0 ? ids : [1];
     }
@@ -117,11 +121,9 @@ Scope {
                     tlAddrStr = String(tlAddr).toLowerCase();
                     if (!tlAddrStr.startsWith("0x"))
                         tlAddrStr = "0x" + tlAddrStr;
-
                 }
                 if (tlAddrStr === targetAddr)
                     return tl;
-
             }
         }
         return null;
@@ -135,7 +137,6 @@ Scope {
                 var cellPt = container.mapToItem(cell, globalX, globalY);
                 if (cellPt.x >= 0 && cellPt.x <= cell.width && cellPt.y >= 0 && cellPt.y <= cell.height)
                     return cell.wsId;
-
             }
         }
         return -1;
@@ -248,7 +249,7 @@ Scope {
     Connections {
         function onRawEvent(event) {
             if (["openlayer", "closelayer", "screencast"].includes(event.name))
-                return ;
+                return;
 
             updateAll();
         }
@@ -267,8 +268,7 @@ Scope {
                 try {
                     var parsed = JSON.parse(this.text);
                     root.windowList = parsed;
-                    var temp = {
-                    };
+                    var temp = {};
                     for (var i = 0; i < parsed.length; i++) {
                         var win = parsed[i];
                         win.address = root.normalizeAddress(win.address);
@@ -281,7 +281,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Process {
@@ -294,8 +293,7 @@ Scope {
                 try {
                     var parsed = JSON.parse(this.text);
                     root.monitors = parsed;
-                    var temp = {
-                    };
+                    var temp = {};
                     for (var i = 0; i < parsed.length; i++) {
                         var mon = parsed[i];
                         temp[mon.id] = mon;
@@ -306,7 +304,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Process {
@@ -325,7 +322,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Process {
@@ -344,7 +340,6 @@ Scope {
                 }
             }
         }
-
     }
 
     // Main popup windows (one for each screen)
@@ -362,7 +357,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -421,7 +416,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Slide-out + fade-out
@@ -447,7 +441,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Auto-close on click outside
@@ -469,10 +462,9 @@ Scope {
                     radius: 0 // Sharp corners
                     // Listen to Escape key to close
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape)
                             win.closePopup();
-
                     }
 
                     // Main Layout
@@ -559,7 +551,6 @@ Scope {
                                         onExited: {
                                             if (root.hoveredWorkspaceId === wsCell.wsId)
                                                 root.hoveredWorkspaceId = -1;
-
                                         }
                                     }
 
@@ -579,7 +570,7 @@ Scope {
 
                                         Repeater {
                                             // Filter windows belonging to this workspace
-                                            model: root.windowList.filter(function(w) {
+                                            model: root.windowList.filter(function (w) {
                                                 return w.workspace.id === wsCell.wsId;
                                             })
 
@@ -621,7 +612,6 @@ Scope {
                                                         height: Math.max(Math.round(winPreview.modelData.size[1] * previewContainer.scale), 12)
                                                         constraintSize: Qt.size(width, height)
                                                     }
-
                                                 }
 
                                                 // App Icon Badge in the Center using file path lookup
@@ -639,7 +629,6 @@ Scope {
                                                         fillMode: Image.PreserveAspectFit
                                                         source: root.getWindowIconPath(winPreview.modelData)
                                                     }
-
                                                 }
 
                                                 // Interactive Drag MouseArea
@@ -648,7 +637,7 @@ Scope {
 
                                                     anchors.fill: parent
                                                     hoverEnabled: true
-                                                    onPressed: (mouse) => {
+                                                    onPressed: mouse => {
                                                         root.draggedWindow = root.getToplevelForAddress(winPreview.modelData.address);
                                                         root.draggedAddress = winPreview.modelData.address;
                                                         root.draggedSourceWorkspace = wsCell.wsId;
@@ -665,7 +654,7 @@ Scope {
                                                         winPreview.parent = contentContainer;
                                                         winPreview.grabbed = true;
                                                     }
-                                                    onPositionChanged: (mouse) => {
+                                                    onPositionChanged: mouse => {
                                                         if (pressed) {
                                                             var globalPt = mapToItem(contentContainer, mouse.x, mouse.y);
                                                             root.dragX = globalPt.x - root.dragOffsetX;
@@ -703,9 +692,9 @@ Scope {
                                                         root.hoveredWorkspaceId = -1;
                                                         root.hoveredWindowAddress = "";
                                                     }
-                                                    onClicked: (mouse) => {
+                                                    onClicked: mouse => {
                                                         if (root.dragMoved)
-                                                            return ;
+                                                            return;
 
                                                         Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({ window = \"address:" + winPreview.modelData.address + "\" })"]);
                                                         win.closePopup();
@@ -745,7 +734,6 @@ Scope {
                                                         horizontalAlignment: Text.AlignHCenter
                                                         anchors.centerIn: parent
                                                     }
-
                                                 }
 
                                                 Behavior on x {
@@ -755,7 +743,6 @@ Scope {
                                                         duration: 180
                                                         easing.type: Easing.OutCubic
                                                     }
-
                                                 }
 
                                                 Behavior on y {
@@ -765,7 +752,6 @@ Scope {
                                                         duration: 180
                                                         easing.type: Easing.OutCubic
                                                     }
-
                                                 }
 
                                                 Behavior on width {
@@ -773,7 +759,6 @@ Scope {
                                                         duration: 180
                                                         easing.type: Easing.OutCubic
                                                     }
-
                                                 }
 
                                                 Behavior on height {
@@ -781,7 +766,6 @@ Scope {
                                                         duration: 180
                                                         easing.type: Easing.OutCubic
                                                     }
-
                                                 }
 
                                                 Behavior on scale {
@@ -789,20 +773,15 @@ Scope {
                                                         duration: 180
                                                         easing.type: Easing.OutCubic
                                                     }
-
                                                 }
 
                                                 Behavior on opacity {
                                                     NumberAnimation {
                                                         duration: 180
                                                     }
-
                                                 }
-
                                             }
-
                                         }
-
                                     }
 
                                     Behavior on scale {
@@ -810,30 +789,19 @@ Scope {
                                             duration: 150
                                             easing.type: Easing.OutCubic
                                         }
-
                                     }
 
                                     Behavior on color {
                                         ColorAnimation {
                                             duration: 150
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

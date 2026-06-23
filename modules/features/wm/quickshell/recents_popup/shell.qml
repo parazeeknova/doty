@@ -16,7 +16,7 @@ Scope {
     property int selectedIndex: 0
     readonly property string fontName: "FiraCode Nerd Font"
 
-    signal requestClose()
+    signal requestClose
 
     function filterClients() {
         if (searchQuery.trim() === "") {
@@ -28,7 +28,6 @@ Scope {
                 var c = clients[i];
                 if (c.title.toLowerCase().indexOf(query) !== -1 || c.class.toLowerCase().indexOf(query) !== -1 || c.workspace_roman.toLowerCase().indexOf(query) !== -1)
                     temp.push(c);
-
             }
             filteredClients = temp;
         }
@@ -65,11 +64,9 @@ Scope {
                     tlAddrStr = String(tlAddr).toLowerCase();
                     if (!tlAddrStr.startsWith("0x"))
                         tlAddrStr = "0x" + tlAddrStr;
-
                 }
                 if (tlAddrStr === targetAddr)
                     return tl;
-
             }
         }
         return null;
@@ -184,7 +181,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Timer {
@@ -209,7 +205,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -267,7 +263,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 ParallelAnimation {
@@ -292,7 +287,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -314,7 +308,7 @@ Scope {
                     border.color: theme.accent
                     radius: 0
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
@@ -375,7 +369,6 @@ Scope {
                                     anchors.fill: parent
                                     verticalAlignment: Text.AlignVCenter
                                 }
-
                             }
 
                             // Underline
@@ -385,7 +378,6 @@ Scope {
                                 height: 1
                                 color: searchInput.activeFocus ? theme.accent : theme.secondary
                             }
-
                         }
 
                         // List view
@@ -435,7 +427,6 @@ Scope {
                                                 height: 32
                                                 constraintSize: Qt.size(width, height)
                                             }
-
                                         }
 
                                         // App Icon Badge in the Center
@@ -452,9 +443,7 @@ Scope {
                                                 fillMode: Image.PreserveAspectFit
                                                 source: root.getWindowIconPath(modelData)
                                             }
-
                                         }
-
                                     }
 
                                     // Text Info Column
@@ -483,7 +472,6 @@ Scope {
                                                 font.pointSize: 6.5
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
 
                                         // Second line: Window Title
@@ -496,9 +484,7 @@ Scope {
                                             width: parent.width
                                             renderType: Text.NativeRendering
                                         }
-
                                     }
-
                                 }
 
                                 MouseArea {
@@ -507,9 +493,7 @@ Scope {
                                     onEntered: root.selectedIndex = index
                                     onClicked: root.focusWorkspace(modelData.workspace_id)
                                 }
-
                             }
-
                         }
 
                         // Bottom Row
@@ -550,19 +534,11 @@ Scope {
                                         getRecentsProc.running = true;
                                     }
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

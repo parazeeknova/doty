@@ -19,9 +19,13 @@ fn main() {
         .map(|s| s.trim().to_string())
         .unwrap_or_else(|_| "true".to_string());
 
-    let new_state = if current_state == "true" { "false" } else { "true" };
-    let _ = fs::write(&pstate, &new_state);
-    let _ = fs::write(TMPFS_STATE, &new_state);
+    let new_state = if current_state == "true" {
+        "false"
+    } else {
+        "true"
+    };
+    let _ = fs::write(&pstate, new_state);
+    let _ = fs::write(TMPFS_STATE, new_state);
 
     let is_running = Command::new("pgrep")
         .args(["-x", "waybar"])
@@ -34,8 +38,6 @@ fn main() {
             .args(["-USR1", "-x", "waybar"])
             .status();
     } else if new_state == "true" {
-        let _ = Command::new("uwsm")
-            .args(["app", "--", "waybar"])
-            .spawn();
+        let _ = Command::new("uwsm").args(["app", "--", "waybar"]).spawn();
     }
 }

@@ -34,7 +34,7 @@ Scope {
     // Hover cell bg
     readonly property string fontName: "FiraCode Nerd Font"
 
-    signal requestClose()
+    signal requestClose
 
     function refreshClipboard() {
         decodeScript.running = true;
@@ -130,7 +130,6 @@ Scope {
                 var txt = getEntryText(rawEntries[i]).toLowerCase();
                 if (txt.indexOf(query) !== -1)
                     temp.push(rawEntries[i]);
-
             }
             filteredEntries = temp;
         }
@@ -202,13 +201,11 @@ Scope {
                     var line = lines[i].trim();
                     if (line !== "")
                         temp.push(line);
-
                 }
                 root.rawEntries = temp;
                 root.filterEntries();
             }
         }
-
     }
 
     // Copy selected entry
@@ -262,7 +259,6 @@ Scope {
                 root.currentPreviewText = this.text;
             }
         }
-
     }
 
     // Render Window on each Screen
@@ -281,7 +277,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -324,7 +320,6 @@ Scope {
                     if (root.activeWindow === 0) {
                         if (win.showPreview)
                             root.activeWindow = 1;
-
                     } else {
                         root.activeWindow = 0;
                     }
@@ -394,7 +389,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 ParallelAnimation {
@@ -419,7 +413,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Click outside or focus loss to close
@@ -449,7 +442,7 @@ Scope {
                     border.color: theme.accent
                     radius: 0
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Tab) {
                             win.handleTab();
                             event.accepted = true;
@@ -489,7 +482,7 @@ Scope {
                                 font.family: root.fontName
                                 font.pointSize: 8
                                 focus: root.activeWindow === 0
-                                Keys.onPressed: (event) => {
+                                Keys.onPressed: event => {
                                     if (event.key === Qt.Key_Tab) {
                                         win.handleTab();
                                         event.accepted = true;
@@ -527,7 +520,6 @@ Scope {
                                     anchors.fill: parent
                                     verticalAlignment: Text.AlignVCenter
                                 }
-
                             }
 
                             // Underline
@@ -537,7 +529,6 @@ Scope {
                                 height: 1
                                 color: (root.activeWindow === 0 && searchInput.activeFocus) ? theme.accent : theme.secondary
                             }
-
                         }
 
                         // List view
@@ -607,7 +598,6 @@ Scope {
                                             verticalAlignment: Text.AlignVCenter
                                             renderType: Text.NativeRendering
                                         }
-
                                     }
 
                                     // Indicator showing a preview is available
@@ -620,11 +610,8 @@ Scope {
                                         renderType: Text.NativeRendering
                                         Layout.alignment: Qt.AlignVCenter
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // Bottom Row (total items & clear all)
@@ -663,20 +650,15 @@ Scope {
                                         wipeProc.running = true;
                                     }
                                 }
-
                             }
-
                         }
-
                     }
 
                     Behavior on opacity {
                         NumberAnimation {
                             duration: 100
                         }
-
                     }
-
                 }
 
                 // Preview Container (right card)
@@ -740,7 +722,6 @@ Scope {
                                 font.pointSize: 7.5
                                 renderType: Text.NativeRendering
                             }
-
                         }
 
                         // Content Preview Area
@@ -799,9 +780,7 @@ Scope {
                                     wrapMode: Text.WrapAnywhere
                                     renderType: Text.NativeRendering
                                 }
-
                             }
-
                         }
 
                         // Actions / Option Buttons Row
@@ -856,7 +835,6 @@ Scope {
                                         }
                                     }
                                 }
-
                             }
 
                             // "copy" button
@@ -880,26 +858,17 @@ Scope {
                                         }
                                     }
                                 }
-
                             }
-
                         }
-
                     }
 
                     Behavior on opacity {
                         NumberAnimation {
                             duration: 100
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

@@ -59,7 +59,6 @@ Scope {
                 }
             }
         }
-
     }
 
     // Refresh every 30 minutes
@@ -73,7 +72,6 @@ Scope {
         onTriggered: {
             if (!fetchGraphProc.running)
                 fetchGraphProc.running = true;
-
         }
     }
 
@@ -144,7 +142,6 @@ Scope {
                                 font.pixelSize: 9
                                 renderType: Text.NativeRendering
                             }
-
                         }
 
                         // Grid & Weekday labels
@@ -206,7 +203,6 @@ Scope {
                                     width: 15
                                     height: 10
                                 }
-
                             }
 
                             // The Graph Grid
@@ -246,13 +242,9 @@ Scope {
                                                 root.hoverInfo = "Hover a cell to see details";
                                             }
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // Grid Legend Row
@@ -294,7 +286,6 @@ Scope {
                                         radius: 0
                                         color: root.levelColors[index]
                                     }
-
                                 }
 
                                 Text {
@@ -305,9 +296,7 @@ Scope {
                                     renderType: Text.NativeRendering
                                     leftPadding: 2
                                 }
-
                             }
-
                         }
 
                         // Separator line
@@ -422,21 +411,12 @@ Scope {
                                         elide: Text.ElideRight
                                         Layout.maximumWidth: 260
                                     }
-
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

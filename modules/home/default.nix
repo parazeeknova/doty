@@ -1,61 +1,68 @@
 { self, inputs, ... }: {
 
-  flake.nixosModules.parazeeknovaHome = { config, pkgs, lib, ... }: {
+  flake.nixosModules.parazeeknovaHome =
+    {
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
+    {
 
-    home-manager = {
-      useGlobalPkgs = true;
-      useUserPackages = true;
-      backupFileExtension = "bak";
-      users.parazeeknova = { ... }: {
+      home-manager = {
+        useGlobalPkgs = true;
+        useUserPackages = true;
+        backupFileExtension = "bak";
+        users.parazeeknova = { ... }: {
 
-        home = {
-          username = "parazeeknova";
-          homeDirectory = "/home/parazeeknova";
-          stateVersion = "24.11";
-        };
+          home = {
+            username = "parazeeknova";
+            homeDirectory = "/home/parazeeknova";
+            stateVersion = "24.11";
+          };
 
-        programs.home-manager.enable = true;
+          programs.home-manager.enable = true;
 
-        # -- Systemd User Services --
-        systemd.user.services.ssh-agent = {
-          Unit = {
-            Description = "SSH key agent";
+          # -- Systemd User Services --
+          systemd.user.services.ssh-agent = {
+            Unit = {
+              Description = "SSH key agent";
+            };
+            Service = {
+              Type = "simple";
+              Environment = "SSH_AUTH_SOCK=%t/ssh-agent.socket";
+              ExecStart = "${pkgs.openssh}/bin/ssh-agent -D -a %t/ssh-agent.socket";
+            };
+            Install = {
+              WantedBy = [ "default.target" ];
+            };
           };
-          Service = {
-            Type = "simple";
-            Environment = "SSH_AUTH_SOCK=%t/ssh-agent.socket";
-            ExecStart = "${pkgs.openssh}/bin/ssh-agent -D -a %t/ssh-agent.socket";
-          };
-          Install = {
-            WantedBy = [ "default.target" ];
-          };
-        };
 
-        systemd.user.services.battery-logger = {
-          Unit = {
-            Description = "Log battery discharge rate to history.json";
-            After = [ "basic.target" ];
+          systemd.user.services.battery-logger = {
+            Unit = {
+              Description = "Log battery discharge rate to history.json";
+              After = [ "basic.target" ];
+            };
+            Service = {
+              Type = "oneshot";
+              ExecStart = "%h/.config/quickshell/battery_popup/log_battery";
+            };
           };
-          Service = {
-            Type = "oneshot";
-            ExecStart = "%h/.config/quickshell/battery_popup/log_battery";
-          };
-        };
 
-        systemd.user.timers.battery-logger = {
-          Unit = {
-            Description = "Log battery discharge rate timer";
-          };
-          Timer = {
-            OnBootSec = "1min";
-            OnUnitActiveSec = "6min";
-            AccuracySec = "1s";
-          };
-          Install = {
-            WantedBy = [ "timers.target" ];
+          systemd.user.timers.battery-logger = {
+            Unit = {
+              Description = "Log battery discharge rate timer";
+            };
+            Timer = {
+              OnBootSec = "1min";
+              OnUnitActiveSec = "6min";
+              AccuracySec = "1s";
+            };
+            Install = {
+              WantedBy = [ "timers.target" ];
+            };
           };
         };
       };
     };
-  };
 }

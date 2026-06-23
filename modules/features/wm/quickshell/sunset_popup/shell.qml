@@ -12,34 +12,41 @@ Scope {
     property string homeDir: Quickshell.env("HOME")
     property string currentState: ""
     property int selectedIndex: 0
-    readonly property var options: [{
-        "label": "Auto",
-        "key": "auto",
-        "temp": ""
-    }, {
-        "label": "Off",
-        "key": "off",
-        "temp": ""
-    }, {
-        "label": "Default",
-        "key": "default",
-        "temp": "6000K"
-    }, {
-        "label": "Sunset",
-        "key": "sunset",
-        "temp": "4500K"
-    }, {
-        "label": "Night",
-        "key": "night",
-        "temp": "3500K"
-    }, {
-        "label": "Midnight",
-        "key": "midnight",
-        "temp": "2500K"
-    }]
+    readonly property var options: [
+        {
+            "label": "Auto",
+            "key": "auto",
+            "temp": ""
+        },
+        {
+            "label": "Off",
+            "key": "off",
+            "temp": ""
+        },
+        {
+            "label": "Default",
+            "key": "default",
+            "temp": "6000K"
+        },
+        {
+            "label": "Sunset",
+            "key": "sunset",
+            "temp": "4500K"
+        },
+        {
+            "label": "Night",
+            "key": "night",
+            "temp": "3500K"
+        },
+        {
+            "label": "Midnight",
+            "key": "midnight",
+            "temp": "2500K"
+        }
+    ]
     readonly property string fontName: "FiraCode Nerd Font"
 
-    signal requestClose()
+    signal requestClose
 
     function applyOption(key) {
         var stateFile = root.homeDir + "/.config/hypr/sunset.state";
@@ -105,7 +112,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Variants {
@@ -122,7 +128,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -180,7 +186,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 ParallelAnimation {
@@ -205,7 +210,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -227,7 +231,7 @@ Scope {
                     border.color: theme.accent
                     radius: 0
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
@@ -274,7 +278,6 @@ Scope {
                                 font.bold: true
                                 renderType: Text.NativeRendering
                             }
-
                         }
 
                         // Underline
@@ -318,7 +321,6 @@ Scope {
                                         renderType: Text.NativeRendering
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
-
                                 }
 
                                 Text {
@@ -339,9 +341,7 @@ Scope {
                                     onEntered: root.selectedIndex = index
                                     onClicked: root.applyOption(modelData.key)
                                 }
-
                             }
-
                         }
 
                         // Bottom Row (current state status)
@@ -362,17 +362,10 @@ Scope {
                                 color: theme.secondary
                                 renderType: Text.NativeRendering
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

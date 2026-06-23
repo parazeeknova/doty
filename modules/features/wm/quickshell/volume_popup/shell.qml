@@ -30,13 +30,12 @@ Scope {
     // Pending volume changes for throttling
     property int pendingOutVol: -1
     property int pendingInVol: -1
-    property var pendingAppVols: ({
-    })
+    property var pendingAppVols: ({})
     property int lastActiveSection: 0
     property int lastActiveSubIndex: 0
     property bool isKeyboardTriggered: Quickshell.env("QS_KEYBOARD") === "1"
 
-    signal requestClose()
+    signal requestClose
 
     function formatTime(secs) {
         if (isNaN(secs) || secs < 0)
@@ -51,14 +50,13 @@ Scope {
         for (var i = 0; i < root.mediaSources.length; i++) {
             if (root.mediaSources[i].name === root.currentMediaSource)
                 return i;
-
         }
         return -1;
     }
 
     function switchMediaSource() {
         if (root.mediaSwitching || root.mediaSources.length <= 1)
-            return ;
+            return;
 
         root.mediaSwitching = true;
         switchMediaAnim.start();
@@ -66,7 +64,7 @@ Scope {
 
     function applyMediaSourceSwitch() {
         if (root.mediaSources.length === 0)
-            return ;
+            return;
 
         var idx = root.currentMediaSourceIndex();
         var nextIdx = (idx + 1) % root.mediaSources.length;
@@ -114,7 +112,7 @@ Scope {
             try {
                 var raw = focusStateFile.text().trim();
                 if (raw === "")
-                    return ;
+                    return;
 
                 var parsed = JSON.parse(raw);
                 if (parsed.activeSection !== undefined)
@@ -122,7 +120,6 @@ Scope {
 
                 if (parsed.activeSubIndex !== undefined)
                     root.lastActiveSubIndex = parsed.activeSubIndex;
-
             } catch (e) {
                 console.log("Failed to parse volume focus state: " + e);
             }
@@ -168,8 +165,7 @@ Scope {
                     var pct = pendingAppVols[index];
                     Quickshell.execDetached(["pactl", "set-sink-input-volume", String(index), pct + "%"]);
                 }
-                pendingAppVols = {
-                };
+                pendingAppVols = {};
             }
         }
     }
@@ -190,8 +186,7 @@ Scope {
                     root.sinks = data.sinks || [];
                     root.sources = data.sources || [];
                     root.apps = data.apps || [];
-                    root.diagnostics = data.diagnostics || {
-                    };
+                    root.diagnostics = data.diagnostics || {};
                     root.media = data.media || null;
                     root.mediaSources = data.media_sources || [];
                     root.currentMediaSource = data.current_media_source || "";
@@ -200,7 +195,6 @@ Scope {
                 }
             }
         }
-
     }
 
     // Process used to persist the user's current media-source selection
@@ -234,7 +228,6 @@ Scope {
                 duration: 140
                 easing.type: Easing.OutCubic
             }
-
         }
 
         // Swap data while hidden
@@ -268,13 +261,11 @@ Scope {
                 duration: 240
                 easing.type: Easing.OutCubic
             }
-
         }
 
         ScriptAction {
             script: root.mediaSwitching = false
         }
-
     }
 
     // Timer to wait for D-Bus status updates after player actions
@@ -325,16 +316,14 @@ Scope {
         running: true
 
         stdout: SplitParser {
-            onRead: (data) => {
+            onRead: data => {
                 // Trigger status check on events (sink, source, sink-input changes)
                 if (pendingOutVol === -1 && pendingInVol === -1 && Object.keys(pendingAppVols).length === 0) {
                     if (!checkStatusProc.running)
                         checkStatusProc.running = true;
-
                 }
             }
         }
-
     }
 
     // Timer to poll audio status every 2 seconds as a fallback
@@ -349,7 +338,6 @@ Scope {
             if (pendingOutVol === -1 && pendingInVol === -1 && Object.keys(pendingAppVols).length === 0) {
                 if (!checkStatusProc.running)
                     checkStatusProc.running = true;
-
             }
         }
     }
@@ -421,27 +409,27 @@ Scope {
                 function getDeviceItem(sub) {
                     if (sub === 0)
                         return {
-                        "type": "header"
-                    };
+                            "type": "header"
+                        };
 
                     var current = 1;
                     for (var i = 0; i < root.sinks.length; i++) {
                         if (current === sub)
                             return {
-                            "type": "sink",
-                            "index": i,
-                            "data": root.sinks[i]
-                        };
+                                "type": "sink",
+                                "index": i,
+                                "data": root.sinks[i]
+                            };
 
                         current++;
                     }
                     for (var j = 0; j < root.sources.length; j++) {
                         if (current === sub)
                             return {
-                            "type": "source",
-                            "index": j,
-                            "data": root.sources[j]
-                        };
+                                "type": "source",
+                                "index": j,
+                                "data": root.sources[j]
+                            };
 
                         current++;
                     }
@@ -569,7 +557,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -578,12 +566,10 @@ Scope {
                 onActiveSectionChanged: {
                     if (isLoaded)
                         root.saveFocusState(activeSection, activeSubIndex);
-
                 }
                 onActiveSubIndexChanged: {
                     if (isLoaded)
                         root.saveFocusState(activeSection, activeSubIndex);
-
                 }
                 screen: modelData
                 color: "transparent"
@@ -634,7 +620,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 ParallelAnimation {
@@ -659,7 +644,6 @@ Scope {
                         duration: 100
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -682,7 +666,7 @@ Scope {
                     radius: 0
                     antialiasing: false
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
@@ -705,15 +689,13 @@ Scope {
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Right) {
                             win.showFocusHighlight = true;
-                            if (event.key === Qt.Key_Right && win.adjustSlider(1)) {
-                            } else {
+                            if (event.key === Qt.Key_Right && win.adjustSlider(1)) {} else {
                                 win.navigateSubIndex(1);
                             }
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Up || event.key === Qt.Key_Left) {
                             win.showFocusHighlight = true;
-                            if (event.key === Qt.Key_Left && win.adjustSlider(-1)) {
-                            } else {
+                            if (event.key === Qt.Key_Left && win.adjustSlider(-1)) {} else {
                                 win.navigateSubIndex(-1);
                             }
                             event.accepted = true;
@@ -779,7 +761,6 @@ Scope {
                                         visible: !artImage.visible
                                         renderType: Text.NativeRendering
                                     }
-
                                 }
 
                                 // Media Info and Controls
@@ -827,11 +808,8 @@ Scope {
                                                     border.color: theme.accent
                                                     opacity: index === root.currentMediaSourceIndex() ? 1 : 0.55
                                                 }
-
                                             }
-
                                         }
-
                                     }
 
                                     Text {
@@ -875,7 +853,6 @@ Scope {
                                                     mediaRefreshTimer.running = true;
                                                 }
                                             }
-
                                         }
 
                                         Text {
@@ -916,7 +893,6 @@ Scope {
                                                     mediaRefreshTimer.running = true;
                                                 }
                                             }
-
                                         }
 
                                         Text {
@@ -944,7 +920,6 @@ Scope {
                                                     mediaRefreshTimer.running = true;
                                                 }
                                             }
-
                                         }
 
                                         // Media source switch button: cycles through available players
@@ -974,9 +949,7 @@ Scope {
                                                 onExited: switchSrcBtn.color = theme.accent
                                                 onClicked: root.switchMediaSource()
                                             }
-
                                         }
-
                                     }
 
                                     // Duration Slider Row
@@ -1020,7 +993,7 @@ Scope {
                                             MouseArea {
                                                 anchors.fill: parent
                                                 enabled: root.media && root.media.length > 0
-                                                onClicked: (mouse) => {
+                                                onClicked: mouse => {
                                                     var pct = mouse.x / width;
                                                     var targetSecs = pct * root.media.length;
                                                     // Update local UI immediately
@@ -1040,7 +1013,6 @@ Scope {
                                                     mediaRefreshTimer.running = true;
                                                 }
                                             }
-
                                         }
 
                                         Text {
@@ -1052,11 +1024,8 @@ Scope {
                                             font.pixelSize: 8
                                             renderType: Text.NativeRendering
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             // Separator below media widget
@@ -1072,7 +1041,6 @@ Scope {
 
                                 y: root.mediaSlide
                             }
-
                         }
 
                         // --- SECTION 1: MASTER OUTPUT ---
@@ -1128,9 +1096,7 @@ Scope {
                                             }
                                         }
                                     }
-
                                 }
-
                             }
 
                             // Master Output Horizontal Slider
@@ -1160,9 +1126,7 @@ Scope {
                                             width: (masterSliderBlocks.width - (masterSliderBlocks.spacing * (masterSliderBlocks.totalBlocks - 1))) / masterSliderBlocks.totalBlocks
                                             color: (index < Math.round(masterSliderBlocks.currentVal * masterSliderBlocks.totalBlocks)) ? theme.accent : theme.bg_light
                                         }
-
                                     }
-
                                 }
 
                                 Rectangle {
@@ -1183,7 +1147,7 @@ Scope {
 
                                     anchors.fill: parent
                                     preventStealing: true
-                                    onWheel: (wheel) => {
+                                    onWheel: wheel => {
                                         if (root.defaultSink) {
                                             var change = wheel.angleDelta.y > 0 ? 2 : -2;
                                             var newVol = Math.max(0, Math.min(root.defaultSink.volume + change, 100));
@@ -1191,16 +1155,14 @@ Scope {
                                             root.pendingOutVol = newVol;
                                         }
                                     }
-                                    onPressed: (mouse) => {
+                                    onPressed: mouse => {
                                         updateVol(mouse.x);
                                     }
-                                    onPositionChanged: (mouse) => {
+                                    onPositionChanged: mouse => {
                                         updateVol(mouse.x);
                                     }
                                 }
-
                             }
-
                         }
 
                         // --- SECTION 2: MIC INPUT ---
@@ -1256,9 +1218,7 @@ Scope {
                                             }
                                         }
                                     }
-
                                 }
-
                             }
 
                             // Mic Input Horizontal Slider
@@ -1288,9 +1248,7 @@ Scope {
                                             width: (micSliderBlocks.width - (micSliderBlocks.spacing * (micSliderBlocks.totalBlocks - 1))) / micSliderBlocks.totalBlocks
                                             color: (index < Math.round(micSliderBlocks.currentVal * micSliderBlocks.totalBlocks)) ? theme.accent : theme.bg_light
                                         }
-
                                     }
-
                                 }
 
                                 Rectangle {
@@ -1311,7 +1269,7 @@ Scope {
 
                                     anchors.fill: parent
                                     preventStealing: true
-                                    onWheel: (wheel) => {
+                                    onWheel: wheel => {
                                         if (root.defaultSource) {
                                             var change = wheel.angleDelta.y > 0 ? 2 : -2;
                                             var newVol = Math.max(0, Math.min(root.defaultSource.volume + change, 100));
@@ -1319,16 +1277,14 @@ Scope {
                                             root.pendingInVol = newVol;
                                         }
                                     }
-                                    onPressed: (mouse) => {
+                                    onPressed: mouse => {
                                         updateVol(mouse.x);
                                     }
-                                    onPositionChanged: (mouse) => {
+                                    onPositionChanged: mouse => {
                                         updateVol(mouse.x);
                                     }
                                 }
-
                             }
-
                         }
 
                         // --- SECTION 5: APP VOLUMES ---
@@ -1392,9 +1348,7 @@ Scope {
                                                         width: (appSliderBlocks.width - (appSliderBlocks.spacing * (appSliderBlocks.totalBlocks - 1))) / appSliderBlocks.totalBlocks
                                                         color: (index < Math.round(appSliderBlocks.currentVal * appSliderBlocks.totalBlocks)) ? theme.accent : theme.bg_light
                                                     }
-
                                                 }
-
                                             }
 
                                             Rectangle {
@@ -1415,7 +1369,7 @@ Scope {
 
                                                 anchors.fill: parent
                                                 preventStealing: true
-                                                onWheel: (wheel) => {
+                                                onWheel: wheel => {
                                                     var change = wheel.angleDelta.y > 0 ? 2 : -2;
                                                     var newVol = Math.max(0, Math.min(modelData.volume + change, 100));
                                                     modelData.volume = newVol;
@@ -1423,22 +1377,17 @@ Scope {
                                                     temp[modelData.index] = newVol;
                                                     root.pendingAppVols = temp;
                                                 }
-                                                onPressed: (mouse) => {
+                                                onPressed: mouse => {
                                                     updateVol(mouse.x);
                                                 }
-                                                onPositionChanged: (mouse) => {
+                                                onPositionChanged: mouse => {
                                                     updateVol(mouse.x);
                                                 }
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // --- SECTION 6: BLUETOOTH MEDIA ---
@@ -1474,7 +1423,6 @@ Scope {
                                         onExited: btPrev.color = theme.accent
                                         onClicked: Quickshell.execDetached(["playerctl", "previous"])
                                     }
-
                                 }
 
                                 Text {
@@ -1493,7 +1441,6 @@ Scope {
                                         onExited: btPlay.color = theme.accent
                                         onClicked: Quickshell.execDetached(["playerctl", "play-pause"])
                                     }
-
                                 }
 
                                 Text {
@@ -1512,11 +1459,8 @@ Scope {
                                         onExited: btNext.color = theme.accent
                                         onClicked: Quickshell.execDetached(["playerctl", "next"])
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // Separator 1
@@ -1553,7 +1497,6 @@ Scope {
                                     root.devicesDropdownOpen = !root.devicesDropdownOpen;
                                 }
                             }
-
                         }
 
                         // Dropdown Content
@@ -1625,11 +1568,8 @@ Scope {
                                                 checkStatusProc.running = true;
                                             }
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             // Subheading: Inputs
@@ -1695,13 +1635,9 @@ Scope {
                                                 checkStatusProc.running = true;
                                             }
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // --- SECTION 7: DIAGNOSTICS ---
@@ -1717,15 +1653,9 @@ Scope {
                             lineHeight: 1.2
                             renderType: Text.NativeRendering
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

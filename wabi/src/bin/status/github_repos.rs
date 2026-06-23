@@ -94,10 +94,10 @@ impl From<RawGitRepo> for GitRepo {
 
 fn get_token() -> Option<String> {
     // Try env var first
-    if let Ok(token) = std::env::var("WABI_GITHUB_TOKEN") {
-        if !token.is_empty() {
-            return Some(token);
-        }
+    if let Ok(token) = std::env::var("WABI_GITHUB_TOKEN")
+        && !token.is_empty()
+    {
+        return Some(token);
     }
 
     // Fallback: read from mcp-env.fish
@@ -106,14 +106,13 @@ fn get_token() -> Option<String> {
     if let Ok(content) = fs::read_to_string(&env_path) {
         for line in content.lines() {
             let line = line.trim();
-            if line.contains("WABI_GITHUB_TOKEN") {
-                if let Some(start) = line.find('"') {
-                    if let Some(end) = line[start + 1..].find('"') {
-                        let token = &line[start + 1..start + 1 + end];
-                        if !token.is_empty() {
-                            return Some(token.to_string());
-                        }
-                    }
+            if line.contains("WABI_GITHUB_TOKEN")
+                && let Some(start) = line.find('"')
+                && let Some(end) = line[start + 1..].find('"')
+            {
+                let token = &line[start + 1..start + 1 + end];
+                if !token.is_empty() {
+                    return Some(token.to_string());
                 }
             }
         }
@@ -199,9 +198,8 @@ fn search_repos(query: &str, token: Option<&str>) -> Vec<GitRepo> {
         items: Vec<RawGitRepo>,
     }
 
-    let result: SearchResult = serde_json::from_str(&json).unwrap_or(SearchResult {
-        items: Vec::new(),
-    });
+    let result: SearchResult =
+        serde_json::from_str(&json).unwrap_or(SearchResult { items: Vec::new() });
 
     result.items.into_iter().map(GitRepo::from).collect()
 }

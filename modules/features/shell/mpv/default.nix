@@ -6,17 +6,25 @@ let
 in
 {
 
-  flake.nixosModules.parazeeknovaMpv = { config, pkgs, lib, ... }: {
-
-    home-manager.users.parazeeknova = { config, pkgs, ... }:
-    let
-      inherit (config.lib.file) mkOutOfStoreSymlink;
-    in
+  flake.nixosModules.parazeeknovaMpv =
     {
-      xdg.configFile = {
-        "mpv/mpv.conf".source = mkOutOfStoreSymlink "${mpvDir}/mpv.conf";
-        "mpv/mpv.conf.template".source = mkOutOfStoreSymlink "${mpvDir}/mpv.conf.template";
-      };
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
+    {
+
+      home-manager.users.parazeeknova =
+        { config, pkgs, ... }:
+        let
+          inherit (config.lib.file) mkOutOfStoreSymlink;
+        in
+        {
+          xdg.configFile = {
+            "mpv/mpv.conf".source = mkOutOfStoreSymlink "${mpvDir}/mpv.conf";
+            "mpv/mpv.conf.template".source = mkOutOfStoreSymlink "${mpvDir}/mpv.conf.template";
+          };
+        };
     };
-  };
 }

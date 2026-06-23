@@ -17,7 +17,7 @@ Scope {
     property int lastActiveSubIndex: 0
     property bool isKeyboardTriggered: Quickshell.env("QS_KEYBOARD") === "1"
 
-    signal requestClose()
+    signal requestClose
 
     function triggerRefresh() {
         refreshTimer.restart();
@@ -54,7 +54,7 @@ Scope {
             try {
                 var raw = focusStateFile.text().trim();
                 if (raw === "")
-                    return ;
+                    return;
 
                 var parsed = JSON.parse(raw);
                 if (parsed.activeSection !== undefined)
@@ -62,7 +62,6 @@ Scope {
 
                 if (parsed.activeSubIndex !== undefined)
                     root.lastActiveSubIndex = parsed.activeSubIndex;
-
             } catch (e) {
                 console.log("Failed to parse bluetooth focus state: " + e);
             }
@@ -108,7 +107,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Timer {
@@ -144,7 +142,6 @@ Scope {
         onTriggered: {
             if (!checkStatusProc.running)
                 checkStatusProc.running = true;
-
         }
     }
 
@@ -169,7 +166,7 @@ Scope {
                     if (root.loading || !root.btEnabled)
                         return [];
 
-                    return root.devices.filter(function(d) {
+                    return root.devices.filter(function (d) {
                         return d.connected;
                     });
                 }
@@ -178,7 +175,7 @@ Scope {
                     if (root.loading || !root.btEnabled)
                         return [];
 
-                    return root.devices.filter(function(d) {
+                    return root.devices.filter(function (d) {
                         return d.paired && !d.connected;
                     });
                 }
@@ -187,7 +184,7 @@ Scope {
                     if (root.loading || !root.btEnabled)
                         return [];
 
-                    return root.devices.filter(function(d) {
+                    return root.devices.filter(function (d) {
                         return !d.paired;
                     });
                 }
@@ -254,7 +251,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -263,12 +260,10 @@ Scope {
                 onActiveSectionChanged: {
                     if (isLoaded)
                         root.saveFocusState(activeSection, activeSubIndex);
-
                 }
                 onActiveSubIndexChanged: {
                     if (isLoaded)
                         root.saveFocusState(activeSection, activeSubIndex);
-
                 }
                 screen: modelData
                 color: "transparent"
@@ -320,7 +315,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Slide-out + fade-out
@@ -346,7 +340,6 @@ Scope {
                         duration: 100
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -366,7 +359,7 @@ Scope {
                     radius: 0
                     antialiasing: false
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
@@ -444,13 +437,13 @@ Scope {
                                         if (root.btEnabled === false)
                                             return "Disabled";
 
-                                        var connected = root.devices.filter(function(d) {
+                                        var connected = root.devices.filter(function (d) {
                                             return d.connected;
                                         });
                                         if (connected.length === 0)
                                             return "No devices connected";
 
-                                        return connected.map(function(d) {
+                                        return connected.map(function (d) {
                                             return d.name;
                                         }).join(", ");
                                     }
@@ -463,7 +456,6 @@ Scope {
                                     renderType: Text.NativeRendering
                                     visible: true
                                 }
-
                             }
 
                             Row {
@@ -504,7 +496,6 @@ Scope {
                                             root.triggerRefresh();
                                         }
                                     }
-
                                 }
 
                                 Text {
@@ -532,7 +523,7 @@ Scope {
                                         onExited: scanBtn.color = theme.accent
                                         onClicked: {
                                             if (checkStatusProc.running)
-                                                return ;
+                                                return;
 
                                             root.scanning = true;
                                             root.pendingScan = true;
@@ -540,11 +531,8 @@ Scope {
                                             checkStatusProc.running = true;
                                         }
                                     }
-
                                 }
-
                             }
-
                         }
 
                         Rectangle {
@@ -568,7 +556,7 @@ Scope {
                         Column {
                             width: parent.width
                             spacing: 3
-                            visible: !root.loading && root.btEnabled && root.devices.filter(function(d) {
+                            visible: !root.loading && root.btEnabled && root.devices.filter(function (d) {
                                 return d.connected;
                             }).length > 0
 
@@ -586,7 +574,7 @@ Scope {
                                 spacing: 2
 
                                 Repeater {
-                                    model: root.devices.filter(function(d) {
+                                    model: root.devices.filter(function (d) {
                                         return d.connected;
                                     })
 
@@ -624,7 +612,6 @@ Scope {
                                                     width: 150
                                                     renderType: Text.NativeRendering
                                                 }
-
                                             }
 
                                             // Battery indicator
@@ -660,15 +647,10 @@ Scope {
                                                         root.triggerRefresh();
                                                     }
                                                 }
-
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             Text {
@@ -678,11 +660,10 @@ Scope {
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
                                 renderType: Text.NativeRendering
-                                visible: root.devices.filter(function(d) {
+                                visible: root.devices.filter(function (d) {
                                     return d.connected;
                                 }).length === 0
                             }
-
                         }
 
                         Rectangle {
@@ -690,7 +671,7 @@ Scope {
                             height: 1
                             color: theme.accent
                             opacity: 0.15
-                            visible: !root.loading && root.btEnabled && root.devices.filter(function(d) {
+                            visible: !root.loading && root.btEnabled && root.devices.filter(function (d) {
                                 return d.connected;
                             }).length > 0
                         }
@@ -699,7 +680,7 @@ Scope {
                         Column {
                             width: parent.width
                             spacing: 3
-                            visible: !root.loading && root.btEnabled && root.devices.filter(function(d) {
+                            visible: !root.loading && root.btEnabled && root.devices.filter(function (d) {
                                 return d.paired && !d.connected;
                             }).length > 0
 
@@ -717,7 +698,7 @@ Scope {
                                 spacing: 2
 
                                 Repeater {
-                                    model: root.devices.filter(function(d) {
+                                    model: root.devices.filter(function (d) {
                                         return d.paired && !d.connected;
                                     })
 
@@ -754,7 +735,6 @@ Scope {
                                                     width: 150
                                                     renderType: Text.NativeRendering
                                                 }
-
                                             }
 
                                             // Battery indicator
@@ -790,15 +770,10 @@ Scope {
                                                         root.triggerRefresh();
                                                     }
                                                 }
-
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             Text {
@@ -808,11 +783,10 @@ Scope {
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
                                 renderType: Text.NativeRendering
-                                visible: root.devices.filter(function(d) {
+                                visible: root.devices.filter(function (d) {
                                     return d.paired && !d.connected;
                                 }).length === 0
                             }
-
                         }
 
                         Rectangle {
@@ -820,7 +794,7 @@ Scope {
                             height: 1
                             color: theme.accent
                             opacity: 0.15
-                            visible: !root.loading && root.btEnabled && root.devices.filter(function(d) {
+                            visible: !root.loading && root.btEnabled && root.devices.filter(function (d) {
                                 return d.paired && !d.connected;
                             }).length > 0
                         }
@@ -845,7 +819,7 @@ Scope {
                                 spacing: 2
 
                                 Repeater {
-                                    model: root.devices.filter(function(d) {
+                                    model: root.devices.filter(function (d) {
                                         return !d.paired;
                                     })
 
@@ -892,15 +866,10 @@ Scope {
                                                         root.triggerRefresh();
                                                     }
                                                 }
-
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             Text {
@@ -910,11 +879,10 @@ Scope {
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 8
                                 renderType: Text.NativeRendering
-                                visible: root.devices.filter(function(d) {
+                                visible: root.devices.filter(function (d) {
                                     return !d.paired;
                                 }).length === 0
                             }
-
                         }
 
                         // --- FOOTER: Bluetooth off message ---
@@ -927,15 +895,9 @@ Scope {
                             renderType: Text.NativeRendering
                             visible: root.btEnabled === false
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

@@ -9,19 +9,23 @@ Scope {
     property string homeDir: Quickshell.env("HOME")
     property string currentProfile: ""
     property int selectedIndex: 0
-    readonly property var profiles: [{
-        "name": "Quiet",
-        "icon": "󰌪"
-    }, {
-        "name": "Balanced",
-        "icon": "󰾅"
-    }, {
-        "name": "Performance",
-        "icon": "󰓅"
-    }]
+    readonly property var profiles: [
+        {
+            "name": "Quiet",
+            "icon": "󰌪"
+        },
+        {
+            "name": "Balanced",
+            "icon": "󰾅"
+        },
+        {
+            "name": "Performance",
+            "icon": "󰓅"
+        }
+    ]
     readonly property string fontName: "FiraCode Nerd Font"
 
-    signal requestClose()
+    signal requestClose
 
     function setProfile(profileName) {
         Quickshell.execDetached(["asusctl", "profile", "set", profileName]);
@@ -69,7 +73,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Variants {
@@ -86,7 +89,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -138,7 +141,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 ParallelAnimation {
@@ -163,7 +165,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -181,7 +182,7 @@ Scope {
                     radius: 0
                     focus: true
                     Component.onCompleted: forceActiveFocus()
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
@@ -259,7 +260,6 @@ Scope {
                                         font.pointSize: 7
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
-
                                 }
 
                                 MouseArea {
@@ -268,19 +268,11 @@ Scope {
                                     onEntered: root.selectedIndex = index
                                     onClicked: root.setProfile(modelData.name)
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

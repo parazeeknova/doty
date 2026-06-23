@@ -139,7 +139,9 @@ fn main() {
         std::thread::sleep(std::time::Duration::from_millis(500));
     }
 
-    let db_path = wabi::quickshell_dir().join("notif_popup").join("screentime.db");
+    let db_path = wabi::quickshell_dir()
+        .join("notif_popup")
+        .join("screentime.db");
     let conn = match Connection::open(db_path) {
         Ok(c) => c,
         Err(_) => {

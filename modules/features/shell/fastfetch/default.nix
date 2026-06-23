@@ -6,22 +6,31 @@ let
 in
 {
 
-  flake.nixosModules.parazeeknovaFastfetch = { config, pkgs, lib, ... }: {
-
-    home-manager.users.parazeeknova = { config, pkgs, ... }:
-    let
-      inherit (config.lib.file) mkOutOfStoreSymlink;
-    in
+  flake.nixosModules.parazeeknovaFastfetch =
     {
-      programs.fastfetch = {
-        enable = true;
-      };
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
+    {
 
-      xdg.configFile = {
-        "fastfetch/config.jsonc".source = mkOutOfStoreSymlink "${fastfetchDir}/config.jsonc";
-        "fastfetch/config.jsonc.template".source = mkOutOfStoreSymlink "${fastfetchDir}/config.jsonc.template";
-        "fastfetch/cat.txt".source = mkOutOfStoreSymlink "${fastfetchDir}/cat.txt";
-      };
+      home-manager.users.parazeeknova =
+        { config, pkgs, ... }:
+        let
+          inherit (config.lib.file) mkOutOfStoreSymlink;
+        in
+        {
+          programs.fastfetch = {
+            enable = true;
+          };
+
+          xdg.configFile = {
+            "fastfetch/config.jsonc".source = mkOutOfStoreSymlink "${fastfetchDir}/config.jsonc";
+            "fastfetch/config.jsonc.template".source =
+              mkOutOfStoreSymlink "${fastfetchDir}/config.jsonc.template";
+            "fastfetch/cat.txt".source = mkOutOfStoreSymlink "${fastfetchDir}/cat.txt";
+          };
+        };
     };
-  };
 }

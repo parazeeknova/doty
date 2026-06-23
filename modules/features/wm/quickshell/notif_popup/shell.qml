@@ -21,8 +21,7 @@ Scope {
     property string uptimeStr: ""
     property int calendarMonthOffset: 0
     // Track expanded notification IDs
-    property var expandedNotifIds: ({
-    })
+    property var expandedNotifIds: ({})
     // Pomodoro properties
     property bool pomoActive: false
     // Screentime properties
@@ -41,7 +40,7 @@ Scope {
     property int lastActiveSubIndex: 0
     property bool isKeyboardTriggered: Quickshell.env("QS_KEYBOARD") === "1"
 
-    signal requestClose()
+    signal requestClose
 
     function getCalendarDays(offset) {
         var date = new Date();
@@ -262,7 +261,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Process {
@@ -276,7 +274,7 @@ Scope {
             onStreamFinished: {
                 // Ignore stale results from old processes
                 if (checkScreentimeProc.launchedOffset !== root.screentimeOffset)
-                    return ;
+                    return;
 
                 try {
                     var data = JSON.parse(this.text);
@@ -291,7 +289,6 @@ Scope {
                 }
             }
         }
-
     }
 
     Process {
@@ -306,7 +303,6 @@ Scope {
                 console.log("Daemon watchdog check completed");
             }
         }
-
     }
 
     FileView {
@@ -318,7 +314,7 @@ Scope {
             try {
                 var raw = pomoStateFile.text().trim();
                 if (raw === "")
-                    return ;
+                    return;
 
                 var parsed = JSON.parse(raw);
                 root.pomoActive = parsed.active ?? false;
@@ -378,7 +374,7 @@ Scope {
             try {
                 var raw = focusStateFile.text().trim();
                 if (raw === "")
-                    return ;
+                    return;
 
                 var parsed = JSON.parse(raw);
                 if (parsed.activeSection !== undefined)
@@ -386,7 +382,6 @@ Scope {
 
                 if (parsed.activeSubIndex !== undefined)
                     root.lastActiveSubIndex = parsed.activeSubIndex;
-
             } catch (e) {
                 console.log("Failed to parse focus state: " + e);
             }
@@ -437,7 +432,6 @@ Scope {
                         } else if (win.activeSubIndex === 1) {
                             if (root.screentimeOffset !== 0)
                                 root.screentimeOffset += 1;
-
                         } else if (win.activeSubIndex === 2) {
                             root.triggerRefresh();
                         }
@@ -559,7 +553,7 @@ Scope {
 
                 function closePopup() {
                     if (isClosing)
-                        return ;
+                        return;
 
                     isClosing = true;
                     exitAnim.start();
@@ -568,12 +562,10 @@ Scope {
                 onActiveSectionChanged: {
                     if (isLoaded)
                         root.saveFocusState(activeSection, activeSubIndex);
-
                 }
                 onActiveSubIndexChanged: {
                     if (isLoaded)
                         root.saveFocusState(activeSection, activeSubIndex);
-
                 }
                 screen: modelData
                 color: "transparent"
@@ -624,7 +616,6 @@ Scope {
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
-
                 }
 
                 // Slide-out + fade-out
@@ -650,7 +641,6 @@ Scope {
                         duration: 100
                         easing.type: Easing.InCubic
                     }
-
                 }
 
                 HyprlandFocusGrab {
@@ -710,7 +700,6 @@ Scope {
                         } else {
                             if (popupBg.hoveredButtonName !== "" && !tooltipHideTimer.running)
                                 tooltipHideTimer.start();
-
                         }
                     }
 
@@ -722,7 +711,7 @@ Scope {
                     radius: 0
                     antialiasing: false
                     focus: true
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;
@@ -822,7 +811,6 @@ Scope {
                                 for (var i = 0; i < hourlyArray.length; i++) {
                                     if (hourlyArray[i] > max)
                                         max = hourlyArray[i];
-
                                 }
                                 return max > 0 ? max : 3600;
                             }
@@ -879,7 +867,6 @@ Scope {
                                                 color: (win.activeSection === 0 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
                                                 radius: 0
                                             }
-
                                         }
 
                                         Text {
@@ -911,7 +898,6 @@ Scope {
                                                 onClicked: {
                                                     if (root.screentimeOffset !== 0)
                                                         root.screentimeOffset += 1;
-
                                                 }
                                             }
 
@@ -920,9 +906,7 @@ Scope {
                                                 color: (win.activeSection === 0 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
                                                 radius: 0
                                             }
-
                                         }
-
                                     }
 
                                     // Refresh (text-only)
@@ -950,11 +934,8 @@ Scope {
                                             color: (win.activeSection === 0 && win.activeSubIndex === 2) ? win.focusHighlightColor : "transparent"
                                             radius: 0
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             // Time Labels row (active & idle - one on left, one on right)
@@ -983,7 +964,6 @@ Scope {
                                         font.bold: true
                                         renderType: Text.NativeRendering
                                     }
-
                                 }
 
                                 Column {
@@ -1009,7 +989,6 @@ Scope {
                                         renderType: Text.NativeRendering
                                         anchors.right: parent.right
                                     }
-
                                 }
 
                                 Text {
@@ -1034,7 +1013,6 @@ Scope {
                                     opacity: 0.8
                                     renderType: Text.NativeRendering
                                 }
-
                             }
 
                             // Minimal Chart with faded horizontal grid lines and timeline labels
@@ -1086,7 +1064,6 @@ Scope {
                                             opacity: 0.4
                                             renderType: Text.NativeRendering
                                         }
-
                                     }
 
                                     // Middle Line
@@ -1111,7 +1088,6 @@ Scope {
                                             opacity: 0.4
                                             renderType: Text.NativeRendering
                                         }
-
                                     }
 
                                     // Baseline
@@ -1136,9 +1112,7 @@ Scope {
                                             opacity: 0.4
                                             renderType: Text.NativeRendering
                                         }
-
                                     }
-
                                 }
 
                                 Row {
@@ -1164,11 +1138,8 @@ Scope {
                                                 color: theme.accent
                                                 radius: 1
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 // Timeline Labels Row (perfectly aligned under each hour)
@@ -1221,13 +1192,9 @@ Scope {
                                                 opacity: 0.5
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             // Top Apps list
@@ -1242,7 +1209,7 @@ Scope {
 
                                 MouseArea {
                                     anchors.fill: parent
-                                    onWheel: (wheel) => {
+                                    onWheel: wheel => {
                                         flickableApps.contentY = Math.max(0, Math.min(flickableApps.contentHeight - flickableApps.height, flickableApps.contentY - wheel.angleDelta.y));
                                     }
                                 }
@@ -1295,7 +1262,6 @@ Scope {
                                                 onStatusChanged: {
                                                     if (status === Image.Error)
                                                         source = "image://icon/unknown";
-
                                                 }
                                             }
 
@@ -1325,15 +1291,10 @@ Scope {
                                                 font.pixelSize: 7
                                                 renderType: Text.NativeRendering
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
 
                         Rectangle {
@@ -1400,11 +1361,8 @@ Scope {
                                                     font.bold: true
                                                     renderType: Text.NativeRendering
                                                 }
-
                                             }
-
                                         }
-
                                     }
 
                                     // Days Grid
@@ -1434,13 +1392,9 @@ Scope {
                                                     font.bold: modelData.isToday
                                                     renderType: Text.NativeRendering
                                                 }
-
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 // Previous Month Button (Top Right)
@@ -1467,7 +1421,6 @@ Scope {
                                         color: (win.activeSection === 1 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
                                         radius: 0
                                     }
-
                                 }
 
                                 // Next Month Button (Bottom Right)
@@ -1495,9 +1448,7 @@ Scope {
                                         color: (win.activeSection === 1 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
                                         radius: 0
                                     }
-
                                 }
-
                             }
 
                             // Right side: Vertical Time
@@ -1546,7 +1497,6 @@ Scope {
                                         font.bold: false
                                         renderType: Text.NativeRendering
                                     }
-
                                 }
 
                                 Item {
@@ -1580,9 +1530,7 @@ Scope {
                                     renderType: Text.NativeRendering
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
-
                             }
-
                         }
 
                         // --- SECTION 1 & 2: NOTIFICATIONS HEADER & LIST ---
@@ -1635,9 +1583,7 @@ Scope {
                                         color: (win.activeSection === 2 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
                                         radius: 0
                                     }
-
                                 }
-
                             }
 
                             // Active Notifications list
@@ -1703,7 +1649,6 @@ Scope {
                                                         fillMode: Image.PreserveAspectFit
                                                         asynchronous: true
                                                     }
-
                                                 }
 
                                                 Column {
@@ -1743,7 +1688,6 @@ Scope {
                                                                 color: (win.activeSection === 2 && win.activeSubIndex === index + 1) ? win.focusHighlightColor : "transparent"
                                                                 radius: 0
                                                             }
-
                                                         }
 
                                                         Text {
@@ -1759,11 +1703,8 @@ Scope {
                                                             anchors.verticalCenter: parent.verticalCenter
                                                             renderType: Text.NativeRendering
                                                         }
-
                                                     }
-
                                                 }
-
                                             }
 
                                             // Description Box
@@ -1808,27 +1749,18 @@ Scope {
                                                         MouseArea {
                                                             anchors.fill: parent
                                                             onClicked: {
-                                                                var copy = Object.assign({
-                                                                }, root.expandedNotifIds);
+                                                                var copy = Object.assign({}, root.expandedNotifIds);
                                                                 copy[modelData.id] = !copy[modelData.id];
                                                                 root.expandedNotifIds = copy;
                                                             }
                                                         }
-
                                                     }
-
                                                 }
-
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
 
                         // --- SECTION 3: HISTORY ---
@@ -1872,7 +1804,6 @@ Scope {
                                         color: (win.activeSection === 3 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
                                         radius: 0
                                     }
-
                                 }
 
                                 MouseArea {
@@ -1910,9 +1841,7 @@ Scope {
                                         color: (win.activeSection === 3 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
                                         radius: 0
                                     }
-
                                 }
-
                             }
 
                             Item {
@@ -1972,7 +1901,6 @@ Scope {
                                                             fillMode: Image.PreserveAspectFit
                                                             asynchronous: true
                                                         }
-
                                                     }
 
                                                     Column {
@@ -1990,9 +1918,7 @@ Scope {
                                                             width: parent.width
                                                             renderType: Text.NativeRendering
                                                         }
-
                                                     }
-
                                                 }
 
                                                 // Description Box
@@ -2034,25 +1960,17 @@ Scope {
                                                             MouseArea {
                                                                 anchors.fill: parent
                                                                 onClicked: {
-                                                                    var copy = Object.assign({
-                                                                    }, root.expandedNotifIds);
+                                                                    var copy = Object.assign({}, root.expandedNotifIds);
                                                                     copy[modelData.id + "_hist"] = !copy[modelData.id + "_hist"];
                                                                     root.expandedNotifIds = copy;
                                                                 }
                                                             }
-
                                                         }
-
                                                     }
-
                                                 }
-
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 Behavior on height {
@@ -2060,11 +1978,8 @@ Scope {
                                         duration: 180
                                         easing.type: Easing.InOutQuad
                                     }
-
                                 }
-
                             }
-
                         }
 
                         Rectangle {
@@ -2117,7 +2032,6 @@ Scope {
                                         win.closePopup();
                                     }
                                 }
-
                             }
 
                             // Network Button
@@ -2160,7 +2074,6 @@ Scope {
                                         win.closePopup();
                                     }
                                 }
-
                             }
 
                             // Bluetooth Button
@@ -2203,7 +2116,6 @@ Scope {
                                         win.closePopup();
                                     }
                                 }
-
                             }
 
                             // Brightness Button
@@ -2246,7 +2158,6 @@ Scope {
                                         win.closePopup();
                                     }
                                 }
-
                             }
 
                             // Battery Button
@@ -2289,7 +2200,6 @@ Scope {
                                         win.closePopup();
                                     }
                                 }
-
                             }
 
                             // System Monitor Button
@@ -2332,9 +2242,7 @@ Scope {
                                         win.closePopup();
                                     }
                                 }
-
                             }
-
                         }
 
                         Row {
@@ -2380,7 +2288,6 @@ Scope {
                                         win.closePopup();
                                     }
                                 }
-
                             }
 
                             // Emoji Button
@@ -2423,7 +2330,6 @@ Scope {
                                         win.closePopup();
                                     }
                                 }
-
                             }
 
                             // Media Button
@@ -2466,7 +2372,6 @@ Scope {
                                         win.closePopup();
                                     }
                                 }
-
                             }
 
                             // Virtual Machine Manager
@@ -2509,7 +2414,6 @@ Scope {
                                         win.closePopup();
                                     }
                                 }
-
                             }
 
                             // Colorscheme Button
@@ -2552,7 +2456,6 @@ Scope {
                                         win.closePopup();
                                     }
                                 }
-
                             }
 
                             // Wallpaper Switcher Button
@@ -2595,9 +2498,7 @@ Scope {
                                         win.closePopup();
                                     }
                                 }
-
                             }
-
                         }
 
                         // Pomodoro Timer Control Column Wrapper
@@ -2673,7 +2574,6 @@ Scope {
                                             var val = parseInt(text);
                                             if (!isNaN(val) && val > 0)
                                                 root.pomoDuration = val * 60;
-
                                         }
                                     }
 
@@ -2685,7 +2585,6 @@ Scope {
                                         anchors.bottom: parent.bottom
                                         visible: !root.pomoActive
                                     }
-
                                 }
 
                                 // Presets Row
@@ -2718,11 +2617,8 @@ Scope {
                                                     root.pomoDuration = modelData * 60;
                                                 }
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 // Animated progress bar (only when active)
@@ -2745,11 +2641,8 @@ Scope {
                                                 duration: 250
                                                 easing.type: Easing.OutCubic
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 // Spacer to push actions to the right (only when inactive)
@@ -2805,7 +2698,6 @@ Scope {
                                                 root.savePomoState();
                                             }
                                         }
-
                                     }
 
                                     Text {
@@ -2833,15 +2725,10 @@ Scope {
                                                 root.savePomoState();
                                             }
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
-
                     }
 
                     // Custom Tooltip Overlay for bottom buttons
@@ -2876,17 +2763,10 @@ Scope {
                             NumberAnimation {
                                 duration: 100
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

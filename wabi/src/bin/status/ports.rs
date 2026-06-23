@@ -44,7 +44,10 @@ fn main() {
         let local_addr = parts[4];
         let peer = if parts.len() > 5 { parts[5] } else { "*:*" };
         let port = local_addr.split(':').next_back().unwrap_or("");
-        let bind_addr = local_addr.rsplit_once(':').map(|(a, _)| a).unwrap_or(local_addr);
+        let bind_addr = local_addr
+            .rsplit_once(':')
+            .map(|(a, _)| a)
+            .unwrap_or(local_addr);
 
         if let Some(users_idx) = line.find("users:(") {
             let users_part = &line[users_idx..];

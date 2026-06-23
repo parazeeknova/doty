@@ -6,16 +6,24 @@ let
 in
 {
 
-  flake.nixosModules.parazeeknovaSwappy = { config, pkgs, lib, ... }: {
-
-    home-manager.users.parazeeknova = { config, pkgs, ... }:
-    let
-      inherit (config.lib.file) mkOutOfStoreSymlink;
-    in
+  flake.nixosModules.parazeeknovaSwappy =
     {
-      xdg.configFile = {
-        "swappy/config".source = mkOutOfStoreSymlink "${swappyDir}/config";
-      };
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
+    {
+
+      home-manager.users.parazeeknova =
+        { config, pkgs, ... }:
+        let
+          inherit (config.lib.file) mkOutOfStoreSymlink;
+        in
+        {
+          xdg.configFile = {
+            "swappy/config".source = mkOutOfStoreSymlink "${swappyDir}/config";
+          };
+        };
     };
-  };
 }
