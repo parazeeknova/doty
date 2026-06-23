@@ -581,8 +581,8 @@ fn main() {
             "modules/features/shell/ghostty/themes/theme",
         ),
         (
-            ".config/yazi/theme.toml.template",
-            ".config/yazi/theme.toml",
+            "modules/features/shell/yazi/theme.toml.template",
+            "modules/features/shell/yazi/theme.toml",
         ),
         (
             "modules/home/programs/git/colors.template",
@@ -662,7 +662,7 @@ fn main() {
             "modules/features/wm/theming/.config/color-schemes/Kvantum.colors",
         ),
         ("modules/features/shell/starship/starship.toml.template", "modules/features/shell/starship/starship.toml"),
-        (".config/tmux/tmux.conf.template", ".config/tmux/tmux.conf"),
+        ("modules/features/shell/tmux/tmux.conf.template", "modules/features/shell/tmux/tmux.conf"),
         (
             "modules/features/shell/fastfetch/config.jsonc.template",
             "modules/features/shell/fastfetch/config.jsonc",
@@ -672,10 +672,10 @@ fn main() {
             ".config/satty/config.toml.template",
             ".config/satty/config.toml",
         ),
-        (".config/nvim/init.lua.template", ".config/nvim/init.lua"),
+        ("modules/features/shell/nvim/init.lua.template", "modules/features/shell/nvim/init.lua"),
         (
-            ".config/vim/colors/matugen.vim.template",
-            ".config/vim/colors/matugen.vim",
+            "modules/features/shell/vim/colors/matugen.vim.template",
+            "modules/features/shell/vim/colors/matugen.vim",
         ),
         (
             ".config/zathura/zathurarc.template",

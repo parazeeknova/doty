@@ -26,6 +26,9 @@
       self.nixosModules.parazeeknovaMatugen
       self.nixosModules.parazeeknovaLazygit
       self.nixosModules.parazeeknovaHyprlandPreviewSharePicker
+      self.nixosModules.parazeeknovaYazi
+      self.nixosModules.parazeeknovaVim
+      self.nixosModules.parazeeknovaNvim
     ];
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -81,7 +84,7 @@
       nvidiaSettings = true;
       powerManagement = {
         enable = true;
-        finegrained = true;
+        finegrained = false;
       };
       package = config.boot.kernelPackages.nvidiaPackages.stable;
       prime = {
