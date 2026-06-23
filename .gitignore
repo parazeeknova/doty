@@ -1,44 +1,48 @@
 .config/git/config
 .local/share/icons/hicolor/
 .config/fish/conf.d/mcp-env.fish
-.config/kilo/package-lock.json
-.config/opencode/package-lock.json
 node_modules
 fish_variables
-.config/tmux/.tmux/plugins/tpm
 .commandcode
 .gemini/antigravity-cli/
 .gemini/config
 .codex
 .vscode/extensions/
 __pycache__
-.config/systemd/system/getty@tty1.service.d/autologin.conf
-.config/quickshell/osd/state.json
-.config/quickshell/battery_popup/history.json
-.config/quickshell/battery_popup/settings.json
-.config/quickshell/media_popup/assets.db
-.config/quickshell/media_popup/flags.json
-.config/quickshell/media_popup/ping.txt
-.config/quickshell/media_popup/settings.json
-.config/quickshell/notif_popup/screentime.db
-.config/quickshell/notif_popup/screentime.db-shm
-.config/quickshell/notif_popup/screentime.db-wal
-.config/quickshell/media_popup/assets.db-wal
-.config/quickshell/media_popup/assets.db-shm
+
+# -- Quickshell state and DB files (now under modules/features/wm) --
+modules/features/wm/quickshell/osd/state.json
+modules/features/wm/quickshell/battery_popup/history.json
+modules/features/wm/quickshell/battery_popup/settings.json
+modules/features/wm/quickshell/media_popup/assets.db
+modules/features/wm/quickshell/media_popup/flags.json
+modules/features/wm/quickshell/media_popup/ping.txt
+modules/features/wm/quickshell/media_popup/settings.json
+modules/features/wm/quickshell/notif_popup/screentime.db
+modules/features/wm/quickshell/notif_popup/screentime.db-shm
+modules/features/wm/quickshell/notif_popup/screentime.db-wal
+modules/features/wm/quickshell/media_popup/assets.db-wal
+modules/features/wm/quickshell/media_popup/assets.db-shm
+modules/features/wm/quickshell/apps_popup/launcher.db
+modules/features/wm/quickshell/apps_popup/launcher.db-shm
+modules/features/wm/quickshell/apps_popup/launcher.db-wal
+
 .config/gtk-3.0/bookmarks
+
+# -- Zen Browser Profiles --
 .config/zen/Profile Groups/
 .config/zen/dbfqf3xb.Default (release)/
 .config/zen/bpw2kdav.Default Profile/
 .config/zen/installs.ini
-.copilot/logs/
 .config/zen/profiles.ini
+
+.copilot/logs/
 ref/
 vm_password
 vm_guest_credentials
-.config/quickshell/apps_popup/launcher.db
-.config/quickshell/apps_popup/launcher.db-shm
-.config/quickshell/apps_popup/launcher.db-wal
+thunar-pkg/
+
+# -- Global DB/runtime ignores --
 *.db
 *.db-shm
 *.db-wal
-thunar-pkg/
