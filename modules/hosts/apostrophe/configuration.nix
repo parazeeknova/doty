@@ -26,6 +26,7 @@
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
     boot.kernelPackages = pkgs.linuxPackages_latest;
+    boot.kernelParams = [ "nvidia-drm.modeset=1" ];
     boot.initrd.luks.devices."luks-fe7a0acb-6379-4025-aab3-05a299853e60".device = "/dev/disk/by-uuid/fe7a0acb-6379-4025-aab3-05a299853e60";
 
     # -- Networking --
@@ -68,7 +69,7 @@
     hardware.graphics.enable = true;
     hardware.nvidia = {
       modesetting.enable = true;
-      open = true;
+      open = false;
       nvidiaSettings = true;
       powerManagement = {
         enable = true;
@@ -87,6 +88,13 @@
 
     # -- Input --
     services.libinput.enable = true;
+
+    # -- Environment --
+    environment.sessionVariables = {
+      GBM_BACKEND = "nvidia-drm";
+      __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+      WLR_NO_HARDWARE_CURSORS = "1";
+    };
 
     # -- User --
     users.users."parazeeknova" = {
