@@ -102,9 +102,25 @@
       services.gnome.gnome-keyring.enable = true;
       services.blueman.enable = true;
       services.upower.enable = true;
+      services.tumbler.enable = true;
+      services.gvfs.enable = true;
 
       # -- Bluetooth --
       hardware.bluetooth.enable = true;
+
+      # -- File Manager & Thumbnails --
+      programs.thunar = {
+        enable = true;
+        plugins = with pkgs; [
+          thunar-volman
+          thunar-archive-plugin
+          thunar-vcs-plugin
+          thunar-shares-plugin
+          thunar-media-tags-plugin
+        ];
+      };
+
+      environment.pathsToLink = [ "/share/thumbnailers" ];
 
       # -- Graphics --
       services.xserver.videoDrivers = [ "nvidia" ];
@@ -153,6 +169,15 @@
 
       # -- Misc --
       nixpkgs.config.allowUnfree = true;
+      nixpkgs.overlays = [
+        (final: prev: {
+          thunar = prev.thunar.overrideAttrs (oldAttrs: {
+            postPatch = (oldAttrs.postPatch or "") + ''
+              sed -i 's/#define BORDER_RADIUS 8/#define BORDER_RADIUS 0/g' thunar/thunar-util.c
+            '';
+          });
+        })
+      ];
       programs.nix-ld.enable = true;
 
       # -- Fix hardcoded /usr/share/applications for non-Nix binaries --

@@ -25,17 +25,8 @@
         vivaldi
         vivaldi-ffmpeg-codecs
 
-        # -- Thunar Supermacy --
-        (thunar.overrideAttrs (oldAttrs: {
-          postPatch = (oldAttrs.postPatch or "") + ''
-            sed -i 's/#define BORDER_RADIUS 8/#define BORDER_RADIUS 0/g' thunar/thunar-util.c
-          '';
-        }))
-        thunar-volman
-        thunar-archive-plugin
-        thunar-vcs-plugin
-        thunar-shares-plugin
-        thunar-media-tags-plugin
+        # -- Thunar Helpers --
+        file-roller
 
         # -- Wayland / Hyprland --
         uwsm
@@ -74,6 +65,7 @@
         mpv
         pavucontrol
         pamixer
+        pulseaudio
 
         # -- System Tray / Applets --
         networkmanagerapplet
@@ -98,6 +90,7 @@
         # -- System Tools --
         udiskie
         lm_sensors
+        upower
 
         # -- Security --
         seahorse
