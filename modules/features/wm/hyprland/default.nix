@@ -39,7 +39,7 @@
         portalPackage = null;
         systemd.enable = false;
         configType = "lua";
-        plugins = [ pkgs.hyprlandPlugins.hypr-dynamic-cursors ];
+        plugins = [ ];
         extraConfig = ''
           -- Load main hyprland configuration modules
           local function safe_require(module)

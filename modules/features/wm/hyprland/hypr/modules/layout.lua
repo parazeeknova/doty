@@ -49,7 +49,7 @@ hl.config {
     plugin = {
         dynamic_cursors = {
             -- enables the plugin
-            enabled = true,
+            enabled = false,
             -- sets the cursor behaviour, supports these values:
             -- tilt    - tilt the cursor based on x-velocity
             -- rotate  - rotate the cursor based on movement direction
