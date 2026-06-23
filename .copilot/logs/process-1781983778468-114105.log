@@ -1,9 +1,0 @@
-2026-06-20T19:29:38.472Z [INFO] Starting CLI in server mode (stdio)
-2026-06-20T19:29:38.473Z [INFO] Starting CLI in stdio mode
-2026-06-20T19:29:38.477Z [INFO] CLI server ready (stdio mode)
-2026-06-20T19:29:38.478Z [INFO] Server started, waiting for requests
-2026-06-20T19:29:38.595Z [INFO] Shell completions: installed fish completions to /home/parazeeknova/.config/fish/completions/copilot.fish
-2026-06-20T19:32:44.910Z [INFO] Shutting down: stdin closed
-2026-06-20T19:32:44.911Z [INFO] Starting graceful shutdown of CLI server
-2026-06-20T19:32:44.911Z [INFO] Destroying 0 active sessions
-2026-06-20T19:32:44.912Z [INFO] CLI server stopped successfully (stdio mode)

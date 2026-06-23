@@ -68,11 +68,18 @@ in
 
         # -- Theme Switcher --
         "scripts/theme_switcher".source = mkOutOfStoreSymlink "${themeDir}/scripts/theme_switcher";
+
+        # -- Color Schemes (writable for theme_switcher) --
+        "color-schemes/Kvantum.colors.template".source = mkOutOfStoreSymlink "${themeDir}/.config/color-schemes/Kvantum.colors.template";
+
+        # -- Fontconfig --
+        "fontconfig/fonts.conf".source = mkOutOfStoreSymlink "${themeDir}/.config/fontconfig/fonts.conf";
       };
 
       home.sessionVariables = {
         QT_QPA_PLATFORMTHEME = "qt6ct";
         QT_STYLE_OVERRIDE = "kvantum";
+        NIXPKGS_QT6_QML_IMPORT_PATH = "${pkgs.qt6.qtmultimedia}/lib/qt-6/qml";
       };
 
       home.activation.copyPapirusIcons = lib.mkAfter ''
