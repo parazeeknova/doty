@@ -7,8 +7,8 @@
     };
 
     home-manager.users.parazeeknova.xdg.configFile = {
-      "bat/config".source = ./config;
-      "bat/themes".source = ./themes;
+      "bat/config".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/shell/bat/config";
+      "bat/themes".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/shell/bat/themes";
     };
   };
 }

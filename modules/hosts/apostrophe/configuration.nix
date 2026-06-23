@@ -17,6 +17,7 @@
       self.nixosModules.parazeeknovaBat
       self.nixosModules.parazeeknovaBtop
       self.nixosModules.parazeeknovaCava
+      self.nixosModules.parazeeknovaMako
     ];
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];

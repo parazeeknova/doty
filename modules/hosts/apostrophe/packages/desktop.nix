@@ -31,7 +31,6 @@
       swappy
       wl-clipboard
       cliphist
-      mako
       tesseract
       brightnessctl
       wlr-randr

@@ -7,8 +7,8 @@
     };
 
     home-manager.users.parazeeknova.xdg.configFile = {
-      "btop/btop.conf".source = ./btop.conf;
-      "btop/themes".source = ./themes;
+      "btop/btop.conf".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/shell/btop/btop.conf";
+      "btop/themes".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/shell/btop/themes";
     };
   };
 }

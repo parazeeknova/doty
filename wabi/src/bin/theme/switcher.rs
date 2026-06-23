@@ -561,12 +561,12 @@ fn main() {
     // Define all templates and their destinations
     let mappings = vec![
         (
-            ".config/hypr/modules/colors.lua.template",
-            ".config/hypr/modules/colors.lua",
+            "modules/features/wm/hyprland/hypr/modules/colors.lua.template",
+            "modules/features/wm/hyprland/hypr/modules/colors.lua",
         ),
         (
-            ".config/waybar/colors.css.template",
-            ".config/waybar/colors/matugen.css",
+            "modules/features/wm/waybar/colors.css.template",
+            "modules/features/wm/waybar/colors/matugen.css",
         ),
         (
             ".config/rofi/colors.rasi.template",
@@ -634,10 +634,10 @@ fn main() {
             ".config/qt6ct/style-colors.conf.template",
             ".config/qt6ct/style-colors.conf",
         ),
-        (".config/mako/config.template", ".config/mako/config"),
+        ("modules/features/wm/mako/config.template", "modules/features/wm/mako/config"),
         (
-            ".config/hypr/hyprlock.conf.template",
-            ".config/hypr/hyprlock.conf",
+            "modules/features/wm/hyprland/hypr/hyprlock.conf.template",
+            "modules/features/wm/hyprland/hypr/hyprlock.conf",
         ),
         (
             ".config/Kvantum/wabi/wabi.kvconfig.template",
@@ -647,7 +647,7 @@ fn main() {
             ".config/color-schemes/Kvantum.colors.template",
             ".local/share/color-schemes/Kvantum.colors",
         ),
-        (".config/starship.toml.template", ".config/starship.toml"),
+        ("modules/features/shell/starship/starship.toml.template", "modules/features/shell/starship/starship.toml"),
         (".config/tmux/tmux.conf.template", ".config/tmux/tmux.conf"),
         (
             ".config/fastfetch/config.jsonc.template",
