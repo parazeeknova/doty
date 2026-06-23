@@ -5,7 +5,7 @@ use std::thread;
 use std::time::Duration;
 
 fn kill_mpvpaper() {
-    let _ = Command::new("killall").args(["-9", "mpvpaper"]).status();
+    let _ = Command::new("pkill").args(["-9", "-f", "mpvpaper"]).status();
 }
 
 fn main() {

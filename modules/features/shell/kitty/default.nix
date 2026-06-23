@@ -1,7 +1,8 @@
 { self, inputs, ... }:
 
 let
-  configDir = ./.;
+  repo = "/home/parazeeknova/doty";
+  kittyDir = "${repo}/modules/features/shell/kitty";
 in
 {
 
@@ -45,10 +46,10 @@ in
       };
 
       xdg.configFile = {
-        "kitty/current-theme.conf".source = mkOutOfStoreSymlink "${configDir}/current-theme.conf";
-        "kitty/current-theme.conf.template".source = mkOutOfStoreSymlink "${configDir}/current-theme.conf.template";
-        "kitty/search.py".source = mkOutOfStoreSymlink "${configDir}/search.py";
-        "kitty/scroll_mark.py".source = mkOutOfStoreSymlink "${configDir}/scroll_mark.py";
+        "kitty/current-theme.conf".source = mkOutOfStoreSymlink "${kittyDir}/current-theme.conf";
+        "kitty/current-theme.conf.template".source = mkOutOfStoreSymlink "${kittyDir}/current-theme.conf.template";
+        "kitty/search.py".source = mkOutOfStoreSymlink "${kittyDir}/search.py";
+        "kitty/scroll_mark.py".source = mkOutOfStoreSymlink "${kittyDir}/scroll_mark.py";
       };
     };
   };

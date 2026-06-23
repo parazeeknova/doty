@@ -2,6 +2,8 @@
 
 let
   themeDir = ./.;
+  repo = "/home/parazeeknova/doty";
+  theming = "${repo}/modules/features/wm/theming";
 in
 {
 
@@ -41,39 +43,39 @@ in
 
       xdg.configFile = {
         # -- GTK Overrides (writable for theme_switcher) --
-        "gtk-3.0/gtk.css".source = mkOutOfStoreSymlink "${themeDir}/.config/gtk-3.0/gtk.css";
-        "gtk-3.0/colors.css".source = mkOutOfStoreSymlink "${themeDir}/.config/gtk-3.0/colors.css";
-        "gtk-3.0/colors.css.template".source = mkOutOfStoreSymlink "${themeDir}/.config/gtk-3.0/colors.css.template";
-        "gtk-3.0/settings.ini".source = mkOutOfStoreSymlink "${themeDir}/.config/gtk-3.0/settings.ini";
-        "gtk-4.0/colors.css".source = mkOutOfStoreSymlink "${themeDir}/.config/gtk-4.0/colors.css";
-        "gtk-4.0/colors.css.template".source = mkOutOfStoreSymlink "${themeDir}/.config/gtk-4.0/colors.css.template";
-        "gtk-4.0/settings.ini".source = mkOutOfStoreSymlink "${themeDir}/.config/gtk-4.0/settings.ini";
+        "gtk-3.0/gtk.css".source = mkOutOfStoreSymlink "${theming}/.config/gtk-3.0/gtk.css";
+        "gtk-3.0/colors.css".source = mkOutOfStoreSymlink "${theming}/.config/gtk-3.0/colors.css";
+        "gtk-3.0/colors.css.template".source = mkOutOfStoreSymlink "${theming}/.config/gtk-3.0/colors.css.template";
+        "gtk-3.0/settings.ini".source = mkOutOfStoreSymlink "${theming}/.config/gtk-3.0/settings.ini";
+        "gtk-4.0/colors.css".source = mkOutOfStoreSymlink "${theming}/.config/gtk-4.0/colors.css";
+        "gtk-4.0/colors.css.template".source = mkOutOfStoreSymlink "${theming}/.config/gtk-4.0/colors.css.template";
+        "gtk-4.0/settings.ini".source = mkOutOfStoreSymlink "${theming}/.config/gtk-4.0/settings.ini";
 
         # -- Kvantum (writable for theme_switcher) --
         "Kvantum/kvantum.kvconfig".text = ''
           [General]
           theme=wabi
         '';
-        "Kvantum/wabi".source = mkOutOfStoreSymlink "${themeDir}/.config/Kvantum/wabi";
+        "Kvantum/wabi".source = mkOutOfStoreSymlink "${theming}/.config/Kvantum/wabi";
 
         # -- Qt5ct (writable for theme_switcher) --
-        "qt5ct/qt5ct.conf".source = mkOutOfStoreSymlink "${themeDir}/.config/qt5ct/qt5ct.conf";
-        "qt5ct/style-colors.conf".source = mkOutOfStoreSymlink "${themeDir}/.config/qt5ct/style-colors.conf";
-        "qt5ct/style-colors.conf.template".source = mkOutOfStoreSymlink "${themeDir}/.config/qt5ct/style-colors.conf.template";
+        "qt5ct/qt5ct.conf".source = mkOutOfStoreSymlink "${theming}/.config/qt5ct/qt5ct.conf";
+        "qt5ct/style-colors.conf".source = mkOutOfStoreSymlink "${theming}/.config/qt5ct/style-colors.conf";
+        "qt5ct/style-colors.conf.template".source = mkOutOfStoreSymlink "${theming}/.config/qt5ct/style-colors.conf.template";
 
         # -- Qt6ct (writable for theme_switcher) --
-        "qt6ct/qt6ct.conf".source = mkOutOfStoreSymlink "${themeDir}/.config/qt6ct/qt6ct.conf";
-        "qt6ct/style-colors.conf".source = mkOutOfStoreSymlink "${themeDir}/.config/qt6ct/style-colors.conf";
-        "qt6ct/style-colors.conf.template".source = mkOutOfStoreSymlink "${themeDir}/.config/qt6ct/style-colors.conf.template";
+        "qt6ct/qt6ct.conf".source = mkOutOfStoreSymlink "${theming}/.config/qt6ct/qt6ct.conf";
+        "qt6ct/style-colors.conf".source = mkOutOfStoreSymlink "${theming}/.config/qt6ct/style-colors.conf";
+        "qt6ct/style-colors.conf.template".source = mkOutOfStoreSymlink "${theming}/.config/qt6ct/style-colors.conf.template";
 
         # -- Theme Switcher --
-        "scripts/theme_switcher".source = mkOutOfStoreSymlink "${themeDir}/scripts/theme_switcher";
+        "scripts/theme_switcher".source = mkOutOfStoreSymlink "${repo}/scripts/theme_switcher";
 
         # -- Color Schemes (writable for theme_switcher) --
-        "color-schemes/Kvantum.colors.template".source = mkOutOfStoreSymlink "${themeDir}/.config/color-schemes/Kvantum.colors.template";
+        "color-schemes/Kvantum.colors.template".source = mkOutOfStoreSymlink "${theming}/.config/color-schemes/Kvantum.colors.template";
 
         # -- Fontconfig --
-        "fontconfig/fonts.conf".source = mkOutOfStoreSymlink "${themeDir}/.config/fontconfig/fonts.conf";
+        "fontconfig/fonts.conf".source = mkOutOfStoreSymlink "${theming}/.config/fontconfig/fonts.conf";
       };
 
       home.sessionVariables = {

@@ -573,8 +573,8 @@ fn main() {
             ".config/rofi/colors.rasi",
         ),
         (
-            ".config/kitty/current-theme.conf.template",
-            ".config/kitty/current-theme.conf",
+            "modules/features/shell/kitty/current-theme.conf.template",
+            "modules/features/shell/kitty/current-theme.conf",
         ),
         (
             ".config/ghostty/theme.template",
@@ -615,24 +615,24 @@ fn main() {
             "modules/features/wm/quickshell/Theme.qml",
         ),
         (
-            ".config/gtk-3.0/colors.css.template",
-            ".themes/wabi/gtk-3.0/colors.css",
+            "modules/features/wm/theming/.config/gtk-3.0/colors.css.template",
+            "modules/features/wm/theming/.themes/wabi/gtk-3.0/colors.css",
         ),
         (
-            ".config/gtk-3.0/colors.css.template",
-            ".themes/wabi/gtk-3.20/colors.css",
+            "modules/features/wm/theming/.config/gtk-3.0/colors.css.template",
+            "modules/features/wm/theming/.themes/wabi/gtk-3.20/colors.css",
         ),
         (
-            ".config/gtk-4.0/colors.css.template",
-            ".themes/wabi/gtk-4.0/colors.css",
+            "modules/features/wm/theming/.config/gtk-4.0/colors.css.template",
+            "modules/features/wm/theming/.themes/wabi/gtk-4.0/colors.css",
         ),
         (
-            ".config/qt5ct/style-colors.conf.template",
-            ".config/qt5ct/style-colors.conf",
+            "modules/features/wm/theming/.config/qt5ct/style-colors.conf.template",
+            "modules/features/wm/theming/.config/qt5ct/style-colors.conf",
         ),
         (
-            ".config/qt6ct/style-colors.conf.template",
-            ".config/qt6ct/style-colors.conf",
+            "modules/features/wm/theming/.config/qt6ct/style-colors.conf.template",
+            "modules/features/wm/theming/.config/qt6ct/style-colors.conf",
         ),
         ("modules/features/wm/mako/config.template", "modules/features/wm/mako/config"),
         (
@@ -640,12 +640,12 @@ fn main() {
             "modules/features/wm/hyprland/hypr/hyprlock.conf",
         ),
         (
-            ".config/Kvantum/wabi/wabi.kvconfig.template",
-            ".config/Kvantum/wabi/wabi.kvconfig",
+            "modules/features/wm/theming/.config/Kvantum/wabi/wabi.kvconfig.template",
+            "modules/features/wm/theming/.config/Kvantum/wabi/wabi.kvconfig",
         ),
         (
-            ".config/color-schemes/Kvantum.colors.template",
-            ".local/share/color-schemes/Kvantum.colors",
+            "modules/features/wm/theming/.config/color-schemes/Kvantum.colors.template",
+            "modules/features/wm/theming/.config/color-schemes/Kvantum.colors",
         ),
         ("modules/features/shell/starship/starship.toml.template", "modules/features/shell/starship/starship.toml"),
         (".config/tmux/tmux.conf.template", ".config/tmux/tmux.conf"),
@@ -691,8 +691,8 @@ fn main() {
     }
 
     // Patch Kvantum SVG
-    let svg_tmpl = doty.join(".config/Kvantum/wabi/wabi.svg.template");
-    let svg_dest = doty.join(".config/Kvantum/wabi/wabi.svg");
+    let svg_tmpl = doty.join("modules/features/wm/theming/.config/Kvantum/wabi/wabi.svg.template");
+    let svg_dest = doty.join("modules/features/wm/theming/.config/Kvantum/wabi/wabi.svg");
     if svg_tmpl.exists() {
         patch_kvantum_svg(&svg_tmpl, &svg_dest, &vars);
         println!("Patched: Kvantum SVG");
@@ -1154,8 +1154,7 @@ fn apply_papirus_folders(accent_hex: &str) {
     // If accent is very desaturated, use grey
     if accent_s < 0.15 {
         println!("Setting Papirus folders to: grey (desaturated accent)");
-        let _ = Command::new("sudo")
-            .arg("papirus-folders")
+        let _ = Command::new("papirus-folders")
             .arg("-t")
             .arg("Papirus-Dark")
             .arg("-C")
@@ -1193,8 +1192,7 @@ fn apply_papirus_folders(accent_hex: &str) {
     }
 
     println!("Setting Papirus folders to: {}", best_color);
-    let _ = Command::new("sudo")
-        .arg("papirus-folders")
+    let _ = Command::new("papirus-folders")
         .arg("-t")
         .arg("Papirus-Dark")
         .arg("-C")
