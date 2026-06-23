@@ -105,6 +105,9 @@
       services.tumbler.enable = true;
       services.gvfs.enable = true;
       services.udisks2.enable = true;
+      services.asusd = {
+        enable = true;
+      };
 
       # -- Bluetooth --
       hardware.bluetooth.enable = true;
