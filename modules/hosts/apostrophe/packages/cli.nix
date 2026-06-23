@@ -73,6 +73,7 @@
         gzip
 
         # -- Dev Tools --
+        github-cli
         lazygit
         gitkraken
         difftastic
