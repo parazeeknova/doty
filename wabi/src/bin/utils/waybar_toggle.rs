@@ -28,14 +28,14 @@ fn main() {
     let _ = fs::write(TMPFS_STATE, new_state);
 
     let is_running = Command::new("pgrep")
-        .args(["-x", "waybar"])
+        .args(["-f", "bin/waybar"])
         .status()
         .map(|s| s.success())
         .unwrap_or(false);
 
     if is_running {
         let _ = Command::new("pkill")
-            .args(["-USR1", "-x", "waybar"])
+            .args(["-USR1", "-f", "bin/waybar"])
             .status();
     } else if new_state == "true" {
         let _ = Command::new("uwsm").args(["app", "--", "waybar"]).spawn();
