@@ -584,7 +584,10 @@ fn main() {
             ".config/yazi/theme.toml.template",
             ".config/yazi/theme.toml",
         ),
-        (".config/git/colors.template", ".config/git/colors"),
+        (
+            "modules/home/programs/git/colors.template",
+            "modules/home/programs/git/colors",
+        ),
         (
             ".config/lazygit/config.yml.template",
             ".config/lazygit/config.yml",

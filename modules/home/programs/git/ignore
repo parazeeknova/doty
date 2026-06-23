@@ -1,0 +1,12 @@
+**/.claude/settings.local.json
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+.env
+node_modules/
+.direnv/
+result
