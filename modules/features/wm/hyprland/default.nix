@@ -84,9 +84,6 @@
     };
 
     # -- Quickshell Config --
-    home-manager.users.parazeeknova.xdg.configFile."quickshell" = {
-      source = ../quickshell;
-      recursive = true;
-    };
+    home-manager.users.parazeeknova.xdg.configFile."quickshell".source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/quickshell";
   };
 }
