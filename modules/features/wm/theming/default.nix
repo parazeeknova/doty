@@ -13,6 +13,8 @@ in
     in
     {
 
+      home.packages = [ pkgs.papirus-folders ];
+
       gtk = {
         enable = true;
         theme = {
@@ -72,6 +74,14 @@ in
         QT_QPA_PLATFORMTHEME = "qt6ct";
         QT_STYLE_OVERRIDE = "kvantum";
       };
+
+      home.activation.copyPapirusIcons = lib.mkAfter ''
+        if [ ! -d "$HOME/.local/share/icons/Papirus-Dark" ]; then
+          mkdir -p "$HOME/.local/share/icons"
+          cp -r ${pkgs.papirus-icon-theme}/share/icons/Papirus-Dark "$HOME/.local/share/icons/Papirus-Dark"
+          chmod -R u+w "$HOME/.local/share/icons/Papirus-Dark"
+        fi
+      '';
     };
   };
 }

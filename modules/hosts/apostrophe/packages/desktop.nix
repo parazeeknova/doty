@@ -66,7 +66,6 @@
       libsForQt5.qt5ct
       libsForQt5.qtstyleplugin-kvantum
       papirus-icon-theme
-      papirus-folders
       capitaine-cursors
       nwg-look
 

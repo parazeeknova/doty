@@ -19,6 +19,7 @@
       self.nixosModules.parazeeknovaCava
       self.nixosModules.parazeeknovaMako
       self.nixosModules.parazeeknovaTheming
+      self.nixosModules.parazeeknovaKitty
     ];
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
