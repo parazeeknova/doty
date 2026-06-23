@@ -109,6 +109,13 @@
     # -- Misc --
     nixpkgs.config.allowUnfree = true;
     programs.nix-ld.enable = true;
+
+    # -- Fix hardcoded /usr/share/applications for non-Nix binaries --
+    systemd.tmpfiles.rules = [
+      "d /usr/share 0755 root root -"
+      "L /usr/share/applications - - - - /run/current-system/sw/share/applications"
+    ];
+
     system.stateVersion = "26.05";
   };
 }

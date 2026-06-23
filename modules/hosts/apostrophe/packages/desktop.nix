@@ -37,6 +37,7 @@
       hyprpaper
       pyprland
       quickshell
+      qt6.qtmultimedia
       grim
       slurp
       swappy
