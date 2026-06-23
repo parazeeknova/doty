@@ -34,38 +34,48 @@ fn get_target_visibility(mode: &str, dynamic_state: &str) -> (bool, bool, bool) 
     }
 }
 
+fn run_command_robust(cmd: &str, args: &[&str]) -> std::io::Result<std::process::ExitStatus> {
+    match Command::new(cmd).args(args).status() {
+        Ok(status) => Ok(status),
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+            let fallback_path = format!("/run/current-system/sw/bin/{}", cmd);
+            Command::new(fallback_path).args(args).status()
+        }
+        Err(err) => Err(err),
+    }
+}
+
+fn spawn_command_robust(cmd: &str, args: &[&str]) -> std::io::Result<std::process::Child> {
+    match Command::new(cmd).args(args).spawn() {
+        Ok(child) => Ok(child),
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+            let fallback_path = format!("/run/current-system/sw/bin/{}", cmd);
+            Command::new(fallback_path).args(args).spawn()
+        }
+        Err(err) => Err(err),
+    }
+}
+
 fn apply_state(github_visible: bool, workspace_visible: bool, waybar_visible: bool) {
-    let _ = Command::new("quickshell")
-        .args(["-c", "github_graph", "ipc", "call", "github_graph", if github_visible { "onShow" } else { "onHide" }])
-        .status();
-    let _ = Command::new("quickshell")
-        .args(["-c", "workspace_overview", "ipc", "call", "workspace_overview", if workspace_visible { "onShow" } else { "onHide" }])
-        .status();
+    let _ = run_command_robust("quickshell", &["-c", "github_graph", "ipc", "call", "github_graph", if github_visible { "onShow" } else { "onHide" }]);
+    let _ = run_command_robust("quickshell", &["-c", "workspace_overview", "ipc", "call", "workspace_overview", if workspace_visible { "onShow" } else { "onHide" }]);
 
     let pwaybar = persistent_waybar_state();
     if waybar_visible {
         let _ = fs::write(TMPFS_WAYBAR, "true");
         let _ = fs::write(pwaybar, "true");
-        let check_waybar = Command::new("pgrep")
-            .args(["-x", "waybar"])
-            .status();
+        let check_waybar = run_command_robust("pgrep", &["-x", "waybar"]);
         if let Ok(status) = check_waybar {
             if !status.success() {
-                let _ = Command::new("uwsm")
-                    .args(["app", "--", "waybar"])
-                    .spawn();
+                let _ = spawn_command_robust("uwsm", &["app", "--", "waybar"]);
             }
         } else {
-            let _ = Command::new("uwsm")
-                .args(["app", "--", "waybar"])
-                .spawn();
+            let _ = spawn_command_robust("uwsm", &["app", "--", "waybar"]);
         }
     } else {
         let _ = fs::write(TMPFS_WAYBAR, "false");
         let _ = fs::write(pwaybar, "false");
-        let _ = Command::new("pkill")
-            .args(["-x", "waybar"])
-            .status();
+        let _ = run_command_robust("pkill", &["-x", "waybar"]);
     }
 }
 
