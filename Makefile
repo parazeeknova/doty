@@ -4,4 +4,4 @@ sync:
 	$(MAKE) -C wabi install
 
 rebuild:
-	./rebuild.sh
+	rustc rebuild.rs -o rebuild && ./rebuild
