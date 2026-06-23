@@ -623,8 +623,16 @@ fn main() {
             "modules/features/wm/theming/.themes/wabi/gtk-3.20/colors.css",
         ),
         (
+            "modules/features/wm/theming/.config/gtk-3.0/colors.css.template",
+            "modules/features/wm/theming/.config/gtk-3.0/colors.css",
+        ),
+        (
             "modules/features/wm/theming/.config/gtk-4.0/colors.css.template",
             "modules/features/wm/theming/.themes/wabi/gtk-4.0/colors.css",
+        ),
+        (
+            "modules/features/wm/theming/.config/gtk-4.0/colors.css.template",
+            "modules/features/wm/theming/.config/gtk-4.0/colors.css",
         ),
         (
             "modules/features/wm/theming/.config/qt5ct/style-colors.conf.template",
