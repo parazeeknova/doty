@@ -56,6 +56,9 @@
       pulse.enable = true;
     };
 
+    # -- Services --
+    services.gnome.gnome-keyring.enable = true;
+
     # -- Graphics --
     services.xserver.videoDrivers = [ "nvidia" ];
     hardware.graphics.enable = true;
@@ -63,6 +66,10 @@
       modesetting.enable = true;
       open = true;
       nvidiaSettings = true;
+      powerManagement = {
+        enable = true;
+        finegrained = true;
+      };
       package = config.boot.kernelPackages.nvidiaPackages.stable;
       prime = {
         offload = {
