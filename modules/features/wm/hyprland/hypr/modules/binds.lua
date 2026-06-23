@@ -241,7 +241,7 @@ hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd(
     "quickshell -c battery_popup ipc call battery_popup close || env QS_KEYBOARD=1 quickshell --config battery_popup"))
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd(
     "quickshell -c notif_popup ipc call notif_popup close || env QS_KEYBOARD=1 quickshell --config notif_popup"))
-hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd("$HOME/doty/scripts/theme_switcher --toggle-glass"))
+hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd("$HOME/doty/modules/scripts/theme_switcher --toggle-glass"))
 hl.bind(mainMod .. " + O", hl.dsp.window.set_prop({
     prop = "opaque",
     value = "toggle",

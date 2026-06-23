@@ -44,8 +44,8 @@ Scope {
         root.currentWallpaperPath = path;
         root.currentThemeMode = "wallpaper";
         // set_wallpaper first (sets the visible wallpaper), then theme_switcher (matugen from the same file).
-        Quickshell.execDetached([root.homeDir + "/doty/scripts/set_wallpaper", path]);
-        Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "wallpaper", path]);
+        Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/set_wallpaper", path]);
+        Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/theme_switcher", "wallpaper", path]);
         Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" > " + root.homeDir + "/.cache/last_wallpaper", "sh", path]);
     }
 
@@ -182,7 +182,7 @@ Scope {
     Process {
         id: presetsLister
 
-        command: [root.homeDir + "/doty/scripts/presets_lister"]
+        command: [root.homeDir + "/doty/modules/scripts/presets_lister"]
         running: false
 
         stdout: StdioCollector {
@@ -364,7 +364,7 @@ Scope {
                                 } else {
                                     var p = root.presets[root.presetFocusIndex - 1];
                                     if (p) {
-                                        Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "preset", p.name]);
+                                        Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/theme_switcher", "preset", p.name]);
                                         win.closePopup();
                                     }
                                 }
@@ -759,7 +759,7 @@ Scope {
                                             root.lastFocus = "preset";
                                             root.currentThemeMode = "preset";
                                             root.currentThemeValue = modelData.name;
-                                            Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "preset", modelData.name]);
+                                            Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/theme_switcher", "preset", modelData.name]);
                                             win.closePopup();
                                         }
                                     }

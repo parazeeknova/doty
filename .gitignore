@@ -1,13 +1,4 @@
-.config/git/config
-.local/share/icons/hicolor/
-.config/fish/conf.d/mcp-env.fish
 node_modules
-fish_variables
-.commandcode
-.gemini/antigravity-cli/
-.gemini/config
-.codex
-.vscode/extensions/
 __pycache__
 
 # -- Quickshell state and DB files (now under modules/features/wm) --
@@ -31,12 +22,9 @@ modules/features/wm/quickshell/apps_popup/launcher.db-wal
 
 # -- Zen Browser Profiles --
 .config/zen/Profile Groups/
-.config/zen/dbfqf3xb.Default (release)/
-.config/zen/bpw2kdav.Default Profile/
 .config/zen/installs.ini
 .config/zen/profiles.ini
 
-.copilot/logs/
 ref/
 vm_password
 vm_guest_credentials

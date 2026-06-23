@@ -27,12 +27,24 @@
       nil
       
       # -- Apps --
+      opencode
       vscode
       ghostty
       kitty
 
-      # -- API Tools --
+      # -- Tools --
       httpie
+      tmux
+      tmuxPlugins.cpu
+      tmuxPlugins.yank
+      tmuxPlugins.battery
+      tmuxPlugins.continuum
+      tmuxPlugins.resurrect
+      tmuxPlugins.catppuccin
+      tmuxPlugins.sessionist
+      tmuxPlugins.tmux-floax
+      tmuxPlugins.online-status
+      tmuxPlugins.tmux-sessionx
     ];
   };
 }

@@ -60,8 +60,8 @@ Scope {
         // Set the actual wallpaper (set_wallpaper) AND the color scheme (theme_switcher) atomically.
         // If we only run one, the screen and the colors drift apart — the preview path
         // calls set_wallpaper on a 260ms debounce, which is skipped when the user confirms fast.
-        Quickshell.execDetached([root.homeDir + "/doty/scripts/set_wallpaper", path]);
-        Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "wallpaper", path]);
+        Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/set_wallpaper", path]);
+        Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/theme_switcher", "wallpaper", path]);
         Quickshell.execDetached(["mkdir", "-p", root.homeDir + "/.cache"]);
         Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" > " + root.homeDir + "/.cache/last_wallpaper", "sh", path]);
         Qt.quit();
@@ -146,7 +146,7 @@ Scope {
         running: false
         onTriggered: {
             if (root.activeWallpaper !== "")
-                Quickshell.execDetached([root.homeDir + "/doty/scripts/set_wallpaper", root.activeWallpaper]);
+                Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/set_wallpaper", root.activeWallpaper]);
 
         }
     }
@@ -171,8 +171,8 @@ Scope {
                     isClosing = true;
 
                     if (root.activeWallpaper !== "") {
-                        Quickshell.execDetached([root.homeDir + "/doty/scripts/set_wallpaper", root.activeWallpaper]);
-                        Quickshell.execDetached([root.homeDir + "/doty/scripts/theme_switcher", "wallpaper", root.activeWallpaper]);
+                        Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/set_wallpaper", root.activeWallpaper]);
+                        Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/theme_switcher", "wallpaper", root.activeWallpaper]);
                         Quickshell.execDetached(["mkdir", "-p", root.homeDir + "/.cache"]);
                         Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" > " + root.homeDir + "/.cache/last_wallpaper", "sh", root.activeWallpaper]);
                     }

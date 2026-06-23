@@ -72,7 +72,7 @@ in
         "qt6ct/style-colors.conf.template".source = mkOutOfStoreSymlink "${theming}/.config/qt6ct/style-colors.conf.template";
 
         # -- Theme Switcher --
-        "scripts/theme_switcher".source = mkOutOfStoreSymlink "${repo}/scripts/theme_switcher";
+        "scripts/theme_switcher".source = mkOutOfStoreSymlink "${repo}/modules/scripts/theme_switcher";
 
         # -- Color Schemes (writable for theme_switcher) --
         "color-schemes/Kvantum.colors.template".source = mkOutOfStoreSymlink "${theming}/.config/color-schemes/Kvantum.colors.template";

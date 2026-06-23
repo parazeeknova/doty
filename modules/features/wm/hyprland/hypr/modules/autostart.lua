@@ -10,7 +10,7 @@ local dotfiles = os.getenv("WABI_DOTFILES_DIR") or (os.getenv("HOME") .. "/doty"
 hl.on("hyprland.start", function()
     -- System Startups
     hl.exec_cmd("hyprctl plugin load " .. os.getenv("HOME") .. "/.config/hypr/plugins/hyprglass.so")
-    hl.exec_cmd(dotfiles .. "/scripts/theme_switcher restore")
+    hl.exec_cmd(dotfiles .. "/modules/scripts/theme_switcher restore")
     hl.exec_cmd("hyprctl setcursor capitaine-cursors 24")
     hl.exec_cmd("uwsm app -- udiskie --tray --notify")
     -- Restore glass state from persistent cache to tmpfs
@@ -32,7 +32,7 @@ hl.on("hyprland.start", function()
     -- Single entry point for waybar + quickshell widgets (avoids double-launch race)
     hl.exec_cmd("sh -c 'sleep 2 && ~/.config/waybar/scripts/toggle_widgets restore'")
     hl.exec_cmd("sh -c '" .. dotfiles ..
-                    "/scripts/set_wallpaper \"$(cat ~/.cache/last_wallpaper 2>/dev/null || echo \"" .. dotfiles .. "/modules/backgrounds/gray_lien.jpg\")\"'")
+                    "/modules/scripts/set_wallpaper \"$(cat ~/.cache/last_wallpaper 2>/dev/null || echo \"" .. dotfiles .. "/modules/backgrounds/gray_lien.jpg\")\"'")
     hl.exec_cmd("uwsm app -- hyprsunset")
     hl.exec_cmd("uwsm app -- hypridle")
     hl.exec_cmd("uwsm app -- pypr")

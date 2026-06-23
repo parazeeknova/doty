@@ -13,11 +13,17 @@
     ];
 
     environment.systemPackages = with pkgs; [
+      vesktop
+      telegram-desktop
       vivaldi
       vivaldi-ffmpeg-codecs
 
       # -- Thunar Supermacy --
-      thunar
+      (thunar.overrideAttrs (oldAttrs: {
+        postPatch = (oldAttrs.postPatch or "") + ''
+          sed -i 's/#define BORDER_RADIUS 8/#define BORDER_RADIUS 0/g' thunar/thunar-util.c
+        '';
+      }))
       thunar-volman
       thunar-archive-plugin
       thunar-vcs-plugin
@@ -26,6 +32,7 @@
 
       # -- Wayland / Hyprland --
       uwsm
+      pyprland
       awww
       mpvpaper
       waybar
@@ -51,6 +58,9 @@
       imagemagick
 
       # -- Audio / Media --
+      spotify
+      spicetify-cli
+      vlc
       playerctl
       imv
       mpv
