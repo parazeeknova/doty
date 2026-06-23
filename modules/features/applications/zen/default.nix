@@ -40,7 +40,7 @@ in
               '';
             })
             // {
-              override = _: patched-zen;
+              override = lib.setFunctionArgs (_: patched-zen) { cfg = true; };
             };
         in
         {
