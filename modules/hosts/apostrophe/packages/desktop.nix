@@ -37,7 +37,6 @@
       hyprpaper
       pyprland
       quickshell
-      qt6.qtmultimedia
       grim
       slurp
       swappy
@@ -66,6 +65,10 @@
       qt6Packages.qt6ct
       libsForQt5.qt5ct
       libsForQt5.qtstyleplugin-kvantum
+      qt5.qtmultimedia
+      qt6.qtmultimedia
+      qt6Packages.qtmultimedia
+      libsForQt5.qtmultimedia
       papirus-icon-theme
       capitaine-cursors
       nwg-look
