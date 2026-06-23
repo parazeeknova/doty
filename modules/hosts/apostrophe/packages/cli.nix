@@ -21,7 +21,6 @@
       # -- File Utils --
       ripgrep
       fd
-      bat
       eza
       fzf
       tree

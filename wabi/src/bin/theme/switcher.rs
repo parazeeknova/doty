@@ -590,8 +590,8 @@ fn main() {
             ".config/lazygit/config.yml",
         ),
         (
-            ".config/btop/themes/matugen.theme.template",
-            ".config/btop/themes/matugen.theme",
+            "modules/features/shell/btop/themes/matugen.theme.template",
+            "modules/features/shell/btop/themes/matugen.theme",
         ),
         (
             "modules/features/shell/bat/themes/matugen.tmTheme.template",
@@ -653,7 +653,7 @@ fn main() {
             ".config/fastfetch/config.jsonc.template",
             ".config/fastfetch/config.jsonc",
         ),
-        (".config/cava/config.template", ".config/cava/config"),
+        ("modules/features/shell/cava/config.template", "modules/features/shell/cava/config"),
         (
             ".config/satty/config.toml.template",
             ".config/satty/config.toml",

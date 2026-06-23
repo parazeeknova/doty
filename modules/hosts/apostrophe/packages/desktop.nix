@@ -43,7 +43,6 @@
       mpv
       pavucontrol
       pamixer
-      cava
 
       # -- System Tray / Applets --
       networkmanagerapplet
