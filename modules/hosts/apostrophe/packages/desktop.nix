@@ -2,6 +2,16 @@
 
   flake.nixosModules.apostrophePackagesDesktop = { config, pkgs, lib, ... }: {
 
+    fonts.packages = with pkgs; [
+      noto-fonts
+      noto-fonts-color-emoji
+      nerd-fonts.fira-code
+      nerd-fonts.noto
+      nerd-fonts.hack
+      nerd-fonts.iosevka
+      nerd-fonts.victor-mono
+    ];
+
     environment.systemPackages = with pkgs; [
       vivaldi
       vivaldi-ffmpeg-codecs
@@ -67,15 +77,6 @@
       # -- Security --
       seahorse
       gnome-keyring
-
-      # -- Fonts --
-      noto-fonts
-      noto-fonts-color-emoji
-      nerd-fonts.fira-code
-      nerd-fonts.noto
-      nerd-fonts.hack
-      nerd-fonts.iosevka
-      nerd-fonts.victor-mono
 
       # -- Documents --
       zathura
