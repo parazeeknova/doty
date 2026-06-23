@@ -49,6 +49,7 @@ in
         "gtk-3.0/settings.ini".source = mkOutOfStoreSymlink "${theming}/.config/gtk-3.0/settings.ini";
         "gtk-4.0/colors.css".source = mkOutOfStoreSymlink "${theming}/.config/gtk-4.0/colors.css";
         "gtk-4.0/colors.css.template".source = mkOutOfStoreSymlink "${theming}/.config/gtk-4.0/colors.css.template";
+        "gtk-4.0/gtk.css".source = mkOutOfStoreSymlink "${theming}/.config/gtk-4.0/gtk.css";
         "gtk-4.0/settings.ini".source = mkOutOfStoreSymlink "${theming}/.config/gtk-4.0/settings.ini";
 
         # -- Kvantum (writable for theme_switcher) --

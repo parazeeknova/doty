@@ -1,0 +1,10 @@
+@import url("colors.css");
+
+.background {
+  background-color: @bg_color;
+  color: @fg_color;
+}
+
+.background.csd, .background.solid-csd, .background.maximized {
+  background-color: @bg_color;
+}
