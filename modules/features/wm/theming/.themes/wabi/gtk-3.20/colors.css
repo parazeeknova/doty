@@ -1,0 +1,27 @@
+@define-color bg_color #16130b;
+@define-color fg_color #eae1d4;
+@define-color base_color #231f17;
+@define-color text_color #eae1d4;
+@define-color selected_bg_color #e4c36c;
+@define-color selected_fg_color #16130b;
+@define-color tooltip_bg_color #16130b;
+@define-color tooltip_fg_color #eae1d4;
+
+@define-color green #e4c36c;
+@define-color green_light #e4c36c;
+@define-color red #ffb4ab;
+@define-color red_light #ffb4ab;
+@define-color yellow #adcfad;
+@define-color yellow_light #adcfad;
+@define-color blue #d5c5a0;
+@define-color blue_light #d5c5a0;
+@define-color purple #d5c5a0;
+@define-color purple_light #d5c5a0;
+@define-color aqua #d5c5a0;
+@define-color aqua_light #d5c5a0;
+@define-color orange #adcfad;
+@define-color orange_light #adcfad;
+@define-color fg_dim #cfc5b4;
+@define-color bg_dim #231f17;
+@define-color bg_light #4c4639;
+@define-color border_color #4c4639;

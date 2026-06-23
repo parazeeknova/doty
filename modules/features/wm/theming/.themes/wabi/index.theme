@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=wabi
+Comment=No comment
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+Name=wabi
+GtkTheme=wabi
+IconTheme=Papirus-Dark
+MetacityTheme=wabi
