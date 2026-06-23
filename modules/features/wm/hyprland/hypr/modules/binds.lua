@@ -11,13 +11,13 @@ local osdctl = os.getenv("HOME") .. "/.config/quickshell/osd/bin/osdctl"
 ---  Applications ---
 ---------------------
 
-local function focus_or_launch(class, launch_cmd)
+local function focus_or_launch(class_pattern, launch_cmd)
     return function()
         local ws = hl.get_active_workspace()
         if ws then
             local windows = hl.get_workspace_windows(ws.id)
             for _, win in ipairs(windows) do
-                if win.class == class then
+                if win.class and win.class:lower():find(class_pattern:lower(), 1, true) then
                     hl.dispatch(hl.dsp.focus({
                         window = "address:" .. win.address
                     }))
@@ -38,10 +38,9 @@ hl.bind(mainMod .. " + SHIFT + E", hl.dsp
     .exec_cmd("env WAYLAND_DISPLAY=\"\" DBUS_SESSION_BUS_ADDRESS=\"\" uwsm app -- thunar --class=thunar.floating"))
 
 -- Browsers
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(
-    "hyprctl clients | grep -iq 'class: .*zen' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:^zen$\" })' || uwsm app -- zen-browser"))
-hl.bind(mainMod .. " + ALT + B", focus_or_launch("vivaldi-stable", "uwsm app -- vivaldi-stable"))
-hl.bind(mainMod .. " + CTRL + B", focus_or_launch("brave-origin-nightly", "uwsm app -- brave-origin-nightly"))
+hl.bind(mainMod .. " + B", focus_or_launch("zen", "uwsm app -- zen-twilight"))
+hl.bind(mainMod .. " + ALT + B", focus_or_launch("vivaldi", "uwsm app -- vivaldi"))
+hl.bind(mainMod .. " + CTRL + B", focus_or_launch("brave", "uwsm app -- brave-origin-nightly"))
 
 -- Editors
 hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd(
