@@ -65,6 +65,7 @@
         "nvidia-drm.modeset=1"
         "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
         "i915.enable_psr=0"
+        "mem_sleep_default=s2idle"
       ];
       boot.blacklistedKernelModules = [ "spd5118" ];
       boot.initrd.luks.devices."luks-fe7a0acb-6379-4025-aab3-05a299853e60".device =

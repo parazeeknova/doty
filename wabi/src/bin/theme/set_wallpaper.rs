@@ -71,7 +71,7 @@ fn main() {
 
         // Ensure awww-daemon is running
         let awww_running = Command::new("pgrep")
-            .args(["-x", "awww-daemon"])
+            .args(["-f", "awww-daemon"])
             .status()
             .map(|s| s.success())
             .unwrap_or(false);
@@ -80,7 +80,7 @@ fn main() {
             let _ = Command::new("uwsm")
                 .args(["app", "--", "awww-daemon"])
                 .spawn();
-            thread::sleep(Duration::from_millis(200));
+            thread::sleep(Duration::from_millis(500));
         }
 
         // Set wallpaper via awww img
