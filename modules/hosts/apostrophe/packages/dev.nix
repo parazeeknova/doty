@@ -10,6 +10,8 @@
     {
 
       environment.systemPackages = with pkgs; [
+        devenv
+
         # -- Languages --
         nodejs
         python3
@@ -38,6 +40,13 @@
         vscode
         ghostty
         kitty
+
+        # -- Dev Tools --
+        github-cli
+        lazygit
+        gitkraken
+        difftastic
+        diff-so-fancy
 
         # -- Tools --
         httpie

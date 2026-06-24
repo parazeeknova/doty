@@ -71,6 +71,16 @@
       boot.initrd.luks.devices."luks-fe7a0acb-6379-4025-aab3-05a299853e60".device =
         "/dev/disk/by-uuid/fe7a0acb-6379-4025-aab3-05a299853e60";
 
+      # -- Automatic updating --
+      system.autoUpgrade.enable = true;
+      system.autoUpgrade.dates = "weekly";
+
+      # -- Automatic cleanup --
+      nix.gc.automatic = true;
+      nix.gc.dates = "daily";
+      nix.gc.options = "--delete-older-than 14d";
+      nix.settings.auto-optimise-store = true;
+
       # -- Networking --
       networking.hostName = "apostrophe";
       networking.networkmanager.enable = true;

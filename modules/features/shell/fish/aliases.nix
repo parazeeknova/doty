@@ -83,6 +83,7 @@
           # -- Nix --
           doty = "cd ~/doty && make rebuild";
           dotes = "cd ~/doty && sudo nixos-rebuild test --flake .#apostrophe";
+          flake = "cd ~/doty && sudo nixos-rebuild switch --flake .#apostrophe";
           nfu = "nix flake update";
           nfc = "nix flake check";
           nfsh = "nix flake show";

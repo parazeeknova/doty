@@ -73,13 +73,6 @@
         gnutar
         gzip
 
-        # -- Dev Tools --
-        github-cli
-        lazygit
-        gitkraken
-        difftastic
-        diff-so-fancy
-
         # -- Media --
         ffmpeg
 
