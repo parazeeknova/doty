@@ -189,16 +189,18 @@ fn main() {
                         set_profile(&settings.ac_profile);
                         set_keyboard_brightness(settings.ac_kbd_brightness);
                         set_brightness(settings.ac_screen_brightness);
-                        notify(
-                            "Battery Automations",
-                            &format!(
-                                "AC connected. Profile: {}. Keyboard: {}%. Brightness: {}%",
-                                settings.ac_profile,
-                                settings.ac_kbd_brightness,
-                                settings.ac_screen_brightness
-                            ),
-                            "battery-charging",
-                        );
+                        if last_status.is_some() {
+                            notify(
+                                "Battery Automations",
+                                &format!(
+                                    "AC connected. Profile: {}. Keyboard: {}%. Brightness: {}%",
+                                    settings.ac_profile,
+                                    settings.ac_kbd_brightness,
+                                    settings.ac_screen_brightness
+                                ),
+                                "battery-charging",
+                            );
+                        }
                     }
                 } else {
                     if is_low {
@@ -206,34 +208,38 @@ fn main() {
                             set_profile(&settings.low_profile);
                             set_keyboard_brightness(settings.low_kbd_brightness);
                             set_brightness(settings.low_screen_brightness);
-                            notify(
-                                "Battery Automations",
-                                &format!(
-                                    "Low Battery ({}%). Profile: {}. Keyboard: {}%. Brightness: {}%",
-                                    capacity,
-                                    settings.low_profile,
-                                    settings.low_kbd_brightness,
-                                    settings.low_screen_brightness
-                                ),
-                                "battery-low",
-                            );
+                            if last_status.is_some() {
+                                notify(
+                                    "Battery Automations",
+                                    &format!(
+                                        "Low Battery ({}%). Profile: {}. Keyboard: {}%. Brightness: {}%",
+                                        capacity,
+                                        settings.low_profile,
+                                        settings.low_kbd_brightness,
+                                        settings.low_screen_brightness
+                                    ),
+                                    "battery-low",
+                                );
+                            }
                         }
                     } else {
                         if was_low || status_changed || last_status.is_none() {
                             set_profile(&settings.bat_profile);
                             set_keyboard_brightness(settings.bat_kbd_brightness);
                             set_brightness(settings.bat_screen_brightness);
-                            notify(
-                                "Battery Automations",
-                                &format!(
-                                    "On Battery ({}%). Profile: {}. Keyboard: {}%. Brightness: {}%",
-                                    capacity,
-                                    settings.bat_profile,
-                                    settings.bat_kbd_brightness,
-                                    settings.bat_screen_brightness
-                                ),
-                                "battery",
-                            );
+                            if last_status.is_some() {
+                                notify(
+                                    "Battery Automations",
+                                    &format!(
+                                        "On Battery ({}%). Profile: {}. Keyboard: {}%. Brightness: {}%",
+                                        capacity,
+                                        settings.bat_profile,
+                                        settings.bat_kbd_brightness,
+                                        settings.bat_screen_brightness
+                                    ),
+                                    "battery",
+                                );
+                            }
                         }
                     }
                 }
