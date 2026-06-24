@@ -6,9 +6,7 @@ use std::time::Duration;
 
 fn kill_mpvpaper() {
     // Send SIGTERM (default signal) to let mpvpaper clean up its Wayland/EGL surfaces
-    let _ = Command::new("pkill")
-        .args(["-f", "mpvpaper"])
-        .status();
+    let _ = Command::new("pkill").args(["-f", "mpvpaper"]).status();
 
     // Wait up to 200ms for it to exit gracefully
     for _ in 0..20 {
