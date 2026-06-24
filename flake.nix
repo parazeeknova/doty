@@ -12,10 +12,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    hyprland-scroll-overview = {
-      url = "github:yayuuu/hyprland-scroll-overview";
-    };
-
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs = {
