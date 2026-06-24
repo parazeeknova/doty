@@ -41,11 +41,14 @@
         # -- Apps --
         opencode
         vscode-fhs
+        vscode-insiders
         zed-editor-fhs
         ghostty
         kitty
         act
         actionlint
+        inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
+        inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-cli
 
         # -- Dev Tools --
         jupyter

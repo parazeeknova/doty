@@ -30,6 +30,10 @@
       url = "github:auguwu/vscode-insiders-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    antigravity-nix = {
+      url = "github:jacopone/antigravity-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";

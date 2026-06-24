@@ -29,7 +29,6 @@
         telegram-desktop
         localsend
         phototonic
-        vscode-insiders
 
         # -- Multi Media --
         freetube
