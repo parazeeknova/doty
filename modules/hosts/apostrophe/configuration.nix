@@ -57,6 +57,7 @@
       # -- Boot --
       boot.loader.systemd-boot.enable = false;
       boot.loader.limine.enable = true;
+      boot.loader.limine.efiInstallAsRemovable = true;
       boot.loader.limine.secureBoot.enable = true;
       boot.loader.efi.canTouchEfiVariables = true;
       boot.kernelPackages = pkgs.linuxPackages_latest;
