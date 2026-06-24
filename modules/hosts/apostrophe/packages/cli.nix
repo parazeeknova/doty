@@ -20,7 +20,7 @@
         pokemon-colorscripts
         tty-clock
         fortune
-        
+
         # -- Editors --
         vim
         neovim
