@@ -42,8 +42,9 @@ in
                 sed -i "s|$src|$out|g" $out/bin/zen-twilight
 
                 # Recreate the symlink for .zen-twilight-wrapped so XPCOM loads libraries from lib/
+                ZEN_BIN_DIR=$(basename $out/lib/zen-bin-*)
                 rm -f $out/bin/.zen-twilight-wrapped
-                ln -s ../lib/zen-bin-*/zen $out/bin/.zen-twilight-wrapped
+                ln -s ../lib/$ZEN_BIN_DIR/zen $out/bin/.zen-twilight-wrapped
               '';
             })
             // {
