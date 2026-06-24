@@ -55,6 +55,7 @@
         killall
         pciutils
         usbutils
+        sbctl
 
         # -- Network Utils --
         nmap
