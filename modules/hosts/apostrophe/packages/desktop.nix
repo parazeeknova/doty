@@ -28,6 +28,7 @@
         vesktop
         telegram-desktop
         localsend
+        phototonic
 
         # -- Multi Media --
         freetube

@@ -44,6 +44,8 @@
         zed-editor-fhs
         ghostty
         kitty
+        act
+        actionlint
 
         # -- Dev Tools --
         jupyter

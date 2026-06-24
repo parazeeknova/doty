@@ -16,7 +16,12 @@
 
       environment.systemPackages = with pkgs; [
         ollama-cuda
+        oterm
         lmstudio
+        pi-coding-agent
+        claude-code
+        codex
+        github-copilot-cli
       ];
     };
 }

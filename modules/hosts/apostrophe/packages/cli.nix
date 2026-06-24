@@ -67,6 +67,7 @@
         pciutils
         usbutils
         sbctl
+        impala
 
         # -- Network Utils --
         nmap
