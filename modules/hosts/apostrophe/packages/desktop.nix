@@ -20,13 +20,26 @@
       ];
 
       environment.systemPackages = with pkgs; [
-        vesktop
-        telegram-desktop
+        # -- Web --
+        chromium
         vivaldi
         vivaldi-ffmpeg-codecs
+        helium.packages.${system}.default
+        vesktop
+        telegram-desktop
+        localsend
 
-        # -- Thunar Helpers --
-        file-roller
+        # -- Multi Media --
+        audacity
+        blender
+        vlc
+        krita
+        gimp
+        inkscape
+        obs-studio
+        kdePackages.kdenlive
+        ncmpcpp
+        
 
         # -- Wayland / Hyprland --
         uwsm
@@ -54,12 +67,12 @@
         matugen
         libnotify
         imagemagick
+        file-roller
 
         # -- Audio / Media --
         spotify
         spicetify-cli
         wf-recorder
-        vlc
         playerctl
         imv
         mpv
@@ -98,6 +111,7 @@
 
         # -- Documents --
         zathura
+        zathuraPkgs.zathura_pdf_mupdf
         evince
       ];
     };

@@ -19,6 +19,7 @@
         go
 
         # -- Package Managers --
+        uv
         pnpm
         bun
         yarn
@@ -37,7 +38,8 @@
 
         # -- Apps --
         opencode
-        vscode
+        vscode-fhs
+        zed-editor-fhs
         ghostty
         kitty
 
