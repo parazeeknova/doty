@@ -105,7 +105,8 @@
         shellAbbrs = {
           # -- Git --
           g = "git";
-          ga = "git add .";
+          ga = "git add --all";
+          gcl = "git clone";
           gco = "git checkout";
           gd = "git diff --output-indicator-new=' ' --output-indicator-old=' '";
           gl = "git log --oneline --graph --decorate -20";

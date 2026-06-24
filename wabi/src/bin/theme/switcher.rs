@@ -951,20 +951,35 @@ fn main() {
     }
 
     if applied {
-        if Command::new("pgrep")
-            .arg("-x")
-            .arg("spotify")
-            .status()
-            .map(|s| s.success())
-            .unwrap_or(false)
-        {
-            let _ = Command::new("pkill").arg("-x").arg("spotify").status();
-            std::thread::sleep(std::time::Duration::from_millis(500));
-            let _ = Command::new("uwsm")
-                .args(["app", "--", "spotify"])
-                .stdout(std::process::Stdio::null())
-                .stderr(std::process::Stdio::null())
-                .spawn();
+        let reload_script = doty.join("modules/scripts/spotify-reload");
+        let reload_status = if reload_script.exists() {
+            Command::new(&reload_script).status().map(|s| s.success()).unwrap_or(false)
+        } else {
+            false
+        };
+
+        if !reload_status {
+            let is_running = Command::new("pgrep")
+                .args(["-x", "spotify"])
+                .status()
+                .map(|s| s.success())
+                .unwrap_or(false)
+                || Command::new("pgrep")
+                .args(["-x", ".spotify-wrappe"])
+                .status()
+                .map(|s| s.success())
+                .unwrap_or(false);
+
+            if is_running {
+                let _ = Command::new("pkill").args(["-x", "spotify"]).status();
+                let _ = Command::new("pkill").args(["-x", ".spotify-wrappe"]).status();
+                std::thread::sleep(std::time::Duration::from_millis(500));
+                let _ = Command::new("uwsm")
+                    .args(["app", "--", "spotify"])
+                    .stdout(std::process::Stdio::null())
+                    .stderr(std::process::Stdio::null())
+                    .spawn();
+            }
         }
     }
 

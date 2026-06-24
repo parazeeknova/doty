@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+import socket
+import urllib.request
+import json
+import urllib.parse
+import sys
+
+try:
+    # Query DevTools targets
+    req = urllib.request.urlopen("http://127.0.0.1:9222/json", timeout=2)
+    targets = json.loads(req.read().decode())
+    
+    # Find the main Spotify page
+    page = next(t for t in targets if t.get("type") == "page")
+    ws_url = page["webSocketDebuggerUrl"]
+    
+    # Parse WebSocket URL
+    parsed = urllib.parse.urlparse(ws_url)
+    host, port = parsed.netloc.split(":")
+    port = int(port)
+    path = parsed.path
+    
+    # Connect raw socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(2)
+    s.connect((host, port))
+    
+    # Send WebSocket upgrade handshake
+    handshake = (
+        f"GET {path} HTTP/1.1\r\n"
+        f"Host: {host}:{port}\r\n"
+        "Upgrade: websocket\r\n"
+        "Connection: Upgrade\r\n"
+        "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+        "Sec-WebSocket-Version: 13\r\n\r\n"
+    )
+    s.sendall(handshake.encode())
+    
+    # Read upgrade response headers
+    response = b""
+    while b"\r\n\r\n" not in response:
+        chunk = s.recv(1024)
+        if not chunk:
+            break
+        response += chunk
+        
+    # Send Page.reload frame (Text frame, masked with all-zeros to avoid modifying payload)
+    msg = json.dumps({"id": 1, "method": "Page.reload"}).encode()
+    frame = bytes([0x81, 0x80 | len(msg), 0x00, 0x00, 0x00, 0x00]) + msg
+    s.sendall(frame)
+    
+    s.close()
+    print("Spotify reloaded successfully.")
+    sys.exit(0)
+except Exception as e:
+    print(f"Failed to reload Spotify: {e}", file=sys.stderr)
+    sys.exit(1)
