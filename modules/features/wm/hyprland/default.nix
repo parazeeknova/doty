@@ -48,6 +48,7 @@
           configType = "lua";
           plugins = [
             pkgs.hyprlandPlugins.hypr-dynamic-cursors
+            inputs.hyprland-scroll-overview.packages.${pkgs.system}.default
           ];
           extraConfig = ''
             -- Load main hyprland configuration modules
