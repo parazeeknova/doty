@@ -15,14 +15,45 @@
           dockerCompat = true;
           defaultNetwork.settings.dns_enabled = true;
         };
+
+        # Enable libvirtd daemon for QEMU virtual machines
+        libvirtd = {
+          enable = true;
+          qemu = {
+            package = pkgs.qemu_kvm;
+            runAsRoot = true;
+            swtpm.enable = true;
+          };
+        };
+
+        # Enable VirtualBox host service
+        virtualbox.host = {
+          enable = true;
+          enableExtensionPack = true;
+        };
+
+        # Enable VMware Workstation host service
+        vmware.host.enable = true;
       };
 
-      # Web Cockpit for managing services on web browser
+      programs.virt-manager.enable = true;
+
       services.cockpit = {
         enable = true;
       };
 
-      # Useful other packages
+      # Automatically define and autostart the default NAT network
+      systemd.services.libvirtd-default-network = {
+        description = "Autostart libvirt default network";
+        after = [ "libvirtd.service" ];
+        requires = [ "libvirtd.service" ];
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.bash}/bin/bash -c '${pkgs.libvirt}/bin/virsh net-start default || true; ${pkgs.libvirt}/bin/virsh net-autostart default || true'";
+        };
+      };
+
       environment.systemPackages = with pkgs; [
         dive
         podman-tui
@@ -30,6 +61,8 @@
         podman-compose
         cockpit
         cockpit-podman
+        cockpit-machines
+        libvirt
       ];
     };
 }

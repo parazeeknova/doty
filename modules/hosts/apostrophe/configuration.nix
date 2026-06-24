@@ -185,6 +185,8 @@
           "networkmanager"
           "wheel"
           "podman"
+          "libvirtd"
+          "vboxusers"
         ];
         shell = pkgs.fish;
       };
