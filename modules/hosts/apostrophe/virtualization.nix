@@ -17,12 +17,19 @@
         };
       };
 
+      # Web Cockpit for managing services on web browser
+      services.cockpit = {
+        enable = true;
+      };
+
       # Useful other packages
       environment.systemPackages = with pkgs; [
         dive
         podman-tui
         podman-desktop
         podman-compose
+        cockpit
+        cockpit-podman
       ];
     };
 }

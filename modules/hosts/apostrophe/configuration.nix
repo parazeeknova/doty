@@ -122,6 +122,7 @@
       };
 
       # -- Services --
+      services.cloudflare-warp.enable = true;
       services.gnome.gnome-keyring.enable = true;
       services.blueman.enable = true;
       services.upower.enable = true;
@@ -183,6 +184,7 @@
         extraGroups = [
           "networkmanager"
           "wheel"
+          "podman"
         ];
         shell = pkgs.fish;
       };

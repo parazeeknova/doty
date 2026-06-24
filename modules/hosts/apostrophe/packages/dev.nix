@@ -50,6 +50,14 @@
         difftastic
         diff-so-fancy
 
+        # -- Kubernetes --
+        kubectl
+        kubernetes-helm
+        k9s
+        kubectx
+        stern
+        minikube
+
         # -- Tools --
         httpie
         tmux
