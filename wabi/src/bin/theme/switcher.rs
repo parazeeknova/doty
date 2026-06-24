@@ -941,11 +941,22 @@ fn main() {
 
     // Apply Spicetify theme if installed
     let mut applied = false;
-    if Command::new("spicetify").args(["apply", "-n"]).status().map(|s| s.success()).unwrap_or(false) {
+    if Command::new("spicetify")
+        .args(["apply", "-n"])
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false)
+    {
         applied = true;
     } else {
         let spicetify_path = home_dir().join(".spicetify").join("spicetify");
-        if spicetify_path.exists() && Command::new(&spicetify_path).args(["apply", "-n"]).status().map(|s| s.success()).unwrap_or(false) {
+        if spicetify_path.exists()
+            && Command::new(&spicetify_path)
+                .args(["apply", "-n"])
+                .status()
+                .map(|s| s.success())
+                .unwrap_or(false)
+        {
             applied = true;
         }
     }
@@ -953,7 +964,10 @@ fn main() {
     if applied {
         let reload_script = doty.join("modules/scripts/spotify-reload");
         let reload_status = if reload_script.exists() {
-            Command::new(&reload_script).status().map(|s| s.success()).unwrap_or(false)
+            Command::new(&reload_script)
+                .status()
+                .map(|s| s.success())
+                .unwrap_or(false)
         } else {
             false
         };
@@ -965,14 +979,16 @@ fn main() {
                 .map(|s| s.success())
                 .unwrap_or(false)
                 || Command::new("pgrep")
-                .args(["-x", ".spotify-wrappe"])
-                .status()
-                .map(|s| s.success())
-                .unwrap_or(false);
+                    .args(["-x", ".spotify-wrappe"])
+                    .status()
+                    .map(|s| s.success())
+                    .unwrap_or(false);
 
             if is_running {
                 let _ = Command::new("pkill").args(["-x", "spotify"]).status();
-                let _ = Command::new("pkill").args(["-x", ".spotify-wrappe"]).status();
+                let _ = Command::new("pkill")
+                    .args(["-x", ".spotify-wrappe"])
+                    .status();
                 std::thread::sleep(std::time::Duration::from_millis(500));
                 let _ = Command::new("uwsm")
                     .args(["app", "--", "spotify"])

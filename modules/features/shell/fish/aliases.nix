@@ -107,10 +107,12 @@
           g = "git";
           ga = "git add --all";
           gcl = "git clone";
+          gpl = "git pull";
           gco = "git checkout";
           gd = "git diff --output-indicator-new=' ' --output-indicator-old=' '";
           gl = "git log --oneline --graph --decorate -20";
           gp = "git push";
+          gpf = "git push --force";
           gs = "git status --short";
           gap = "git add --patch";
           gcns = "git -c commit.gpgsign=false commit -m";
