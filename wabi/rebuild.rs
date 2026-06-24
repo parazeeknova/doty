@@ -236,6 +236,13 @@ fn main() {
         }
     }
 
+    // Step 4.5: Nix Garbage Collection
+    print_step("Collecting Nix garbage (deleting profiles older than 14 days)...");
+    match run_cmd("sudo", &["nix-collect-garbage", "--delete-older-than", "14d"]) {
+        Ok(status) if status.success() => print_success("Garbage collection completed successfully."),
+        _ => print_warning("Garbage collection failed or skipped."),
+    }
+
     // Step 5: System Rebuild
     print_step("Rebuilding NixOS configuration...");
     match run_cmd("sudo", &["nixos-rebuild", "switch", "--flake", ".#apostrophe"]) {
