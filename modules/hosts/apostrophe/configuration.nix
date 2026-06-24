@@ -179,7 +179,7 @@
       nixpkgs.config.allowUnfree = true;
       nixpkgs.overlays = [
         (final: prev: {
-          thunar = prev.thunar.overrideAttrs (oldAttrs: {
+          thunar-unwrapped = prev.thunar-unwrapped.overrideAttrs (oldAttrs: {
             postPatch = (oldAttrs.postPatch or "") + ''
               sed -i 's/#define BORDER_RADIUS 8/#define BORDER_RADIUS 0/g' thunar/thunar-util.c
             '';
