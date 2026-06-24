@@ -60,9 +60,9 @@
       boot.kernelPackages = pkgs.linuxPackages_latest;
       boot.kernelParams = [
         "nvidia-drm.modeset=1"
-        "mem_sleep_default=deep"
         "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
       ];
+      boot.blacklistedKernelModules = [ "spd5118" ];
       boot.initrd.luks.devices."luks-fe7a0acb-6379-4025-aab3-05a299853e60".device =
         "/dev/disk/by-uuid/fe7a0acb-6379-4025-aab3-05a299853e60";
 
