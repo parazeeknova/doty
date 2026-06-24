@@ -10,6 +10,7 @@
     {
       imports = [
         self.nixosModules.apostropheHardware
+        self.nixosModules.apostropheDisko
         inputs.home-manager.nixosModules.home-manager
         self.nixosModules.apostrophePackages
         self.nixosModules.parazeeknovaHome
