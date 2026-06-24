@@ -93,6 +93,12 @@
       # -- Auto Login (TTY) --
       services.getty.autologinUser = "parazeeknova";
 
+      # -- Security --
+      security.sudo.extraConfig = ''
+        Defaults pwfeedback
+        Defaults insults
+      '';
+
       # -- Audio --
       services.pulseaudio.enable = false;
       security.rtkit.enable = true;
