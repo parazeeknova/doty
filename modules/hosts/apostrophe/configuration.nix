@@ -11,6 +11,7 @@
       imports = [
         self.nixosModules.apostropheHardware
         self.nixosModules.apostropheDisko
+        self.nixosModules.apostropheVirtualization
         inputs.home-manager.nixosModules.home-manager
         self.nixosModules.apostrophePackages
         self.nixosModules.parazeeknovaHome

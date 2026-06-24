@@ -24,7 +24,7 @@
         chromium
         vivaldi
         vivaldi-ffmpeg-codecs
-        helium.packages.${system}.default
+        inputs.helium.packages.${pkgs.stdenv.hostPlatform.system}.default
         vesktop
         telegram-desktop
         localsend
@@ -39,7 +39,6 @@
         obs-studio
         kdePackages.kdenlive
         ncmpcpp
-        
 
         # -- Wayland / Hyprland --
         uwsm
