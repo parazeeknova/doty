@@ -5,6 +5,25 @@ use std::thread;
 use std::time::Duration;
 
 fn kill_mpvpaper() {
+    // Send SIGTERM (default signal) to let mpvpaper clean up its Wayland/EGL surfaces
+    let _ = Command::new("pkill")
+        .args(["-f", "mpvpaper"])
+        .status();
+
+    // Wait up to 200ms for it to exit gracefully
+    for _ in 0..20 {
+        let running = Command::new("pgrep")
+            .args(["-f", "mpvpaper"])
+            .status()
+            .map(|s| s.success())
+            .unwrap_or(false);
+        if !running {
+            return;
+        }
+        thread::sleep(Duration::from_millis(10));
+    }
+
+    // Fallback to SIGKILL only if it refused to exit
     let _ = Command::new("pkill")
         .args(["-9", "-f", "mpvpaper"])
         .status();
