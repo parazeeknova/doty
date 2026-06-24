@@ -143,6 +143,7 @@
           finegrained = false;
         };
         package = config.boot.kernelPackages.nvidiaPackages.stable;
+        dynamicBoost.enable = true;
       };
 
       # -- Input --
