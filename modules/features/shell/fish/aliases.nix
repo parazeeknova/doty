@@ -112,6 +112,7 @@
           gs = "git status --short";
           gap = "git add --patch";
           gcns = "git -c commit.gpgsign=false commit -m";
+          gam = "git commit --amend --no-edit";
 
           # -- TMUX --
           t = "tmux";
