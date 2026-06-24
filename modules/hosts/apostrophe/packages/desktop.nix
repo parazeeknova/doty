@@ -30,6 +30,7 @@
         localsend
 
         # -- Multi Media --
+        freetube
         audacity
         blender
         vlc

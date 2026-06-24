@@ -49,6 +49,7 @@
         self.nixosModules.parazeeknovaVesktop
         self.nixosModules.parazeeknovaScripts
         self.nixosModules.parazeeknovaZen
+        self.nixosModules.parazeeknovaGaming
       ];
 
       nix.settings.experimental-features = [
@@ -186,7 +187,6 @@
           "wheel"
           "podman"
           "libvirtd"
-          "vboxusers"
         ];
         shell = pkgs.fish;
       };

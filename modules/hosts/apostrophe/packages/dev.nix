@@ -16,6 +16,7 @@
         nodejs
         python3
         rustup
+        openjdk
         go
 
         # -- Package Managers --

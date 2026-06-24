@@ -10,6 +10,17 @@
     {
 
       environment.systemPackages = with pkgs; [
+        # -- JFR --
+        proton-vpn
+        ani-cli
+        mangal
+        suwayomi-server
+        cmatrix
+        cowsay
+        pokemon-colorscripts
+        tty-clock
+        fortune
+        
         # -- Editors --
         vim
         neovim

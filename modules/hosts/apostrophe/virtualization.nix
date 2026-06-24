@@ -26,12 +26,6 @@
           };
         };
 
-        # Enable VirtualBox host service
-        virtualbox.host = {
-          enable = true;
-          enableExtensionPack = true;
-        };
-
         # Enable VMware Workstation host service
         vmware.host.enable = true;
       };
