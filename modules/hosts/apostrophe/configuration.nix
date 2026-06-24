@@ -204,6 +204,7 @@
       # -- Misc --
       nixpkgs.config.allowUnfree = true;
       nixpkgs.overlays = [
+        inputs.vscode-insiders.overlays.default
         (final: prev: {
           thunar-unwrapped = prev.thunar-unwrapped.overrideAttrs (oldAttrs: {
             postPatch = (oldAttrs.postPatch or "") + ''

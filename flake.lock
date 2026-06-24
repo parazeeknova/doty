@@ -313,6 +313,7 @@
         "nix-doom-emacs-unstraightened": "nix-doom-emacs-unstraightened",
         "nixpkgs": "nixpkgs",
         "nvf": "nvf",
+        "vscode-insiders": "vscode-insiders",
         "zen-browser": "zen-browser"
       }
     },
@@ -376,6 +377,26 @@
       "original": {
         "owner": "numtide",
         "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "vscode-insiders": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782292643,
+        "narHash": "sha256-HZkusbReWjmiBTte1u4L7hwFhVosrkFXJReRxaq9TFI=",
+        "owner": "auguwu",
+        "repo": "vscode-insiders-nix",
+        "rev": "cb694447c8d82c07420838417766a694db1f14a3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "auguwu",
+        "repo": "vscode-insiders-nix",
         "type": "github"
       }
     },

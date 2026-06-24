@@ -53,6 +53,7 @@
         podman-tui
         podman-desktop
         podman-compose
+        distrobox
         cockpit
         cockpit-podman
         cockpit-machines
