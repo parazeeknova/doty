@@ -34,9 +34,7 @@ in
 
                 # Copy fx-autoconfig program files
                 LIB_DIR=$(echo $out/lib/zen-bin-*)
-                mkdir -p $LIB_DIR/defaults/pref
-                cp ${./fx-autoconfig/program/config.js} $LIB_DIR/config.js
-                cp ${./fx-autoconfig/program/defaults/pref/config-prefs.js} $LIB_DIR/defaults/pref/config-prefs.js
+                cp ${./fx-autoconfig/program/config.js} $LIB_DIR/mozilla.cfg
 
                 # Patch the wrapper script to run from our patched out path instead of the unpatched src path
                 sed -i "s|$src|$out|g" $out/bin/zen-twilight

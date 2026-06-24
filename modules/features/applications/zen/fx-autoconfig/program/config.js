@@ -1,6 +1,6 @@
 // skip 1st line
 try {
-
+  let { classes: Cc, interfaces: Ci, manager: Cm } = Components;
   let UChrm = Cc['@mozilla.org/file/directory_service;1'].getService(Ci.nsIProperties).get('UChrm', Ci.nsIFile);
   let ProfD = Cc['@mozilla.org/file/directory_service;1'].getService(Ci.nsIProperties).get('ProfD', Ci.nsIFile);
 
@@ -21,7 +21,7 @@ try {
 
   if (cmanifest.exists()) {
     try {
-      Components.manager.QueryInterface(Ci.nsIComponentRegistrar).autoRegister(cmanifest);
+      Cm.QueryInterface(Ci.nsIComponentRegistrar).autoRegister(cmanifest);
     } catch (e) {
       logErr("autoRegister failed: " + e + "\nmanifest=" + cmanifest.path + "\n");
     }
@@ -35,6 +35,7 @@ try {
   }
 } catch (ex) {
   try {
+    let { classes: Cc, interfaces: Ci } = Components;
     let ProfD = Cc['@mozilla.org/file/directory_service;1'].getService(Ci.nsIProperties).get('ProfD', Ci.nsIFile);
     let f = ProfD.clone();
     f.append('zen-autoconfig-err.log');
