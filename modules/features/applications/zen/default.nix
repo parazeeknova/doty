@@ -37,6 +37,13 @@ in
                 mkdir -p $LIB_DIR/defaults/pref
                 cp ${./fx-autoconfig/program/config.js} $LIB_DIR/config.js
                 cp ${./fx-autoconfig/program/defaults/pref/config-prefs.js} $LIB_DIR/defaults/pref/config-prefs.js
+
+                # Patch the wrapper script to run from our patched out path instead of the unpatched src path
+                sed -i "s|$src|$out|g" $out/bin/zen-twilight
+
+                # Recreate the symlink for .zen-twilight-wrapped so XPCOM loads libraries from lib/
+                rm -f $out/bin/.zen-twilight-wrapped
+                ln -s ../lib/zen-bin-*/zen $out/bin/.zen-twilight-wrapped
               '';
             })
             // {
