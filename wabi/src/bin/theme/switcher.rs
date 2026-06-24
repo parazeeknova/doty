@@ -940,9 +940,17 @@ fn main() {
     let _ = Command::new("killall").arg("-USR1").arg("kitty").status();
 
     // Apply Spicetify theme if installed
-    let spicetify_path = home_dir().join(".spicetify").join("spicetify");
-    if spicetify_path.exists() {
-        let _ = Command::new(&spicetify_path).args(["apply", "-n"]).status();
+    let mut applied = false;
+    if Command::new("spicetify").args(["apply", "-n"]).status().map(|s| s.success()).unwrap_or(false) {
+        applied = true;
+    } else {
+        let spicetify_path = home_dir().join(".spicetify").join("spicetify");
+        if spicetify_path.exists() && Command::new(&spicetify_path).args(["apply", "-n"]).status().map(|s| s.success()).unwrap_or(false) {
+            applied = true;
+        }
+    }
+
+    if applied {
         if Command::new("pgrep")
             .arg("-x")
             .arg("spotify")
