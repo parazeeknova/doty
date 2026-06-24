@@ -36,6 +36,7 @@
         nix-output-monitor
         nixfmt
         nil
+        cachix
 
         # -- Apps --
         opencode
@@ -45,6 +46,7 @@
         kitty
 
         # -- Dev Tools --
+        jupyter
         github-cli
         lazygit
         gitkraken

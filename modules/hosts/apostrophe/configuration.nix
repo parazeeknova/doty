@@ -50,6 +50,7 @@
         self.nixosModules.parazeeknovaScripts
         self.nixosModules.parazeeknovaZen
         self.nixosModules.parazeeknovaGaming
+        self.nixosModules.parazeeknovaLlms
       ];
 
       nix.settings.experimental-features = [
