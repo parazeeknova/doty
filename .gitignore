@@ -30,8 +30,15 @@ ref/
 vm_password
 vm_guest_credentials
 thunar-pkg/
+build/
 
 # -- Global DB/runtime ignores --
 *.db
 *.db-shm
 *.db-wal
+
+# -- Voxtype models --
+.voxtype/
+voxtype_models/
+*.bin
+*.onnx

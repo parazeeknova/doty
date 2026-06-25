@@ -51,6 +51,7 @@
         self.nixosModules.parazeeknovaZen
         self.nixosModules.parazeeknovaGaming
         self.nixosModules.parazeeknovaLlms
+        self.nixosModules.parazeeknovaVoxtype
         self.nixosModules.parazeeknovaEmacs
       ];
 

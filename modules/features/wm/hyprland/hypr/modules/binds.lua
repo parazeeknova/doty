@@ -202,6 +202,14 @@ hl.bind("XF86Launch3", hl.dsp
     .exec_cmd("quickshell -c profile_popup ipc call profile_popup close || quickshell --config profile_popup"))
 
 ---------------------
+---    Voxtype    ---
+---------------------
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("voxtype record start"))
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("voxtype record stop"), {
+    release = true
+})
+
+---------------------
 ---   Pyprland    ---
 ---------------------
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("pypr layout_center toggle"))

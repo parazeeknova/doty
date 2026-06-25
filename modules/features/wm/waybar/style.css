@@ -67,3 +67,24 @@ window#waybar {
   color: @blue;
   padding: 4px 0;
 }
+
+#custom-voxtype {
+  font-size: 0.9rem;
+  padding: 4px 0;
+}
+
+#custom-voxtype.recording {
+  color: @red;
+}
+
+#custom-voxtype.transcribing {
+  color: @yellow;
+}
+
+#custom-voxtype.idle {
+  color: @fg1;
+}
+
+#custom-voxtype.stopped {
+  color: @grey1;
+}
