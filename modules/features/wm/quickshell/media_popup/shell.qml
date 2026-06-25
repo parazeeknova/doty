@@ -98,8 +98,16 @@ Scope {
 
     function recorderExtraArgs() {
         var parts = [];
-        if (flagsAdapter.recordCodec)
-            parts.push("-c " + flagsAdapter.recordCodec);
+        if (flagsAdapter.recordCodec) {
+            var codecMap = {
+                "h264": "libx264",
+                "hevc": "libx265",
+                "vp9": "libvpx-vp9",
+                "av1": "libsvtav1"
+            };
+            var mappedCodec = codecMap[flagsAdapter.recordCodec] || flagsAdapter.recordCodec;
+            parts.push("-c " + mappedCodec);
+        }
 
         var fps = effectiveFps();
         if (fps)
