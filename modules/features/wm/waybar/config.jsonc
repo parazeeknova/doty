@@ -16,7 +16,7 @@
     "clock",
   ],
   "custom/voxtype": {
-    "exec": "voxtype status --follow --format json --icon-theme nerd-font",
+    "exec": "~/.config/waybar/scripts/get_voxtype_status",
     "return-type": "json",
     "format": "{}",
     "tooltip": true

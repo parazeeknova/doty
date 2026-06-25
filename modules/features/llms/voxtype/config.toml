@@ -18,7 +18,7 @@ volume = 0.7
 [whisper]
 model = "small"
 language = "auto"
-translate = false
+translate = true
 on_demand_loading = true
 
 [output]

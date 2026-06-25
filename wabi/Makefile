@@ -44,6 +44,7 @@ install: build
 	cp target/release/toggle_widgets ../modules/features/wm/waybar/scripts/toggle_widgets
 	cp target/release/wabi_power ../modules/features/wm/waybar/scripts/wabi_power
 	cp target/release/tray_count ../modules/features/wm/waybar/scripts/tray_count
+	cp target/release/get_voxtype_status ../modules/features/wm/waybar/scripts/get_voxtype_status
 	cp target/release/wallpaper_thumb_watcher ../modules/features/wm/quickshell/wallpaper_switcher/wallpaper_thumb_watcher
 	cp target/release/get_github_graph ../modules/features/wm/quickshell/github_graph/get_github_graph
 	cp target/release/theme_switcher ../modules/scripts/theme_switcher
