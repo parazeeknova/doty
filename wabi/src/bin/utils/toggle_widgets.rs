@@ -21,7 +21,11 @@ fn persistent_waybar_state() -> String {
     format!("{}/.cache/quickshell/waybar_state", home)
 }
 
-fn get_target_visibility(mode: &str, dynamic_state: &str, waybar_enabled: &str) -> (bool, bool, bool) {
+fn get_target_visibility(
+    mode: &str,
+    dynamic_state: &str,
+    waybar_enabled: &str,
+) -> (bool, bool, bool) {
     if dynamic_state == "false" {
         return (false, false, false);
     }
@@ -77,7 +81,9 @@ fn is_waybar_running() -> bool {
 
 fn kill_waybar() {
     let _ = Command::new("pkill").args(["-x", "waybar"]).status();
-    let _ = Command::new("pkill").args(["-x", ".waybar-wrapped"]).status();
+    let _ = Command::new("pkill")
+        .args(["-x", ".waybar-wrapped"])
+        .status();
 }
 
 fn apply_state(github_visible: bool, workspace_visible: bool, waybar_visible: bool) {
