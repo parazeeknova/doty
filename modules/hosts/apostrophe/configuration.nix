@@ -203,6 +203,7 @@
 
       # -- Misc --
       nixpkgs.config.allowUnfree = true;
+      nixpkgs.config.cudaSupport = true;
       nixpkgs.overlays = [
         inputs.vscode-insiders.overlays.default
         (final: prev: {
