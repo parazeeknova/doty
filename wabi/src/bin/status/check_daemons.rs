@@ -19,7 +19,9 @@ fn is_process_running(process_name: &str) -> bool {
 
 fn is_caffeine_active() -> bool {
     let home = env::var("HOME").unwrap_or_default();
-    std::path::Path::new(&home).join(".cache/caffeine-active").exists()
+    std::path::Path::new(&home)
+        .join(".cache/caffeine-active")
+        .exists()
 }
 
 fn start_daemon(daemon: &Daemon) -> bool {

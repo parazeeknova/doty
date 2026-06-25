@@ -34,9 +34,7 @@ fn main() {
             let pidof_hypridle = Command::new("pidof").arg("hypridle").output();
             let hypridle_running = pidof_hypridle.map(|o| o.status.success()).unwrap_or(false);
             if !hypridle_running {
-                let _ = Command::new("uwsm")
-                    .args(["app", "--", "hypridle"])
-                    .spawn();
+                let _ = Command::new("uwsm").args(["app", "--", "hypridle"]).spawn();
             }
         }
         return;
@@ -54,9 +52,7 @@ fn main() {
         let pidof_hypridle = Command::new("pidof").arg("hypridle").output();
         let hypridle_running = pidof_hypridle.map(|o| o.status.success()).unwrap_or(false);
         if !hypridle_running {
-            let _ = Command::new("uwsm")
-                .args(["app", "--", "hypridle"])
-                .spawn();
+            let _ = Command::new("uwsm").args(["app", "--", "hypridle"]).spawn();
         }
 
         let osdctl = format!("{}/.config/quickshell/osd/bin/osdctl", home);
