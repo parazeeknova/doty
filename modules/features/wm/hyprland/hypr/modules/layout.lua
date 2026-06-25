@@ -27,21 +27,21 @@ end
 
 -- This requires https://github.com/yayuuu/hyprland-scroll-overview plugin
 -- hyprpm add https://github.com/yayuuu/hyprland-scroll-overview.git && hyprpm update
-if hl.plugin and hl.plugin.scrolloverview then
-    hl.plugin.scrolloverview.configure({
-        gesture_distance = 300,
-        scale = 0.6,
-        workspace_gap = 10,
-        wallpaper = 0,
-        blur = true,
-        shadow = {
-            enabled = false,
-            range = 6,
-            render_power = 2,
-            color = tonumber(colors.shadow_color) or 0xee1a1a1a
-        }
-    })
-end
+-- if hl.plugin and hl.plugin.scrolloverview then
+--     hl.plugin.scrolloverview.configure({
+--         gesture_distance = 300,
+--         scale = 0.6,
+--         workspace_gap = 10,
+--         wallpaper = 0,
+--         blur = true,
+--         shadow = {
+--             enabled = false,
+--             range = 6,
+--             render_power = 2,
+--             color = tonumber(colors.shadow_color) or 0xee1a1a1a
+--         }
+--     })
+-- end
 
 -- This requires https://github.com/VirtCode/hypr-dynamic-cursors plugin
 -- hyprpm add https://github.com/virtcode/hypr-dynamic-cursors && hyprpm enable dynamic-cursors

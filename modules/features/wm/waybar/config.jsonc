@@ -16,7 +16,7 @@
     "clock",
   ],
   "custom/voxtype": {
-    "exec": "voxtype status --follow --format json",
+    "exec": "voxtype status --follow --format json --icon-theme nerd-font",
     "return-type": "json",
     "format": "{}",
     "tooltip": true

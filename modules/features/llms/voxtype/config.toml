@@ -9,10 +9,15 @@ device = "default"
 sample_rate = 16000
 max_duration_secs = 60
 
-# Local Whisper model configuration
+[audio.feedback]
+enabled = true
+theme = "default"
+volume = 0.7
+
+# Local Whisper model
 [whisper]
-model = "base.en"
-language = "en"
+model = "small"
+language = "auto"
 translate = false
 on_demand_loading = true
 

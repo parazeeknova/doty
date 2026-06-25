@@ -132,11 +132,12 @@ hl.bind(mainMod .. " + mouse_up", hl.dsp.window.cycle_next({
     prev = true
 }))
 
-hl.bind("ALT + TAB", function()
-    if hl.plugin and hl.plugin.scrolloverview then
-        hl.plugin.scrolloverview.overview("toggle")
-    end
-end)
+-- This is disabled because the scroll overview plugin is not supported on nix atm
+-- hl.bind("ALT + TAB", function()
+--     if hl.plugin and hl.plugin.scrolloverview then
+--         hl.plugin.scrolloverview.overview("toggle")
+--     end
+-- end)
 
 hl.bind(mainMod .. " + backslash", function()
     local ws = hl.get_active_workspace()
