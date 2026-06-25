@@ -117,6 +117,9 @@ fn wifi_autoconnect_by_ssid() -> HashMap<String, bool> {
 }
 
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    let force_rescan = args.contains(&"--rescan".to_string());
+
     let wifi_enabled = is_wifi_enabled();
     let airplane_mode = is_airplane_mode();
     let wifi_device = active_wifi_device();
@@ -141,6 +144,7 @@ fn main() {
 
     // 1. Get scanned wifi networks
     if wifi_enabled {
+        let rescan_val = if force_rescan { "yes" } else { "no" };
         let wifi_list_out = run_cmd(
             "nmcli",
             &[
@@ -151,7 +155,7 @@ fn main() {
                 "wifi",
                 "list",
                 "--rescan",
-                "auto",
+                rescan_val,
             ],
         )
         .unwrap_or_default();
@@ -324,6 +328,9 @@ fn main() {
         networks,
         vpns,
     };
+
+    let cache_path = wabi::cache_dir().join("network_status.json");
+    let _ = wabi::atomic_write_json(&cache_path, &status);
 
     print_json(&status);
 }

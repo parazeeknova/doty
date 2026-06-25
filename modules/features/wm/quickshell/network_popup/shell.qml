@@ -134,6 +134,40 @@ Scope {
         }
     }
 
+    FileView {
+        id: statusCacheFile
+
+        path: "file://" + root.homeDir + "/.cache/quickshell/network_status.json"
+        watchChanges: true
+        onLoaded: {
+            try {
+                var raw = statusCacheFile.text().trim();
+                if (raw === "")
+                    return;
+
+                var data = JSON.parse(raw);
+                root.wifiEnabled = data.wifi_enabled ?? false;
+                root.airplaneMode = data.airplane_mode ?? false;
+                root.connected = data.connected ?? false;
+                root.activeSsid = data.active_ssid || "";
+                root.activeSignal = data.active_signal || 0;
+                root.warpConnected = data.warp_connected || false;
+                root.details = data.details || ({
+                        "ip_address": "",
+                        "gateway": "",
+                        "dns": "",
+                        "subnet": "",
+                        "security": "",
+                        "bssid": ""
+                    });
+                root.networks = data.networks || [];
+                root.vpns = data.vpns || [];
+            } catch (e) {
+                console.log("Failed to parse network status cache: " + e);
+            }
+        }
+    }
+
     Theme {
         id: theme
     }
@@ -180,6 +214,14 @@ Scope {
         }
     }
 
+    // Process to run the Rust helper with --rescan to force a hardware scan
+    Process {
+        id: updateStatusProc
+
+        command: [root.homeDir + "/.config/quickshell/network_popup/get_network_status", "--rescan"]
+        running: false
+    }
+
     // Timer to wait and refresh status after actions
     Timer {
         id: refreshTimer
@@ -204,6 +246,20 @@ Scope {
         onTriggered: {
             if (!checkStatusProc.running)
                 checkStatusProc.running = true;
+        }
+    }
+
+    // Timer to trigger full hardware rescans in the background (every 15 seconds)
+    Timer {
+        id: backgroundScanTimer
+
+        interval: 15000
+        repeat: true
+        running: true
+        triggeredOnStart: true
+        onTriggered: {
+            if (!updateStatusProc.running)
+                updateStatusProc.running = true;
         }
     }
 

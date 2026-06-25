@@ -819,7 +819,7 @@ Scope {
                             spacing: 6
 
                             // Header switcher + Refresh
-                            Row {
+                            Item {
                                 width: parent.width
                                 height: 16
 
@@ -831,6 +831,7 @@ Scope {
                                     font.bold: true
                                     opacity: 0.6
                                     renderType: Text.NativeRendering
+                                    anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
 
@@ -1017,6 +1018,7 @@ Scope {
 
                             // Minimal Chart with faded horizontal grid lines and timeline labels
                             Item {
+                                id: chartContainer
                                 property int maxVal: screentimeCol.getMaxHourly(root.screentimeHourly)
 
                                 function formatLabel(seconds) {
@@ -1057,7 +1059,7 @@ Scope {
                                         Text {
                                             anchors.right: parent.right
                                             anchors.verticalCenter: parent.verticalCenter
-                                            text: parent.parent.parent.formatLabel(parent.parent.parent.maxVal)
+                                            text: chartContainer.formatLabel(chartContainer.maxVal)
                                             color: theme.fg_light
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 6
@@ -1081,7 +1083,7 @@ Scope {
                                         Text {
                                             anchors.right: parent.right
                                             anchors.verticalCenter: parent.verticalCenter
-                                            text: parent.parent.parent.formatLabel(parent.parent.parent.maxVal / 2)
+                                            text: chartContainer.formatLabel(chartContainer.maxVal / 2)
                                             color: theme.fg_light
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 6
@@ -1134,7 +1136,7 @@ Scope {
                                             Rectangle {
                                                 anchors.bottom: parent.bottom
                                                 width: parent.width
-                                                height: Math.max(1, (modelData / Math.max(1, parent.parent.parent.maxVal)) * 32)
+                                                height: modelData > 0 ? Math.max(1, (modelData / Math.max(1, chartContainer.maxVal)) * 32) : 0
                                                 color: theme.accent
                                                 radius: 1
                                             }
@@ -1772,6 +1774,12 @@ Scope {
                                 width: parent.width
                                 height: 14
 
+                                Rectangle {
+                                    anchors.fill: historyTitleRow
+                                    color: (win.activeSection === 3 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                    radius: 0
+                                }
+
                                 Row {
                                     id: historyTitleRow
 
@@ -1797,12 +1805,6 @@ Scope {
                                         font.bold: true
                                         opacity: 0.6
                                         renderType: Text.NativeRendering
-                                    }
-
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        color: (win.activeSection === 3 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
-                                        radius: 0
                                     }
                                 }
 
