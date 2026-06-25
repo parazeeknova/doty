@@ -9,6 +9,24 @@ fn persistent_state() -> String {
     format!("{}/.cache/quickshell/waybar_state", home)
 }
 
+fn is_waybar_running() -> bool {
+    let is_normal = Command::new("pgrep")
+        .args(["-x", "waybar"])
+        .stdout(std::process::Stdio::null())
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false);
+    if is_normal {
+        return true;
+    }
+    Command::new("pgrep")
+        .args(["-x", ".waybar-wrapped"])
+        .stdout(std::process::Stdio::null())
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false)
+}
+
 fn main() {
     let home = env::var("HOME").unwrap_or_default();
     let _ = fs::create_dir_all(format!("{}/.cache/quickshell", home));
@@ -27,15 +45,14 @@ fn main() {
     let _ = fs::write(&pstate, new_state);
     let _ = fs::write(TMPFS_STATE, new_state);
 
-    let is_running = Command::new("pgrep")
-        .args(["-f", "bin/waybar"])
-        .status()
-        .map(|s| s.success())
-        .unwrap_or(false);
+    let is_running = is_waybar_running();
 
     if is_running {
         let _ = Command::new("pkill")
-            .args(["-USR1", "-f", "bin/waybar"])
+            .args(["-USR1", "-x", "waybar"])
+            .status();
+        let _ = Command::new("pkill")
+            .args(["-USR1", "-x", ".waybar-wrapped"])
             .status();
     } else if new_state == "true" {
         let _ = Command::new("uwsm").args(["app", "--", "waybar"]).spawn();

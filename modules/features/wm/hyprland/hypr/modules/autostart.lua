@@ -26,16 +26,6 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd(
 		"sh -lc 'if command -v quickshell >/dev/null 2>&1; then uwsm app -- quickshell --config workspace_overview; elif command -v qs >/dev/null 2>&1; then uwsm app -- qs --config workspace_overview; fi'"
 	)
-	-- Restore waybar + widget state from persistent cache to tmpfs
-	hl.exec_cmd(
-		"sh -c 'cat ~/.cache/quickshell/waybar_state 2>/dev/null > /tmp/quickshell_waybar_state || printf true > /tmp/quickshell_waybar_state'"
-	)
-	hl.exec_cmd(
-		"sh -c 'cat ~/.cache/quickshell/widgets_state 2>/dev/null > /tmp/quickshell_widgets_state || printf true > /tmp/quickshell_widgets_state'"
-	)
-	hl.exec_cmd(
-		"sh -c 'cat ~/.cache/quickshell/widgets_config 2>/dev/null > /tmp/quickshell_widgets_config || printf default > /tmp/quickshell_widgets_config'"
-	)
 	-- Single entry point for waybar + quickshell widgets (avoids double-launch race)
 	hl.exec_cmd("~/.config/waybar/scripts/toggle_widgets restore")
 	hl.exec_cmd(

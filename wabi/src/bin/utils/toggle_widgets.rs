@@ -21,16 +21,17 @@ fn persistent_waybar_state() -> String {
     format!("{}/.cache/quickshell/waybar_state", home)
 }
 
-fn get_target_visibility(mode: &str, dynamic_state: &str) -> (bool, bool, bool) {
+fn get_target_visibility(mode: &str, dynamic_state: &str, waybar_enabled: &str) -> (bool, bool, bool) {
     if dynamic_state == "false" {
         return (false, false, false);
     }
+    let waybar_visible = waybar_enabled == "true";
     match mode {
-        "both" => (true, true, true),
-        "github" => (true, false, true),
-        "workspace" => (false, true, true),
-        "none" => (false, false, true),
-        _ => (true, true, true), // default/fallback
+        "both" => (true, true, waybar_visible),
+        "github" => (true, false, waybar_visible),
+        "workspace" => (false, true, waybar_visible),
+        "none" => (false, false, waybar_visible),
+        _ => (true, true, waybar_visible), // default/fallback
     }
 }
 
@@ -57,10 +58,17 @@ fn spawn_command_robust(cmd: &str, args: &[&str]) -> std::io::Result<std::proces
 }
 
 fn is_waybar_running() -> bool {
-    // NixOS wraps waybar as `.waybar-wrapped`, so `pgrep -x waybar` never matches.
-    // Use `pgrep -f` against the cmdline path instead.
+    let is_normal = Command::new("pgrep")
+        .args(["-x", "waybar"])
+        .stdout(std::process::Stdio::null())
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false);
+    if is_normal {
+        return true;
+    }
     Command::new("pgrep")
-        .args(["-f", "bin/waybar"])
+        .args(["-x", ".waybar-wrapped"])
         .stdout(std::process::Stdio::null())
         .status()
         .map(|s| s.success())
@@ -68,7 +76,8 @@ fn is_waybar_running() -> bool {
 }
 
 fn kill_waybar() {
-    let _ = Command::new("pkill").args(["-f", "bin/waybar"]).status();
+    let _ = Command::new("pkill").args(["-x", "waybar"]).status();
+    let _ = Command::new("pkill").args(["-x", ".waybar-wrapped"]).status();
 }
 
 fn apply_state(github_visible: bool, workspace_visible: bool, waybar_visible: bool) {
@@ -99,16 +108,13 @@ fn apply_state(github_visible: bool, workspace_visible: bool, waybar_visible: bo
         ],
     );
 
-    let pwaybar = persistent_waybar_state();
     if waybar_visible {
         let _ = fs::write(TMPFS_WAYBAR, "true");
-        let _ = fs::write(pwaybar, "true");
         if !is_waybar_running() {
             let _ = spawn_command_robust("uwsm", &["app", "--", "waybar"]);
         }
     } else {
         let _ = fs::write(TMPFS_WAYBAR, "false");
-        let _ = fs::write(pwaybar, "false");
         kill_waybar();
     }
 }
@@ -121,6 +127,11 @@ fn main() {
             .map(|h| format!("{}/.cache/quickshell", h))
             .unwrap_or_default(),
     );
+
+    let pwaybar = persistent_waybar_state();
+    let waybar_enabled = fs::read_to_string(&pwaybar)
+        .map(|s| s.trim().to_string())
+        .unwrap_or_else(|_| "true".to_string());
 
     if args.len() > 1 && args[1] == "restore" {
         let pstate = persistent_state();
@@ -135,7 +146,7 @@ fn main() {
             .unwrap_or_else(|_| "default".to_string());
         let _ = fs::write(TMPFS_CONFIG, &mode);
 
-        let (gh, ws, wb) = get_target_visibility(&mode, &state);
+        let (gh, ws, wb) = get_target_visibility(&mode, &state, &waybar_enabled);
         apply_state(gh, ws, wb);
         return;
     }
@@ -150,7 +161,7 @@ fn main() {
             .map(|s| s.trim().to_string())
             .unwrap_or_else(|_| "true".to_string());
 
-        let (gh, ws, wb) = get_target_visibility(&mode, &state);
+        let (gh, ws, wb) = get_target_visibility(&mode, &state, &waybar_enabled);
         apply_state(gh, ws, wb);
         return;
     }
@@ -170,6 +181,6 @@ fn main() {
     let _ = fs::write(persistent_state(), new_state);
     let _ = fs::write(TMPFS_STATE, new_state);
 
-    let (gh, ws, wb) = get_target_visibility(&mode, new_state);
+    let (gh, ws, wb) = get_target_visibility(&mode, new_state, &waybar_enabled);
     apply_state(gh, ws, wb);
 }
