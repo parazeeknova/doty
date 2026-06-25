@@ -18,7 +18,8 @@ fn get_sunset_state() -> String {
 }
 
 fn is_caffeine_active() -> bool {
-    Path::new("/tmp/caffeine-mode").exists()
+    let home = std::env::var("HOME").unwrap_or_default();
+    Path::new(&home).join(".cache/caffeine-active").exists()
 }
 
 fn main() {

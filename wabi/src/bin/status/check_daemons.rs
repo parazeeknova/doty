@@ -17,6 +17,11 @@ fn is_process_running(process_name: &str) -> bool {
         .unwrap_or(false)
 }
 
+fn is_caffeine_active() -> bool {
+    let home = env::var("HOME").unwrap_or_default();
+    std::path::Path::new(&home).join(".cache/caffeine-active").exists()
+}
+
 fn start_daemon(daemon: &Daemon) -> bool {
     let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
 
@@ -143,7 +148,11 @@ fn main() {
                 true
             }
         } else {
-            !is_process_running(daemon.process_name)
+            if daemon.name == "Hypridle" && is_caffeine_active() {
+                false
+            } else {
+                !is_process_running(daemon.process_name)
+            }
         };
 
         if needs_start {
