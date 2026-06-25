@@ -246,9 +246,9 @@ hl.bind(mainMod .. " + ALT + X",
     hl.dsp.exec_cmd("quickshell -c tray_popup ipc call tray_popup close || quickshell --config tray_popup"))
 hl.bind("SUPER_L", hl.dsp
     .exec_cmd("quickshell -c workspace_popup ipc call workspace_popup close || quickshell --config workspace_popup"), {
-    release = true,
-    ignore_mods = true
-})
+        release = true,
+        ignore_mods = true
+    })
 
 ---------------------
 ---   Screenshots ---
@@ -261,14 +261,14 @@ local grimhyprctl = "grim -o \"$(hyprctl activeworkspace -j | jq -r '.monitor')\
 local slurp_cmd = "slurp -b \\#1d2021b0 -c \\#d5c4a1ff -s \\#00000000"
 
 local save_register_ss = "mkdir -p " .. ss_dir .. " && FILE=" .. ss_path .. " && " .. grimhyprctl ..
-                             " \"$FILE\" && wl-copy < \"$FILE\" && " .. media_helper ..
-                             " add-asset screenshot \"$FILE\""
+    " \"$FILE\" && wl-copy < \"$FILE\" && " .. media_helper ..
+    " add-asset screenshot \"$FILE\""
 local save_register_ss_region = "mkdir -p " .. ss_dir .. " && FILE=" .. ss_path .. " && grim -g \"$(" .. slurp_cmd ..
-                                    ")\" \"$FILE\" && wl-copy < \"$FILE\" && " .. media_helper ..
-                                    " add-asset screenshot \"$FILE\""
+    ")\" \"$FILE\" && wl-copy < \"$FILE\" && " .. media_helper ..
+    " add-asset screenshot \"$FILE\""
 local save_register_ss_region_swappy = "mkdir -p " .. ss_dir .. " && FILE=" .. ss_path .. " && grim -g \"$(" ..
-                                           slurp_cmd .. ")\" \"$FILE\" && swappy -f \"$FILE\" -o \"$FILE\" && " ..
-                                           media_helper .. " add-asset screenshot \"$FILE\""
+    slurp_cmd .. ")\" \"$FILE\" && swappy -f \"$FILE\" -o \"$FILE\" && " ..
+    media_helper .. " add-asset screenshot \"$FILE\""
 
 hl.bind("Print", hl.dsp.exec_cmd("sh -c '" .. save_register_ss .. "'"), {
     locked = true
@@ -277,10 +277,10 @@ hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("sh -c '" .. save_register_ss
 hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("sh -c '" .. save_register_ss_region .. "'"))
 hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd(
     "sh -c 'if ! command -v tesseract &> /dev/null; then notify-send -t 4000 -a \"OCR\" \"Tesseract not installed\" \"Please make sure tesseract is installed in your packages configuration.\"; exit 1; fi; grim -g \"$(" ..
-        slurp_cmd ..
-        ")\" /tmp/ocr_image.png && TEXT=$(tesseract /tmp/ocr_image.png stdout 2>/dev/null) && rm /tmp/ocr_image.png && if [ ! -z \"$TEXT\" ]; then echo -n \"$TEXT\" | wl-copy && " ..
-        media_helper ..
-        " add ocr \"$TEXT\" && notify-send -t 1500 -h string:x-canonical-private-synchronous:ocr-notify -a \"OCR\" \"Extracted text copied to clipboard\"; else notify-send -t 1500 -a \"OCR\" \"No text found\"; fi'"))
+    slurp_cmd ..
+    ")\" /tmp/ocr_image.png && TEXT=$(tesseract /tmp/ocr_image.png stdout 2>/dev/null) && rm /tmp/ocr_image.png && if [ ! -z \"$TEXT\" ]; then echo -n \"$TEXT\" | wl-copy && " ..
+    media_helper ..
+    " add ocr \"$TEXT\" && notify-send -t 1500 -h string:x-canonical-private-synchronous:ocr-notify -a \"OCR\" \"Extracted text copied to clipboard\"; else notify-send -t 1500 -a \"OCR\" \"No text found\"; fi'"))
 
 ---------------------
 ---    System     ---
@@ -297,7 +297,7 @@ hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("$HOME/.config/quickshell/med
 
 -- Power menu / Logout
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd(
-    [[sh -c 'LOCK="/tmp/power_menu.lock"; now=$(date +%s%3N); last=$(cat "$LOCK" 2>/dev/null || echo 0); elapsed=$((now - last)); if [ "$elapsed" -lt 500 ]; then exit 0; fi; echo "$now" > "$LOCK"; quickshell -c power_popup ipc call power_popup close || quickshell --config power_popup']]),
+        [[sh -c 'LOCK="/tmp/power_menu.lock"; now=$(date +%s%3N); last=$(cat "$LOCK" 2>/dev/null || echo 0); elapsed=$((now - last)); if [ "$elapsed" -lt 500 ]; then exit 0; fi; echo "$now" > "$LOCK"; quickshell -c power_popup ipc call power_popup close || quickshell --config power_popup']]),
     {
         locked = true
     })

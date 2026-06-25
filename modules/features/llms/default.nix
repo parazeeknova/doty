@@ -34,6 +34,7 @@
         cudaPackages.nccl
         cudaPackages.cudnn
         cudaPackages.libnpp
+        whisper-cpp
       ];
     };
 }

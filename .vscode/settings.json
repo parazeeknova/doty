@@ -3,6 +3,7 @@
     "/usr/share/hypr/stubs"
   ],
   "Lua.diagnostics.globals": [
-    "vim"
+    "vim",
+    "hl"
   ]
 }
