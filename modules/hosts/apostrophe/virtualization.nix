@@ -40,7 +40,7 @@
             Origins = lib.mkForce "http://localhost:9090 https://localhost:9090 http://127.0.0.1:9090 https://127.0.0.1:9090";
           };
         };
-        packages = with pkgs; [
+        plugins = with pkgs; [
           cockpit-podman
           cockpit-machines
         ];
