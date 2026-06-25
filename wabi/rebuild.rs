@@ -135,8 +135,8 @@ fn main() {
         std::process::exit(1);
     }
 
-    // Step 2: Format QML files and run nixfmt
-    print_step("Formatting and linting QML / Nix files...");
+    // Step 2: Format QML, Nix, and Lua files
+    print_step("Formatting and linting QML / Nix / Lua files...");
     
     println!("-> Formatting QML files...");
     if run_cmd_silent(
@@ -194,6 +194,28 @@ fn main() {
         }
     }
 
+    println!("-> Formatting Lua files...");
+    if run_cmd_silent(
+        "nix-shell",
+        &["-p", "stylua", "--run", "find modules/features/wm/hyprland/hypr -type f -name '*.lua' -exec stylua {} +"]
+    ) {
+        print_success("Lua files formatted.");
+    } else {
+        print_error("Lua formatting failed.");
+        std::process::exit(1);
+    }
+
+    println!("-> Checking Lua formatting...");
+    if run_cmd_silent(
+        "nix-shell",
+        &["-p", "stylua", "--run", "find modules/features/wm/hyprland/hypr -type f -name '*.lua' -exec stylua --check {} +"]
+    ) {
+        print_success("Lua formatting check passed.");
+    } else {
+        print_error("Lua formatting check failed.");
+        std::process::exit(1);
+    }
+
     // Step 3: Nix flake check
     print_step("Running nix flake check...");
     if run_cmd_silent("nix", &["flake", "check"]) {
@@ -220,7 +242,7 @@ fn main() {
             if !lines.is_empty() {
                 print_warning("Formatting changed some files. Committing formatting updates...");
                 if run_cmd_silent("git", &["add", "-A"]) 
-                    && run_cmd_silent("git", &["commit", "--no-gpg-sign", "-m", "style: auto-format Nix and QML files"]) {
+                    && run_cmd_silent("git", &["commit", "--no-gpg-sign", "-m", "style: auto-format Nix, QML, and Lua files"]) {
                     print_success("Formatting changes committed successfully.");
                 } else {
                     print_error("Failed to commit formatting changes.");

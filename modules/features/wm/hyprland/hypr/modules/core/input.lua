@@ -2,28 +2,28 @@
 ---- INPUT ----
 ---------------
 hl.config({
-    input = {
-        kb_layout = "us",
-        kb_variant = "",
-        kb_model = "",
-        kb_options = "",
-        kb_rules = "",
+	input = {
+		kb_layout = "us",
+		kb_variant = "",
+		kb_model = "",
+		kb_options = "",
+		kb_rules = "",
 
-        follow_mouse = 1,
+		follow_mouse = 1,
 
-        sensitivity = 0,
+		sensitivity = 0,
 
-        touchpad = {
-            natural_scroll = true
-        }
-    },
-    cursor = {
-        no_warps = true
-    }
+		touchpad = {
+			natural_scroll = true,
+		},
+	},
+	cursor = {
+		no_warps = true,
+	},
 })
 
 hl.gesture({
-    fingers = 4,
-    direction = "horizontal",
-    action = "workspace"
+	fingers = 4,
+	direction = "horizontal",
+	action = "workspace",
 })
