@@ -30,8 +30,10 @@ fn main() {
 
     for line in reader.lines().map_while(Result::ok) {
         if let Ok(mut status) = serde_json::from_str::<VoxtypeStatus>(&line) {
-            // Only show indicator in Waybar if recording or transcribing
-            if status.status_class != "recording" && status.status_class != "transcribing" {
+            // Customize indicator behavior: show only the mic icon when recording, and empty when not recording/transcribing
+            if status.status_class == "recording" {
+                status.text = "󰍬".to_string();
+            } else if status.status_class != "transcribing" {
                 status.text = String::new();
             }
             if let Ok(output_str) = serde_json::to_string(&status) {
