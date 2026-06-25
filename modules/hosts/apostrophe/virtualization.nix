@@ -40,6 +40,10 @@
             Origins = lib.mkForce "http://localhost:9090 https://localhost:9090 http://127.0.0.1:9090 https://127.0.0.1:9090";
           };
         };
+        packages = with pkgs; [
+          cockpit-podman
+          cockpit-machines
+        ];
       };
 
       # Automatically define and autostart the default NAT network
@@ -61,8 +65,6 @@
         podman-compose
         distrobox
         cockpit
-        cockpit-podman
-        cockpit-machines
         libvirt
       ];
     };
