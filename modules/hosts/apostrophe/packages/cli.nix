@@ -68,6 +68,7 @@
         usbutils
         sbctl
         impala
+        kexec-tools
 
         # -- Network Utils --
         nmap
