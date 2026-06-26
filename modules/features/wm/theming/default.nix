@@ -15,6 +15,9 @@ in
       ...
     }:
     {
+      imports = [
+        ./console-colors.nix-inc
+      ];
 
       home-manager.users.parazeeknova =
         { config, pkgs, ... }:

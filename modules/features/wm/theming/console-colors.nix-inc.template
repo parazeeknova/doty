@@ -1,0 +1,20 @@
+{ ... }: {
+  console.colors = [
+    "{{bg_hex}}"
+    "{{error_hex}}"
+    "{{accent_hex}}"
+    "{{tertiary_hex}}"
+    "{{secondary_hex}}"
+    "{{tertiary_hex}}"
+    "{{secondary_hex}}"
+    "{{fg_hex}}"
+    "{{bg_light_hex}}"
+    "{{error_hex}}"
+    "{{accent_hex}}"
+    "{{tertiary_hex}}"
+    "{{secondary_hex}}"
+    "{{tertiary_hex}}"
+    "{{secondary_hex}}"
+    "{{fg_light_hex}}"
+  ];
+}

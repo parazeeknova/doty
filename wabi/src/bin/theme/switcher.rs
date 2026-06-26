@@ -561,6 +561,10 @@ fn main() {
     // Define all templates and their destinations
     let mappings = vec![
         (
+            "modules/features/wm/theming/console-colors.nix-inc.template",
+            "modules/features/wm/theming/console-colors.nix-inc",
+        ),
+        (
             "modules/features/wm/hyprland/hypr/modules/colors.lua.template",
             "modules/features/wm/hyprland/hypr/modules/colors.lua",
         ),
