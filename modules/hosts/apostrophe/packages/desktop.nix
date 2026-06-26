@@ -81,9 +81,11 @@
         pamixer
         pulseaudio
 
-        # -- System Tray / Applets --
+        # -- System Tray / Apps --
         networkmanagerapplet
         blueman
+        gnome-calculator
+        gnome-clocks
 
         # -- Qt / GTK Themes --
         qt6Packages.qt6ct
@@ -114,6 +116,7 @@
         zathura
         zathuraPkgs.zathura_pdf_mupdf
         evince
+        freeoffice
       ];
     };
 }

@@ -18,7 +18,9 @@ Scope {
     property string currentMediaSource: ""
     property string sunsetState: "Off"
     property bool caffeineActive: false
+    property bool isInitialLoad: true
     property int lastKbdBrightness: -1
+    property int kbdPollCount: 0
     property int lastBatteryCapacity: -1
     property bool lowBatteryAlerted: false
     property string lastBatteryStatus: ""
@@ -296,6 +298,10 @@ Scope {
         var state = readState();
         message = state.text;
         kind = state.kind;
+        if (root.isInitialLoad) {
+            visibleNow = false;
+            return;
+        }
         visibleNow = state.visible && state.text.length > 0;
         if (visibleNow) {
             hideTimer.interval = state.timeout_ms || 1200;
@@ -510,7 +516,10 @@ Scope {
         path: root.statePath
         blockLoading: true
         watchChanges: true
-        onFileChanged: reload()
+        onFileChanged: {
+            root.isInitialLoad = false;
+            reload();
+        }
         onLoaded: root.refreshState()
     }
 
@@ -533,11 +542,12 @@ Scope {
             var val = kbdBacklightFile.text().trim();
             var intVal = parseInt(val);
             if (!isNaN(intVal)) {
-                if (lastKbdBrightness !== -1 && lastKbdBrightness !== intVal) {
+                if (root.kbdPollCount > 5 && lastKbdBrightness !== -1 && lastKbdBrightness !== intVal) {
                     var pct = Math.round((intVal / 3) * 100);
                     root.showOSD("kbd brightness " + pct + "%", "info", 1200);
                 }
                 lastKbdBrightness = intVal;
+                root.kbdPollCount++;
             }
         }
     }
