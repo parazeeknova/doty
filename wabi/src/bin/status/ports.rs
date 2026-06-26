@@ -31,10 +31,6 @@ fn main() {
     let mut ports = Vec::new();
 
     for line in output.lines().skip(1) {
-        if !line.contains("users:(") {
-            continue;
-        }
-
         let parts: Vec<&str> = line.split_whitespace().collect();
         if parts.len() < 5 {
             continue;
@@ -48,6 +44,8 @@ fn main() {
             .rsplit_once(':')
             .map(|(a, _)| a)
             .unwrap_or(local_addr);
+
+        let mut user_processes = Vec::new();
 
         if let Some(users_idx) = line.find("users:(") {
             let users_part = &line[users_idx..];
@@ -66,26 +64,34 @@ fn main() {
                             .unwrap_or_else(|| after_pid.find(')').unwrap_or(0));
                         let pid = &after_pid[..end_pid_idx];
 
-                        let key = (
-                            proto.clone(),
-                            port.to_string(),
-                            prog.to_string(),
-                            pid.to_string(),
-                        );
-                        if !seen.contains(&key) {
-                            seen.insert(key.clone());
-                            ports.push(PortEntry {
-                                protocol: proto.clone(),
-                                port: port.to_string(),
-                                process: prog.to_string(),
-                                pid: pid.to_string(),
-                                address: bind_addr.to_string(),
-                                peer: peer.to_string(),
-                            });
-                        }
+                        user_processes.push((prog.to_string(), pid.to_string()));
                     }
                 }
                 cursor = &cursor[pid_idx + 4..];
+            }
+        }
+
+        if user_processes.is_empty() {
+            user_processes.push(("-".to_string(), "-".to_string()));
+        }
+
+        for (prog, pid) in user_processes {
+            let key = (
+                proto.clone(),
+                port.to_string(),
+                prog.clone(),
+                pid.clone(),
+            );
+            if !seen.contains(&key) {
+                seen.insert(key.clone());
+                ports.push(PortEntry {
+                    protocol: proto.clone(),
+                    port: port.to_string(),
+                    process: prog,
+                    pid,
+                    address: bind_addr.to_string(),
+                    peer: peer.to_string(),
+                });
             }
         }
     }

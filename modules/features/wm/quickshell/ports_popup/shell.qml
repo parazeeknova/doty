@@ -11,6 +11,7 @@ Scope {
 
     property string homeDir: Quickshell.env("HOME")
     property var ports: []
+    property var groupedPorts: []
     property var filteredPorts: []
     property string searchQuery: ""
     property int selectedIndex: 0
@@ -18,16 +19,116 @@ Scope {
 
     signal requestClose
 
+    function groupPorts(flatPorts) {
+        var groupsMap = {};
+        var groupedList = [];
+
+        for (var i = 0; i < flatPorts.length; i++) {
+            var p = flatPorts[i];
+            if (p.process === "-" || p.pid === "-") {
+                groupedList.push({
+                    isGroup: false,
+                    protocol: p.protocol,
+                    port: p.port,
+                    process: p.process,
+                    pid: p.pid,
+                    address: p.address,
+                    peer: p.peer
+                });
+            } else {
+                var key = p.process + "|" + p.pid;
+                if (!groupsMap[key]) {
+                    groupsMap[key] = {
+                        isGroup: true,
+                        expanded: false,
+                        process: p.process,
+                        pid: p.pid,
+                        ports: []
+                    };
+                    groupedList.push(groupsMap[key]);
+                }
+                groupsMap[key].ports.push(p);
+            }
+        }
+
+        for (var j = 0; j < groupedList.length; j++) {
+            var item = groupedList[j];
+            if (item.isGroup) {
+                if (item.ports.length === 1) {
+                    var singlePort = item.ports[0];
+                    groupedList[j] = {
+                        isGroup: false,
+                        protocol: singlePort.protocol,
+                        port: singlePort.port,
+                        process: singlePort.process,
+                        pid: singlePort.pid,
+                        address: singlePort.address,
+                        peer: singlePort.peer
+                    };
+                } else {
+                    var protocols = [];
+                    var portNumbers = [];
+                    var addresses = [];
+                    for (var k = 0; k < item.ports.length; k++) {
+                        var sp = item.ports[k];
+                        if (protocols.indexOf(sp.protocol) === -1) {
+                            protocols.push(sp.protocol);
+                        }
+                        if (portNumbers.indexOf(sp.port) === -1) {
+                            portNumbers.push(sp.port);
+                        }
+                        if (addresses.indexOf(sp.address) === -1) {
+                            addresses.push(sp.address);
+                        }
+                    }
+                    item.protocol = protocols.join(",");
+                    item.port = item.ports.length + " ports";
+                    item.address = addresses.join(", ");
+                    item.ports.sort(function(a, b) {
+                        return parseInt(a.port) - parseInt(b.port);
+                    });
+                }
+            }
+        }
+
+        return groupedList;
+    }
+
     function filterPorts() {
-        if (searchQuery.trim() === "") {
-            filteredPorts = ports;
+        var query = searchQuery.trim().toLowerCase();
+        if (query === "") {
+            filteredPorts = groupedPorts;
         } else {
             var temp = [];
-            var query = searchQuery.toLowerCase();
-            for (var i = 0; i < ports.length; i++) {
-                var p = ports[i];
-                if (p.protocol.toLowerCase().indexOf(query) !== -1 || p.port.indexOf(query) !== -1 || p.process.toLowerCase().indexOf(query) !== -1 || p.pid.indexOf(query) !== -1)
-                    temp.push(p);
+            for (var i = 0; i < groupedPorts.length; i++) {
+                var item = groupedPorts[i];
+                if (item.isGroup) {
+                    var processMatch = item.process.toLowerCase().indexOf(query) !== -1;
+                    var pidMatch = item.pid.indexOf(query) !== -1;
+                    var anyChildMatch = false;
+                    for (var k = 0; k < item.ports.length; k++) {
+                        var cp = item.ports[k];
+                        if (cp.protocol.toLowerCase().indexOf(query) !== -1 || cp.port.indexOf(query) !== -1 || cp.address.toLowerCase().indexOf(query) !== -1) {
+                            anyChildMatch = true;
+                        }
+                    }
+                    if (processMatch || pidMatch || anyChildMatch) {
+                        temp.push({
+                            isGroup: true,
+                            expanded: true, // auto-expand on search!
+                            process: item.process,
+                            pid: item.pid,
+                            protocol: item.protocol,
+                            port: item.port,
+                            address: item.address,
+                            ports: item.ports
+                        });
+                    }
+                } else {
+                    if (item.protocol.toLowerCase().indexOf(query) !== -1 || item.port.indexOf(query) !== -1 || item.process.toLowerCase().indexOf(query) !== -1 || item.pid.indexOf(query) !== -1 || item.address.toLowerCase().indexOf(query) !== -1) {
+                        temp.push(item);
+                    }
+                }
             }
             filteredPorts = temp;
         }
@@ -64,6 +165,7 @@ Scope {
                 try {
                     var data = JSON.parse(this.text);
                     root.ports = data.ports || [];
+                    root.groupedPorts = root.groupPorts(root.ports);
                     root.filterPorts();
                 } catch (e) {
                     console.log("Failed to parse ports: " + e);
@@ -120,7 +222,7 @@ Scope {
                 focusable: true
                 color: "transparent"
                 implicitWidth: 320
-                implicitHeight: Math.min(260, 32 + portsList.contentHeight + bottomRow.implicitHeight)
+                implicitHeight: Math.min(450, 32 + portsList.contentHeight + bottomRow.implicitHeight)
                 Component.onCompleted: {
                     introAnim.start();
                     searchInput.forceActiveFocus();
@@ -237,6 +339,33 @@ Scope {
                                 root.killPort(root.filteredPorts[root.selectedIndex].pid);
 
                             event.accepted = true;
+                        } else if (event.key === Qt.Key_Right) {
+                            if (root.filteredPorts.length > 0) {
+                                var selectedItem = root.filteredPorts[root.selectedIndex];
+                                if (selectedItem.isGroup) {
+                                    selectedItem.expanded = true;
+                                    root.filteredPorts = root.filteredPorts.slice();
+                                    event.accepted = true;
+                                }
+                            }
+                        } else if (event.key === Qt.Key_Left) {
+                            if (root.filteredPorts.length > 0) {
+                                var selectedItem = root.filteredPorts[root.selectedIndex];
+                                if (selectedItem.isGroup) {
+                                    selectedItem.expanded = false;
+                                    root.filteredPorts = root.filteredPorts.slice();
+                                    event.accepted = true;
+                                }
+                            }
+                        } else if (event.key === Qt.Key_Space) {
+                            if (root.filteredPorts.length > 0) {
+                                var selectedItem = root.filteredPorts[root.selectedIndex];
+                                if (selectedItem.isGroup) {
+                                    selectedItem.expanded = !selectedItem.expanded;
+                                    root.filteredPorts = root.filteredPorts.slice();
+                                    event.accepted = true;
+                                }
+                            }
                         }
                     }
 
@@ -370,76 +499,173 @@ Scope {
                                 }
                             }
 
-                            delegate: Rectangle {
+                            delegate: Item {
                                 width: portsList.width
-                                height: 16
-                                color: (root.selectedIndex === index) ? theme.bg_dark : "transparent"
-                                radius: 0
+                                height: delegateColumn.height
 
-                                Row {
-                                    anchors.left: parent.left
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.leftMargin: 4
+                                Column {
+                                    id: delegateColumn
+                                    width: parent.width
 
-                                    Text {
-                                        text: modelData.protocol
-                                        width: 44
-                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
-                                        font.family: root.fontName
-                                        font.pointSize: 7
-                                        renderType: Text.NativeRendering
-                                        anchors.verticalCenter: parent.verticalCenter
+                                    Rectangle {
+                                        id: mainRow
+                                        width: parent.width
+                                        height: 16
+                                        color: (root.selectedIndex === index) ? theme.bg_dark : "transparent"
+
+                                        Row {
+                                            anchors.left: parent.left
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.leftMargin: 4
+
+                                            Text {
+                                                text: modelData.protocol
+                                                width: 44
+                                                color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                                font.family: root.fontName
+                                                font.pointSize: 7
+                                                renderType: Text.NativeRendering
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+
+                                            Text {
+                                                text: modelData.port
+                                                width: 50
+                                                color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                                font.family: root.fontName
+                                                font.pointSize: 7
+                                                renderType: Text.NativeRendering
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+
+                                            Row {
+                                                width: 100
+                                                spacing: 2
+                                                anchors.verticalCenter: parent.verticalCenter
+
+                                                Text {
+                                                    text: modelData.isGroup ? (modelData.expanded ? "▼" : "▶") : ""
+                                                    width: modelData.isGroup ? 10 : 0
+                                                    color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                                    font.family: root.fontName
+                                                    font.pointSize: 7
+                                                    renderType: Text.NativeRendering
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                }
+
+                                                Text {
+                                                    text: modelData.process
+                                                    width: 100 - (modelData.isGroup ? 12 : 0)
+                                                    color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                                    font.family: root.fontName
+                                                    font.pointSize: 7
+                                                    elide: Text.ElideRight
+                                                    renderType: Text.NativeRendering
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                }
+                                            }
+
+                                            Text {
+                                                text: modelData.pid
+                                                width: 48
+                                                color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                                font.family: root.fontName
+                                                font.pointSize: 7
+                                                opacity: root.selectedIndex === index ? 0.7 : 0.5
+                                                renderType: Text.NativeRendering
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+
+                                            Text {
+                                                text: modelData.address
+                                                color: root.selectedIndex === index ? theme.accent : theme.secondary
+                                                font.family: root.fontName
+                                                font.pointSize: 7
+                                                elide: Text.ElideRight
+                                                opacity: root.selectedIndex === index ? 0.7 : 0.5
+                                                renderType: Text.NativeRendering
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            onEntered: root.selectedIndex = index
+                                            onClicked: {
+                                                if (modelData.isGroup) {
+                                                    modelData.expanded = !modelData.expanded;
+                                                    root.filteredPorts = root.filteredPorts.slice();
+                                                } else {
+                                                    root.killPort(modelData.pid);
+                                                }
+                                            }
+                                        }
                                     }
 
-                                    Text {
-                                        text: modelData.port
-                                        width: 50
-                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
-                                        font.family: root.fontName
-                                        font.pointSize: 7
-                                        renderType: Text.NativeRendering
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
+                                    Column {
+                                        id: expandedContainer
+                                        width: parent.width
+                                        visible: modelData.isGroup && modelData.expanded
 
-                                    Text {
-                                        text: modelData.process
-                                        width: 100
-                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
-                                        font.family: root.fontName
-                                        font.pointSize: 7
-                                        elide: Text.ElideRight
-                                        renderType: Text.NativeRendering
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
+                                        Repeater {
+                                            model: modelData.ports
 
-                                    Text {
-                                        text: modelData.pid
-                                        width: 48
-                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
-                                        font.family: root.fontName
-                                        font.pointSize: 7
-                                        opacity: root.selectedIndex === index ? 0.7 : 0.5
-                                        renderType: Text.NativeRendering
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
+                                            delegate: Rectangle {
+                                                width: parent.width
+                                                height: 16
+                                                color: "transparent"
 
-                                    Text {
-                                        text: modelData.address
-                                        color: root.selectedIndex === index ? theme.accent : theme.secondary
-                                        font.family: root.fontName
-                                        font.pointSize: 7
-                                        elide: Text.ElideRight
-                                        opacity: root.selectedIndex === index ? 0.7 : 0.5
-                                        renderType: Text.NativeRendering
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-                                }
+                                                Row {
+                                                    anchors.left: parent.left
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                    anchors.leftMargin: 4
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    onEntered: root.selectedIndex = index
-                                    onClicked: root.killPort(modelData.pid)
+                                                    Text {
+                                                        text: "↳ " + modelData.protocol
+                                                        width: 44
+                                                        color: theme.secondary
+                                                        font.family: root.fontName
+                                                        font.pointSize: 7
+                                                        renderType: Text.NativeRendering
+                                                        opacity: 0.7
+                                                        anchors.verticalCenter: parent.verticalCenter
+                                                    }
+
+                                                    Text {
+                                                        text: modelData.port
+                                                        width: 50
+                                                        color: theme.accent
+                                                        font.family: root.fontName
+                                                        font.pointSize: 7
+                                                        renderType: Text.NativeRendering
+                                                        anchors.verticalCenter: parent.verticalCenter
+                                                    }
+
+                                                    Text {
+                                                        text: ""
+                                                        width: 100
+                                                    }
+
+                                                    Text {
+                                                        text: ""
+                                                        width: 48
+                                                    }
+
+                                                    Text {
+                                                        text: modelData.address
+                                                        color: theme.secondary
+                                                        font.family: root.fontName
+                                                        font.pointSize: 7
+                                                        elide: Text.ElideRight
+                                                        renderType: Text.NativeRendering
+                                                        opacity: 0.7
+                                                        anchors.verticalCenter: parent.verticalCenter
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
