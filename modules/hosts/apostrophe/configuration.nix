@@ -85,6 +85,11 @@
       boot.initrd.luks.devices."luks-fe7a0acb-6379-4025-aab3-05a299853e60".device =
         "/dev/disk/by-uuid/fe7a0acb-6379-4025-aab3-05a299853e60";
 
+      # -- Secondary Drive Decryption --
+      environment.etc."crypttab".text = ''
+        crypted-second /dev/disk/by-uuid/d25f8779-8f37-41b7-bfed-a13b4291faef /etc/cryptsetup-keys.d/nvme1n1.key luks,discard
+      '';
+
       # -- Automatic updating --
       system.autoUpgrade.enable = true;
       system.autoUpgrade.dates = "weekly";

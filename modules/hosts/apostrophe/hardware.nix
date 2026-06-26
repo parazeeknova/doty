@@ -53,6 +53,16 @@
         ];
       };
 
+      fileSystems."/data" = {
+        device = "/dev/mapper/crypted-second";
+        fsType = "btrfs";
+        options = [
+          "compress=zstd"
+          "noatime"
+          "x-systemd.requires=systemd-cryptsetup@crypted-second.service"
+        ];
+      };
+
       swapDevices = [
         { device = "/dev/mapper/luks-fe7a0acb-6379-4025-aab3-05a299853e60"; }
       ];
