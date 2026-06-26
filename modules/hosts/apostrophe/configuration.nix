@@ -87,7 +87,7 @@
 
       # -- Secondary Drive Decryption --
       environment.etc."crypttab".text = ''
-        crypted-second /dev/disk/by-uuid/d25f8779-8f37-41b7-bfed-a13b4291faef /etc/cryptsetup-keys.d/nvme1n1.key luks,discard
+        crypted_second /dev/disk/by-uuid/d25f8779-8f37-41b7-bfed-a13b4291faef /etc/cryptsetup-keys.d/nvme1n1.key luks,discard
       '';
 
       # -- Automatic updating --

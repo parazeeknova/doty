@@ -54,12 +54,12 @@
       };
 
       fileSystems."/data" = {
-        device = "/dev/mapper/crypted-second";
+        device = "/dev/mapper/crypted_second";
         fsType = "btrfs";
         options = [
           "compress=zstd"
           "noatime"
-          "x-systemd.requires=systemd-cryptsetup@crypted-second.service"
+          "x-systemd.requires=systemd-cryptsetup@crypted_second.service"
         ];
       };
 
