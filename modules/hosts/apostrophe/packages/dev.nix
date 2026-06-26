@@ -58,6 +58,7 @@
         gitkraken
         difftastic
         diff-so-fancy
+        beekeeper-studio
 
         # -- Kubernetes --
         kubectl
@@ -68,6 +69,7 @@
         minikube
 
         # -- Tools --
+        mission-center
         httpie
         tmux
         tmuxPlugins.cpu

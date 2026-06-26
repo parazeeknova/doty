@@ -11,8 +11,8 @@
 
       environment.systemPackages = with pkgs; [
         # -- JFR --
-        proton-vpn
         ani-cli
+        proton-vpn-cli
         mangal
         suwayomi-server
         cmatrix

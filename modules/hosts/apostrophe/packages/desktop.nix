@@ -41,6 +41,7 @@
         obs-studio
         kdePackages.kdenlive
         ncmpcpp
+        qbittorrent-enhanced
 
         # -- Wayland / Hyprland --
         uwsm
@@ -116,7 +117,8 @@
         zathura
         zathuraPkgs.zathura_pdf_mupdf
         evince
-        freeoffice
+        onlyoffice-desktopeditors
+        collabora-desktop
       ];
     };
 }
