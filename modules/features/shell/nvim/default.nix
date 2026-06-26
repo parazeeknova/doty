@@ -15,9 +15,6 @@
             inputs.nvf.homeManagerModules.default
           ];
 
-          xdg.configFile."nvim/colors/matugen.vim".source =
-            config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/shell/vim/colors/matugen.vim";
-
           programs.nvf = {
             enable = true;
             settings = {
@@ -36,13 +33,18 @@
                   clipboard = "unnamedplus";
                 };
 
-                # Theme (Dynamic Colors using Matugen)
-                theme.enable = false;
+                # Theme (Catppuccin Mocha with Transparency)
+                theme = {
+                  enable = true;
+                  name = "catppuccin";
+                  style = "mocha";
+                  transparent = true;
+                };
 
-                luaConfigRC.theme = ''
-                  vim.opt.runtimepath:append("/home/parazeeknova/doty/modules/features/shell/vim")
-                  vim.cmd("colorscheme matugen")
-                '';
+                # Binds (which-key shortcut helper)
+                binds = {
+                  whichKey.enable = true;
+                };
 
                 # Statusline / Bufferline
                 statusline.lualine = {
@@ -82,16 +84,23 @@
                   enable = true;
                 };
 
+                # Formatter (conform-nvim)
+                formatter = {
+                  conform-nvim.enable = true;
+                };
+
                 # LSP
                 lsp = {
                   enable = true;
                   formatOnSave = true;
                   lightbulb.enable = true;
+                  trouble.enable = true;
                 };
 
                 # Language Support
                 languages = {
                   enableTreesitter = true;
+                  enableLSP = true;
                   enableFormat = true;
 
                   nix.enable = true;
