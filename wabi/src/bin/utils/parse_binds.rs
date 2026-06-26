@@ -1013,7 +1013,7 @@ fn main() {
         let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
         format!("{home}/doty")
     });
-    let binds_file = format!("{dotfiles}/.config/hypr/modules/binds.lua");
+    let binds_file = format!("{dotfiles}/modules/features/wm/hyprland/hypr/modules/binds.lua");
     let args: Vec<String> = std::env::args().collect();
     let filepath = if args.len() > 1 {
         &args[1]

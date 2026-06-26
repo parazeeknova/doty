@@ -39,21 +39,10 @@ hl.window_rule({
 hl.window_rule({
 	name = "thunar-floating",
 	match = {
-		initial_class = "thunar.floating",
-		initial_title = ".* - Thunar$",
-	},
-	float = true,
-	size = { 1000, 600 },
-	center = true,
-})
-
-hl.window_rule({
-	name = "thunar-rename-floating",
-	match = {
 		class = "^thunar$",
-		title = "^Rename.*$",
 	},
 	float = true,
+	size = { 1000, 650 },
 	center = true,
 })
 
@@ -137,14 +126,15 @@ hl.layer_rule({
 
 -- Workspace assignments for specific applications using exact class names (anchored regex)
 local workspace_assignments = {
-	["1"] = { "^zen.*$", "^[Vv]ivaldi.*$", "^brave-origin-nightly$" },
-	["2"] = { "^code-insiders$", "^dev\\.warp\\.Warp$" },
-	["3"] = { "^thunar$", "^Code$", "^code$" },
-	["4"] = { "^com\\.mitchellh\\.ghostty$" },
+	["1"] = { "^zen.*$", "^[Vv]ivaldi.*$" },
+	["2"] = { "^code-insiders$", "^dev\\.warp\\.Warp$", "^[Ee]macs$" },
+	["3"] = { "^com\\.mitchellh\\.ghostty$", "^Code$", "^code$" },
+	["4"] = { "^[Ff]ree[Tt]ube$" },
 	["5 silent"] = { "^[Ss]potify$" },
 	["6"] = { "^vesktop$", "^TelegramDesktop$" },
+	["8"] = { "^[Ss]team$", "^[Ll]utris$", "^[Hh]eroic$" },
 	["9"] = { "^virt-manager$", "^qemu.*$", "^Qemu.*$" },
-	["10"] = { "^[Vv]mware.*$" },
+	["10"] = { "^[Vv]mware.*$", "^[Pp]odman-[Dd]esktop$" },
 }
 
 for ws, classes in pairs(workspace_assignments) do
@@ -166,7 +156,7 @@ hl.window_rule({
 	},
 	workspace = "special:gitkraken",
 	float = true,
-	size = { 1200, 800 },
+	size = { 1680, 1010 },
 	center = true,
 })
 
@@ -177,7 +167,18 @@ hl.window_rule({
 	},
 	workspace = "special:helium",
 	float = true,
-	size = { 1200, 800 },
+	size = { 1680, 1010 },
+	center = true,
+})
+
+hl.window_rule({
+	name = "obs-scratchpad",
+	match = {
+		class = "^(com\\.obsproject\\.Studio|obs)$",
+	},
+	workspace = "special:obs",
+	float = true,
+	size = { 1680, 1010 },
 	center = true,
 })
 

@@ -16,10 +16,6 @@ hl.bind(mainMod .. " + SHIFT + RETURN", hl.dsp.exec_cmd("uwsm app -- ghostty --c
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("uwsm app -- kitty"))
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd("uwsm app -- warp-terminal"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
-hl.bind(
-	mainMod .. " + SHIFT + E",
-	hl.dsp.exec_cmd('env WAYLAND_DISPLAY="" DBUS_SESSION_BUS_ADDRESS="" uwsm app -- thunar --class=thunar.floating')
-)
 
 -- Browsers
 hl.bind(
@@ -60,6 +56,12 @@ hl.bind(
 	mainMod .. " + M",
 	hl.dsp.exec_cmd(
 		"hyprctl clients | grep -iq 'class: .*spotify' && hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })' || (uwsm app -- spotify && hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })')"
+	)
+)
+hl.bind(
+	mainMod .. " + Y",
+	hl.dsp.exec_cmd(
+		"hyprctl clients | grep -iq 'class: .*freetube' && hyprctl dispatch 'hl.dsp.focus({ workspace = 4 })' || (uwsm app -- freetube && hyprctl dispatch 'hl.dsp.focus({ workspace = 4 })')"
 	)
 )
 
@@ -261,7 +263,13 @@ hl.bind(
 hl.bind(
 	mainMod .. " + ALT + H",
 	hl.dsp.exec_cmd(
-		"pgrep -x helium && hyprctl dispatch 'hl.dsp.workspace.toggle_special(\"helium\")' || helium-browser"
+		"pgrep -x helium && hyprctl dispatch 'hl.dsp.workspace.toggle_special(\"helium\")' || helium"
+	)
+)
+hl.bind(
+	mainMod .. " + ALT + O",
+	hl.dsp.exec_cmd(
+		"(pgrep -x obs || pgrep -x .obs-wrapped) && hyprctl dispatch 'hl.dsp.workspace.toggle_special(\"obs\")' || obs"
 	)
 )
 
