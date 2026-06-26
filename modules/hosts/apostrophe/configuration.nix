@@ -14,48 +14,9 @@
         self.nixosModules.apostropheVirtualization
         inputs.home-manager.nixosModules.home-manager
         self.nixosModules.apostrophePackages
-        self.nixosModules.parazeeknovaHome
-        self.nixosModules.parazeeknovaGit
-        self.nixosModules.parazeeknovaFish
-        self.nixosModules.parazeeknovaBash
-        self.nixosModules.parazeeknovaStarship
-        self.nixosModules.parazeeknovaTmux
-        self.nixosModules.parazeeknovaZoxide
-        self.nixosModules.parazeeknovaHyprland
-        self.nixosModules.parazeeknovaWaybar
-        self.nixosModules.parazeeknovaBat
-        self.nixosModules.parazeeknovaBtop
-        self.nixosModules.parazeeknovaCava
-        self.nixosModules.parazeeknovaMako
-        self.nixosModules.parazeeknovaTheming
-        self.nixosModules.parazeeknovaKitty
-        self.nixosModules.parazeeknovaEza
-        self.nixosModules.parazeeknovaFastfetch
-        self.nixosModules.parazeeknovaGhostty
-        self.nixosModules.parazeeknovaMatugen
-        self.nixosModules.parazeeknovaLazygit
-        self.nixosModules.parazeeknovaHyprlandPreviewSharePicker
-        self.nixosModules.parazeeknovaYazi
-        self.nixosModules.parazeeknovaVim
-        self.nixosModules.parazeeknovaNvim
-        self.nixosModules.parazeeknovaMpd
-        self.nixosModules.parazeeknovaMpv
-        self.nixosModules.parazeeknovaSatty
-        self.nixosModules.parazeeknovaSwappy
-        self.nixosModules.parazeeknovaZathura
-        self.nixosModules.parazeeknovaPypr
-        self.nixosModules.parazeeknovaOpencode
-        self.nixosModules.parazeeknovaSpicetify
-        self.nixosModules.parazeeknovaVesktop
-        self.nixosModules.parazeeknovaScripts
-        self.nixosModules.parazeeknovaZen
-        self.nixosModules.parazeeknovaGaming
-        self.nixosModules.parazeeknovaLlms
-        self.nixosModules.parazeeknovaVoxtype
-        self.nixosModules.parazeeknovaEmacs
-        self.nixosModules.parazeeknovaVscodeinsiders
-        self.nixosModules.parazeeknovaSuwayomi
-      ];
+      ] ++ (builtins.attrValues (
+        lib.filterAttrs (name: _: lib.hasPrefix "parazeeknova" name && !(lib.hasSuffix "Env" name || lib.hasSuffix "Aliases" name || lib.hasSuffix "Functions" name)) self.nixosModules
+      ));
 
       nix.settings.experimental-features = [
         "nix-command"
@@ -192,7 +153,7 @@
           finegrained = false;
         };
         package = config.boot.kernelPackages.nvidiaPackages.stable;
-        dynamicBoost.enable = true;
+        dynamicBoost.enable = false;
       };
 
       # -- Input --

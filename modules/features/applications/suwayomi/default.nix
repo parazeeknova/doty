@@ -14,7 +14,7 @@
         package = pkgs.suwayomi-server;
         user = "parazeeknova";
         group = "users";
-        dataDir = "/home/parazeeknova/.local/share/suwayomi-server";
+        dataDir = "/home/parazeeknova";
         openFirewall = false;
         settings = {
           server = {
