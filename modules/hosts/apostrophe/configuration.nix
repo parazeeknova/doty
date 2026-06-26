@@ -54,6 +54,7 @@
         self.nixosModules.parazeeknovaVoxtype
         self.nixosModules.parazeeknovaEmacs
         self.nixosModules.parazeeknovaVscodeinsiders
+        self.nixosModules.parazeeknovaSuwayomi
       ];
 
       nix.settings.experimental-features = [
