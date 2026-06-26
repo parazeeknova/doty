@@ -59,6 +59,7 @@
         options = [
           "compress=zstd"
           "noatime"
+          "nodiscard"
           "x-systemd.requires=systemd-cryptsetup@crypted_second.service"
         ];
       };

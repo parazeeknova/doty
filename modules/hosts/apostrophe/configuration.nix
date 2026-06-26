@@ -82,6 +82,7 @@
         "i915.enable_psr=0"
         "mem_sleep_default=s2idle"
         "nvme_core.default_ps_max_latency_us=0"
+        "pcie_aspm=off"
       ];
       boot.blacklistedKernelModules = [ "spd5118" ];
       boot.initrd.luks.devices."luks-fe7a0acb-6379-4025-aab3-05a299853e60".device =
@@ -101,6 +102,9 @@
       nix.gc.dates = "daily";
       nix.gc.options = "--delete-older-than 14d";
       nix.settings.auto-optimise-store = true;
+
+      # -- Storage Optimization --
+      services.fstrim.enable = true;
 
       # -- Networking --
       networking.hostName = "apostrophe";
