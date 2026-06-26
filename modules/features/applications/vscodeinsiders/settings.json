@@ -162,5 +162,6 @@
 	"workbench.productIconTheme": "Tabler",
 	"workbench.colorTheme": "Matugen",
 	"editor.scrollbar.verticalScrollbarSize": 0,
-	"cmake.showConfigureWithDebuggerNotification": false
+	"cmake.showConfigureWithDebuggerNotification": false,
+	"biome.suggestInstallingGlobally": false
 }

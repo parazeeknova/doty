@@ -24,6 +24,8 @@
         pnpm
         bun
         yarn
+        biome
+        lefthook
 
         # -- Build Tools --
         gcc

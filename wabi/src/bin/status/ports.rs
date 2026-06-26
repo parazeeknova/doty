@@ -76,12 +76,7 @@ fn main() {
         }
 
         for (prog, pid) in user_processes {
-            let key = (
-                proto.clone(),
-                port.to_string(),
-                prog.clone(),
-                pid.clone(),
-            );
+            let key = (proto.clone(), port.to_string(), prog.clone(), pid.clone());
             if !seen.contains(&key) {
                 seen.insert(key.clone());
                 ports.push(PortEntry {
