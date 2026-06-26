@@ -13,6 +13,7 @@ Scope {
     property string currentThemeValue: ""
     property bool glassEnabled: true
     property bool waybarEnabled: true
+    property bool wallpaperPaused: false
     property string widgetsMode: "default"
     property var wallpapers: []
     property var presets: []
@@ -133,6 +134,17 @@ Scope {
         watchChanges: true
         onLoaded: {
             root.waybarEnabled = (waybarStateWatcher.text().trim() !== "false");
+        }
+        onFileChanged: reload()
+    }
+
+    FileView {
+        id: wallpaperPauseWatcher
+
+        path: "file://" + root.homeDir + "/.cache/quickshell/live_wallpaper_paused"
+        watchChanges: true
+        onLoaded: {
+            root.wallpaperPaused = (wallpaperPauseWatcher.text().trim() === "true");
         }
         onFileChanged: reload()
     }
@@ -907,6 +919,63 @@ Scope {
                                             color: root.waybarEnabled ? theme.bg : theme.accent
                                             anchors.verticalCenter: parent.verticalCenter
                                             x: root.waybarEnabled ? 18 : 2
+
+                                            Behavior on x {
+                                                NumberAnimation {
+                                                    duration: 150
+                                                    easing.type: Easing.OutQuad
+                                                }
+                                            }
+                                        }
+
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 150
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            MouseArea {
+                                width: parent.width
+                                height: 14
+                                enabled: root.currentWallpaperPath.endsWith(".mp4") || root.currentWallpaperPath.endsWith(".webm")
+                                opacity: enabled ? 1.0 : 0.4
+                                onClicked: {
+                                    Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/toggle_wallpaper_pause"]);
+                                }
+
+                                Row {
+                                    anchors.fill: parent
+                                    spacing: 8
+
+                                    Text {
+                                        text: "Pause Live Wallpaper"
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: false
+                                        renderType: Text.NativeRendering
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: parent.width - 36
+                                    }
+
+                                    Rectangle {
+                                        width: 28
+                                        height: 12
+                                        color: root.wallpaperPaused ? theme.accent : theme.bg_light
+                                        border.color: theme.accent
+                                        border.width: 1
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        radius: 0
+
+                                        Rectangle {
+                                            width: 8
+                                            height: 8
+                                            color: root.wallpaperPaused ? theme.bg : theme.accent
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            x: root.wallpaperPaused ? 18 : 2
 
                                             Behavior on x {
                                                 NumberAnimation {

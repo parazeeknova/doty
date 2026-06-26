@@ -118,6 +118,10 @@ name = "set_wallpaper"
 path = "src/bin/theme/set_wallpaper.rs"
 
 [[bin]]
+name = "toggle_wallpaper_pause"
+path = "src/bin/theme/toggle_wallpaper_pause.rs"
+
+[[bin]]
 name = "screentime_daemon"
 path = "src/bin/status/screentime_daemon.rs"
 

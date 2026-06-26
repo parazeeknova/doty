@@ -47,6 +47,7 @@ in
             "scripts/set_wallpaper_bin".source = mkOutOfStoreSymlink "${scriptsDir}/set_wallpaper_bin";
             "scripts/theme_switcher".source = mkOutOfStoreSymlink "${scriptsDir}/theme_switcher";
             "scripts/tmux-sessionizer".source = mkOutOfStoreSymlink "${scriptsDir}/tmux-sessionizer";
+            "scripts/toggle_wallpaper_pause".source = mkOutOfStoreSymlink "${scriptsDir}/toggle_wallpaper_pause";
           };
         };
     };

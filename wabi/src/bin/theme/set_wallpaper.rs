@@ -55,10 +55,20 @@ fn main() {
         // Kill existing mpvpaper instances immediately
         kill_mpvpaper();
 
+        let paused_flag = wabi::cache_dir().join("live_wallpaper_paused");
+        let is_paused = fs::read_to_string(&paused_flag)
+            .map(|s| s.trim() == "true")
+            .unwrap_or(false);
+
+        let mut mpv_opts = String::from("--loop --no-audio --hwdec=no --load-scripts=no --cache=no --demuxer-max-bytes=10M --vd-lavc-fast=yes --vd-lavc-skiploopfilter=all --vf=fps=30 --scale=bilinear --cscale=bilinear --dscale=bilinear --sws-scaler=fast-bilinear --correct-downscaling=no --linear-downscaling=no --sigmoid-upscaling=no --hdr-compute-peak=no --input-ipc-server=/tmp/mpvpaper-ipc");
+        if is_paused {
+            mpv_opts.push_str(" --pause");
+        }
+
         // Spawn mpvpaper with optimal performance flags (30fps limit, bilinear scaling, skipped loop filter)
         let cmd = format!(
-            "uwsm app -- mpvpaper -o \"--loop --no-audio --hwdec=no --load-scripts=no --cache=no --demuxer-max-bytes=10M --vd-lavc-fast=yes --vd-lavc-skiploopfilter=all --vf=fps=30 --scale=bilinear --cscale=bilinear --dscale=bilinear --sws-scaler=fast-bilinear --correct-downscaling=no --linear-downscaling=no --sigmoid-upscaling=no --hdr-compute-peak=no\" '*' '{}' >/tmp/mpvpaper_rust.log 2>&1",
-            path_str
+            "uwsm app -- mpvpaper -o \"{}\" '*' '{}' >/tmp/mpvpaper_rust.log 2>&1",
+            mpv_opts, path_str
         );
         println!("Spawning via bash: {}", cmd);
         match Command::new("bash").args(["-c", &cmd]).spawn() {

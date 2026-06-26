@@ -52,6 +52,7 @@ install: build
 	cp --remove-destination target/release/theme_switcher ../modules/features/wm/theming/scripts/theme_switcher
 	cp --remove-destination target/release/kbd_aura ../modules/scripts/kbd_aura
 	cp --remove-destination target/release/set_wallpaper ../modules/scripts/set_wallpaper_bin
+	cp --remove-destination target/release/toggle_wallpaper_pause ../modules/scripts/toggle_wallpaper_pause
 	cp --remove-destination target/release/parse_binds ../modules/features/wm/quickshell/shortcut_popup/parse_binds
 	cp --remove-destination target/release/caffeine ../modules/features/wm/quickshell/brightness_popup/caffeine
 	cp --remove-destination target/release/decode_cliphist ../modules/features/wm/quickshell/clipboard_popup/decode_cliphist

@@ -159,6 +159,13 @@ Scope {
 
             return "󰖚";
         }
+        // Wallpaper
+        if (lower.includes("wallpaper")) {
+            if (lower.includes("pause"))
+                return "󰏤";
+
+            return "󰸉";
+        }
         // Caps Lock
         if (lower.includes("caps"))
             return "󰪛";
@@ -214,6 +221,14 @@ Scope {
 
         if (lower.includes("sunset"))
             return theme.tertiary;
+
+        // Wallpaper
+        if (lower.includes("wallpaper")) {
+            if (lower.includes("pause"))
+                return theme.secondary;
+
+            return theme.accent;
+        }
 
         // Profile
         if (lower.includes("profile:")) {
