@@ -22,8 +22,6 @@
         fortune
 
         # -- Editors --
-        vim
-        neovim
 
         # -- Shell Tools --
         starship

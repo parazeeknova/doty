@@ -60,7 +60,9 @@ fn main() {
             .map(|s| s.trim() == "true")
             .unwrap_or(false);
 
-        let mut mpv_opts = String::from("--loop --no-audio --hwdec=no --load-scripts=no --cache=no --demuxer-max-bytes=10M --vd-lavc-fast=yes --vd-lavc-skiploopfilter=all --vf=fps=30 --scale=bilinear --cscale=bilinear --dscale=bilinear --sws-scaler=fast-bilinear --correct-downscaling=no --linear-downscaling=no --sigmoid-upscaling=no --hdr-compute-peak=no --input-ipc-server=/tmp/mpvpaper-ipc");
+        let mut mpv_opts = String::from(
+            "--loop --no-audio --hwdec=no --load-scripts=no --cache=no --demuxer-max-bytes=10M --vd-lavc-fast=yes --vd-lavc-skiploopfilter=all --vf=fps=30 --scale=bilinear --cscale=bilinear --dscale=bilinear --sws-scaler=fast-bilinear --correct-downscaling=no --linear-downscaling=no --sigmoid-upscaling=no --hdr-compute-peak=no --input-ipc-server=/tmp/mpvpaper-ipc",
+        );
         if is_paused {
             mpv_opts.push_str(" --pause");
         }
