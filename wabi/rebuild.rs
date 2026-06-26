@@ -258,9 +258,15 @@ fn main() {
         }
     }
 
-    // Step 4.5: Nix Garbage Collection
-    print_step("Collecting Nix garbage (deleting profiles older than 14 days)...");
-    match run_cmd("sudo", &["nix-collect-garbage", "--delete-older-than", "14d"]) {
+    // Step 4.5: Nix Garbage Collection & Generation Cleanup
+    print_step("Deleting old system generations (keeping last 12)...");
+    match run_cmd("sudo", &["nix-env", "-p", "/nix/var/nix/profiles/system", "--delete-generations", "+12"]) {
+        Ok(status) if status.success() => print_success("Old system generations deleted."),
+        _ => print_warning("Failed to delete old system generations."),
+    }
+
+    print_step("Collecting Nix garbage...");
+    match run_cmd("sudo", &["nix-collect-garbage"]) {
         Ok(status) if status.success() => print_success("Garbage collection completed successfully."),
         _ => print_warning("Garbage collection failed or skipped."),
     }
