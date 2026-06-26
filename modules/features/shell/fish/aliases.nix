@@ -61,6 +61,13 @@
           brr = "bun run dev";
           bct = "bun run check && bun run check-types";
 
+          # -- Makefile --
+          m = "make";
+          mi = "make install";
+          mb = "make build";
+          mt = "make test";
+          mu = "make update";
+
           # -- Rust (Cargo) --
           cgin = "cargo install";
           cginit = "cargo init";
@@ -96,6 +103,12 @@
           nb = "nix build";
           nr = "nix run";
           ne = "nix eval";
+
+          # -- Distrobox --
+          arch = "distrobox enter archlinux";
+          ubuntu = "distrobox enter ubuntu";
+          fedora = "distrobox enter fedora";
+          opensuse = "distrobox enter opensuse";
 
           # -- Archives --
           tarnow = "tar -acf ";
