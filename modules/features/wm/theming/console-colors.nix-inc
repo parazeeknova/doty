@@ -17,4 +17,14 @@
     "c4c5dd"
     "c7c5d0"
   ];
+
+  boot.loader.limine.extraConfig = ''
+    interface_branding: ""
+    interface_help_hidden: yes
+    term_margin: 350
+    term_margin_gradient: 0
+    term_background: 00131318
+    term_foreground: e4e1e9
+    backdrop: 131318
+  '';
 }

@@ -17,4 +17,14 @@
     "{{secondary_hex}}"
     "{{fg_light_hex}}"
   ];
+
+  boot.loader.limine.extraConfig = ''
+    interface_branding: ""
+    interface_help_hidden: yes
+    term_margin: 350
+    term_margin_gradient: 0
+    term_background: 00{{bg_hex}}
+    term_foreground: {{fg_hex}}
+    backdrop: {{bg_hex}}
+  '';
 }
