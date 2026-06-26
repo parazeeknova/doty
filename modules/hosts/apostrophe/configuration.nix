@@ -35,6 +35,7 @@
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
       ];
+      nix.settings.trusted-users = [ "root" "parazeeknova" ];
 
       # -- Boot --
       boot.loader.systemd-boot.enable = false;

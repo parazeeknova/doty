@@ -15,10 +15,6 @@
 
 [url "git@github.com:parazeeknova/"]
   insteadOf = "para:"
-
-[url "git@github.com:"]
-	insteadOf = https://github.com/
-
 [url "git@github.com:singularityworks-xyz/"]
   insteadOf = "sw:"
 
