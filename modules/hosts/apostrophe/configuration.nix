@@ -14,8 +14,13 @@
         self.nixosModules.apostropheVirtualization
         inputs.home-manager.nixosModules.home-manager
         self.nixosModules.apostrophePackages
-      ] ++ (builtins.attrValues (
-        lib.filterAttrs (name: _: lib.hasPrefix "parazeeknova" name && !(lib.hasSuffix "Env" name || lib.hasSuffix "Aliases" name || lib.hasSuffix "Functions" name)) self.nixosModules
+      ]
+      ++ (builtins.attrValues (
+        lib.filterAttrs (
+          name: _:
+          lib.hasPrefix "parazeeknova" name
+          && !(lib.hasSuffix "Env" name || lib.hasSuffix "Aliases" name || lib.hasSuffix "Functions" name)
+        ) self.nixosModules
       ));
 
       nix.settings.experimental-features = [

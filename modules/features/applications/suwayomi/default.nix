@@ -32,5 +32,7 @@
           };
         };
       };
+
+      systemd.services.suwayomi-server.environment.JAVA_TOOL_OPTIONS = "-noverify";
     };
 }
