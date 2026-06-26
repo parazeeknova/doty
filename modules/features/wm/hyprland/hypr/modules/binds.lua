@@ -501,12 +501,7 @@ hl.bind(
 		locked = true,
 	}
 )
-hl.bind(
-	mainMod .. " + ALT + E",
-	hl.dsp.exec_cmd(
-		"sh -c 'if command -v uwsm >/dev/null 2>&1 && uwsm check is-active; then uwsm stop; else hyprctl dispatch exit; fi'"
-	)
-)
+
 
 -- Caps lock OSD
 hl.bind("Caps_Lock", hl.dsp.exec_cmd(osdctl .. " caps toggle"), {

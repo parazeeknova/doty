@@ -156,6 +156,9 @@
       services.asusd = {
         enable = true;
       };
+      services.logind.extraConfig = ''
+        HandlePowerKey=ignore
+      '';
 
       # -- Bluetooth --
       hardware.bluetooth.enable = true;
