@@ -15,8 +15,7 @@
         { config, pkgs, ... }:
         {
           # Write settings directly to the Insiders settings path
-          home.file.".config/Code - Insiders/User/settings.json".text =
-            builtins.readFile ./settings.json;
+          home.file.".config/Code - Insiders/User/settings.json".text = builtins.readFile ./settings.json;
         };
     };
 }
