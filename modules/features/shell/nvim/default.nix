@@ -22,8 +22,8 @@
             enable = true;
             settings = {
               vim = {
-                viAlias = true;
-                vimAlias = true;
+                viAlias = false;
+                vimAlias = false;
 
                 # General Options
                 options = {
@@ -40,6 +40,7 @@
                 theme.enable = false;
 
                 luaConfigRC.theme = ''
+                  vim.opt.runtimepath:append("/home/parazeeknova/doty/modules/features/shell/vim")
                   vim.cmd("colorscheme matugen")
                 '';
 

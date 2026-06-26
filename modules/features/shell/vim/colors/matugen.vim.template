@@ -45,7 +45,7 @@ if (has('termguicolors') && &termguicolors) || has('gui_running')
 endif
 
       " For Neovim compatibility
-      if has('nvim')
+      if has('nvim') && exists('g:terminal_ansi_colors')
         " Set Neovim specific terminal colors
         let g:terminal_color_0 = '#' . g:terminal_ansi_colors[0]
         let g:terminal_color_1 = '#' . g:terminal_ansi_colors[1]
