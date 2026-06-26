@@ -117,8 +117,7 @@
         zathura
         zathuraPkgs.zathura_pdf_mupdf
         evince
-        onlyoffice-desktopeditors
-        collabora-desktop
+        wpsoffice
       ];
     };
 }
