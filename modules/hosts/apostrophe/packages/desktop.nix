@@ -70,8 +70,6 @@
         libnotify
         imagemagick
         file-roller
-        hyprlax
-        valgrind 
 
         # -- Audio / Media --
         spotify

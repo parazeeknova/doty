@@ -100,7 +100,6 @@
                 # Language Support
                 languages = {
                   enableTreesitter = true;
-                  enableLSP = true;
                   enableFormat = true;
 
                   nix.enable = true;
