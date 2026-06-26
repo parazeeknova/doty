@@ -80,6 +80,7 @@
         "nvidia-drm.modeset=1"
         "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
         "i915.enable_psr=0"
+        "i915.enable_dc=0"
         "mem_sleep_default=s2idle"
         "nvme_core.default_ps_max_latency_us=0"
         "pcie_aspm=off"
