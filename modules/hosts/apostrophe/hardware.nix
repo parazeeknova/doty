@@ -53,7 +53,7 @@
         ];
       };
 
-      fileSystems."/data" = {
+      fileSystems."/home/parazeeknova/secondary" = {
         device = "/dev/mapper/crypted_second";
         fsType = "btrfs";
         options = [
