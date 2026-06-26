@@ -14,11 +14,9 @@
       home-manager.users.parazeeknova =
         { config, pkgs, ... }:
         {
-          programs.vscode = {
-            enable = true;
-            package = pkgs.vscode-insiders;
-            profiles.default.userSettings = builtins.fromJSON (builtins.readFile ./settings.json);
-          };
+          # Write settings directly to the Insiders settings path
+          home.file.".config/Code - Insiders/User/settings.json".text =
+            builtins.readFile ./settings.json;
         };
     };
 }
