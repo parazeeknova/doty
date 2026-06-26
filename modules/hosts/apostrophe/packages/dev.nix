@@ -25,6 +25,7 @@
         bun
         yarn
         biome
+        turbo
         lefthook
 
         # -- Build Tools --

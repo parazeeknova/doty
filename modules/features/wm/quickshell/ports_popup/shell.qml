@@ -84,7 +84,7 @@ Scope {
                     item.protocol = protocols.join(",");
                     item.port = item.ports.length + " ports";
                     item.address = addresses.join(", ");
-                    item.ports.sort(function(a, b) {
+                    item.ports.sort(function (a, b) {
                         return parseInt(a.port) - parseInt(b.port);
                     });
                 }
@@ -115,7 +115,8 @@ Scope {
                     if (processMatch || pidMatch || anyChildMatch) {
                         temp.push({
                             isGroup: true,
-                            expanded: true, // auto-expand on search!
+                            expanded: true // auto-expand on search!
+                            ,
                             process: item.process,
                             pid: item.pid,
                             protocol: item.protocol,
