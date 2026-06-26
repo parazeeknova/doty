@@ -1,5 +1,9 @@
 { self, inputs, ... }:
 
+let
+  repo = "/home/parazeeknova/doty";
+  vscodeInsidersDir = "${repo}/modules/features/applications/vscodeinsiders";
+in
 {
 
   flake.nixosModules.parazeeknovaVscodeinsiders =
@@ -13,9 +17,15 @@
 
       home-manager.users.parazeeknova =
         { config, pkgs, ... }:
+        let
+          inherit (config.lib.file) mkOutOfStoreSymlink;
+        in
         {
-          # Write settings directly to the Insiders settings path
-          home.file.".config/Code - Insiders/User/settings.json".text = builtins.readFile ./settings.json;
+          home.file.".config/Code - Insiders/User/settings.json".source =
+            mkOutOfStoreSymlink "${vscodeInsidersDir}/settings.json";
+
+          home.file.".vscode-insiders/extensions".source =
+            mkOutOfStoreSymlink "/home/parazeeknova/.vscode/extensions";
         };
     };
 }

@@ -1,9 +1,166 @@
 {
-  "Lua.workspace.library": [
-    "/usr/share/hypr/stubs"
-  ],
-  "Lua.diagnostics.globals": [
-    "vim",
-    "hl"
-  ]
+	"github.copilot.nextEditSuggestions.enabled": true,
+	"chat.commandCenter.enabled": false,
+	"workbench.layoutControl.enabled": false,
+	"workbench.activityBar.location": "bottom",
+	"workbench.startupEditor": "none",
+	"workbench.sideBar.location": "right",
+	"editor.fontSize": 12,
+	"editor.formatOnSave": true,
+	"files.autoSave": "afterDelay",
+	"editor.tabCompletion": "on",
+	"workbench.editor.pinnedTabSizing": "compact",
+	"editor.defaultFormatter": "biomejs.biome",
+	"editor.fontFamily": "FiraCode Nerd Font Mono,Consolas, 'Courier New', monospace",
+	"editor.tabSize": 2,
+	"editor.formatOnPaste": true,
+	"editor.aiStats.enabled": true,
+	"editor.autoIndentOnPaste": true,
+	"editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+	"workbench.iconTheme": "gruvbox-material-icon-theme",
+	"breadcrumbs.enabled": false,
+	"workbench.editor.splitSizing": "distribute",
+	"editor.minimap.maxColumn": 70,
+	"editor.minimap.side": "left",
+	"editor.scrollbar.horizontal": "hidden",
+	"editor.scrollbar.horizontalScrollbarSize": 0,
+	"editor.scrollbar.vertical": "hidden",
+	"workbench.editor.highlightModifiedTabs": true,
+	"workbench.editor.pinnedTabsOnSeparateRow": true,
+	"workbench.editor.scrollToSwitchTabs": true,
+	"workbench.editor.tabSizing": "shrink",
+	"window.density.editorTabHeight": "compact",
+	"terminal.integrated.confirmOnExit": "hasChildProcesses",
+	"terminal.integrated.cursorBlinking": true,
+	"terminal.integrated.cursorStyle": "line",
+	"terminal.integrated.enableImages": true,
+	"terminal.integrated.enableVisualBell": true,
+	"terminal.integrated.fontSize": 11.6,
+	"terminal.integrated.hideOnStartup": "whenEmpty",
+	"editor.smoothScrolling": true,
+	"editor.cursorSmoothCaretAnimation": "on",
+	"workbench.list.smoothScrolling": true,
+	"terminal.integrated.smoothScrolling": true,
+	"editor.cursorBlinking": "smooth",
+	"editor.stickyScroll.defaultModel": "foldingProviderModel",
+	"terminal.integrated.stickyScroll.enabled": true,
+	"notebook.stickyScroll.enabled": true,
+	"tailwind-fold.autoFold": false,
+	"search.showLineNumbers": true,
+	"redhat.telemetry.enabled": false,
+	"workbench.navigationControl.enabled": false,
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
+	},
+	"mdb.mcp.server": "prompt",
+	"[dockercompose]": {
+		"editor.insertSpaces": true,
+		"editor.tabSize": 2,
+		"editor.autoIndent": "advanced",
+		"editor.quickSuggestions": {
+			"other": true,
+			"comments": false,
+			"strings": true
+		},
+		"editor.defaultFormatter": "redhat.vscode-yaml"
+	},
+	"[github-actions-workflow]": {
+		"editor.defaultFormatter": "redhat.vscode-yaml"
+	},
+	"svelte.enable-ts-plugin": true,
+	"explorer.confirmDragAndDrop": false,
+	"security.workspace.trust.untrustedFiles": "open",
+	"terminal.integrated.fontWeight": "700",
+	"github.copilot.enable": {
+		"*": true,
+		"plaintext": false,
+		"markdown": true,
+		"scminput": false
+	},
+	"database-client.autoSync": true,
+	"chat.agent.thinkingStyle": "collapsedPreview",
+	"chat.editor.fontSize": 10,
+	"chat.fontSize": 10,
+	"chat.tools.terminal.autoApprove": {
+		"bun": true,
+		"Set-Content": true,
+		"pnpm": true,
+		"ForEach-Object": true,
+		"dir": true
+	},
+	"chat.agent.maxRequests": 100000,
+	"docker.extension.enableComposeLanguageServer": false,
+	"makefile.configureOnOpen": true,
+	"typescript.updateImportsOnFileMove.enabled": "always",
+	"chat.mcp.gallery.enabled": true,
+	"window.commandCenter": false,
+	"window.titleBarStyle": "native",
+	"terminal.integrated.gpuAcceleration": "on",
+	"window.menuBarVisibility": "toggle",
+	"prisma.hidePrisma6Prompts": true,
+	"files.associations": {
+		"*.prisma": "prisma"
+	},
+	"chat.viewSessions.orientation": "stacked",
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"python.defaultInterpreterPath": "/sbin/python3.14",
+	"workbench.statusBar.visible": false,
+	"[toml]": {
+		"editor.defaultFormatter": "tamasfe.even-better-toml"
+	},
+	"[glsl]": {
+		"editor.defaultFormatter": "raczzalan.webgl-glsl-editor"
+	},
+	"[lua]": {
+		"editor.defaultFormatter": "sumneko.lua"
+	},
+	"workbench.editorAssociations": {
+		"*.copilotmd": "vscode.markdown.preview.editor",
+		"*.woff2": "default"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	},
+	"json.schemaDownload.trustedDomains": {
+		"https://schemastore.azurewebsites.net/": true,
+		"https://raw.githubusercontent.com/": true,
+		"https://www.schemastore.org/": true,
+		"https://json.schemastore.org/": true,
+		"https://json-schema.org/": true,
+		"https://biomejs.dev": true
+	},
+	"[rust]": {
+		"editor.defaultFormatter": "rust-lang.rust-analyzer"
+	},
+	"terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
+	"editor.linkedEditing": true,
+	"editor.wordWrap": "bounded",
+	"cloudcode.updateChannel": "Insiders",
+	"workbench.editor.empty.hint": "hidden",
+	"explorer.confirmDelete": false,
+	"update.showReleaseNotes": false,
+	"claudeCode.preferredLocation": "panel",
+	"workbench.editor.wrapTabs": true,
+	"chat.editor.wordWrap": "on",
+	"telemetry.feedback.enabled": false,
+	"telemetry.telemetryLevel": "off",
+	"telemetry.editStats.enabled": false,
+	"editor.experimental.preferTreeSitter.typescript": true,
+	"workbench.activityBar.autoHide": true,
+	"workbench.activityBar.compact": true,
+	"[xml]": {
+		"editor.defaultFormatter": "redhat.vscode-xml"
+	},
+	"[shellscript]": {
+		"editor.defaultFormatter": "shakram02.bash-beautify"
+	},
+	"workbench.editor.showTabIndex": true,
+	"[jsonc]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	},
+	"window.customTitleBarVisibility": "never",
+	"workbench.productIconTheme": "Tabler",
+	"workbench.colorTheme": "Matugen",
+	"editor.scrollbar.verticalScrollbarSize": 0,
+	"cmake.showConfigureWithDebuggerNotification": false
 }
