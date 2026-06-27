@@ -108,6 +108,8 @@
         udiskie
         lm_sensors
         upower
+        kdePackages.ark
+        gnome-disk-utility
 
         # -- Security --
         seahorse
