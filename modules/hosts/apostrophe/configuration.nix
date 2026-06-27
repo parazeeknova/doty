@@ -48,15 +48,15 @@
       boot.loader.limine.secureBoot.enable = true;
       boot.loader.efi.canTouchEfiVariables = true;
       boot.kernelPackages = pkgs.linuxPackages_latest;
-      boot.kernelParams = [
-        "nvidia-drm.modeset=1"
-        "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-        "i915.enable_psr=0"
-        "i915.enable_dc=0"
-        "mem_sleep_default=s2idle"
-        "nvme_core.default_ps_max_latency_us=0"
-        "pcie_aspm=off"
-      ];
+      # boot.kernelParams = [
+      #   "nvidia-drm.modeset=1"
+      #   "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+      #   "i915.enable_psr=0"
+      #   "i915.enable_dc=0"
+      #   "mem_sleep_default=s2idle"
+      #   "nvme_core.default_ps_max_latency_us=0"
+      #   "pcie_aspm=off"
+      # ];
       boot.blacklistedKernelModules = [ "spd5118" ];
       boot.initrd.luks.devices."luks-fe7a0acb-6379-4025-aab3-05a299853e60".device =
         "/dev/disk/by-uuid/fe7a0acb-6379-4025-aab3-05a299853e60";
@@ -152,7 +152,10 @@
       environment.pathsToLink = [ "/share/thumbnailers" ];
 
       # -- Graphics --
-      services.xserver.videoDrivers = [ "nvidia" ];
+      services.xserver.videoDrivers = [
+        "modesetting"
+        "nvidia"
+      ];
       hardware.graphics.enable = true;
       hardware.nvidia = {
         modesetting.enable = true;
@@ -160,23 +163,23 @@
         nvidiaSettings = true;
         powerManagement = {
           enable = true;
-          finegrained = false;
+          finegrained = true;
         };
         package = config.boot.kernelPackages.nvidiaPackages.stable;
         dynamicBoost.enable = true;
+
+        prime = {
+          offload = {
+            enable = true;
+            enableOffloadCmd = true;
+          };
+          intelBusId = "PCI:0@0:2:0";
+          nvidiaBusId = "PCI:1@0:0:0";
+        };
       };
 
       # -- Input --
       services.libinput.enable = true;
-
-      # -- Environment --
-      environment.sessionVariables = {
-        # On Optimus (Intel + NVIDIA) offload mode, the Wayland compositor should run on the integrated GPU (Intel).
-        # Setting these globally forces Hyprland onto the NVIDIA GPU, causing frequent crashes/freezes.
-        # GBM_BACKEND = "nvidia-drm";
-        # __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-        # WLR_NO_HARDWARE_CURSORS = "1";
-      };
 
       # -- User --
       users.users."parazeeknova" = {
