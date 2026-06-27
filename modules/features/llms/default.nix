@@ -27,7 +27,6 @@
         ollama-cuda
         llama-cpp
         mistral-rs
-        vllm
         oterm
         pi-coding-agent
         claude-code
