@@ -3,7 +3,7 @@
 # Check if a Waydroid window is already running in Hyprland
 if hyprctl clients | grep -iq 'class: [Ww]aydroid'; then
     # Toggle the special workspace (hide/show)
-    hyprctl dispatch togglespecialworkspace waydroid
+    hyprctl dispatch 'hl.dsp.workspace.toggle_special("waydroid")'
 else
     # Start container service if not active
     if ! systemctl is-active --quiet waydroid-container; then
@@ -19,5 +19,5 @@ else
     waydroid show-full-ui &
     
     # Toggle the special workspace to bring it up
-    hyprctl dispatch togglespecialworkspace waydroid
+    hyprctl dispatch 'hl.dsp.workspace.toggle_special("waydroid")'
 fi
