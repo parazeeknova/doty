@@ -160,7 +160,7 @@
         nvidiaSettings = true;
         powerManagement = {
           enable = true;
-          finegrained = true;
+          finegrained = false;
         };
         package = config.boot.kernelPackages.nvidiaPackages.stable;
         dynamicBoost.enable = true;
