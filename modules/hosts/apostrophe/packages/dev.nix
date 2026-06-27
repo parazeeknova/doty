@@ -11,6 +11,11 @@
 
       environment.systemPackages = with pkgs; [
         devenv
+        cudatoolkit
+        wrangler
+        google-cloud-sdk
+        awscli
+        cloudflare-cli
 
         # -- Languages --
         nodejs
