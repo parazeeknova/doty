@@ -61,11 +61,16 @@
               set -e
               PROP_FILE="/var/lib/waydroid/waydroid.prop"
               BASE_PROP_FILE="/var/lib/waydroid/waydroid_base.prop"
+              CONFIG_NODES="/var/lib/waydroid/lxc/waydroid/config_nodes"
 
               mkdir -p /var/lib/waydroid
               touch "$PROP_FILE"
               chown root:root "$PROP_FILE"
               chmod 644 "$PROP_FILE"
+
+              # Resolve intelRenderNode to its real path (e.g. /dev/dri/renderD128)
+              intelRenderNodeReal=$(readlink -f "${intelRenderNode}")
+              nodeName=$(basename "$intelRenderNodeReal")
 
               # Function to set properties (removes old, adds new)
               set_prop() {
@@ -86,7 +91,7 @@
               # Setup waydroid.prop
               set_prop "$PROP_FILE" ro.hardware.gralloc gbm
               set_prop "$PROP_FILE" ro.hardware.egl mesa
-              set_prop "$PROP_FILE" gralloc.gbm.device ${intelRenderNode}
+              set_prop "$PROP_FILE" gralloc.gbm.device "$intelRenderNodeReal"
               del_prop "$PROP_FILE" ro.hardware.vulkan
               del_prop "$PROP_FILE" gralloc.gbm.legacy
 
@@ -94,7 +99,7 @@
               if [ -f "$BASE_PROP_FILE" ]; then
                 set_prop "$BASE_PROP_FILE" ro.hardware.gralloc gbm
                 set_prop "$BASE_PROP_FILE" ro.hardware.egl mesa
-                set_prop "$BASE_PROP_FILE" gralloc.gbm.device ${intelRenderNode}
+                set_prop "$BASE_PROP_FILE" gralloc.gbm.device "$intelRenderNodeReal"
                 del_prop "$BASE_PROP_FILE" ro.hardware.vulkan
                 del_prop "$BASE_PROP_FILE" gralloc.gbm.legacy
               fi
@@ -103,6 +108,14 @@
               ${pkgs.gnused}/bin/sed -i '/^$/d' "$PROP_FILE"
               if [ -f "$BASE_PROP_FILE" ]; then
                 ${pkgs.gnused}/bin/sed -i '/^$/d' "$BASE_PROP_FILE"
+              fi
+
+              # Fix LXC config_nodes to ensure the resolved render node is mounted in the container
+              if [ -f "$CONFIG_NODES" ]; then
+                # Remove existing renderD mounts
+                ${pkgs.gnused}/bin/sed -i '/\/dev\/dri\/renderD/d' "$CONFIG_NODES"
+                # Add the correct one
+                echo "lxc.mount.entry = $intelRenderNodeReal dev/dri/$nodeName none bind,create=file,optional 0 0" >> "$CONFIG_NODES"
               fi
             '')
           ];
