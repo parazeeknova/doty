@@ -308,10 +308,10 @@ hl.bind(
 ---------------------
 ---    Voxtype    ---
 ---------------------
-hl.bind("Scroll_Lock", hl.dsp.exec_cmd("voxtype record start"), {
+hl.bind("F9", hl.dsp.exec_cmd("voxtype record start"), {
 	ignore_mods = true,
 })
-hl.bind("Scroll_Lock", hl.dsp.exec_cmd("voxtype record stop"), {
+hl.bind("F9", hl.dsp.exec_cmd("voxtype record stop"), {
 	release = true,
 	ignore_mods = true,
 })
