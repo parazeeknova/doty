@@ -271,10 +271,7 @@ hl.bind(
 	)
 )
 
-hl.bind(
-	mainMod .. " + ALT + A",
-	hl.dsp.exec_cmd("$HOME/doty/modules/scripts/toggle_waydroid")
-)
+hl.bind(mainMod .. " + ALT + A", hl.dsp.exec_cmd("$HOME/doty/modules/scripts/toggle_waydroid"))
 
 ---------------------
 ---    Old Rofi   ---

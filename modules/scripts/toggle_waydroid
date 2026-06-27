@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# Check if Waydroid UI is already running
-if pgrep -x "waydroid" > /dev/null; then
-    # Toggle the special workspace
+# Check if a Waydroid window is already running in Hyprland
+if hyprctl clients | grep -iq 'class: [Ww]aydroid'; then
+    # Toggle the special workspace (hide/show)
     hyprctl dispatch togglespecialworkspace waydroid
 else
     # Start container service if not active

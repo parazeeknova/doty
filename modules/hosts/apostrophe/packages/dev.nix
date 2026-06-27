@@ -16,6 +16,7 @@
         google-cloud-sdk
         awscli
         cloudflare-cli
+        appimage-run
 
         # -- Languages --
         nodejs
