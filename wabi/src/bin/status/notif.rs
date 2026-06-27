@@ -111,23 +111,30 @@ fn is_audio_muted() -> bool {
 }
 
 fn get_uptime() -> String {
-    let out = run_cmd("uptime", &["-p"]).unwrap_or_default();
-    let clean = out
-        .trim()
-        .replace("up ", "")
-        .replace(" hours,", "h")
-        .replace(" hour,", "h")
-        .replace(" minutes", "m")
-        .replace(" minute", "m")
-        .replace(" days,", "d")
-        .replace(" day,", "d")
-        .replace(" weeks,", "w")
-        .replace(" week,", "w");
-    if clean.is_empty() {
-        "UP 0M".to_string()
-    } else {
-        format!("UP {}", clean.to_uppercase())
+    let raw = std::fs::read_to_string("/proc/uptime").unwrap_or_default();
+    let seconds = raw
+        .split_whitespace()
+        .next()
+        .and_then(|s| s.parse::<f64>().ok())
+        .map(|s| s as u64)
+        .unwrap_or(0);
+
+    let days = seconds / 86400;
+    let hours = (seconds % 86400) / 3600;
+    let minutes = (seconds % 3600) / 60;
+
+    let mut parts = Vec::new();
+    if days > 0 {
+        parts.push(format!("{}d", days));
     }
+    if hours > 0 {
+        parts.push(format!("{}h", hours));
+    }
+    if minutes > 0 || parts.is_empty() {
+        parts.push(format!("{}m", minutes));
+    }
+
+    format!("UP {}", parts.join(" ").to_uppercase())
 }
 
 fn main() {
