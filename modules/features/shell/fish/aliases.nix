@@ -114,6 +114,9 @@
           tarnow = "tar -acf ";
           untar = "tar -zxvf ";
           wget = "wget -c ";
+
+          # -- Waydroid --
+          droidstop = "waydroid session stop; sudo systemctl stop waydroid-container";
         };
         shellAbbrs = {
           # -- Git --
