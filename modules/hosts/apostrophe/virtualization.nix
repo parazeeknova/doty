@@ -134,10 +134,10 @@
           ExecStart = pkgs.writeShellScript "waydroid-intel-fix-post" ''
             set -e
             ${pkgs.coreutils}/bin/sleep 5
-            
+
             PROP_FILE="/var/lib/waydroid/waydroid.prop"
             BASE_PROP_FILE="/var/lib/waydroid/waydroid_base.prop"
-            
+
             for f in "$PROP_FILE" "$BASE_PROP_FILE"; do
               if [ -f "$f" ]; then
                 ${pkgs.gnused}/bin/sed -i '/^ro.hardware.vulkan=/d' "$f"
