@@ -86,10 +86,10 @@ doty # Assuming you have the alias set up, otherwise run `sudo nixos-rebuild swi
 
 | | | | |
 | :---: | :---: | :---: | :---: |
-| ![Preview 1](https://cdn.przknv.cc/doty/app-launcher.png) | ![Preview 2](https://cdn.przknv.cc/doty/battery.png) | ![Preview 3](https://cdn.przknv.cc/doty/brightness.png) | ![Preview 4](https://cdn.przknv.cc/doty/emoji.png) |
-| ![Preview 5](https://cdn.przknv.cc/doty/github.png) | ![Preview 6](https://cdn.przknv.cc/doty/media.png) | ![Preview 7](https://cdn.przknv.cc/doty/podman.png) | ![Preview 8](https://cdn.przknv.cc/doty/clipboard.png) |
-| ![Preview 9](https://cdn.przknv.cc/doty/system.png) | ![Preview 10](https://cdn.przknv.cc/doty/virtual.png) | ![Preview 11](https://cdn.przknv.cc/doty/wifi.png) | ![Preview 12](https://cdn.przknv.cc/doty/waydroid.png) |
-| ![Preview 13](https://cdn.przknv.cc/doty/wallpaper-switcher.png) | ![Preview 14](https://cdn.przknv.cc/doty/control-center.png) | ![Preview 15](https://cdn.przknv.cc/doty/color-scheme.png) | ![Preview 16](https://cdn.przknv.cc/doty/screencapture.png) |
+| **App Launcher**<br><img src="https://cdn.przknv.cc/doty/app-launcher.png" width="250"> | **Battery**<br><img src="https://cdn.przknv.cc/doty/battery.png" width="250"> | **Brightness**<br><img src="https://cdn.przknv.cc/doty/brightness.png" width="250"> | **Emoji**<br><img src="https://cdn.przknv.cc/doty/emoji.png" width="250"> |
+| **GitHub**<br><img src="https://cdn.przknv.cc/doty/github.png" width="250"> | **Media**<br><img src="https://cdn.przknv.cc/doty/media.png" width="250"> | **Podman**<br><img src="https://cdn.przknv.cc/doty/podman.png" width="250"> | **Clipboard**<br><img src="https://cdn.przknv.cc/doty/clipboard.png" width="250"> |
+| **System Info**<br><img src="https://cdn.przknv.cc/doty/system.png" width="250"> | **Virtualization**<br><img src="https://cdn.przknv.cc/doty/virtual.png" width="250"> | **Wi-Fi**<br><img src="https://cdn.przknv.cc/doty/wifi.png" width="250"> | **Waydroid**<br><img src="https://cdn.przknv.cc/doty/waydroid.png" width="250"> |
+| **Wallpaper Switcher**<br><img src="https://cdn.przknv.cc/doty/wallpaper-switcher.png" width="250"> | **Control Center**<br><img src="https://cdn.przknv.cc/doty/control-center.png" width="250"> | **Color Schemes**<br><img src="https://cdn.przknv.cc/doty/color-scheme.png" width="250"> | **Screen Capture**<br><img src="https://cdn.przknv.cc/doty/screencapture.png" width="250"> |
 
 <br />
 
@@ -99,6 +99,8 @@ doty # Assuming you have the alias set up, otherwise run `sudo nixos-rebuild swi
 | | | | |
 | :---: | :---: | :---: | :---: |
 | ![Preview 17](https://cdn.przknv.cc/doty/t1.png) | ![Preview 18](https://cdn.przknv.cc/doty/t2.png) | ![Preview 19](https://cdn.przknv.cc/doty/t3.png) | ![Preview 20](https://cdn.przknv.cc/doty/t4.png) |
+
+![Preview](https://cdn.przknv.cc/doty/wabi.png)
 
 All application adopt the color scheme based on the current wallpaper. Here are some previews of different wallpapers and their corresponding dynamic themes.
 
