@@ -26,22 +26,22 @@ This contains latest changes as i've moved to NixOS.
 <a id="features"></a>
 <img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=686c5b&vCenter=true&width=435&height=25&lines=FEATURES" width="450"/>
 
-- ❄️ **Declarative & Reproducible**: Powered by Nix Flakes and Home Manager to ensure your environment is fully reproducible across installations.
-- 📦 **Everything Configured**: Fully customized daemons, keys, widgets, popups, launchers and services out-of-the-box, nix magic. *Yo arch so fat, when she tried to clone this, AUR servers went straight into swap memory.*
-- 🧠 **AI-Powered (Local) Workflows**: Out-of-the-box integrations for local OCR, Speech-to-Text (STT), and LLMs.
-- 🖼️ **Animated Wallpaper**: Automatically change your wallpaper based on time of day or system events or put an video.
-- 🕛 **Screen Time & Focus Mode**: Track your screen time and enable focus mode to block distractions.
-- 🤖 **Virtualization Maxx**: Waydroid, Droidbox(ubuntu, fedora, etc), VMware, Qemu/Libvirt all preconfigured for development.
-- 🎨 **Matugen Dynamic Theming**: Colors dynamically generated from your active wallpaper to keep your workspace fresh and cohesive.
-- 📜 **Horizontal Scrolling Layout**: Slide through workspace layers in a smooth horizontal layout.
-- 🍸 **Liquid Glass Aesthetics**: Modern, translucent, and blurred glassmorphism so clean you'll try to wipe your greasy fingerprints off the screen.
-- 🗣️ **Highly Opinionated**: Built with a curated layout and toolchain designed for efficiency for developers.
-- ⚡ **Quickshell Popups**: Instant control panels, system sliders, and toggles right at your fingertips.
-- ⚙️ **Under the Hood Nix Magic**: Lockfiles ensuring package version consistency across updates.
-- 🍃 **Resource Efficient**: Tailored to run light on system resources.
-- 🧩 **Modular & Extensible**: Easily add or remove components to suit your workflow.
-- 🖥️ **Cockpit Integration**: Seamless integration with Cockpit for system management & instant logs.
-- very more..
+- `[Core]` **Declarative & Reproducible**: Powered by Nix Flakes and Home Manager to ensure your environment is fully reproducible across installations.
+- `[Setup]` **Everything Configured**: Fully customized daemons, keys, widgets, popups, launchers and services out-of-the-box, nix magic. *Yo arch so fat, when she tried to clone this, AUR servers went straight into swap memory.*
+- `[AI]` **AI-Powered (Local) Workflows**: Out-of-the-box integrations for local OCR, Speech-to-Text (STT), and LLMs.
+- `[UI]` **Animated Wallpaper**: Automatically change your wallpaper based on time of day or system events or put an video.
+- `[Utils]` **Screen Time & Focus Mode**: Track your screen time and enable focus mode to block distractions.
+- `[Dev]` **Virtualization Maxx**: Waydroid, Droidbox(ubuntu, fedora, etc), VMware, Qemu/Libvirt all preconfigured for development.
+- `[Theme]` **Matugen Dynamic Theming**: Colors dynamically generated from your active wallpaper to keep your workspace fresh and cohesive.
+- `[Layout]` **Horizontal Scrolling Layout**: Slide through workspace layers in a smooth horizontal layout.
+- `[Design]` **Liquid Glass Aesthetics**: Modern, translucent, and blurred glassmorphism so clean you'll try to wipe your greasy fingerprints off the screen.
+- `[Opinion]` **Highly Opinionated**: Built with a curated layout and toolchain designed for efficiency for developers.
+- `[Widgets]` **Quickshell Popups**: Instant control panels, system sliders, and toggles right at your fingertips.
+- `[System]` **Under the Hood Nix Magic**: Lockfiles ensuring package version consistency across updates.
+- `[Perf]` **Resource Efficient**: Tailored to run light on system resources.
+- `[Modular]` **Modular & Extensible**: Easily add or remove components to suit your workflow.
+- `[Admin]` **Cockpit Integration**: Seamless integration with Cockpit for system management & instant logs.
+- And much more...
 
 <br />
 
