@@ -440,7 +440,7 @@ local save_register_ss = "mkdir -p "
 	.. grimhyprctl
 	.. ' "$FILE" && wl-copy < "$FILE" && '
 	.. media_helper
-	.. ' add-asset screenshot "$FILE"'
+	.. ' add-asset screenshot "$FILE" && notify-send -t 2000 -i "$FILE" -a "Screenshot" "Screenshot Saved" "Copied to clipboard"'
 local save_register_ss_region = "mkdir -p "
 	.. ss_dir
 	.. " && FILE="
@@ -449,7 +449,7 @@ local save_register_ss_region = "mkdir -p "
 	.. slurp_cmd
 	.. ')" "$FILE" && wl-copy < "$FILE" && '
 	.. media_helper
-	.. ' add-asset screenshot "$FILE"'
+	.. ' add-asset screenshot "$FILE" && notify-send -t 2000 -i "$FILE" -a "Screenshot" "Region Saved" "Copied to clipboard"'
 local save_register_ss_region_swappy = "mkdir -p "
 	.. ss_dir
 	.. " && FILE="
@@ -458,7 +458,7 @@ local save_register_ss_region_swappy = "mkdir -p "
 	.. slurp_cmd
 	.. ')" "$FILE" && swappy -f "$FILE" -o "$FILE" && '
 	.. media_helper
-	.. ' add-asset screenshot "$FILE"'
+	.. ' add-asset screenshot "$FILE" && notify-send -t 2000 -i "$FILE" -a "Screenshot" "Screenshot Saved" "Copied to clipboard"'
 
 hl.bind("Print", hl.dsp.exec_cmd("sh -c '" .. save_register_ss .. "'"), {
 	locked = true,
