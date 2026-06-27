@@ -156,14 +156,14 @@
       hardware.graphics.enable = true;
       hardware.nvidia = {
         modesetting.enable = true;
-        open = false;
+        open = true;
         nvidiaSettings = true;
         powerManagement = {
           enable = true;
-          finegrained = false;
+          finegrained = true;
         };
         package = config.boot.kernelPackages.nvidiaPackages.stable;
-        dynamicBoost.enable = false;
+        dynamicBoost.enable = true;
       };
 
       # -- Input --
