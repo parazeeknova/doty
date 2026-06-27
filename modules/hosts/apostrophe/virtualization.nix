@@ -60,6 +60,7 @@
             (pkgs.writeShellScript "waydroid-gpu-fix-pre" ''
               set -e
               PROP_FILE="/var/lib/waydroid/waydroid.prop"
+              BASE_PROP_FILE="/var/lib/waydroid/waydroid_base.prop"
 
               mkdir -p /var/lib/waydroid
               touch "$PROP_FILE"
@@ -68,18 +69,41 @@
 
               # Function to set properties (removes old, adds new)
               set_prop() {
-                ${pkgs.gnused}/bin/sed -i "/^$1=/d" "$PROP_FILE"
-                echo "$1=$2" >> "$PROP_FILE"
+                local file="$1"
+                local key="$2"
+                local val="$3"
+                ${pkgs.gnused}/bin/sed -i "/^$key=/d" "$file"
+                echo "$key=$val" >> "$file"
               }
 
-              # Force Intel GPU (GBM/Mesa)
-              set_prop ro.hardware.gralloc gbm
-              set_prop ro.hardware.egl mesa
-              set_prop gralloc.gbm.device ${intelRenderNode}
-              set_prop ro.hardware.vulkan intel
+              # Function to delete properties
+              del_prop() {
+                local file="$1"
+                local key="$2"
+                ${pkgs.gnused}/bin/sed -i "/^$key=/d" "$file"
+              }
+
+              # Setup waydroid.prop
+              set_prop "$PROP_FILE" ro.hardware.gralloc gbm
+              set_prop "$PROP_FILE" ro.hardware.egl mesa
+              set_prop "$PROP_FILE" gralloc.gbm.device ${intelRenderNode}
+              del_prop "$PROP_FILE" ro.hardware.vulkan
+              del_prop "$PROP_FILE" gralloc.gbm.legacy
+
+              # Setup waydroid_base.prop (if it exists)
+              if [ -f "$BASE_PROP_FILE" ]; then
+                set_prop "$BASE_PROP_FILE" ro.hardware.gralloc gbm
+                set_prop "$BASE_PROP_FILE" ro.hardware.egl mesa
+                set_prop "$BASE_PROP_FILE" gralloc.gbm.device ${intelRenderNode}
+                del_prop "$BASE_PROP_FILE" ro.hardware.vulkan
+                del_prop "$BASE_PROP_FILE" gralloc.gbm.legacy
+              fi
 
               # Clean empty lines
               ${pkgs.gnused}/bin/sed -i '/^$/d' "$PROP_FILE"
+              if [ -f "$BASE_PROP_FILE" ]; then
+                ${pkgs.gnused}/bin/sed -i '/^$/d' "$BASE_PROP_FILE"
+              fi
             '')
           ];
         };
@@ -97,10 +121,16 @@
           ExecStart = pkgs.writeShellScript "waydroid-intel-fix-post" ''
             set -e
             ${pkgs.coreutils}/bin/sleep 5
-            ${config.virtualisation.waydroid.package}/bin/waydroid prop set ro.hardware.gralloc gbm
-            ${config.virtualisation.waydroid.package}/bin/waydroid prop set ro.hardware.egl mesa
-            ${config.virtualisation.waydroid.package}/bin/waydroid prop set gralloc.gbm.device ${intelRenderNode}
-            ${config.virtualisation.waydroid.package}/bin/waydroid prop set ro.hardware.vulkan intel
+            
+            PROP_FILE="/var/lib/waydroid/waydroid.prop"
+            BASE_PROP_FILE="/var/lib/waydroid/waydroid_base.prop"
+            
+            for f in "$PROP_FILE" "$BASE_PROP_FILE"; do
+              if [ -f "$f" ]; then
+                ${pkgs.gnused}/bin/sed -i '/^ro.hardware.vulkan=/d' "$f"
+                ${pkgs.gnused}/bin/sed -i '/^gralloc.gbm.legacy=/d' "$f"
+              fi
+            done
           '';
         };
       };
@@ -111,15 +141,15 @@
           users = [ "parazeeknova" ];
           commands = [
             {
-              command = "${pkgs.systemd}/bin/systemctl start waydroid-container";
+              command = "/run/current-system/sw/bin/systemctl start waydroid-container";
               options = [ "NOPASSWD" ];
             }
             {
-              command = "${pkgs.systemd}/bin/systemctl stop waydroid-container";
+              command = "/run/current-system/sw/bin/systemctl stop waydroid-container";
               options = [ "NOPASSWD" ];
             }
             {
-              command = "${pkgs.systemd}/bin/systemctl status waydroid-container";
+              command = "/run/current-system/sw/bin/systemctl status waydroid-container";
               options = [ "NOPASSWD" ];
             }
           ];
