@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Write};
 use std::process::{Command, Stdio};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -38,10 +38,12 @@ fn main() {
             }
             if let Ok(output_str) = serde_json::to_string(&status) {
                 println!("{}", output_str);
+                let _ = std::io::stdout().flush();
             }
         } else {
             // Fallback to printing as-is if parsing fails
             println!("{}", line);
+            let _ = std::io::stdout().flush();
         }
     }
 
