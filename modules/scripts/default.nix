@@ -49,6 +49,7 @@ in
             "scripts/tmux-sessionizer".source = mkOutOfStoreSymlink "${scriptsDir}/tmux-sessionizer";
             "scripts/toggle_wallpaper_pause".source =
               mkOutOfStoreSymlink "${scriptsDir}/toggle_wallpaper_pause";
+            "scripts/toggle_waydroid".source = mkOutOfStoreSymlink "${scriptsDir}/toggle_waydroid";
           };
         };
     };

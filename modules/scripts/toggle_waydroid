@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# Check if Waydroid UI is already running
+if pgrep -x "waydroid" > /dev/null; then
+    # Toggle the special workspace
+    hyprctl dispatch togglespecialworkspace waydroid
+else
+    # Start container service if not active
+    if ! systemctl is-active --quiet waydroid-container; then
+        notify-send -t 3000 -a "Waydroid" "System Container" "Starting Waydroid system container..."
+        # Start container via passwordless sudo
+        sudo systemctl start waydroid-container
+        # Wait a moment for container to initialize
+        sleep 2
+    fi
+    
+    notify-send -t 3000 -a "Waydroid" "Android Session" "Launching Waydroid user session..."
+    # Start the Waydroid full UI in the background
+    waydroid show-full-ui &
+    
+    # Toggle the special workspace to bring it up
+    hyprctl dispatch togglespecialworkspace waydroid
+fi

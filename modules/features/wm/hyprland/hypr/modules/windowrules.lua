@@ -182,6 +182,17 @@ hl.window_rule({
 	center = true,
 })
 
+hl.window_rule({
+	name = "waydroid-scratchpad",
+	match = {
+		class = "^[Ww]aydroid$",
+	},
+	workspace = "special:waydroid",
+	float = true,
+	size = { 1610, 1010 },
+	center = true,
+})
+
 local colors = {}
 local colors_status, c = pcall(require, "modules.colors")
 if colors_status then
