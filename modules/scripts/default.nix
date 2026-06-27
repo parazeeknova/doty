@@ -50,6 +50,17 @@ in
             "scripts/toggle_wallpaper_pause".source =
               mkOutOfStoreSymlink "${scriptsDir}/toggle_wallpaper_pause";
             "scripts/toggle_waydroid".source = mkOutOfStoreSymlink "${scriptsDir}/toggle_waydroid";
+
+            ".local/share/applications/Waydroid.desktop".text = ''
+              [Desktop Entry]
+              Type=Application
+              Name=Waydroid
+              GenericName=Android Container
+              Exec=${repo}/modules/scripts/toggle_waydroid
+              Comment=Run Android apps in a containerized environment.
+              Icon=waydroid
+              Categories=Utility;
+            '';
           };
         };
     };
