@@ -452,6 +452,7 @@ pub fn list_assets(
          FROM assets a",
     );
     let mut conditions: Vec<String> = Vec::new();
+    conditions.push("a.deleted_at IS NULL".to_string());
     let mut binds: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
 
     if let Some(s) = search.filter(|s| !s.is_empty()) {
