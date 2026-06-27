@@ -308,9 +308,12 @@ hl.bind(
 ---------------------
 ---    Voxtype    ---
 ---------------------
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("voxtype record start"))
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("voxtype record stop"), {
+hl.bind("Pause", hl.dsp.exec_cmd("voxtype record start"), {
+	ignore_mods = true,
+})
+hl.bind("Pause", hl.dsp.exec_cmd("voxtype record stop"), {
 	release = true,
+	ignore_mods = true,
 })
 
 ---------------------
