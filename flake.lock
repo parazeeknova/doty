@@ -289,16 +289,17 @@
     "hyprland-scroll-overview": {
       "flake": false,
       "locked": {
-        "dirtyRev": "00d4b672f06a3bbe94f2c0009126babae4e615ad-dirty",
-        "dirtyShortRev": "00d4b67-dirty",
         "lastModified": 1782606563,
-        "narHash": "sha256-CEPblfy995NcE9ru2RmkspqTOo0dPB8wvpYkV6PUmLM=",
-        "type": "git",
-        "url": "file:///home/parazeeknova/doty/ref/hyprland-scroll-overview"
+        "narHash": "sha256-7/D4tuLpgs1DE8k5DzkwLEOi7iOPkqHhk6zryus5KYg=",
+        "owner": "yayuuu",
+        "repo": "hyprland-scroll-overview",
+        "rev": "00d4b672f06a3bbe94f2c0009126babae4e615ad",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "file:///home/parazeeknova/doty/ref/hyprland-scroll-overview"
+        "owner": "yayuuu",
+        "repo": "hyprland-scroll-overview",
+        "type": "github"
       }
     },
     "import-tree": {

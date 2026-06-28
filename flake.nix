@@ -43,7 +43,7 @@
       flake = false;
     };
     hyprland-scroll-overview = {
-      url = "git+file:///home/parazeeknova/doty/ref/hyprland-scroll-overview";
+      url = "github:yayuuu/hyprland-scroll-overview";
       flake = false;
     };
 
