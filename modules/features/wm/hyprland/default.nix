@@ -57,7 +57,11 @@
 
         src = inputs.hyprland-scroll-overview;
 
-        nativeBuildInputs = [ pkgs.pkg-config pkgs.cmake pkgs.gcc14 ];
+        nativeBuildInputs = [
+          pkgs.pkg-config
+          pkgs.cmake
+          pkgs.gcc14
+        ];
         buildInputs = [
           pkgs.hyprland
           pkgs.aquamarine
