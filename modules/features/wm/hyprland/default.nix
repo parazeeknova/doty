@@ -84,6 +84,10 @@
           pkgs.cairo
           pkgs.glslang
         ];
+
+        postInstall = ''
+          mv $out/lib/libscrolloverview.so $out/lib/libhyprland-scroll-overview.so
+        '';
       };
     in
     {
