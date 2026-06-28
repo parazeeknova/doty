@@ -16,12 +16,12 @@
       nix.settings = inputs.aagl.nixConfig;
 
       # Enable an-anime-team launchers
-      programs.anime-game-launcher.enable = true;      # Genshin Impact
-      programs.anime-games-launcher.enable = true;     # Multiple games
+      programs.anime-game-launcher.enable = true; # Genshin Impact
+      programs.anime-games-launcher.enable = false; # Multiple games
       programs.honkers-railway-launcher.enable = false; # Honkai: Star Rail
-      programs.honkers-launcher.enable = false;         # Honkai Impact 3rd
-      programs.wavey-launcher.enable = true;           # Wuthering Waves
-      programs.sleepy-launcher.enable = false;          # Zenless Zone Zero
+      programs.honkers-launcher.enable = false; # Honkai Impact 3rd
+      programs.wavey-launcher.enable = false; # Wuthering Waves
+      programs.sleepy-launcher.enable = false; # Zenless Zone Zero
 
       # Enable Steam
       programs.steam = {

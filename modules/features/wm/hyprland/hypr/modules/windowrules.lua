@@ -57,6 +57,26 @@ hl.window_rule({
 	center = true,
 })
 
+hl.window_rule({
+	name = "anime-game-launcher-rules",
+	match = {
+		class = "^moe\\.launcher\\.an-anime-game-launcher$",
+	},
+	workspace = "8",
+	float = true,
+	border_size = 0,
+})
+
+hl.window_rule({
+	name = "wavey-launcher-rules",
+	match = {
+		class = "^moe\\.launcher\\.wavey-launcher$",
+	},
+	workspace = "8",
+	float = true,
+	border_size = 0,
+})
+
 hl.layer_rule({
 	name = "quickshell-blur",
 	match = {
