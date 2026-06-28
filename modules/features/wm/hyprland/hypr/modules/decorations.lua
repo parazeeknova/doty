@@ -82,6 +82,12 @@ hl.config({
 	animations = {
 		enabled = true,
 	},
+	plugin = {
+		hyprfocus = {
+			mode = "slide",
+			slide_height = 2,
+		},
+	},
 })
 
 -- Curves
@@ -229,4 +235,18 @@ hl.animation({
 	enabled = true,
 	speed = 3,
 	bezier = "standardDecel",
+})
+
+-- hyprfocus animations
+hl.animation({
+	leaf = "hyprfocusIn",
+	enabled = true,
+	speed = 4,
+	bezier = "emphasizedDecel",
+})
+hl.animation({
+	leaf = "hyprfocusOut",
+	enabled = true,
+	speed = 4,
+	bezier = "emphasizedDecel",
 })

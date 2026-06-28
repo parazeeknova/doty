@@ -38,6 +38,10 @@
       url = "github:ezKEa/aagl-gtk-on-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    hypr-kinetic-scroll = {
+      url = "github:savonovv/hypr-kinetic-scroll";
+      flake = false;
+    };
 
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";

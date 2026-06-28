@@ -7,6 +7,50 @@
       lib,
       ...
     }:
+    let
+      hypr-kinetic-scroll = pkgs.stdenv.mkDerivation {
+        pname = "hypr-kinetic-scroll";
+        version = "unstable";
+
+        src = inputs.hypr-kinetic-scroll;
+
+        nativeBuildInputs = [ pkgs.pkg-config ];
+        buildInputs = [
+          pkgs.hyprland
+          pkgs.aquamarine
+          pkgs.hyprgraphics
+          pkgs.hyprutils
+          pkgs.hyprlang
+          pkgs.hyprcursor
+          pkgs.libGL
+          pkgs.libxcb-wm
+          pkgs.libxcb-errors
+          pkgs.wayland-protocols
+          pkgs.lua
+          pkgs.pixman
+          pkgs.libdrm
+          pkgs.libinput
+          pkgs.systemd
+          pkgs.wayland
+          pkgs.libxkbcommon
+          pkgs.pango
+          pkgs.cairo
+        ];
+
+        buildPhase = ''
+          runHook preBuild
+          make
+          runHook postBuild
+        '';
+
+        installPhase = ''
+          runHook preInstall
+          mkdir -p $out/lib
+          cp hypr-kinetic-scroll.so $out/lib/libhypr-kinetic-scroll.so
+          runHook postInstall
+        '';
+      };
+    in
     {
 
       # -- Hyprland --
@@ -48,6 +92,8 @@
           configType = "lua";
           plugins = [
             pkgs.hyprlandPlugins.hypr-dynamic-cursors
+            pkgs.hyprlandPlugins.hyprfocus
+            hypr-kinetic-scroll
           ];
           extraConfig = ''
             -- Load main hyprland configuration modules

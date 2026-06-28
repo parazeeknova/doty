@@ -248,6 +248,22 @@
         "type": "github"
       }
     },
+    "hypr-kinetic-scroll": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1781791499,
+        "narHash": "sha256-rYhrHXLqMOkiTCgub2s9s4CXoNkTrWq9Qsggq6oGjlQ=",
+        "owner": "savonovv",
+        "repo": "hypr-kinetic-scroll",
+        "rev": "1e77fb637b18bcc9d1f76f54212f5881d8b9223c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "savonovv",
+        "repo": "hypr-kinetic-scroll",
+        "type": "github"
+      }
+    },
     "hyprland-preview-share-picker": {
       "inputs": {
         "nixpkgs": [
@@ -387,6 +403,7 @@
         "flake-parts": "flake-parts",
         "helium": "helium",
         "home-manager": "home-manager",
+        "hypr-kinetic-scroll": "hypr-kinetic-scroll",
         "hyprland-preview-share-picker": "hyprland-preview-share-picker",
         "import-tree": "import-tree",
         "nix-doom-emacs-unstraightened": "nix-doom-emacs-unstraightened",

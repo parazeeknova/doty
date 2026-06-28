@@ -20,6 +20,17 @@ hl.config({
 	cursor = {
 		no_warps = true,
 	},
+	plugin = {
+		kinetic_scroll = {
+			enabled = 1,
+			decel = 0.99,
+			min_velocity = 1.3,
+			interval_ms = 8,
+			delta_multiplier = 1.25,
+			disable_in_browser = 1,
+			stop_on_target_change = 1,
+		},
+	},
 })
 
 hl.gesture({
