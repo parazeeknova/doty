@@ -286,6 +286,21 @@
         "url": "https://github.com/WhySoBad/hyprland-preview-share-picker"
       }
     },
+    "hyprland-scroll-overview": {
+      "flake": false,
+      "locked": {
+        "dirtyRev": "00d4b672f06a3bbe94f2c0009126babae4e615ad-dirty",
+        "dirtyShortRev": "00d4b67-dirty",
+        "lastModified": 1782606563,
+        "narHash": "sha256-CEPblfy995NcE9ru2RmkspqTOo0dPB8wvpYkV6PUmLM=",
+        "type": "git",
+        "url": "file:///home/parazeeknova/doty/ref/hyprland-scroll-overview"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:///home/parazeeknova/doty/ref/hyprland-scroll-overview"
+      }
+    },
     "import-tree": {
       "locked": {
         "lastModified": 1778781969,
@@ -405,6 +420,7 @@
         "home-manager": "home-manager",
         "hypr-kinetic-scroll": "hypr-kinetic-scroll",
         "hyprland-preview-share-picker": "hyprland-preview-share-picker",
+        "hyprland-scroll-overview": "hyprland-scroll-overview",
         "import-tree": "import-tree",
         "nix-doom-emacs-unstraightened": "nix-doom-emacs-unstraightened",
         "nixpkgs": "nixpkgs",

@@ -42,6 +42,10 @@
       url = "github:savonovv/hypr-kinetic-scroll";
       flake = false;
     };
+    hyprland-scroll-overview = {
+      url = "git+file:///home/parazeeknova/doty/ref/hyprland-scroll-overview";
+      flake = false;
+    };
 
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";

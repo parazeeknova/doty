@@ -78,7 +78,6 @@
         minikube
 
         # -- Tools --
-        mission-center
         httpie
         tmux
         tmuxPlugins.cpu

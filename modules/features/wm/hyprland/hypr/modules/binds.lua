@@ -199,12 +199,12 @@ hl.bind(
 	})
 )
 
--- This is disabled because the scroll overview plugin is not supported on nix atm
--- hl.bind("ALT + TAB", function()
---     if hl.plugin and hl.plugin.scrolloverview then
---         hl.plugin.scrolloverview.overview("toggle")
---     end
--- end)
+-- This is enabled because the scroll overview plugin is now supported on nix
+hl.bind("ALT + TAB", function()
+	if hl.plugin and hl.plugin.scrolloverview then
+		hl.plugin.scrolloverview.overview("toggle")
+	end
+end)
 
 hl.bind(mainMod .. " + backslash", function()
 	local ws = hl.get_active_workspace()
