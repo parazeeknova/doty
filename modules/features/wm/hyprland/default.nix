@@ -82,6 +82,7 @@
           pkgs.libxkbcommon
           pkgs.pango
           pkgs.cairo
+          pkgs.glslang
         ];
       };
     in
