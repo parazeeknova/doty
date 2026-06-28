@@ -8,6 +8,21 @@
       ...
     }:
     {
+      imports = [
+        inputs.aagl.nixosModules.default
+      ];
+
+      # Set up Cachix binary cache for aagl-gtk-on-nix
+      nix.settings = inputs.aagl.nixConfig;
+
+      # Enable an-anime-team launchers
+      programs.anime-game-launcher.enable = true;      # Genshin Impact
+      programs.anime-games-launcher.enable = true;     # Multiple games
+      programs.honkers-railway-launcher.enable = false; # Honkai: Star Rail
+      programs.honkers-launcher.enable = false;         # Honkai Impact 3rd
+      programs.wavey-launcher.enable = true;           # Wuthering Waves
+      programs.sleepy-launcher.enable = false;          # Zenless Zone Zero
+
       # Enable Steam
       programs.steam = {
         enable = true;
