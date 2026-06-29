@@ -64,15 +64,15 @@
             };
           };
 
-          systemd.user.services.gmail-daemon = {
+          systemd.user.services.mail-notifier = {
             Unit = {
-              Description = "Gmail Instant Push Notification Daemon";
+              Description = "Instant Push Mail Notification Watcher";
               After = [ "network-online.target" ];
               Wants = [ "network-online.target" ];
             };
             Service = {
               Type = "simple";
-              ExecStart = "%h/.local/bin/gmail_daemon";
+              ExecStart = "%h/.local/bin/mail_notifier";
               Restart = "always";
               RestartSec = "10";
             };

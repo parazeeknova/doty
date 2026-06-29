@@ -219,8 +219,8 @@
       # -- SOPS Decryption Config --
       sops.defaultSopsFile = ../../../secrets/secrets.yaml;
       sops.age.keyFile = "/home/parazeeknova/.config/sops/age/keys.txt";
-      sops.secrets.gmail-accounts = {
-        path = "/run/secrets/gmail-accounts.json";
+      sops.secrets.mail-accounts = {
+        path = "/run/secrets/mail-accounts.json";
         owner = "parazeeknova";
         group = "users";
         mode = "0400";

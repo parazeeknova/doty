@@ -95,9 +95,9 @@ fn main() {
             ipc_socket: Some("wabi_screentime.sock"),
         },
         Daemon {
-            name: "Gmail Daemon",
-            process_name: "gmail_daemon",
-            start_command: "uwsm app -- ~/.local/bin/gmail_daemon",
+            name: "Mail Notifier",
+            process_name: "mail_notifier",
+            start_command: "uwsm app -- ~/.local/bin/mail_notifier",
             ipc_socket: None,
         },
         Daemon {

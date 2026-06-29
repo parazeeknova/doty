@@ -31,7 +31,7 @@ fn main() {
         std::process::exit(0);
     }
 
-    println!("Starting gmail_daemon for {} accounts", accounts.len());
+    println!("Starting mail_notifier for {} accounts", accounts.len());
 
     // 2. Spawn a thread for each account
     let mut handles = vec![];
@@ -58,19 +58,19 @@ fn get_config_path() -> PathBuf {
     }
 
     // Check environment variable
-    if let Ok(env_path) = env::var("GMAIL_ACCOUNTS_JSON") {
+    if let Ok(env_path) = env::var("MAIL_ACCOUNTS_JSON") {
         return PathBuf::from(env_path);
     }
 
-    // Default to /run/secrets/gmail-accounts.json (Option C - SOPS/agenix)
-    let sops_path = PathBuf::from("/run/secrets/gmail-accounts.json");
+    // Default to /run/secrets/mail-accounts.json (Option C - SOPS/agenix)
+    let sops_path = PathBuf::from("/run/secrets/mail-accounts.json");
     if sops_path.exists() {
         return sops_path;
     }
 
     // Fallback to local test config
     let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
-    Path::new(&home).join(".config/wabi/gmail.json")
+    Path::new(&home).join(".config/wabi/mail.json")
 }
 
 fn load_config(path: &Path) -> Result<Vec<Account>, Box<dyn std::error::Error>> {
@@ -84,7 +84,7 @@ fn run_account_loop(account: Account) {
     let max_backoff = Duration::from_secs(300);
 
     loop {
-        println!("[{}] Connecting to Gmail IMAP...", account.email);
+        println!("[{}] Connecting to Mail IMAP...", account.email);
         match connect_and_monitor(&account) {
             Ok(_) => {
                 // If it returns Ok, it means we exited cleanly or connection closed cleanly.
@@ -363,7 +363,7 @@ fn send_notification(
     };
 
     notif
-        .summary(&format!("Gmail ({})", account_email))
+        .summary(&format!("Mail ({})", account_email))
         .body(&formatted_body)
         .action("default", "Open in Browser")
         .hint(notify_rust::Hint::Category("email".to_string()))

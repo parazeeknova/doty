@@ -129,8 +129,8 @@ name = "screentime_daemon"
 path = "src/bin/status/screentime_daemon.rs"
 
 [[bin]]
-name = "gmail_daemon"
-path = "src/bin/status/gmail_daemon.rs"
+name = "mail_notifier"
+path = "src/bin/status/mail_notifier.rs"
 
 [[bin]]
 name = "get_screentime_status"
