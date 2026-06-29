@@ -1,3 +1,12 @@
+# What is this?
+# This file configures SOPS (Secrets Operations) for this repository.
+# It tells SOPS which public keys to use when encrypting files in the secrets/
+# directory.
+#
+# How to use:
+# To encrypt secrets, your local public key must be defined here, and the
+# corresponding private key must be present in ~/.config/sops/age/keys.txt.
+
 keys:
   - &primary age1g9dmq5nqv70h5gwdvr5frvjzv2xkj3j3hs3pfky400nns6uamdtqeyfz4k
 creation_rules:
