@@ -36,7 +36,7 @@
 
           # -- Wabi Theme System --
           set -Ux WABI_DOTFILES_DIR "$HOME/doty"
-          set -Ux WABI_VM_SCAN_ROOT ""
+          set -Ux WABI_VM_SCAN_ROOT "$HOME/secondary/virtuals"
           set -Ux WABI_GITHUB_USER "parazeeknova"
           set -Ux WABI_PRESETS_DIR "$HOME/doty/wabi/presets"
         '';

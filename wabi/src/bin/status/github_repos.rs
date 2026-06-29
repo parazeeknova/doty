@@ -93,7 +93,15 @@ impl From<RawGitRepo> for GitRepo {
 }
 
 fn get_token() -> Option<String> {
-    // Try env var first
+    // Try SOPS decrypted secret first
+    if let Ok(token) = fs::read_to_string("/run/secrets/github-token") {
+        let trimmed = token.trim();
+        if !trimmed.is_empty() {
+            return Some(trimmed.to_string());
+        }
+    }
+
+    // Try env var second
     if let Ok(token) = std::env::var("WABI_GITHUB_TOKEN")
         && !token.is_empty()
     {

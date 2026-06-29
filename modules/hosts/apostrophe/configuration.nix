@@ -225,6 +225,12 @@
         group = "users";
         mode = "0400";
       };
+      sops.secrets.github-token = {
+        path = "/run/secrets/github-token";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
 
       system.stateVersion = "26.05";
     };
