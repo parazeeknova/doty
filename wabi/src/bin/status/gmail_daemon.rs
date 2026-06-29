@@ -515,11 +515,11 @@ mod tests {
     #[ignore]
     fn test_trigger_desktop_notification() {
         send_notification(
-            "yesh8harsh@gmail.com",
-            "Harsh Sahu (harshsahu049@gmail.com)",
+            "testuser@gmail.com",
+            "Tester Name (tester@gmail.com)",
             "Test Subject",
             "This is the body content of the email!",
-            "https://mail.google.com/?authuser=yesh8harsh@gmail.com#inbox",
+            "https://mail.google.com/?authuser=testuser@gmail.com#inbox",
         );
     }
 }
