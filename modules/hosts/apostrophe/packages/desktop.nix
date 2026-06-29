@@ -30,6 +30,30 @@
         localsend
         phototonic
 
+        # -- ZCode --
+        (appimageTools.wrapType2 {
+          pname = "zcode";
+          version = "3.2.0";
+          src = fetchurl {
+            url = "https://cdn-zcode.z.ai/zcode/electron/releases/3.2.0/ZCode-3.2.0-linux-x64.AppImage";
+            sha256 = "0r8q0f17m26yvxib58dd88ygasrygc5ky6m3zbvmnjq57l64bsjg";
+          };
+          extraInstallCommands = ''
+            mkdir -p $out/share/applications
+            cat > $out/share/applications/zcode.desktop <<EOF
+            [Desktop Entry]
+            Name=ZCode
+            Exec=zcode %U
+            Terminal=false
+            Type=Application
+            Icon=zcode
+            StartupWMClass=ZCode
+            Comment=AI Coding Assistant
+            Categories=Development;
+            EOF
+          '';
+        })
+
         # -- Multi Media --
         freetube
         audacity
