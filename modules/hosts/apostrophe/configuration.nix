@@ -243,6 +243,12 @@
         group = "users";
         mode = "0400";
       };
+      sops.secrets.anthropic-auth-token = {
+        path = "/run/secrets/anthropic-auth-token";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
 
       system.stateVersion = "26.05";
     };
