@@ -510,4 +510,16 @@ mod tests {
         let simple_email = "From: abc@xyz.com\r\nSubject: test\r\n\r\nSimple Body";
         assert_eq!(extract_plain_text(simple_email).trim(), "Simple Body");
     }
+
+    #[test]
+    #[ignore]
+    fn test_trigger_desktop_notification() {
+        send_notification(
+            "yesh8harsh@gmail.com",
+            "Harsh Sahu (harshsahu049@gmail.com)",
+            "Test Subject",
+            "This is the body content of the email!",
+            "https://mail.google.com/?authuser=yesh8harsh@gmail.com#inbox",
+        );
+    }
 }
