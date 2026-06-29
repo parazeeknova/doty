@@ -231,6 +231,18 @@
         group = "users";
         mode = "0400";
       };
+      sops.secrets.context7-api-key = {
+        path = "/run/secrets/context7-api-key";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.modal-api-key = {
+        path = "/run/secrets/modal-api-key";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
 
       system.stateVersion = "26.05";
     };

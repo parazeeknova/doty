@@ -40,6 +40,14 @@
           set -Ux WABI_VM_SCAN_ROOT "$HOME/secondary/virtuals"
           set -Ux WABI_GITHUB_USER "parazeeknova"
           set -Ux WABI_PRESETS_DIR "$HOME/doty/wabi/presets"
+
+          # -- SOPS Decrypted Environment Variables --
+          if test -f /run/secrets/context7-api-key
+              set -gx CONTEXT7_API_KEY (cat /run/secrets/context7-api-key)
+          end
+          if test -f /run/secrets/modal-api-key
+              set -gx MODAL_API_KEY (cat /run/secrets/modal-api-key)
+          end
         '';
       };
     };
