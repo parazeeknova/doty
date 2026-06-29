@@ -21,7 +21,7 @@
           sops = {
             defaultSopsFile = ../../secrets/secrets.yaml;
             age.keyFile = "/home/parazeeknova/.config/sops/age/keys.txt";
-            secrets.anthropic-auth-token = {};
+            secrets.anthropic-auth-token = { };
             templates."claude-settings" = {
               content = ''
                 {
