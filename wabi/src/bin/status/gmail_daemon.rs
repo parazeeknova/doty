@@ -158,8 +158,8 @@ fn handle_new_message<T: std::io::Read + std::io::Write>(
     seq: u32,
     email: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    // Fetch the Envelope and the body text in a single roundtrip
-    let fetch_query = "ENVELOPE BODY.PEEK[TEXT]";
+    // Fetch the Envelope and the body text in a single parenthesized query list
+    let fetch_query = "(ENVELOPE BODY.PEEK[TEXT])";
     let fetches = session.fetch(seq.to_string(), fetch_query)?;
     let msg = fetches.iter().next().ok_or("No fetch result returned")?;
 
