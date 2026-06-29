@@ -13,6 +13,7 @@
         self.nixosModules.apostropheDisko
         self.nixosModules.apostropheVirtualization
         inputs.home-manager.nixosModules.home-manager
+        inputs.sops-nix.nixosModules.sops
         self.nixosModules.apostrophePackages
         self.nixosModules.apostropheFans
       ]
@@ -214,6 +215,17 @@
         "d /usr/share 0755 root root -"
         "L /usr/share/applications - - - - /run/current-system/sw/share/applications"
       ];
+
+      # -- SOPS Decryption Config --
+      sops.defaultSopsFile = ../../../secrets/secrets.yaml;
+      sops.age.keyFile = "/home/parazeeknova/.config/sops/age/keys.txt";
+      sops.secrets.gmail-accounts = {
+        path = "/run/secrets/gmail-accounts.json";
+        owner = "parazeeknova";
+        group = "users";
+        mode = "0400";
+      };
+
       system.stateVersion = "26.05";
     };
 }

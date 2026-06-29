@@ -17,6 +17,8 @@
           stylua
           gnumake
           git
+          sops
+          age
         ];
 
         shellHook = ''
