@@ -130,7 +130,7 @@ fn connect_and_monitor(account: &Account) -> Result<(), Box<dyn std::error::Erro
         let result = idle.wait_keepalive();
 
         // Parse result. If it's an error, propagate it (which will trigger reconnect)
-        let _ = result?;
+        result?;
 
         // Recheck INBOX
         let count = get_message_count(&mut session)?;
