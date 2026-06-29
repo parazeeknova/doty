@@ -158,8 +158,8 @@ fn handle_new_message<T: std::io::Read + std::io::Write>(
     seq: u32,
     email: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    // Fetch the Envelope and the body text in a single parenthesized query list
-    let fetch_query = "(ENVELOPE BODY.PEEK[TEXT])";
+    // Fetch the Envelope and the raw body in a single parenthesized query list
+    let fetch_query = "(ENVELOPE BODY.PEEK[])";
     let fetches = session.fetch(seq.to_string(), fetch_query)?;
     let msg = fetches.iter().next().ok_or("No fetch result returned")?;
 
@@ -199,12 +199,14 @@ fn handle_new_message<T: std::io::Read + std::io::Write>(
         })
         .unwrap_or_else(|| "Unknown Sender".to_string());
 
-    // Extract the body snippet (if returned by server)
-    let raw_body = msg
-        .text()
+    // Extract the raw message body (headers + content)
+    let raw_msg = msg
+        .body()
         .map(|bytes| String::from_utf8_lossy(bytes).into_owned())
         .unwrap_or_default();
 
+    // Extract only the clean plain text part (skip headers and MIME boundaries)
+    let raw_body = extract_plain_text(&raw_msg);
     let body_snippet = clean_snippet(&raw_body);
 
     // Extract Message-ID header from envelope
@@ -251,6 +253,37 @@ fn handle_new_message<T: std::io::Read + std::io::Write>(
     });
 
     Ok(())
+}
+
+fn extract_plain_text(raw_msg: &str) -> String {
+    let lower_msg = raw_msg.to_lowercase();
+    if let Some(pos) = lower_msg.find("content-type: text/plain") {
+        let sub_part = &raw_msg[pos..];
+        if let Some(blank_pos) = sub_part.find("\r\n\r\n") {
+            let body_start = &sub_part[blank_pos + 4..];
+            if let Some(boundary_pos) = body_start.find("\r\n--") {
+                return body_start[..boundary_pos].to_string();
+            } else if let Some(boundary_pos) = body_start.find("\n--") {
+                return body_start[..boundary_pos].to_string();
+            }
+            return body_start.to_string();
+        } else if let Some(blank_pos) = sub_part.find("\n\n") {
+            let body_start = &sub_part[blank_pos + 2..];
+            if let Some(boundary_pos) = body_start.find("\n--") {
+                return body_start[..boundary_pos].to_string();
+            }
+            return body_start.to_string();
+        }
+    }
+
+    // Fallback: Skip the main headers
+    if let Some(pos) = raw_msg.find("\r\n\r\n") {
+        raw_msg[pos + 4..].to_string()
+    } else if let Some(pos) = raw_msg.find("\n\n") {
+        raw_msg[pos + 2..].to_string()
+    } else {
+        raw_msg.to_string()
+    }
 }
 
 fn strip_html_tags(s: &str) -> String {
@@ -467,5 +500,14 @@ mod tests {
         let cleaned = clean_snippet(&long_raw);
         assert_eq!(cleaned.len(), 103); // 100 'a's + "..."
         assert!(cleaned.ends_with("..."));
+    }
+
+    #[test]
+    fn test_extract_plain_text() {
+        let multipart_email = "MIME-Version: 1.0\r\nContent-Type: multipart/alternative; boundary=\"boundary\"\r\n\r\n--boundary\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nHello World\r\n--boundary\r\nContent-Type: text/html\r\n\r\n<h1>Hello</h1>\r\n--boundary--";
+        assert_eq!(extract_plain_text(multipart_email).trim(), "Hello World");
+
+        let simple_email = "From: abc@xyz.com\r\nSubject: test\r\n\r\nSimple Body";
+        assert_eq!(extract_plain_text(simple_email).trim(), "Simple Body");
     }
 }
