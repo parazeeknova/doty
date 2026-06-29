@@ -899,13 +899,6 @@ fn main() {
         }
     }
 
-    // Sync symlinks only (no cargo rebuild or daemon restart — not needed for color changes)
-    let _ = Command::new("stow")
-        .arg(".")
-        .arg("--ignore=.antigravitycli")
-        .current_dir(&doty)
-        .status();
-
     // Reload services
     let _ = Command::new("gsettings")
         .arg("set")
