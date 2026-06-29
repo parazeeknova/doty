@@ -21,6 +21,7 @@ install: build
 	-pkill -f screentime_daemon 2>/dev/null || true
 	-pkill -f mtp_notify 2>/dev/null || true
 	-pkill -f get_voxtype_status 2>/dev/null || true
+	-pkill -f gmail_daemon 2>/dev/null || true
 	@sleep 0.5
 	mkdir -p ../modules/features/wm/quickshell/battery_popup ../modules/features/wm/quickshell/volume_popup ../modules/features/wm/quickshell/osd/bin ../modules/features/wm/quickshell/network_popup ../modules/features/wm/quickshell/clipboard_popup ../modules/features/wm/quickshell/bluetooth_popup ../modules/features/wm/quickshell/brightness_popup ../modules/features/wm/quickshell/notif_popup ../modules/features/wm/quickshell/sysmon_popup ../modules/features/wm/quickshell/podman_popup ../modules/features/wm/quickshell/media_popup ../modules/features/wm/quickshell/vm_popup ../modules/features/wm/quickshell/ports_popup ../modules/features/wm/quickshell/sunset_popup ../modules/features/wm/quickshell/apps_popup ../modules/features/wm/quickshell/recents_popup ../modules/features/wm/quickshell/wallpaper_switcher ../modules/features/wm/quickshell/github_graph ../modules/features/wm/shortcut_popup ../modules/features/wm/volume_popup ../modules/features/wm/waybar/scripts ../modules/features/wm/theming/scripts ../modules/scripts
 	cp --remove-destination target/release/get_battery_status ../modules/features/wm/quickshell/battery_popup/get_battery_status
@@ -62,9 +63,11 @@ install: build
 	cp --remove-destination target/release/get_screentime_status $(HOME)/.local/bin/get_screentime_status
 	cp --remove-destination target/release/check_daemons $(HOME)/.local/bin/check_daemons
 	cp --remove-destination target/release/mtp_notify $(HOME)/.local/bin/mtp_notify
+	cp --remove-destination target/release/gmail_daemon $(HOME)/.local/bin/gmail_daemon
 	@echo "==> Restarting daemons..."
 	@uwsm app -- ~/.config/quickshell/battery_popup/battery_daemon >/dev/null 2>&1 &
 	@uwsm app -- ~/.config/quickshell/wallpaper_switcher/wallpaper_thumb_watcher >/dev/null 2>&1 &
 	@uwsm app -- ~/.local/bin/screentime_daemon >/dev/null 2>&1 &
 	@uwsm app -- ~/.local/bin/mtp_notify >/dev/null 2>&1 &
+	@uwsm app -- ~/.local/bin/gmail_daemon >/dev/null 2>&1 &
 	@echo "==> Install complete."

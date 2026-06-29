@@ -95,6 +95,12 @@ fn main() {
             ipc_socket: Some("wabi_screentime.sock"),
         },
         Daemon {
+            name: "Gmail Daemon",
+            process_name: "gmail_daemon",
+            start_command: "uwsm app -- ~/.local/bin/gmail_daemon",
+            ipc_socket: None,
+        },
+        Daemon {
             name: "Wallpaper Watcher",
             process_name: "wallpaper_thumb_watcher",
             start_command: "uwsm app -- ~/.config/quickshell/wallpaper_switcher/wallpaper_thumb_watcher",

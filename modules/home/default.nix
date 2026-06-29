@@ -63,6 +63,23 @@
               WantedBy = [ "timers.target" ];
             };
           };
+
+          systemd.user.services.gmail-daemon = {
+            Unit = {
+              Description = "Gmail Instant Push Notification Daemon";
+              After = [ "network-online.target" ];
+              Wants = [ "network-online.target" ];
+            };
+            Service = {
+              Type = "simple";
+              ExecStart = "%h/.local/bin/gmail_daemon --config /run/secrets/gmail-accounts.json";
+              Restart = "always";
+              RestartSec = "10";
+            };
+            Install = {
+              WantedBy = [ "default.target" ];
+            };
+          };
         };
       };
     };
