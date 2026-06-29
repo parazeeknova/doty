@@ -368,7 +368,7 @@ fn send_notification(
         .action("default", "Open in Browser")
         .hint(notify_rust::Hint::Category("email".to_string()))
         .hint(notify_rust::Hint::Urgency(notify_rust::Urgency::Normal))
-        .timeout(notify_rust::Timeout::Never);
+        .timeout(notify_rust::Timeout::Milliseconds(5000));
 
     match notif.show() {
         Ok(handle) => {
