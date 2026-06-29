@@ -218,10 +218,10 @@
 
       # -- SOPS Decryption Config --
       sops.defaultSopsFile = ../../../secrets/secrets.yaml;
-      sops.age.keyFile = "/home/parazeeknova/.config/sops/age/keys.txt";
+      sops.age.keyFile = "${config.users.users.parazeeknova.home}/.config/sops/age/keys.txt";
       sops.secrets.mail-accounts = {
         path = "/run/secrets/mail-accounts.json";
-        owner = "parazeeknova";
+        owner = config.users.users.parazeeknova.name;
         group = "users";
         mode = "0400";
       };
