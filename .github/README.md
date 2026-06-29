@@ -79,6 +79,68 @@ doty # Assuming you have the alias set up, otherwise run `sudo nixos-rebuild swi
 
 <br />
 
+<a id="secrets"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=686c5b&vCenter=true&width=435&height=25&lines=SECRETS%20%26%20SOPS" width="450"/>
+
+Doty manages personal system credentials and API tokens securely using [sops-nix](https://github.com/mic92/sops-nix) and [age](https://github.com/FiloSottile/age) encryption. Secrets are encrypted locally and committed safely to GitHub, so only your authorized machine can decrypt them.
+
+This configuration encrypts:
+* **Mail Accounts**: Credentials for the push notification daemon (`mail_notifier`).
+* **GitHub API Token**: Personal access token to pull repository metadata in the Quickshell app launcher.
+
+### Guide: How to configure secrets for your own setup
+
+If you are cloning this repository for your own machine, you will need to set up your own encrypted secrets:
+
+#### 1. Generate a new Age keypair
+First, generate a local private key on your machine. This key **must remain local** (never committed to Git):
+```shell
+mkdir -p ~/.config/sops/age
+nix shell nixpkgs#age -c age-keygen -o ~/.config/sops/age/keys.txt
+```
+Take note of the printed public key (starts with `age1...`).
+
+#### 2. Update `.sops.yaml`
+Modify the public key defined in [`.sops.yaml`](file:///.sops.yaml) at the root of the repository with the public key you generated:
+```yaml
+keys:
+  - &primary <your_public_key_here>
+creation_rules:
+  - path_regex: secrets/.*\.yaml$
+    key_groups:
+      - age:
+          - *primary
+```
+
+#### 3. Create your unencrypted YAML file
+Create a temporary file `secrets/temp_unencrypted.yaml` containing your email credentials and GitHub token:
+```yaml
+mail-accounts: |
+  [
+    {
+      "email": "your_email@gmail.com",
+      "password": "your_app_password"
+    }
+  ]
+github-token: |
+  ghp_your_github_token_here
+```
+
+#### 4. Encrypt it using SOPS
+Encrypt your secrets into the tracked file path `secrets/secrets.yaml` (which is committed to Git) and delete the temporary file:
+```shell
+nix shell nixpkgs#sops -c sops --encrypt secrets/temp_unencrypted.yaml > secrets/secrets.yaml
+rm secrets/temp_unencrypted.yaml
+```
+
+#### 5. Rebuild your system
+Apply the new configuration:
+```shell
+sudo nixos-rebuild switch --flake .#apostrophe
+```
+
+<br />
+
 <a id="preview"></a>
 <img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=686c5b&vCenter=true&width=435&height=25&lines=PREVIEW" width="450"/>
 
