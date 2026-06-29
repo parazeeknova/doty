@@ -158,8 +158,8 @@ fn handle_new_message<T: std::io::Read + std::io::Write>(
     seq: u32,
     email: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    // Fetch the Envelope
-    let fetch_query = "ENVELOPE";
+    // Fetch the Envelope and the first 150 bytes of the body text in a single roundtrip
+    let fetch_query = "ENVELOPE BODY.PEEK[TEXT]<0.150>";
     let fetches = session.fetch(seq.to_string(), fetch_query)?;
     let msg = fetches.iter().next().ok_or("No fetch result returned")?;
 
@@ -199,6 +199,14 @@ fn handle_new_message<T: std::io::Read + std::io::Write>(
         })
         .unwrap_or_else(|| "Unknown Sender".to_string());
 
+    // Extract the body snippet (if returned by server)
+    let raw_body = msg
+        .text()
+        .map(|bytes| String::from_utf8_lossy(bytes).into_owned())
+        .unwrap_or_default();
+
+    let body_snippet = clean_snippet(&raw_body);
+
     // Extract Message-ID header from envelope
     let message_id = envelope
         .message_id
@@ -236,12 +244,52 @@ fn handle_new_message<T: std::io::Read + std::io::Write>(
     // Trigger Notification asynchronously so we don't block the IMAP connection loop
     let from_clone = from.clone();
     let subject_clone = subject.clone();
+    let body_clone = body_snippet.clone();
     let email_clone = email.to_string();
     thread::spawn(move || {
-        send_notification(&email_clone, &from_clone, &subject_clone, &url);
+        send_notification(&email_clone, &from_clone, &subject_clone, &body_clone, &url);
     });
 
     Ok(())
+}
+
+fn strip_html_tags(s: &str) -> String {
+    let mut result = String::new();
+    let mut in_tag = false;
+    for c in s.chars() {
+        if c == '<' {
+            in_tag = true;
+        } else if c == '>' {
+            in_tag = false;
+        } else if !in_tag {
+            result.push(c);
+        }
+    }
+    result
+}
+
+fn clean_snippet(raw_body: &str) -> String {
+    let stripped = strip_html_tags(raw_body);
+    let mut cleaned = String::new();
+    let mut last_was_space = false;
+    for c in stripped.chars() {
+        if c.is_whitespace() {
+            if !last_was_space {
+                cleaned.push(' ');
+                last_was_space = true;
+            }
+        } else {
+            cleaned.push(c);
+            last_was_space = false;
+        }
+    }
+    let trimmed = cleaned.trim().to_string();
+    if trimmed.chars().count() > 100 {
+        let truncated: String = trimmed.chars().take(100).collect();
+        format!("{}...", truncated)
+    } else {
+        trimmed
+    }
 }
 
 fn escape_html(s: &str) -> String {
@@ -257,16 +305,33 @@ fn escape_html(s: &str) -> String {
         .collect()
 }
 
-fn send_notification(account_email: &str, from: &str, subject: &str, url: &str) {
+fn send_notification(
+    account_email: &str,
+    from: &str,
+    subject: &str,
+    body_snippet: &str,
+    url: &str,
+) {
     let mut notif = Notification::new();
     let escaped_from = escape_html(from);
     let escaped_subject = escape_html(subject);
-    notif
-        .summary(&format!("Gmail ({})", account_email))
-        .body(&format!(
+    let escaped_body = escape_html(body_snippet);
+
+    let formatted_body = if escaped_body.is_empty() {
+        format!(
             "<b>From:</b> {}\n<b>Subject:</b> {}",
             escaped_from, escaped_subject
-        ))
+        )
+    } else {
+        format!(
+            "<b>From:</b> {}\n<b>Subject:</b> {}\n\n{}",
+            escaped_from, escaped_subject, escaped_body
+        )
+    };
+
+    notif
+        .summary(&format!("Gmail ({})", account_email))
+        .body(&formatted_body)
         .action("default", "Open in Browser")
         .hint(notify_rust::Hint::Category("email".to_string()))
         .hint(notify_rust::Hint::Urgency(notify_rust::Urgency::Normal))
@@ -375,5 +440,32 @@ mod tests {
         assert_eq!(accounts[0].password, "pass1");
         assert_eq!(accounts[1].email, "two@gmail.com");
         assert_eq!(accounts[1].password, "pass2");
+    }
+
+    #[test]
+    fn test_escape_html() {
+        let malicios_subject = "Hey <script>alert('xss')</script> & buy \"something\"";
+        let escaped = escape_html(malicios_subject);
+        assert_eq!(
+            escaped,
+            "Hey &lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt; &amp; buy &quot;something&quot;"
+        );
+    }
+
+    #[test]
+    fn test_strip_html_tags() {
+        let html = "<html><body><h1>Hello</h1> World</body></html>";
+        assert_eq!(strip_html_tags(html), "Hello World");
+    }
+
+    #[test]
+    fn test_clean_snippet() {
+        let raw = "  <div>First line</div>\n\n\tSecond    line  ";
+        assert_eq!(clean_snippet(raw), "First line Second line");
+
+        let long_raw = "a".repeat(150);
+        let cleaned = clean_snippet(&long_raw);
+        assert_eq!(cleaned.len(), 103); // 100 'a's + "..."
+        assert!(cleaned.ends_with("..."));
     }
 }
