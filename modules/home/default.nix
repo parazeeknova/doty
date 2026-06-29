@@ -72,7 +72,7 @@
             };
             Service = {
               Type = "simple";
-              ExecStart = "%h/.local/bin/gmail_daemon --config /run/secrets/gmail-accounts.json";
+              ExecStart = "%h/.local/bin/gmail_daemon";
               Restart = "always";
               RestartSec = "10";
             };
