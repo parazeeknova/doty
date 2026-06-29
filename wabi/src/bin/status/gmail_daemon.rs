@@ -357,7 +357,7 @@ fn send_notification(
         )
     } else {
         format!(
-            "<b>From:</b> {}\n<b>Subject:</b> {}\n\n{}",
+            "<b>From:</b> {}\n<b>Subject:</b> {}\n<b>Body:</b> {}",
             escaped_from, escaped_subject, escaped_body
         )
     };
