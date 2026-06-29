@@ -170,23 +170,20 @@ fn parse_desktop_file(path: &Path) -> Option<AppInfo> {
             let val = line[pos + 1..].trim();
 
             match key {
-                "Name"
-                    if name.is_none() => {
-                        name = Some(val.to_string());
-                    }
-                "Exec"
-                    if exec.is_none() => {
-                        let cleaned = val
-                            .split_whitespace()
-                            .filter(|arg| !arg.starts_with('%'))
-                            .collect::<Vec<_>>()
-                            .join(" ");
-                        exec = Some(cleaned);
-                    }
-                "Icon"
-                    if icon.is_none() => {
-                        icon = Some(val.to_string());
-                    }
+                "Name" if name.is_none() => {
+                    name = Some(val.to_string());
+                }
+                "Exec" if exec.is_none() => {
+                    let cleaned = val
+                        .split_whitespace()
+                        .filter(|arg| !arg.starts_with('%'))
+                        .collect::<Vec<_>>()
+                        .join(" ");
+                    exec = Some(cleaned);
+                }
+                "Icon" if icon.is_none() => {
+                    icon = Some(val.to_string());
+                }
                 "NoDisplay" if val.to_lowercase() == "true" => {
                     no_display = true;
                 }
