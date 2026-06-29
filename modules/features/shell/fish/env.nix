@@ -14,6 +14,7 @@
           # -- Locale --
           set -gx LANG en_US.UTF-8
           set -gx LC_ALL en_US.UTF-8
+          set -gx DIRENV_LOG_FORMAT ""
 
           # -- SSH / GPG --
           set -gx GPG_TTY (tty)
