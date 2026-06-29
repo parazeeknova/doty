@@ -193,7 +193,7 @@ fn handle_new_message<T: std::io::Read + std::io::Write>(
                 .unwrap_or_default();
             let email_addr = format!("{}@{}", mailbox, host);
             match name {
-                Some(n) if !n.trim().is_empty() => format!("{} <{}>", n, email_addr),
+                Some(n) if !n.trim().is_empty() => format!("{} ({})", n, email_addr),
                 _ => email_addr,
             }
         })
@@ -224,11 +224,11 @@ fn handle_new_message<T: std::io::Read + std::io::Write>(
             })
             .collect();
         format!(
-            "https://mail.google.com/mail/u/{}/#search/rfc822msgid%3A{}",
+            "https://mail.google.com/mail/?authuser={}&#search/rfc822msgid%3A{}",
             email, encoded_id
         )
     } else {
-        format!("https://mail.google.com/mail/u/{}/#inbox", email)
+        format!("https://mail.google.com/mail/?authuser={}#inbox", email)
     };
 
     println!("[{}] New Email: {} - Subject: {}", email, from, subject);
@@ -244,13 +244,28 @@ fn handle_new_message<T: std::io::Read + std::io::Write>(
     Ok(())
 }
 
+fn escape_html(s: &str) -> String {
+    s.chars()
+        .map(|c| match c {
+            '&' => "&amp;".to_string(),
+            '<' => "&lt;".to_string(),
+            '>' => "&gt;".to_string(),
+            '"' => "&quot;".to_string(),
+            '\'' => "&#x27;".to_string(),
+            _ => c.to_string(),
+        })
+        .collect()
+}
+
 fn send_notification(account_email: &str, from: &str, subject: &str, url: &str) {
     let mut notif = Notification::new();
+    let escaped_from = escape_html(from);
+    let escaped_subject = escape_html(subject);
     notif
         .summary(&format!("Gmail ({})", account_email))
         .body(&format!(
             "<b>From:</b> {}\n<b>Subject:</b> {}",
-            from, subject
+            escaped_from, escaped_subject
         ))
         .action("default", "Open in Browser")
         .hint(notify_rust::Hint::Category("email".to_string()))
@@ -303,16 +318,16 @@ mod tests {
                 })
                 .collect();
             format!(
-                "https://mail.google.com/mail/u/{}/#search/rfc822msgid%3A{}",
+                "https://mail.google.com/mail/?authuser={}&#search/rfc822msgid%3A{}",
                 email, encoded_id
             )
         } else {
-            format!("https://mail.google.com/mail/u/{}/#inbox", email)
+            format!("https://mail.google.com/mail/?authuser={}#inbox", email)
         };
 
         assert_eq!(
             url,
-            "https://mail.google.com/mail/u/testuser@gmail.com/#search/rfc822msgid%3Aabc123xyz%40mail.gmail.com"
+            "https://mail.google.com/mail/?authuser=testuser@gmail.com&#search/rfc822msgid%3Aabc123xyz%40mail.gmail.com"
         );
     }
 
@@ -332,16 +347,16 @@ mod tests {
                 })
                 .collect();
             format!(
-                "https://mail.google.com/mail/u/{}/#search/rfc822msgid%3A{}",
+                "https://mail.google.com/mail/?authuser={}&#search/rfc822msgid%3A{}",
                 email, encoded_id
             )
         } else {
-            format!("https://mail.google.com/mail/u/{}/#inbox", email)
+            format!("https://mail.google.com/mail/?authuser={}#inbox", email)
         };
 
         assert_eq!(
             url,
-            "https://mail.google.com/mail/u/testuser@gmail.com/#inbox"
+            "https://mail.google.com/mail/?authuser=testuser@gmail.com#inbox"
         );
     }
 
