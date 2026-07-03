@@ -37,7 +37,7 @@
           version = "3.2.5";
           src = fetchurl {
             url = "https://cdn-zcode.z.ai/zcode/electron/releases/3.2.5/ZCode-3.2.5-linux-x64.AppImage";
-            sha256 = "0r8q0f17m26yvxib58dd88ygasrygc5ky6m3zbvmnjq57l64bsjg";
+            sha256 = "1mdyw0jv6yc6854yl3ygm7yrvckgf09q93ckh3w4rq3j49g4gsaa";
           };
           extraInstallCommands = ''
             mkdir -p $out/share/applications
