@@ -272,3 +272,13 @@ hl.window_rule({
 	},
 	scrolling_width = 0.7,
 })
+
+hl.window_rule({
+	name = "megasync-float",
+	match = {
+		class = ".*[Mm][Ee][Gg][Aa].*",
+	},
+	float = true,
+	size = { 400, 500 },
+	move = { "40", "monitor_h - window_h - 30" },
+})
