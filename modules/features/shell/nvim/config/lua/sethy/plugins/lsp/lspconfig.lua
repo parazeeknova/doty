@@ -133,9 +133,71 @@ return {
             },
         })
 
+        vim.lsp.config("clangd", {
+            cmd = { "clangd", "--background-index", "--clang-tidy" },
+            filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
+        })
+
+        vim.lsp.config("nil_ls", {
+            settings = {
+                ["nil"] = {
+                    formattingCommand = { "nixfmt" },
+                    nix = {
+                        flake = {
+                            autoArchive = true,
+                        },
+                    },
+                },
+            },
+        })
+
+        vim.lsp.config("pyright", {
+            settings = {
+                python = {
+                    analysis = {
+                        typeCheckingMode = "basic",
+                        autoSearchPaths = true,
+                        useLibraryCodeForTypes = true,
+                        diagnosticMode = "openFilesOnly",
+                    },
+                },
+            },
+        })
+
+        vim.lsp.config("elixirls", {
+            cmd = { "elixir-ls" },
+            settings = {
+                elixirLS = {
+                    dialyzerEnabled = true,
+                    fetchDeps = false,
+                    suggestSpecs = true,
+                },
+            },
+        })
+
+        vim.lsp.config("dockerls", {})
+
+        vim.lsp.config("sqlls", {
+            cmd = { "sql-language-server", "up", "--method", "stdio" },
+        })
+
+        vim.lsp.config("jsonls", {
+            settings = {
+                json = {
+                    validate = { enable = true },
+                },
+            },
+        })
+
+        vim.lsp.config("jdtls", {
+            cmd = { "jdtls" },
+            filetypes = { "java" },
+        })
+
         vim.lsp.enable({
             "lua_ls", "cssls", "emmet_language_server", "emmet_ls",
             "ts_ls", "gopls", "rust_analyzer", "astro", "tailwindcss", "marksman",
+            "clangd", "nil_ls", "pyright", "elixirls", "dockerls", "sqlls", "jsonls", "jdtls",
         })
     end,
 }
