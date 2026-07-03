@@ -21,6 +21,7 @@
 
       environment.systemPackages = with pkgs; [
         # -- Web --
+        google-chrome
         chromium
         vivaldi
         vivaldi-ffmpeg-codecs
@@ -33,9 +34,9 @@
         # -- ZCode --
         (appimageTools.wrapType2 {
           pname = "zcode";
-          version = "3.2.0";
+          version = "3.2.5";
           src = fetchurl {
-            url = "https://cdn-zcode.z.ai/zcode/electron/releases/3.2.0/ZCode-3.2.0-linux-x64.AppImage";
+            url = "https://cdn-zcode.z.ai/zcode/electron/releases/3.2.5/ZCode-3.2.5-linux-x64.AppImage";
             sha256 = "0r8q0f17m26yvxib58dd88ygasrygc5ky6m3zbvmnjq57l64bsjg";
           };
           extraInstallCommands = ''
