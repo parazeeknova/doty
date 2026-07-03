@@ -82,7 +82,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let latest_version = match get_latest_zcode_version() {
         Some(v) => v,
-        None => std::process::exit(1),
+        None => {
+            eprintln!("Warning: Could not check for ZCode updates. Skipping update check.");
+            return Ok(());
+        }
     };
 
     println!("Latest online version: {}", latest_version);
