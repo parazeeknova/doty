@@ -175,3 +175,7 @@ path = "src/bin/utils/ghostty_tmux.rs"
 [[bin]]
 name = "get_voxtype_status"
 path = "src/bin/status/voxtype.rs"
+
+[[bin]]
+name = "update_zcode"
+path = "src/bin/utils/update-zcode.rs"

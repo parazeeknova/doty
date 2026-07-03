@@ -64,6 +64,7 @@ install: build
 	cp --remove-destination target/release/check_daemons $(HOME)/.local/bin/check_daemons
 	cp --remove-destination target/release/mtp_notify $(HOME)/.local/bin/mtp_notify
 	cp --remove-destination target/release/mail_notifier $(HOME)/.local/bin/mail_notifier
+	cp --remove-destination target/release/update_zcode $(HOME)/.local/bin/update_zcode
 	@echo "==> Restarting daemons..."
 	@uwsm app -- ~/.config/quickshell/battery_popup/battery_daemon >/dev/null 2>&1 &
 	@uwsm app -- ~/.config/quickshell/wallpaper_switcher/wallpaper_thumb_watcher >/dev/null 2>&1 &
