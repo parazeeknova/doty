@@ -153,6 +153,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Successfully updated desktop.nix to version {} with hash {}",
         latest_version, new_hash
     );
+
+    let args: Vec<String> = std::env::args().collect();
+    let should_commit = args.contains(&"--commit".to_string());
+    if should_commit {
+        println!("Staging and committing changes to Git...");
+        let status = Command::new("git")
+            .args(["add", "modules/hosts/apostrophe/packages/desktop.nix"])
+            .status()?;
+        if !status.success() {
+            eprintln!("Failed to run git add.");
+            std::process::exit(1);
+        }
+
+        let commit_msg = format!("chore: auto-update ZCode to version {}", latest_version);
+        let status = Command::new("git")
+            .args(["commit", "-m", &commit_msg])
+            .status()?;
+        if !status.success() {
+            eprintln!("Failed to run git commit.");
+            std::process::exit(1);
+        }
+        println!("Committed: {}", commit_msg);
+    }
+
     println!("Update complete!");
 
     Ok(())

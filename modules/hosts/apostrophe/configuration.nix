@@ -68,8 +68,34 @@
       '';
 
       # -- Automatic updating --
-      system.autoUpgrade.enable = true;
-      system.autoUpgrade.dates = "weekly";
+      system.autoUpgrade = {
+        enable = true;
+        dates = "weekly";
+        flake = "/home/parazeeknova/doty#apostrophe";
+        flags = [
+          "--update-input"
+          "nixpkgs"
+          "--commit-lock-file"
+        ];
+      };
+
+      systemd.services.update-zcode = {
+        description = "Check and update ZCode package version and hash";
+        path = [
+          pkgs.git
+          pkgs.nix
+          pkgs.curl
+          pkgs.openssh
+        ];
+        serviceConfig = {
+          Type = "oneshot";
+          User = "parazeeknova";
+          WorkingDirectory = "/home/parazeeknova/doty";
+          ExecStart = "/home/parazeeknova/doty/wabi/target/release/update_zcode --commit";
+        };
+      };
+      systemd.services.nixos-upgrade.wants = [ "update-zcode.service" ];
+      systemd.services.nixos-upgrade.after = [ "update-zcode.service" ];
 
       # -- Automatic cleanup --
       nix.gc.automatic = true;
