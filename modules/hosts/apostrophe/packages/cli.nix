@@ -89,7 +89,9 @@
         ffmpeg
 
         # -- Misc --
-        tmux
+        jujutsu
+        jjui
+        lazyjj
         screen
         less
         man-db
