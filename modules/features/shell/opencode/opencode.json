@@ -12,6 +12,48 @@
       },
       "enabled": true
     },
+    "github": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_PERSONAL_ACCESS_TOKEN}"
+      },
+      "enabled": true
+    },
+    "cloudflare": {
+      "type": "remote",
+      "url": "https://mcp.cloudflare.com/mcp",
+      "headers": {
+        "Authorization": "Bearer {env:CLOUDFLARE_API_TOKEN}"
+      },
+      "enabled": true
+    },
+    "filesystem": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/home/parazeeknova/doty",
+        "/home/parazeeknova/Repository",
+        "home/parazeeknova/Projects",
+        "/home/parazeeknova"
+      ],
+      "enabled": true
+    },
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@playwright/mcp"
+      ],
+      "enabled": true
+    },
     "chrome-devtools": {
       "type": "local",
       "command": [
