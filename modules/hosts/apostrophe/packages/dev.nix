@@ -17,6 +17,8 @@
         awscli
         cloudflare-cli
         appimage-run
+        azure-cli
+        terraform
 
         # -- Languages --
         nodejs
