@@ -1,6 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["@warp-dot-dev/opencode-warp"],
+  "plugin": [
+    "@warp-dot-dev/opencode-warp"
+  ],
   "mcp": {
     "context7": {
       "type": "remote",
@@ -8,6 +10,16 @@
       "headers": {
         "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
       },
+      "enabled": true
+    },
+    "chrome-devtools": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "chrome-devtools-mcp@latest",
+        "--autoConnect"
+      ],
       "enabled": true
     }
   },
@@ -22,6 +34,18 @@
       "models": {
         "zai-org/GLM-5.1-FP8": {
           "name": "GLM-5.1"
+        }
+      }
+    },
+    "azure": {
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "https://asmedia-resource.openai.azure.com/openai/v1",
+        "apiKey": "{env:AZURE_API_KEY}"
+      },
+      "models": {
+        "Kimi-K2.6": {
+          "name": "Kimi-K2.6"
         }
       }
     }

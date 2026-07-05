@@ -60,6 +60,9 @@
           if test -f /run/secrets/anthropic-auth-token
               set -gx ANTHROPIC_AUTH_TOKEN (cat /run/secrets/anthropic-auth-token)
           end
+          if test -f /run/secrets/azure-api-key
+              set -gx AZURE_API_KEY (cat /run/secrets/azure-api-key)
+          end
         '';
       };
     };
