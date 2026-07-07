@@ -21,30 +21,92 @@
         src = appimageSrc;
       };
 
-      neo-browser = pkgs.appimageTools.wrapType2 {
+      neo-browser = pkgs.stdenv.mkDerivation {
         pname = "neo-browser";
         version = "2.0.6";
-        src = appimageSrc;
 
-        extraInstallCommands = ''
-          mkdir -p $out/share/applications
+        src = extractedSrc;
+
+        nativeBuildInputs = [
+          pkgs.autoPatchelfHook
+          pkgs.wrapGAppsHook3
+          pkgs.copyDesktopItems
+          pkgs.makeWrapper
+        ];
+
+        buildInputs = with pkgs; [
+          glib
+          nss
+          nspr
+          dbus
+          atk
+          at-spi2-core
+          cups
+          gtk3
+          pango
+          cairo
+          libx11
+          libxcomposite
+          libxdamage
+          libxext
+          libxfixes
+          libxrandr
+          mesa
+          expat
+          libxcb
+          libxkbcommon
+          systemd
+          alsa-lib
+          libglvnd
+        ];
+
+        # Tell autoPatchelf not to complain about libraries it can't find that might not be needed
+        autoPatchelfIgnoreMissingDeps = true;
+
+        installPhase = ''
+          mkdir -p $out/bin
+          mkdir -p $out/lib/neo-browser
           mkdir -p $out/share/icons/hicolor/512x512/apps
 
-          # Copy icon
-          cp ${extractedSrc}/neo-browser.png $out/share/icons/hicolor/512x512/apps/neo-browser.png
+          # Copy extracted files to the lib directory
+          cp -r * $out/lib/neo-browser/
 
-          # Create desktop entry
-          cat > $out/share/applications/neo-browser.desktop <<EOF
-          [Desktop Entry]
-          Name=Neo Browser
-          Comment=Secure browser for online examinations
-          Exec=neo-browser %U
-          Icon=neo-browser
-          Type=Application
-          Categories=Utility;Network;WebBrowser;
-          Terminal=false
-          EOF
+          # Make the binary executable
+          chmod +x $out/lib/neo-browser/neo-browser
+
+          # Symlink it to bin/
+          ln -s $out/lib/neo-browser/neo-browser $out/bin/neo-browser
+
+          # Copy icon
+          cp $out/lib/neo-browser/neo-browser.png $out/share/icons/hicolor/512x512/apps/neo-browser.png
         '';
+
+        postFixup = ''
+          wrapProgram $out/bin/neo-browser \
+            --prefix LD_LIBRARY_PATH : ${
+              lib.makeLibraryPath [
+                pkgs.libGL
+                pkgs.libglvnd
+              ]
+            }
+        '';
+
+        desktopItems = [
+          (pkgs.makeDesktopItem {
+            name = "neo-browser";
+            exec = "neo-browser %U";
+            icon = "neo-browser";
+            desktopName = "Neo Browser";
+            comment = "Secure browser for online examinations";
+            categories = [
+              "Utility"
+              "Network"
+              "WebBrowser"
+            ];
+            mimeType = [ "x-scheme-handler/neoexam" ];
+            terminal = false;
+          })
+        ];
       };
     in
     {
