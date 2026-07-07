@@ -42,3 +42,6 @@ build/
 voxtype_models/
 *.bin
 *.onnx
+
+squashfs-temp
+asar-unpacked
