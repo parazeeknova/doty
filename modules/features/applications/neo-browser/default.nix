@@ -103,7 +103,7 @@
               "Network"
               "WebBrowser"
             ];
-            mimeType = [ "x-scheme-handler/neoexam" ];
+            mimeTypes = [ "x-scheme-handler/neoexam" ];
             terminal = false;
           })
         ];
