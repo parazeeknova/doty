@@ -12,6 +12,6 @@ if ok then
     })
 end
 
+require("current-theme")
 require("sethy.core")
 require("sethy.lazy")
-require("current-theme")

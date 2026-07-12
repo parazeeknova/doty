@@ -240,6 +240,12 @@ hi(0, "SnacksNormal", { fg = c.fg, bg = c.bg })
 hi(0, "SnacksPickerNormal", { fg = c.fg, bg = c.bg })
 hi(0, "SnacksPickerBorder", { fg = c.outline, bg = c.bg })
 hi(0, "SnacksPickerPrompt", { fg = c.fg, bg = c.bg })
+hi(0, "SnacksDashboardHeader", { fg = c.primary, bold = true })
+hi(0, "SnacksDashboardIcon", { fg = c.primary })
+hi(0, "SnacksDashboardDesc", { fg = c.fg })
+hi(0, "SnacksDashboardKey", { fg = c.secondary })
+hi(0, "SnacksDashboardFooter", { fg = c.fg_dim })
+hi(0, "SnacksDashboardSpecial", { fg = c.outline })
 
 -- Todo comments
 hi(0, "TodoSignFIX", { fg = c.error })

@@ -61,10 +61,10 @@ vim.keymap.set("n", "<leader>r", function()
     local filetype = vim.bo.filetype
     if filetype == "cpp" then
         vim.cmd("write")
-        vim.cmd("split | term g++ -O2 % -o %:p:r && %:p:r")
+        vim.cmd("split | term g++ -std=c++20 -Wall -Wextra -O2 % -o %:p:r && %:p:r")
     elseif filetype == "c" then
         vim.cmd("write")
-        vim.cmd("split | term gcc -O2 % -o %:p:r && %:p:r")
+        vim.cmd("split | term gcc -std=c17 -Wall -Wextra -O2 % -o %:p:r && %:p:r")
     elseif filetype == "rust" then
         vim.cmd("write")
         vim.cmd("split | term cargo run")
