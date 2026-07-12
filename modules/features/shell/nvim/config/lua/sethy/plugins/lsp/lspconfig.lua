@@ -134,7 +134,7 @@ return {
         })
 
         vim.lsp.config("clangd", {
-            cmd = { "clangd", "--background-index", "--clang-tidy" },
+            cmd = { "clangd", "--background-index", "--clang-tidy", "--query-driver=/**/*" },
             filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
         })
 

@@ -55,3 +55,29 @@ vim.keymap.set("n", "<leader>lr", function()
     vim.cmd("lsp restart")
     vim.notify("LSP restarted", vim.log.levels.INFO)
 end, { desc = "Restart LSP" })
+
+-- Run current file based on filetype
+vim.keymap.set("n", "<leader>r", function()
+    local filetype = vim.bo.filetype
+    if filetype == "cpp" then
+        vim.cmd("write")
+        vim.cmd("split | term g++ -O2 % -o %:p:r && %:p:r")
+    elseif filetype == "c" then
+        vim.cmd("write")
+        vim.cmd("split | term gcc -O2 % -o %:p:r && %:p:r")
+    elseif filetype == "rust" then
+        vim.cmd("write")
+        vim.cmd("split | term cargo run")
+    elseif filetype == "python" then
+        vim.cmd("write")
+        vim.cmd("split | term python3 %")
+    elseif filetype == "go" then
+        vim.cmd("write")
+        vim.cmd("split | term go run %")
+    elseif filetype == "sh" then
+        vim.cmd("write")
+        vim.cmd("split | term bash %")
+    else
+        print("No runner configured for filetype: " .. filetype)
+    end
+end, { desc = "Run current file" })
