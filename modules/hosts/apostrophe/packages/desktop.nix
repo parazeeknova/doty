@@ -23,7 +23,6 @@
         # -- Web --
         google-chrome
         megasync
-        chromium
         vivaldi
         vivaldi-ffmpeg-codecs
         inputs.helium.packages.${pkgs.stdenv.hostPlatform.system}.default

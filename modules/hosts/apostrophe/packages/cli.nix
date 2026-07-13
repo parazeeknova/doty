@@ -11,9 +11,6 @@
 
       environment.systemPackages = with pkgs; [
         # -- JFR --
-        ani-cli
-        proton-vpn-cli
-        mangal
         suwayomi-server
         cmatrix
         cowsay
@@ -90,9 +87,6 @@
         ffmpeg
 
         # -- Misc --
-        jujutsu
-        jjui
-        lazyjj
         screen
         less
         man-db

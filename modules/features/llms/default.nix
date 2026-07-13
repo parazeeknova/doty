@@ -26,8 +26,6 @@
       environment.systemPackages = with pkgs; [
         ollama-cuda
         llama-cpp
-        mistral-rs
-        oterm
         pi-coding-agent
         claude-code
         codex

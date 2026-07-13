@@ -38,6 +38,8 @@
 
         # -- Build Tools --
         gcc
+        llvmPackages.clang
+        clang-tools
         gnumake
         cmake
         pkg-config

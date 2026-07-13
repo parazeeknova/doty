@@ -26,6 +26,8 @@ in
             enable = true;
             settings = {
               font_family = "FiraCode Nerd Font";
+              italic_font = "VictorMono Nerd Font Mono Italic";
+              bold_italic_font = "VictorMono Nerd Font Mono Bold Italic";
               font_size = 8.5;
               cursor_shape = "beam";
               cursor_trail = 1;
