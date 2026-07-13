@@ -65,7 +65,7 @@ vim.keymap.set("n", "<leader>r", function()
         if vim.fn.filereadable(dir .. "/Makefile") == 1 then
             vim.cmd(string.format("split | term make -C %s && %s/main", dir, dir))
         else
-            vim.cmd("split | term g++ -std=c++20 -Wall -Wextra -O2 % -o %:p:r && %:p:r")
+            vim.cmd("split | term clang++ -std=c++20 -Wall -Wextra -O2 % -o %:p:r && %:p:r")
         end
     elseif filetype == "c" then
         vim.cmd("write")
@@ -73,7 +73,7 @@ vim.keymap.set("n", "<leader>r", function()
         if vim.fn.filereadable(dir .. "/Makefile") == 1 then
             vim.cmd(string.format("split | term make -C %s && %s/main", dir, dir))
         else
-            vim.cmd("split | term gcc -std=c17 -Wall -Wextra -O2 % -o %:p:r && %:p:r")
+            vim.cmd("split | term clang -std=c17 -Wall -Wextra -O2 % -o %:p:r && %:p:r")
         end
     elseif filetype == "rust" then
         vim.cmd("write")

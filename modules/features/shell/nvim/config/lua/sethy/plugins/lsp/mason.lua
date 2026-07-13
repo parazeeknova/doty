@@ -20,12 +20,12 @@ return {
             ensure_installed = {
                 "lua_ls", "ts_ls", "html", "cssls", "tailwindcss",
                 "gopls", "angularls", "astro", "emmet_ls", "emmet_language_server", "marksman",
-                "clangd", "nil_ls", "pyright", "elixirls", "dockerls", "sqlls", "jsonls", "jdtls",
+                "nil_ls", "pyright", "elixirls", "dockerls", "sqlls", "jsonls", "jdtls",
             },
         })
 
         mason_tool_installer.setup({
-            ensure_installed = { "biome", "prettier", "stylua", "isort", "pylint", "clangd", "denols" },
+            ensure_installed = { "biome", "prettier", "stylua", "isort", "pylint", "denols" },
         })
     end,
 }
