@@ -61,10 +61,20 @@ vim.keymap.set("n", "<leader>r", function()
     local filetype = vim.bo.filetype
     if filetype == "cpp" then
         vim.cmd("write")
-        vim.cmd("split | term g++ -std=c++20 -Wall -Wextra -O2 % -o %:p:r && %:p:r")
+        local dir = vim.fn.expand("%:p:h")
+        if vim.fn.filereadable(dir .. "/Makefile") == 1 then
+            vim.cmd(string.format("split | term make -C %s && %s/main", dir, dir))
+        else
+            vim.cmd("split | term g++ -std=c++20 -Wall -Wextra -O2 % -o %:p:r && %:p:r")
+        end
     elseif filetype == "c" then
         vim.cmd("write")
-        vim.cmd("split | term gcc -std=c17 -Wall -Wextra -O2 % -o %:p:r && %:p:r")
+        local dir = vim.fn.expand("%:p:h")
+        if vim.fn.filereadable(dir .. "/Makefile") == 1 then
+            vim.cmd(string.format("split | term make -C %s && %s/main", dir, dir))
+        else
+            vim.cmd("split | term gcc -std=c17 -Wall -Wextra -O2 % -o %:p:r && %:p:r")
+        end
     elseif filetype == "rust" then
         vim.cmd("write")
         vim.cmd("split | term cargo run")

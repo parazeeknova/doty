@@ -9,7 +9,7 @@ return {
             local ensure_installed = {
                 "json", "javascript", "typescript", "tsx", "go", "yaml", "html", "css", "python",
                 "http", "prisma", "svelte", "graphql", "bash", "vim", "dockerfile",
-                "gitignore", "query", "vimdoc", "c", "java", "rust", "ron",
+                "gitignore", "query", "vimdoc", "c", "cpp", "java", "rust", "ron",
             }
             treesitter.install(ensure_installed)
             vim.api.nvim_create_autocmd("FileType", {
