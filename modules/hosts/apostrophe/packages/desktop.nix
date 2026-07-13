@@ -34,10 +34,10 @@
         # -- ZCode --
         (appimageTools.wrapType2 {
           pname = "zcode";
-          version = "3.3.4";
+          version = "3.3.5";
           src = fetchurl {
-            url = "https://cdn-zcode.z.ai/zcode/electron/releases/3.3.4/ZCode-3.3.4-linux-x64.AppImage";
-            sha256 = "1sj1x4iinhyilnxr5cyx5myifvnhkpq1n2j4d6xl0cy2pfv2y1fi";
+            url = "https://cdn-zcode.z.ai/zcode/electron/releases/3.3.5/ZCode-3.3.5-linux-x64.AppImage";
+            sha256 = "0a11n8p4p38aja16r7l12ybwajxb25zlcmxbjn3dd7klcfh0md6v";
           };
           extraInstallCommands = ''
             mkdir -p $out/share/applications
