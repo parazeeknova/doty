@@ -19,11 +19,12 @@
         mode = "0600";
       };
 
-      # Symlink the decrypted configuration to the user's home directory
-      # so that running 'rclone' manually works out-of-the-box.
+      # Symlink the user's config to a mutable runtime config copy
+      # so that rclone can write and refresh OAuth tokens successfully.
       systemd.tmpfiles.rules = [
         "d /home/parazeeknova/.config/rclone 0700 parazeeknova users - -"
-        "L+ /home/parazeeknova/.config/rclone/rclone.conf - - - - /run/secrets/rclone.conf"
+        "d /home/parazeeknova/.cache/rclone 0700 parazeeknova users - -"
+        "L+ /home/parazeeknova/.config/rclone/rclone.conf - - - - /home/parazeeknova/.cache/rclone/rclone-runtime.conf"
       ];
 
       # -- Google Drive Sync Service --
@@ -39,13 +40,17 @@
         serviceConfig = {
           Type = "oneshot";
           User = "parazeeknova";
-          # Check if the [gdrive] remote is configured in rclone.conf
+          # Use a wrapper to copy the read-only credentials to the mutable location
+          # before running the sync command.
           ExecStart = pkgs.writeShellScript "rclone-gdrive-sync-wrapper" ''
             if [ ! -f /run/secrets/rclone.conf ] || ! grep -q "\[gdrive\]" /run/secrets/rclone.conf; then
               echo "Google Drive remote [gdrive] is not configured in /run/secrets/rclone.conf. Skipping sync."
               exit 0
             fi
-            exec ${pkgs.rclone}/bin/rclone --config /run/secrets/rclone.conf sync gdrive: /home/parazeeknova/secondary/cloud-sync/gdrive/ --fast-list --verbose
+            mkdir -p /home/parazeeknova/.cache/rclone
+            cp -f /run/secrets/rclone.conf /home/parazeeknova/.cache/rclone/rclone-runtime.conf
+            chmod 600 /home/parazeeknova/.cache/rclone/rclone-runtime.conf
+            exec ${pkgs.rclone}/bin/rclone --config /home/parazeeknova/.cache/rclone/rclone-runtime.conf sync gdrive: /home/parazeeknova/secondary/cloud-sync/gdrive/ --fast-list --verbose
           '';
         };
       };
@@ -73,14 +78,17 @@
         serviceConfig = {
           Type = "oneshot";
           User = "parazeeknova";
-          # Check if the [gphotos] remote is configured in rclone.conf
-          # Syncs gphotos:media/by-month to organize photos into year/month folders locally.
+          # Use a wrapper to copy the read-only credentials to the mutable location
+          # before running the photos sync command.
           ExecStart = pkgs.writeShellScript "rclone-gphotos-sync-wrapper" ''
             if [ ! -f /run/secrets/rclone.conf ] || ! grep -q "\[gphotos\]" /run/secrets/rclone.conf; then
               echo "Google Photos remote [gphotos] is not configured in /run/secrets/rclone.conf. Skipping sync."
               exit 0
             fi
-            exec ${pkgs.rclone}/bin/rclone --config /run/secrets/rclone.conf sync gphotos:media/by-month /home/parazeeknova/secondary/cloud-sync/gphotos/ --fast-list --verbose
+            mkdir -p /home/parazeeknova/.cache/rclone
+            cp -f /run/secrets/rclone.conf /home/parazeeknova/.cache/rclone/rclone-runtime.conf
+            chmod 600 /home/parazeeknova/.cache/rclone/rclone-runtime.conf
+            exec ${pkgs.rclone}/bin/rclone --config /home/parazeeknova/.cache/rclone/rclone-runtime.conf sync gphotos:media/by-month /home/parazeeknova/secondary/cloud-sync/gphotos/ --fast-list --verbose
           '';
         };
       };
