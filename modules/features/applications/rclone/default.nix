@@ -39,9 +39,15 @@
         serviceConfig = {
           Type = "oneshot";
           User = "parazeeknova";
-          # Use rclone sync to mirror Google Drive locally.
-          # --fast-list reduces API usage (highly recommended for Google Drive)
-          ExecStart = "${pkgs.rclone}/bin/rclone --config /run/secrets/rclone.conf sync gdrive: /home/parazeeknova/secondary/cloud-sync/gdrive/ --fast-list --verbose";
+          # Use a wrapper to check if a token is configured.
+          # This prevents rebuild failures when no credentials are setup yet.
+          ExecStart = pkgs.writeShellScript "rclone-gdrive-sync-wrapper" ''
+            if [ ! -f /run/secrets/rclone.conf ] || ! grep -q "token =" /run/secrets/rclone.conf; then
+              echo "Google Drive token is not configured in /run/secrets/rclone.conf. Skipping sync."
+              exit 0
+            fi
+            exec ${pkgs.rclone}/bin/rclone --config /run/secrets/rclone.conf sync gdrive: /home/parazeeknova/secondary/cloud-sync/gdrive/ --fast-list --verbose
+          '';
         };
       };
 
