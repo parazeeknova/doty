@@ -60,6 +60,7 @@ end, { desc = "Restart LSP" })
 vim.keymap.set("n", "<leader>r", function()
     local filetype = vim.bo.filetype
     if filetype == "cpp" then
+        pcall(function() require("conform").format({ async = false }) end)
         vim.cmd("write")
         local dir = vim.fn.expand("%:p:h")
         if vim.fn.filereadable(dir .. "/Makefile") == 1 then
@@ -68,6 +69,7 @@ vim.keymap.set("n", "<leader>r", function()
             vim.cmd("split | term clang++ -std=c++20 -Wall -Wextra -O2 % -o %:p:r && %:p:r")
         end
     elseif filetype == "c" then
+        pcall(function() require("conform").format({ async = false }) end)
         vim.cmd("write")
         local dir = vim.fn.expand("%:p:h")
         if vim.fn.filereadable(dir .. "/Makefile") == 1 then

@@ -37,7 +37,7 @@
         lefthook
 
         # -- Build Tools --
-        gcc
+        (lib.lowPrio gcc)
         llvmPackages.clang
         clang-tools
         gnumake

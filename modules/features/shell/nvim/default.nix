@@ -15,7 +15,12 @@ in
     }:
     {
       home-manager.users.parazeeknova =
-        { config, pkgs, lib, ... }:
+        {
+          config,
+          pkgs,
+          lib,
+          ...
+        }:
         let
           inherit (config.lib.file) mkOutOfStoreSymlink;
         in
@@ -28,7 +33,6 @@ in
             git
             tree-sitter
             gnumake
-            (lib.lowPrio gcc)
             llvmPackages.clang
             clang-tools
             lua-language-server
