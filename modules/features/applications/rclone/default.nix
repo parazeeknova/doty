@@ -64,43 +64,5 @@
         };
         wantedBy = [ "timers.target" ];
       };
-
-      # -- Google Photos Sync Service --
-      systemd.services.rclone-gphotos-sync = {
-        description = "Sync Google Photos to /home/parazeeknova/secondary/cloud-sync/gphotos/";
-        requires = [ "home-parazeeknova-secondary.mount" ];
-        after = [
-          "network-online.target"
-          "home-parazeeknova-secondary.mount"
-          "sops-nix.service"
-        ];
-        wants = [ "network-online.target" ];
-        serviceConfig = {
-          Type = "oneshot";
-          User = "parazeeknova";
-          # Use a wrapper to copy the read-only credentials to the mutable location
-          # before running the photos sync command.
-          ExecStart = pkgs.writeShellScript "rclone-gphotos-sync-wrapper" ''
-            if [ ! -f /run/secrets/rclone.conf ] || ! grep -q "\[gphotos\]" /run/secrets/rclone.conf; then
-              echo "Google Photos remote [gphotos] is not configured in /run/secrets/rclone.conf. Skipping sync."
-              exit 0
-            fi
-            mkdir -p /home/parazeeknova/.cache/rclone
-            cp -f /run/secrets/rclone.conf /home/parazeeknova/.cache/rclone/rclone-runtime.conf
-            chmod 600 /home/parazeeknova/.cache/rclone/rclone-runtime.conf
-            exec ${pkgs.rclone}/bin/rclone --config /home/parazeeknova/.cache/rclone/rclone-runtime.conf sync gphotos:media/by-month /home/parazeeknova/secondary/cloud-sync/gphotos/ --fast-list --verbose
-          '';
-        };
-      };
-
-      # Timer for Google Photos sync (every 2 hours)
-      systemd.timers.rclone-gphotos-sync = {
-        description = "Timer to periodically run Google Photos sync";
-        timerConfig = {
-          OnBootSec = "10m";
-          OnUnitActiveSec = "2h";
-        };
-        wantedBy = [ "timers.target" ];
-      };
     };
 }
