@@ -47,11 +47,13 @@
       # Useful packages for gaming
       environment.systemPackages = with pkgs; [
         wineWow64Packages.stable
+        cemu
         protonplus
         winetricks
         vkd3d-proton
         mangohud
         gamescope
+        gamemode
         heroic
         lutris
       ];

@@ -26,6 +26,9 @@
         rustup
         openjdk
         go
+        zig
+        zigimports
+        zig-zlint
 
         # -- Package Managers --
         uv
