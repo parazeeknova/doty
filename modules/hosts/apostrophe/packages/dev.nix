@@ -25,6 +25,8 @@
         python3
         rustup
         openjdk
+        temurin-bin
+        temurin-jre-bin
         go
         zig
         zigimports
@@ -75,6 +77,8 @@
         difftastic
         diff-so-fancy
         beekeeper-studio
+        figma-linux
+        figma-agent
 
         # -- Kubernetes --
         kubectl

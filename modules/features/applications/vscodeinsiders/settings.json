@@ -165,5 +165,13 @@
 	"workbench.colorTheme": "Matugen",
 	"editor.scrollbar.verticalScrollbarSize": 0,
 	"cmake.showConfigureWithDebuggerNotification": false,
-	"biome.suggestInstallingGlobally": false
+	"biome.suggestInstallingGlobally": false,
+	"yaml.disableSchemaDetection": [
+		"**/.github/workflows/*.yml",
+		"**/.github/workflows/*.yaml",
+		"**/.gitea/workflows/*.yml",
+		"**/.gitea/workflows/*.yaml",
+		"**/.forgejo/workflows/*.yml",
+		"**/.forgejo/workflows/*.yaml"
+	]
 }
