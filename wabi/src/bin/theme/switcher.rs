@@ -69,7 +69,6 @@ fn get_image_stats(image_path: &Path) -> Option<(f64, f64)> {
 }
 
 fn get_matugen_palette(wallpaper_path: &Path, force_mode: &str) -> Option<HashMap<String, String>> {
-
     let hash = stable_hash(wallpaper_path);
     let cache_dir = home_dir()
         .join(".cache")
@@ -290,14 +289,38 @@ fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     let fg_brightness = 0.299 * (fg_r as f64) + 0.587 * (fg_g as f64) + 0.114 * (fg_b as f64);
     let is_light = bg_brightness > fg_brightness;
     vars.insert("is_light".to_string(), is_light.to_string());
-    vars.insert("vscode_theme".to_string(), (if is_light { "Matugen Light" } else { "Matugen" }).to_string());
-    vars.insert("uses_dark_theme".to_string(), if is_light { "0" } else { "1" }.to_string());
-    vars.insert("vim_background".to_string(), (if is_light { "light" } else { "dark" }).to_string());
-    vars.insert("prefers_color_scheme".to_string(), if is_light { "1" } else { "0" }.to_string());
-    vars.insert("gtk_icon_theme".to_string(), (if is_light { "Papirus" } else { "Papirus-Dark" }).to_string());
-    vars.insert("gtk_prefer_dark".to_string(), (if is_light { "0" } else { "1" }).to_string());
-    vars.insert("respect_darkness".to_string(), (if is_light { "false" } else { "true" }).to_string());
-    vars.insert("dark_titlebar".to_string(), (if is_light { "false" } else { "true" }).to_string());
+    vars.insert(
+        "vscode_theme".to_string(),
+        (if is_light { "Matugen Light" } else { "Matugen" }).to_string(),
+    );
+    vars.insert(
+        "uses_dark_theme".to_string(),
+        if is_light { "0" } else { "1" }.to_string(),
+    );
+    vars.insert(
+        "vim_background".to_string(),
+        (if is_light { "light" } else { "dark" }).to_string(),
+    );
+    vars.insert(
+        "prefers_color_scheme".to_string(),
+        if is_light { "1" } else { "0" }.to_string(),
+    );
+    vars.insert(
+        "gtk_icon_theme".to_string(),
+        (if is_light { "Papirus" } else { "Papirus-Dark" }).to_string(),
+    );
+    vars.insert(
+        "gtk_prefer_dark".to_string(),
+        (if is_light { "0" } else { "1" }).to_string(),
+    );
+    vars.insert(
+        "respect_darkness".to_string(),
+        (if is_light { "false" } else { "true" }).to_string(),
+    );
+    vars.insert(
+        "dark_titlebar".to_string(),
+        (if is_light { "false" } else { "true" }).to_string(),
+    );
 
     vars.insert("bg".to_string(), bg.clone());
     vars.insert("bg_hex".to_string(), bg.replace("#", ""));
@@ -561,12 +584,18 @@ fn main() {
     // Read/save colorscheme mode (auto/light/dark)
     let colorscheme_mode = if mode == "wallpaper" && args.len() >= 4 {
         let val = args[3].trim().to_string();
-        let mode_file = home_dir().join(".cache").join("quickshell").join("colorscheme_mode");
+        let mode_file = home_dir()
+            .join(".cache")
+            .join("quickshell")
+            .join("colorscheme_mode");
         let _ = fs::create_dir_all(mode_file.parent().unwrap());
         let _ = fs::write(&mode_file, &val);
         val
     } else {
-        let mode_file = home_dir().join(".cache").join("quickshell").join("colorscheme_mode");
+        let mode_file = home_dir()
+            .join(".cache")
+            .join("quickshell")
+            .join("colorscheme_mode");
         if mode_file.exists() {
             fs::read_to_string(&mode_file)
                 .ok()
@@ -814,7 +843,8 @@ fn main() {
         println!("Rendered: ~/.cache/matugen/vscode-colors");
     }
 
-    let t_colors_json = doty.join("modules/features/applications/vscodeinsiders/vscode-colors.json.template");
+    let t_colors_json =
+        doty.join("modules/features/applications/vscodeinsiders/vscode-colors.json.template");
     let d_colors_json = matugen_cache.join("vscode-colors.json");
     if t_colors_json.exists() && render_template(&t_colors_json, &d_colors_json, &vars) {
         println!("Rendered: ~/.cache/matugen/vscode-colors.json");
@@ -1008,8 +1038,16 @@ fn main() {
         .arg("wabi")
         .status();
     let is_light_theme = vars.get("is_light").map(|s| s == "true").unwrap_or(false);
-    let color_scheme = if is_light_theme { "prefer-light" } else { "prefer-dark" };
-    let icon_theme = if is_light_theme { "Papirus" } else { "Papirus-Dark" };
+    let color_scheme = if is_light_theme {
+        "prefer-light"
+    } else {
+        "prefer-dark"
+    };
+    let icon_theme = if is_light_theme {
+        "Papirus"
+    } else {
+        "Papirus-Dark"
+    };
 
     let _ = Command::new("gsettings")
         .arg("set")
@@ -1072,7 +1110,8 @@ fn main() {
 
     if applied {
         // Copy spicetifyWrapper.js to the patched directory (fixes NixOS spicetify-cli package bug)
-        let wrapper_dest = home_dir().join(".local/share/spotify-patched/Apps/xpui/helper/spicetifyWrapper.js");
+        let wrapper_dest =
+            home_dir().join(".local/share/spotify-patched/Apps/xpui/helper/spicetifyWrapper.js");
         let wrapper_src = doty.join("modules/features/applications/spicetify/spicetifyWrapper.js");
         if wrapper_src.exists() {
             if let Some(parent) = wrapper_dest.parent() {
@@ -1361,7 +1400,10 @@ fn apply_papirus_folders(accent_hex: &str, is_light: bool) {
 
     // If accent is very desaturated, use grey
     if accent_s < 0.15 {
-        println!("Setting Papirus folders to: grey (desaturated accent) for {}", folder_theme);
+        println!(
+            "Setting Papirus folders to: grey (desaturated accent) for {}",
+            folder_theme
+        );
         let _ = Command::new("nix-shell")
             .arg("-p")
             .arg("gtk3")
@@ -1398,12 +1440,18 @@ fn apply_papirus_folders(accent_hex: &str, is_light: bool) {
         }
     }
 
-    println!("Setting Papirus folders to: {} for {}", best_color, folder_theme);
+    println!(
+        "Setting Papirus folders to: {} for {}",
+        best_color, folder_theme
+    );
     let _ = Command::new("nix-shell")
         .arg("-p")
         .arg("gtk3")
         .arg("--run")
-        .arg(format!("papirus-folders -t Papirus -C {} -u && papirus-folders -t Papirus-Dark -C {} -u", best_color, best_color))
+        .arg(format!(
+            "papirus-folders -t Papirus -C {} -u && papirus-folders -t Papirus-Dark -C {} -u",
+            best_color, best_color
+        ))
         .spawn();
 }
 

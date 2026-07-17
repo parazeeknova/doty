@@ -9,7 +9,6 @@ fn extract_field(content: &str, start_pattern: &str, end_pattern: &str) -> Optio
     Some(content[val_start..val_start + end_idx].to_string())
 }
 
-
 fn get_latest_verso_version() -> Option<String> {
     let output = Command::new("curl")
         .args([
@@ -28,7 +27,7 @@ fn get_latest_verso_version() -> Option<String> {
 
     let json = String::from_utf8_lossy(&output.stdout);
     let tag = extract_field(&json, "\"tag_name\":\"", "\"")?;
-    
+
     // Strip leading 'v' if present
     if let Some(stripped) = tag.strip_prefix('v') {
         Some(stripped.to_string())

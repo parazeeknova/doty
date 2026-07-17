@@ -542,9 +542,21 @@ Scope {
 
                                 Repeater {
                                     model: [
-                                        { mode: "auto", label: "Auto", icon: "󰚌" },
-                                        { mode: "dark", label: "Dark", icon: "" },
-                                        { mode: "light", label: "Light", icon: "" }
+                                        {
+                                            mode: "auto",
+                                            label: "Auto",
+                                            icon: "󰚌"
+                                        },
+                                        {
+                                            mode: "dark",
+                                            label: "Dark",
+                                            icon: ""
+                                        },
+                                        {
+                                            mode: "light",
+                                            label: "Light",
+                                            icon: ""
+                                        }
                                     ]
 
                                     delegate: MouseArea {
@@ -593,14 +605,38 @@ Scope {
 
                                 Repeater {
                                     model: [
-                                        { name: "bg", color: theme.bg },
-                                        { name: "bg_dark", color: theme.bg_dark },
-                                        { name: "bg_light", color: theme.bg_light },
-                                        { name: "fg", color: theme.fg },
-                                        { name: "fg_light", color: theme.fg_light },
-                                        { name: "accent", color: theme.accent },
-                                        { name: "secondary", color: theme.secondary },
-                                        { name: "tertiary", color: theme.tertiary }
+                                        {
+                                            name: "bg",
+                                            color: theme.bg
+                                        },
+                                        {
+                                            name: "bg_dark",
+                                            color: theme.bg_dark
+                                        },
+                                        {
+                                            name: "bg_light",
+                                            color: theme.bg_light
+                                        },
+                                        {
+                                            name: "fg",
+                                            color: theme.fg
+                                        },
+                                        {
+                                            name: "fg_light",
+                                            color: theme.fg_light
+                                        },
+                                        {
+                                            name: "accent",
+                                            color: theme.accent
+                                        },
+                                        {
+                                            name: "secondary",
+                                            color: theme.secondary
+                                        },
+                                        {
+                                            name: "tertiary",
+                                            color: theme.tertiary
+                                        }
                                     ]
 
                                     delegate: Rectangle {
