@@ -33,6 +33,41 @@ fn stable_hash(path: &Path) -> String {
     format!("{:016x}", hasher.finish())
 }
 
+fn get_image_stats(image_path: &Path) -> Option<(f64, f64)> {
+    let brightness_out = Command::new("magick")
+        .args([
+            image_path.to_str()?,
+            "-colorspace",
+            "Gray",
+            "-format",
+            "%[fx:mean]",
+            "info:",
+        ])
+        .output()
+        .ok()?;
+    let brightness_str = String::from_utf8_lossy(&brightness_out.stdout);
+    let brightness: f64 = brightness_str.trim().parse().ok()?;
+
+    let saturation_out = Command::new("magick")
+        .args([
+            image_path.to_str()?,
+            "-colorspace",
+            "HSL",
+            "-channel",
+            "G",
+            "-separate",
+            "-format",
+            "%[fx:mean]",
+            "info:",
+        ])
+        .output()
+        .ok()?;
+    let saturation_str = String::from_utf8_lossy(&saturation_out.stdout);
+    let saturation: f64 = saturation_str.trim().parse().ok()?;
+
+    Some((brightness, saturation))
+}
+
 fn get_matugen_palette(wallpaper_path: &Path) -> Option<HashMap<String, String>> {
     let hash = stable_hash(wallpaper_path);
     let cache_dir = home_dir()
@@ -67,16 +102,34 @@ fn get_matugen_palette(wallpaper_path: &Path) -> Option<HashMap<String, String>>
             wallpaper_path.to_path_buf()
         };
 
-        // Run matugen dynamically — either no cache or stale cache.
-        let out = Command::new("matugen")
-            .arg("image")
-            .arg(&matugen_input)
-            .arg("--json")
-            .arg("hex")
-            .arg("--source-color-index")
-            .arg("0")
-            .output()
-            .ok()?;
+        let stats = get_image_stats(&matugen_input).unwrap_or((0.5, 1.0));
+        let is_monochrome = stats.1 < 0.08;
+        let is_light = stats.0 > 0.55;
+        println!(
+            "Wallpaper stats: brightness = {:.3}, saturation = {:.3} (monochrome = {}, light = {})",
+            stats.0, stats.1, is_monochrome, is_light
+        );
+
+        let mut cmd = Command::new("matugen");
+        cmd.args([
+            "image",
+            matugen_input.to_str()?,
+            "--json",
+            "hex",
+            "--source-color-index",
+            "0",
+        ]);
+
+        if is_monochrome {
+            cmd.args(["--type", "scheme-monochrome"]);
+        }
+        if is_light {
+            cmd.args(["--mode", "light"]);
+        } else {
+            cmd.args(["--mode", "dark"]);
+        }
+
+        let out = cmd.output().ok()?;
         if !out.status.success() {
             return None;
         }
@@ -225,6 +278,13 @@ fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
         .get("error")
         .cloned()
         .unwrap_or_else(|| "#cc241d".to_string());
+
+    let (bg_r, bg_g, bg_b) = hex_to_rgb_tuple(&bg).unwrap_or((0, 0, 0));
+    let (fg_r, fg_g, fg_b) = hex_to_rgb_tuple(&fg).unwrap_or((255, 255, 255));
+    let bg_brightness = 0.299 * (bg_r as f64) + 0.587 * (bg_g as f64) + 0.114 * (bg_b as f64);
+    let fg_brightness = 0.299 * (fg_r as f64) + 0.587 * (fg_g as f64) + 0.114 * (fg_b as f64);
+    let is_light = bg_brightness > fg_brightness;
+    vars.insert("is_light".to_string(), is_light.to_string());
 
     vars.insert("bg".to_string(), bg.clone());
     vars.insert("bg_hex".to_string(), bg.replace("#", ""));
@@ -735,8 +795,9 @@ fn main() {
     }
 
     // Apply Papirus folder colors
+    let is_light_theme = vars.get("is_light").map(|s| s == "true").unwrap_or(false);
     if let Some(accent) = vars.get("accent") {
-        apply_papirus_folders(accent);
+        apply_papirus_folders(accent, is_light_theme);
     }
 
     // Render Zen Browser colors
@@ -906,11 +967,22 @@ fn main() {
         .arg("gtk-theme")
         .arg("wabi")
         .status();
+    let is_light_theme = vars.get("is_light").map(|s| s == "true").unwrap_or(false);
+    let color_scheme = if is_light_theme { "prefer-light" } else { "prefer-dark" };
+    let icon_theme = if is_light_theme { "Papirus" } else { "Papirus-Dark" };
+
     let _ = Command::new("gsettings")
         .arg("set")
         .arg("org.gnome.desktop.interface")
         .arg("color-scheme")
-        .arg("prefer-dark")
+        .arg(color_scheme)
+        .status();
+
+    let _ = Command::new("gsettings")
+        .arg("set")
+        .arg("org.gnome.desktop.interface")
+        .arg("icon-theme")
+        .arg(icon_theme)
         .status();
     let _ = Command::new("hyprctl").arg("reload").status();
     let _ = Command::new("pkill")
@@ -1205,7 +1277,7 @@ fn rgb_to_hsl(r: f64, g: f64, b: f64) -> (f64, f64, f64) {
     (h * 60.0, s, l)
 }
 
-fn apply_papirus_folders(accent_hex: &str) {
+fn apply_papirus_folders(accent_hex: &str, is_light: bool) {
     let accent = accent_hex.trim_start_matches('#');
     let (r, g, b) = if accent.len() == 6 {
         let r = u8::from_str_radix(&accent[0..2], 16).unwrap_or(0) as f64;
@@ -1245,12 +1317,14 @@ fn apply_papirus_folders(accent_hex: &str) {
         ("yellow", (255.0, 235.0, 59.0)),
     ];
 
+    let folder_theme = if is_light { "Papirus" } else { "Papirus-Dark" };
+
     // If accent is very desaturated, use grey
     if accent_s < 0.15 {
-        println!("Setting Papirus folders to: grey (desaturated accent)");
+        println!("Setting Papirus folders to: grey (desaturated accent) for {}", folder_theme);
         let _ = Command::new("papirus-folders")
             .arg("-t")
-            .arg("Papirus-Dark")
+            .arg(folder_theme)
             .arg("-C")
             .arg("grey")
             .arg("-u")
@@ -1285,10 +1359,10 @@ fn apply_papirus_folders(accent_hex: &str) {
         }
     }
 
-    println!("Setting Papirus folders to: {}", best_color);
+    println!("Setting Papirus folders to: {} for {}", best_color, folder_theme);
     let _ = Command::new("papirus-folders")
         .arg("-t")
-        .arg("Papirus-Dark")
+        .arg(folder_theme)
         .arg("-C")
         .arg(best_color)
         .arg("-u")
