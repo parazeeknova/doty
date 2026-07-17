@@ -12,7 +12,7 @@
     {
       "type": "command",
       "key": "  ",
-      "keyColor": "38;2;109;94;15",
+      "keyColor": "38;2;252;185;116",
       "text": "splash=$(hyprctl splash);echo $splash"
     },
     {
@@ -28,35 +28,35 @@
       "type": "os",
       "key": "  󰣇 OS",
       "format": "{2}",
-      "keyColor": "38;2;109;94;15"
+      "keyColor": "38;2;252;185;116"
     },
     {
       "type": "kernel",
       "key": "   Kernel",
       "format": "{2}",
-      "keyColor": "38;2;109;94;15"
+      "keyColor": "38;2;252;185;116"
     },
     {
       "type": "packages",
       "key": "  󰏗 Packages",
-      "keyColor": "38;2;102;94;64"
+      "keyColor": "38;2;225;193;163"
     },
     {
       "type": "display",
       "key": "  󰍹 Display",
       "format": "{1}x{2} @ {3}Hz [{7}]",
-      "keyColor": "38;2;102;94;64"
+      "keyColor": "38;2;225;193;163"
     },
     {
       "type": "terminal",
       "key": "   Terminal",
-      "keyColor": "38;2;109;94;15"
+      "keyColor": "38;2;252;185;116"
     },
     {
       "type": "wm",
       "key": "   WM",
       "format": "{2}",
-      "keyColor": "38;2;109;94;15"
+      "keyColor": "38;2;252;185;116"
     },
     {
       "type": "custom",
@@ -76,36 +76,36 @@
       "type": "cpu",
       "format": "{1} @ {7}",
       "key": "   CPU",
-      "keyColor": "38;2;109;94;15"
+      "keyColor": "38;2;252;185;116"
     },
     {
       "type": "gpu",
       "format": "{1} {2}",
       "key": "  󰊴 GPU",
-      "keyColor": "38;2;109;94;15"
+      "keyColor": "38;2;252;185;116"
     },
     {
       "type": "gpu",
       "format": "{3}",
       "key": "   GPU Driver",
-      "keyColor": "38;2;102;94;64"
+      "keyColor": "38;2;225;193;163"
     },
     {
       "type": "memory",
       "key": "   Memory ",
-      "keyColor": "38;2;102;94;64"
+      "keyColor": "38;2;225;193;163"
     },
     {
       "type": "disk",
       "key": "  󱦟 OS Age ",
       "folders": "/",
-      "keyColor": "38;2;186;26;26",
+      "keyColor": "38;2;255;180;171",
       "format": "{days} days"
     },
     {
       "type": "uptime",
       "key": "  󱫐 Uptime ",
-      "keyColor": "38;2;186;26;26"
+      "keyColor": "38;2;255;180;171"
     },
     {
       "type": "custom",

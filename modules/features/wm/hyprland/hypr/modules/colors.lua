@@ -1,8 +1,8 @@
 return {
-	active_border = "rgba(6d5e0fee)",
-	inactive_border = "rgba(e9e2d0aa)",
-	border_color = "rgb(6d5e0f)",
-	shadow_color = "0x186d5e0f",
-	accent_hex = "6d5e0f",
-	bg_light_hex = "e9e2d0",
+	active_border = "rgba(fcb974ee)",
+	inactive_border = "rgba(50453aaa)",
+	border_color = "rgb(fcb974)",
+	shadow_color = "0x18fcb974",
+	accent_hex = "fcb974",
+	bg_light_hex = "50453a",
 }

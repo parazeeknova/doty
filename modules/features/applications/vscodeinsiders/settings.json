@@ -162,7 +162,7 @@
 	},
 	"window.customTitleBarVisibility": "never",
 	"workbench.productIconTheme": "Tabler",
-	"workbench.colorTheme": "Matugen Light",
+	"workbench.colorTheme": "Matugen",
 	"editor.scrollbar.verticalScrollbarSize": 0,
 	"cmake.showConfigureWithDebuggerNotification": false,
 	"biome.suggestInstallingGlobally": false,
