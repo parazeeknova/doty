@@ -1362,7 +1362,7 @@ fn apply_papirus_folders(accent_hex: &str, is_light: bool) {
             .arg("-p")
             .arg("gtk3")
             .arg("--run")
-            .arg(format!("papirus-folders -t {} -C grey -u", folder_theme))
+            .arg("papirus-folders -t Papirus -C grey -u && papirus-folders -t Papirus-Dark -C grey -u")
             .spawn();
         return;
     }
@@ -1399,7 +1399,7 @@ fn apply_papirus_folders(accent_hex: &str, is_light: bool) {
         .arg("-p")
         .arg("gtk3")
         .arg("--run")
-        .arg(format!("papirus-folders -t {} -C {} -u", folder_theme, best_color))
+        .arg(format!("papirus-folders -t Papirus -C {} -u && papirus-folders -t Papirus-Dark -C {} -u", best_color, best_color))
         .spawn();
 }
 
