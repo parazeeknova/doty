@@ -104,6 +104,38 @@ fn main() {
         }
     }
 
+    // Step 0.5: Check and update ZCode
+    print_step("Checking and updating ZCode...");
+    if run_cmd("./wabi/target/release/update_zcode", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
+        print_success("ZCode check/update completed.");
+    } else {
+        print_warning("ZCode check/update failed or skipped.");
+    }
+
+    // Step 0.7: Update Nix Flake inputs
+    print_step("Updating Nix flake inputs...");
+    if run_cmd("nix", &["flake", "update"]).map(|s| s.success()).unwrap_or(false) {
+        print_success("Flake inputs updated successfully.");
+        match get_cmd_output("git", &["status", "--porcelain", "flake.lock"]) {
+            Ok(status) if !status.trim().is_empty() => {
+                print_warning("flake.lock has changed. Committing...");
+                if run_cmd_silent("git", &["add", "flake.lock"])
+                    && run_cmd_silent("git", &["commit", "--no-gpg-sign", "-m", "chore: update flake.lock"]) {
+                    print_success("flake.lock committed successfully.");
+                } else {
+                    print_error("Failed to commit flake.lock changes.");
+                    std::process::exit(1);
+                }
+            }
+            _ => {
+                print_success("flake.lock is already up to date.");
+            }
+        }
+    } else {
+        print_error("nix flake update failed.");
+        std::process::exit(1);
+    }
+
     // Step 1: Lint, format, and build wabi
     print_step("Linting, formatting, and building wabi...");
     
