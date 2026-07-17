@@ -54,16 +54,16 @@ fallback = [
 ]
 
 [color-palette]
-palette = ["#dac66f", "#d1c6a2", "#a9d0b4", "#ffb4ab", "#cdc6b4", "#4b4739"]
+palette = ["#fcb974", "#e1c1a3", "#bfcc9b", "#ffb4ab", "#d5c3b5", "#50453a"]
 
 custom = [
-    "#dac66f",
-    "#d1c6a2",
-    "#a9d0b4",
+    "#fcb974",
+    "#e1c1a3",
+    "#bfcc9b",
     "#ffb4ab",
-    "#cdc6b4",
-    "#4b4739",
-    "#e8e2d4",
-    "#15130b",
-    "#222017",
+    "#d5c3b5",
+    "#50453a",
+    "#eee0d5",
+    "#19120c",
+    "#261e18",
 ]

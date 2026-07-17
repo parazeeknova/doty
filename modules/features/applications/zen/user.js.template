@@ -19,3 +19,7 @@ user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 // injection. With this off, the matugen-boosts bridge has no place
 // to put the userstyles.
 user_pref("zen.boosts.enabled", true);
+
+// Force websites and Zen UI to follow light/dark prefers-color-scheme
+user_pref("layout.css.prefers-color-scheme.content-override", {{prefers_color_scheme}});
+user_pref("ui.systemUsesDarkTheme", {{uses_dark_theme}});

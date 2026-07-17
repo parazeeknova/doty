@@ -290,6 +290,8 @@ fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     let fg_brightness = 0.299 * (fg_r as f64) + 0.587 * (fg_g as f64) + 0.114 * (fg_b as f64);
     let is_light = bg_brightness > fg_brightness;
     vars.insert("is_light".to_string(), is_light.to_string());
+    vars.insert("uses_dark_theme".to_string(), if is_light { "0" } else { "1" }.to_string());
+    vars.insert("prefers_color_scheme".to_string(), if is_light { "1" } else { "0" }.to_string());
 
     vars.insert("bg".to_string(), bg.clone());
     vars.insert("bg_hex".to_string(), bg.replace("#", ""));

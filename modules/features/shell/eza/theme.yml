@@ -1,24 +1,24 @@
 filekinds:
   normal:
-    foreground: "#e8e2d4"
+    foreground: "#eee0d5"
   directory:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
     is_bold: true
   symlink:
-    foreground: "#d1c6a2"
+    foreground: "#e1c1a3"
     is_italic: true
   pipe:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
   block_device:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   char_device:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   socket:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   special:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   executable:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
     is_bold: true
   mount_point:
     foreground: "#ffb4ab"
@@ -26,170 +26,170 @@ filekinds:
 
 perms:
   user_read:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
   user_write:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   user_execute_file:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
   user_execute_other:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
   group_read:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   group_write:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   group_execute:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   other_read:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
   other_write:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
   other_execute:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
   special_user_file:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
     is_bold: true
   special_other:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
     is_bold: true
   attribute:
-    foreground: "#d1c6a2"
+    foreground: "#e1c1a3"
 
 size:
   major:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
     is_bold: true
   minor:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
   number_byte:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   number_kilo:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   number_mega:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
   number_giga:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
   number_huge:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
     is_bold: true
   unit_byte:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
   unit_kilo:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
   unit_mega:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
   unit_giga:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
   unit_huge:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
 
 users:
   user_you:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
     is_bold: true
   user_root:
     foreground: "#ffb4ab"
     is_bold: true
   user_other:
-    foreground: "#e8e2d4"
+    foreground: "#eee0d5"
   group_yours:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
   group_other:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
   group_root:
     foreground: "#ffb4ab"
 
 links:
   normal:
-    foreground: "#d1c6a2"
+    foreground: "#e1c1a3"
   multi_link_file:
-    foreground: "#d1c6a2"
+    foreground: "#e1c1a3"
     is_bold: true
 
 git:
   new:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
   modified:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   deleted:
     foreground: "#ffb4ab"
   renamed:
-    foreground: "#d1c6a2"
+    foreground: "#e1c1a3"
   ignored:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
   conflicted:
     foreground: "#ffb4ab"
     is_bold: true
 
 git_repo:
   branch_main:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
   branch_other:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   git_clean:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
   git_dirty:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
 
 security_context:
   none:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
   selinux:
     colon:
-      foreground: "#cdc6b4"
+      foreground: "#d5c3b5"
     user:
-      foreground: "#d1c6a2"
+      foreground: "#e1c1a3"
     role:
-      foreground: "#a9d0b4"
+      foreground: "#bfcc9b"
     typ:
-      foreground: "#dac66f"
+      foreground: "#fcb974"
     range:
-      foreground: "#d1c6a2"
+      foreground: "#e1c1a3"
 
 file_type:
   image:
-    foreground: "#d1c6a2"
+    foreground: "#e1c1a3"
     is_italic: true
   video:
-    foreground: "#d1c6a2"
+    foreground: "#e1c1a3"
   music:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   crypto:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
   document:
-    foreground: "#e8e2d4"
+    foreground: "#eee0d5"
   compressed:
     foreground: "#ffb4ab"
   temp:
-    foreground: "#cdc6b4"
+    foreground: "#d5c3b5"
   compiled:
-    foreground: "#a9d0b4"
+    foreground: "#bfcc9b"
   build:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
     is_underline: true
   source:
-    foreground: "#dac66f"
+    foreground: "#fcb974"
 
 punctuation:
-  foreground: "#cdc6b4"
+  foreground: "#d5c3b5"
 
 date:
-  foreground: "#cdc6b4"
+  foreground: "#d5c3b5"
 
 inode:
-  foreground: "#4b4739"
+  foreground: "#50453a"
 
 blocks:
-  foreground: "#dac66f"
+  foreground: "#fcb974"
 
 header:
-  foreground: "#dac66f"
+  foreground: "#fcb974"
   is_bold: true
 
 octal:
-  foreground: "#a9d0b4"
+  foreground: "#bfcc9b"
 
 flags:
-  foreground: "#cdc6b4"
+  foreground: "#d5c3b5"
 
 control_char:
   foreground: "#ffb4ab"

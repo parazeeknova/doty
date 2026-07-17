@@ -1,32 +1,32 @@
 { ... }: {
   console.colors = [
-    "15130b"
+    "19120c"
     "ffb4ab"
-    "dac66f"
-    "a9d0b4"
-    "d1c6a2"
-    "a9d0b4"
-    "d1c6a2"
-    "e8e2d4"
-    "4b4739"
+    "fcb974"
+    "bfcc9b"
+    "e1c1a3"
+    "bfcc9b"
+    "e1c1a3"
+    "eee0d5"
+    "50453a"
     "ffb4ab"
-    "dac66f"
-    "a9d0b4"
-    "d1c6a2"
-    "a9d0b4"
-    "d1c6a2"
-    "cdc6b4"
+    "fcb974"
+    "bfcc9b"
+    "e1c1a3"
+    "bfcc9b"
+    "e1c1a3"
+    "d5c3b5"
   ];
 
   boot.loader.limine.extraConfig = ''
     interface_branding: btw i use nix
-    interface_branding_colour: dac66f
+    interface_branding_colour: fcb974
     interface_help_hidden: yes
     wallpaper_style: centered
-    backdrop: 15130b
+    backdrop: 19120c
     term_margin: 350
     term_margin_gradient: 0
-    term_background: 0015130b
-    term_foreground: e8e2d4
+    term_background: 0019120c
+    term_foreground: eee0d5
   '';
 }
