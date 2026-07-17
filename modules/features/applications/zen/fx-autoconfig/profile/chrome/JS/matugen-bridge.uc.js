@@ -315,7 +315,7 @@ function syncBoostForDomain(domain, config, css) {
 const UNIVERSAL_BOOST_OPTIONS = {
   boostName: "matugen universal",
   enableColorBoost: true,
-  autoTheme: true, // pull hue from active workspace gradient
+  autoTheme: false, // force manual HSL mapping to bypass Zen autoTheme hue bug
   smartInvert: false,
   brightness: 0.5,
   saturation: 0.5,
@@ -782,17 +782,12 @@ function syncWorkspaceTheme(data, force = false) {
           `Synced workspace gradient: ${gradientColors.length} color(s) from accent ${accentHex} (verified=${!!match})`,
         );
         Services.obs.notifyObservers(null, "zen-space-gradient-update");
-        lastSyncedAccent = accentHex;
-        return;
       }
-      logInfo(
-        "syncWorkspaceTheme: no active workspace, falling back to direct HSL on boosts",
-      );
-    } else {
-      logInfo(
-        "syncWorkspaceTheme: gZenWorkspaces not available, falling back to direct HSL on boosts",
-      );
     }
+
+    logInfo(
+      "syncWorkspaceTheme: finished workspace gradient sync, continuing to direct HSL on boosts",
+    );
 
     // Path 2: directly update the dot-picker knobs on every
     // universal-boosted domain. The C++ tint layer reads
@@ -828,7 +823,7 @@ function syncWorkspaceTheme(data, force = false) {
       }
     }
     logInfo(`HSL fallback: updated ${updated} boost(s), failed ${failed}, from accent ${accentHex}`);
-    if (updated > 0) lastSyncedAccent = accentHex;
+    lastSyncedAccent = accentHex;
   } catch (e) {
     logError(`syncWorkspaceTheme: ${e.message}\n${e.stack || ""}`);
   }
