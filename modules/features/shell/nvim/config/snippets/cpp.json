@@ -1,0 +1,23 @@
+{
+  "Competitive Programming Boilerplate": {
+    "prefix": [
+      "cp",
+      "cppboilerplate"
+    ],
+    "body": [
+      "#include <bits/stdc++.h>",
+      "using namespace std;",
+      "",
+      "#if 1",
+      "int main() {",
+      "  ios::sync_with_stdio(false);",
+      "  cin.tie(nullptr);",
+      "",
+      "  $0",
+      "  return 0;",
+      "}",
+      "#endif"
+    ],
+    "description": "Boilerplate for competitive programming"
+  }
+}

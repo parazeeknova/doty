@@ -9,7 +9,11 @@ return {
         config = function()
             require("blink.cmp").setup({
                 fuzzy = { implementation = "prefer_rust" },
-                keymap = { preset = "default" },
+                keymap = {
+                    preset = "default",
+                    ["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+                    ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+                },
                 completion = {
                     menu = { auto_show = true },
                     documentation = { auto_show = true },
@@ -34,6 +38,7 @@ return {
                 snippets = { preset = "luasnip" },
             })
             require("luasnip.loaders.from_vscode").lazy_load()
+            require("luasnip.loaders.from_vscode").lazy_load({ paths = { vim.fn.stdpath("config") .. "/snippets" } })
         end,
     },
 }
