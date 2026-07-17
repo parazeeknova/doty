@@ -35,15 +35,13 @@ Rectangle {
     }
 
     function getTextColor(isActiveOrHovered) {
-        var isLight = (presetRow.dotColors && presetRow.dotColors.length > 0 && presetRow.isLightTheme(presetRow.dotColors[0]));
         if (isActiveOrHovered) {
+            var isLight = (presetRow.dotColors && presetRow.dotColors.length > 0 && presetRow.isLightTheme(presetRow.dotColors[0]));
             if (isLight)
                 return theme.accent;
             return (presetRow.dotColors && presetRow.dotColors.length > 3) ? presetRow.dotColors[3] : theme.accent;
         } else {
-            if (isLight)
-                return theme.fg_light;
-            return (presetRow.dotColors && presetRow.dotColors.length > 2) ? presetRow.dotColors[2] : theme.fg_light;
+            return theme.fg_light;
         }
     }
 
@@ -120,7 +118,7 @@ Rectangle {
                 }
                 return presetRow.rowActive ? (nameText + " - active") : nameText;
             }
-            color: presetRow.getTextColor(presetRow.rowActive)
+            color: presetRow.getTextColor(presetRow.rowActive || presetRow.rowFocused || rowMouse.containsMouse)
             font.family: "FiraCode Nerd Font"
             font.pixelSize: 8
             font.bold: presetRow.rowActive
