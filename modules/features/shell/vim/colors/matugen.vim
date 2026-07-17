@@ -8,12 +8,8 @@ if exists('g:loaded_matugen') | finish | endif
 let g:loaded_matugen = 1
 
 
-" Detect background based on terminal colors
-if $BACKGROUND =~# 'light'
-  set background=light
-else
-  set background=dark
-endif
+" Set background based on wabi switcher
+set background=light
 
 " hi clear
 let g:colors_name = 'matugen'
