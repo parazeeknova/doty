@@ -292,6 +292,7 @@ fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     vars.insert("is_light".to_string(), is_light.to_string());
     vars.insert("vscode_theme".to_string(), (if is_light { "Matugen Light" } else { "Matugen" }).to_string());
     vars.insert("uses_dark_theme".to_string(), if is_light { "0" } else { "1" }.to_string());
+    vars.insert("vim_background".to_string(), (if is_light { "light" } else { "dark" }).to_string());
     vars.insert("prefers_color_scheme".to_string(), if is_light { "1" } else { "0" }.to_string());
     vars.insert("gtk_icon_theme".to_string(), (if is_light { "Papirus" } else { "Papirus-Dark" }).to_string());
     vars.insert("gtk_prefer_dark".to_string(), (if is_light { "0" } else { "1" }).to_string());
@@ -621,34 +622,6 @@ fn main() {
         println!("Rendered cache Colors.qml (early)");
     }
 
-    if mode == "wallpaper" {
-        let path = Path::new(&value);
-        let is_video = path
-            .extension()
-            .and_then(|ext| ext.to_str())
-            .map(|ext| matches!(ext.to_ascii_lowercase().as_str(), "mp4" | "webm"))
-            .unwrap_or(false);
-
-        let matugen_input = if is_video {
-            let hash = stable_hash(path);
-            home_dir()
-                .join(".cache")
-                .join("quickshell")
-                .join("wallpaper_switcher")
-                .join("thumbs")
-                .join(format!("{}.jpg", hash))
-        } else {
-            path.to_path_buf()
-        };
-
-        let _ = Command::new("matugen")
-            .arg("image")
-            .arg(&matugen_input)
-            .arg("--source-color-index")
-            .arg("0")
-            .spawn();
-    }
-
     // Define all templates and their destinations
     let mappings = vec![
         (
@@ -841,6 +814,12 @@ fn main() {
     let d_colors_json = matugen_cache.join("vscode-colors.json");
     if t_colors_json.exists() && render_template(&t_colors_json, &d_colors_json, &vars) {
         println!("Rendered: ~/.cache/matugen/vscode-colors.json");
+    }
+
+    let t_nvim = doty.join("modules/features/shell/nvim/nvim-theme.lua.template");
+    let d_nvim = matugen_cache.join("nvim-theme.lua");
+    if t_nvim.exists() && render_template(&t_nvim, &d_nvim, &vars) {
+        println!("Rendered: ~/.cache/matugen/nvim-theme.lua");
     }
 
     // Patch Kvantum SVG

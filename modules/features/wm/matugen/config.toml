@@ -1,6 +1,1 @@
 [config]
-
-# Neovim dynamic theme
-[templates.nvim-theme]
-input_path = './templates/nvim-colors'
-output_path = '~/.cache/matugen/nvim-theme.lua'
