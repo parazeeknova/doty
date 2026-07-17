@@ -68,16 +68,7 @@ fn get_image_stats(image_path: &Path) -> Option<(f64, f64)> {
     Some((brightness, saturation))
 }
 
-fn get_matugen_palette(wallpaper_path: &Path) -> Option<HashMap<String, String>> {
-    let mode_file = home_dir().join(".cache").join("quickshell").join("colorscheme_mode");
-    let force_mode = if mode_file.exists() {
-        fs::read_to_string(&mode_file)
-            .ok()
-            .map(|s| s.trim().to_string())
-            .unwrap_or_else(|| "auto".to_string())
-    } else {
-        "auto".to_string()
-    };
+fn get_matugen_palette(wallpaper_path: &Path, force_mode: &str) -> Option<HashMap<String, String>> {
 
     let hash = stable_hash(wallpaper_path);
     let cache_dir = home_dir()
@@ -114,7 +105,7 @@ fn get_matugen_palette(wallpaper_path: &Path) -> Option<HashMap<String, String>>
 
         let stats = get_image_stats(&matugen_input).unwrap_or((0.5, 1.0));
         let is_monochrome = stats.1 < 0.08;
-        let is_light = match force_mode.as_str() {
+        let is_light = match force_mode {
             "light" => true,
             "dark" => false,
             _ => stats.0 > 0.55,
@@ -559,6 +550,25 @@ fn main() {
         value = args[2].clone();
     }
 
+    // Read/save colorscheme mode (auto/light/dark)
+    let colorscheme_mode = if mode == "wallpaper" && args.len() >= 4 {
+        let val = args[3].trim().to_string();
+        let mode_file = home_dir().join(".cache").join("quickshell").join("colorscheme_mode");
+        let _ = fs::create_dir_all(mode_file.parent().unwrap());
+        let _ = fs::write(&mode_file, &val);
+        val
+    } else {
+        let mode_file = home_dir().join(".cache").join("quickshell").join("colorscheme_mode");
+        if mode_file.exists() {
+            fs::read_to_string(&mode_file)
+                .ok()
+                .map(|s| s.trim().to_string())
+                .unwrap_or_else(|| "auto".to_string())
+        } else {
+            "auto".to_string()
+        }
+    };
+
     // Save selection for restore on login
     let _ = fs::create_dir_all(cache_theme_path.parent().unwrap());
     let _ = fs::write(&cache_theme_path, format!("{} {}", mode, value));
@@ -573,7 +583,7 @@ fn main() {
         }),
         "wallpaper" => {
             let wall = Path::new(&value);
-            match get_matugen_palette(wall) {
+            match get_matugen_palette(wall, &colorscheme_mode) {
                 Some(p) => p,
                 None => {
                     eprintln!("Failed to extract colors; falling back to Gruvbox");

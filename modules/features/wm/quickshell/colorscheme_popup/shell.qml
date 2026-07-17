@@ -47,7 +47,7 @@ Scope {
         root.currentThemeMode = "wallpaper";
         // set_wallpaper first (sets the visible wallpaper), then theme_switcher (matugen from the same file).
         Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/set_wallpaper", path]);
-        Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/theme_switcher", "wallpaper", path]);
+        Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/theme_switcher", "wallpaper", path, root.colorschemeMode]);
         Quickshell.execDetached(["sh", "-c", "printf %s \"$1\" > " + root.homeDir + "/.cache/last_wallpaper", "sh", path]);
     }
 
@@ -168,9 +168,10 @@ Scope {
 
     function setColorschemeMode(mode) {
         root.colorschemeMode = mode;
-        Quickshell.execDetached(["sh", "-c", "mkdir -p " + root.homeDir + "/.cache/quickshell && printf %s \"" + mode + "\" > " + root.homeDir + "/.cache/quickshell/colorscheme_mode"]);
         if (root.currentThemeMode === "wallpaper" && root.currentWallpaperPath !== "") {
-            Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/theme_switcher", "wallpaper", root.currentWallpaperPath]);
+            Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/theme_switcher", "wallpaper", root.currentWallpaperPath, mode]);
+        } else {
+            Quickshell.execDetached(["sh", "-c", "mkdir -p " + root.homeDir + "/.cache/quickshell && printf %s \"" + mode + "\" > " + root.homeDir + "/.cache/quickshell/colorscheme_mode"]);
         }
     }
 
