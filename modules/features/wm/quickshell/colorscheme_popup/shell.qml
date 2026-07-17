@@ -540,26 +540,30 @@ Scope {
                                 spacing: 4
 
                                 Repeater {
-                                    model: ["auto", "dark", "light"]
+                                    model: [
+                                        { mode: "auto", label: "Auto", icon: "󰚌" },
+                                        { mode: "dark", label: "Dark", icon: "" },
+                                        { mode: "light", label: "Light", icon: "" }
+                                    ]
 
                                     delegate: MouseArea {
                                         width: (parent.width - 8) / 3
                                         height: 16
                                         onClicked: {
-                                            root.setColorschemeMode(modelData);
+                                            root.setColorschemeMode(modelData.mode);
                                         }
 
                                         Rectangle {
                                             anchors.fill: parent
-                                            color: (root.colorschemeMode === modelData) ? theme.accent : theme.bg_dark
+                                            color: (root.colorschemeMode === modelData.mode) ? theme.accent : theme.bg_dark
                                             border.color: theme.accent
                                             border.width: 1
                                             radius: 0
 
                                             Text {
                                                 anchors.centerIn: parent
-                                                text: modelData.toUpperCase()
-                                                color: (root.colorschemeMode === modelData) ? theme.bg : theme.fg
+                                                text: modelData.icon + " " + modelData.label
+                                                color: (root.colorschemeMode === modelData.mode) ? theme.bg : theme.fg
                                                 font.family: "FiraCode Nerd Font"
                                                 font.pixelSize: 7
                                                 font.bold: true
