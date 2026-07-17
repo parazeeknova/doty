@@ -210,6 +210,18 @@ function loadUserstylesFor(name, file) {
     logInfo(
       `Loaded userstyles[${name}]: ${css.length} bytes from ${file.path}`,
     );
+    // Sync to Zen Boosts if configured
+    for (const [domain, config] of Object.entries(BOOST_SITES)) {
+      const fileSuffix = config.cssFile.slice(USERSTYLES_PREFIX.length, -4);
+      if (fileSuffix === name) {
+        logInfo(`Syncing boost for ${domain} due to userstyles change`);
+        try {
+          syncBoostForDomain(domain, config, css);
+        } catch (e) {
+          logError(`loadUserstylesFor syncBoost[${domain}]: ${e.message}`);
+        }
+      }
+    }
   }
 }
 
@@ -465,7 +477,7 @@ function syncUniversalBoosts() {
   if (universalBoostedDomains.size > 0) {
     try {
       const data = readJson();
-      if (data) syncWorkspaceTheme(data);
+      if (data) syncWorkspaceTheme(data, created > 0 || lastSyncedAccent === null);
     } catch (e) {
       logError(`post-universal sync: ${e.message}`);
     }
@@ -726,11 +738,16 @@ function rgbToHsl(r, g, b) {
   return { h, s, l };
 }
 
-function syncWorkspaceTheme(data) {
-  const accentHex = data?.accent;
+function syncWorkspaceTheme(data, force = false) {
+  let accentHex = data?.accent;
+  if (!accentHex) {
+    try {
+      accentHex = Services.prefs.getStringPref("matugen.theme.accent", "");
+    } catch (e) {}
+  }
   if (!accentHex) return;
-  if (accentHex === lastSyncedAccent) return;
-  logInfo(`syncWorkspaceTheme: called with accent=${accentHex}`);
+  if (!force && accentHex === lastSyncedAccent) return;
+  logInfo(`syncWorkspaceTheme: called with accent=${accentHex} (force=${force})`);
   try {
     const win = Services.wm.getMostRecentWindow("navigator:browser");
     if (!win) {
@@ -755,8 +772,16 @@ function syncWorkspaceTheme(data) {
     if (win.gZenWorkspaces) {
       const ws = win.gZenWorkspaces.getActiveWorkspace();
       if (ws && ws.theme) {
-        const bgDark = hexToRgb01(data["bg-dark"]);
-        const bgLight = hexToRgb01(data["bg-light"]);
+        let bgDarkHex = data ? data["bg-dark"] : null;
+        let bgLightHex = data ? data["bg-light"] : null;
+        if (!data) {
+          try {
+            bgDarkHex = Services.prefs.getStringPref("matugen.theme.bg-dark", "");
+            bgLightHex = Services.prefs.getStringPref("matugen.theme.bg-light", "");
+          } catch (e) {}
+        }
+        const bgDark = hexToRgb01(bgDarkHex);
+        const bgLight = hexToRgb01(bgLightHex);
         const gradientColors = [{ c: accentRgb, isPrimary: true }];
         if (bgDark) gradientColors.push({ c: bgDark });
         if (bgLight) gradientColors.push({ c: bgLight });
