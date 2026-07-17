@@ -55,6 +55,30 @@
           '';
         })
 
+        # -- Verso --
+        (appimageTools.wrapType2 {
+          pname = "verso";
+          version = "0.3.70";
+          src = fetchurl {
+            url = "https://github.com/parazeeknova/verso/releases/download/v0.3.70/Verso-0.3.70-x86_64.AppImage";
+            sha256 = "04bjf1liqmsd7dy9b6zwqs6glbwjlmvxsg6a6g9j0ay1d8gycz7z";
+          };
+          extraInstallCommands = ''
+            mkdir -p $out/share/applications
+            cat > $out/share/applications/verso.desktop <<EOF
+            [Desktop Entry]
+            Name=Verso
+            Exec=verso %U
+            Terminal=false
+            Type=Application
+            Icon=verso
+            StartupWMClass=Verso
+            Comment=Verso Application
+            Categories=Network;
+            EOF
+          '';
+        })
+
         # -- Multi Media --
         freetube
         audacity

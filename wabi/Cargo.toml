@@ -179,3 +179,7 @@ path = "src/bin/status/voxtype.rs"
 [[bin]]
 name = "update_zcode"
 path = "src/bin/utils/update-zcode.rs"
+
+[[bin]]
+name = "update_verso"
+path = "src/bin/utils/update-verso.rs"

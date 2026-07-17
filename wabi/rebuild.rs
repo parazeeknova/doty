@@ -112,6 +112,14 @@ fn main() {
         print_warning("ZCode check/update failed or skipped.");
     }
 
+    // Step 0.6: Check and update Verso
+    print_step("Checking and updating Verso...");
+    if run_cmd("./wabi/target/release/update_verso", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
+        print_success("Verso check/update completed.");
+    } else {
+        print_warning("Verso check/update failed or skipped.");
+    }
+
     // Step 0.7: Update Nix Flake inputs
     print_step("Updating Nix flake inputs...");
     if run_cmd("nix", &["flake", "update"]).map(|s| s.success()).unwrap_or(false) {

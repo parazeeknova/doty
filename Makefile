@@ -4,7 +4,7 @@ sync:
 	$(MAKE) -C wabi install
 
 rebuild:
-	cargo build --manifest-path wabi/Cargo.toml --release --bin update_zcode
+	cargo build --manifest-path wabi/Cargo.toml --release --bin update_zcode --bin update_verso
 	rustc wabi/rebuild.rs -o wabi/rebuild && ./wabi/rebuild
 
 update-zcode:
