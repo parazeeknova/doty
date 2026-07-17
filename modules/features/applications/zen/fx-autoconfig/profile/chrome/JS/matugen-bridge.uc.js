@@ -746,6 +746,8 @@ function syncWorkspaceTheme(data, force = false) {
       `syncWorkspaceTheme: accent=${accentHex} → hsl(${h.toFixed(1)}°, ${(s * 100).toFixed(0)}%, ${(l * 100).toFixed(0)}%)`,
     );
 
+    let syncedWorkspace = false;
+
     // Path 1: try to push into the active Zen workspace gradient
     // (used when the user has Zen Workspaces enabled). The C++ boost
     // layer reads workspace.theme.gradientColors[primary].c when
@@ -782,6 +784,7 @@ function syncWorkspaceTheme(data, force = false) {
           `Synced workspace gradient: ${gradientColors.length} color(s) from accent ${accentHex} (verified=${!!match})`,
         );
         Services.obs.notifyObservers(null, "zen-space-gradient-update");
+        syncedWorkspace = true;
       }
     }
 
@@ -823,7 +826,9 @@ function syncWorkspaceTheme(data, force = false) {
       }
     }
     logInfo(`HSL fallback: updated ${updated} boost(s), failed ${failed}, from accent ${accentHex}`);
-    lastSyncedAccent = accentHex;
+    if (updated > 0 || syncedWorkspace) {
+      lastSyncedAccent = accentHex;
+    }
   } catch (e) {
     logError(`syncWorkspaceTheme: ${e.message}\n${e.stack || ""}`);
   }
