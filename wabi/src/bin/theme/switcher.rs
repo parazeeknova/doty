@@ -292,6 +292,8 @@ fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     vars.insert("is_light".to_string(), is_light.to_string());
     vars.insert("uses_dark_theme".to_string(), if is_light { "0" } else { "1" }.to_string());
     vars.insert("prefers_color_scheme".to_string(), if is_light { "1" } else { "0" }.to_string());
+    vars.insert("gtk_icon_theme".to_string(), (if is_light { "Papirus" } else { "Papirus-Dark" }).to_string());
+    vars.insert("gtk_prefer_dark".to_string(), (if is_light { "0" } else { "1" }).to_string());
 
     vars.insert("bg".to_string(), bg.clone());
     vars.insert("bg_hex".to_string(), bg.replace("#", ""));
@@ -729,6 +731,14 @@ fn main() {
         (
             "modules/features/wm/theming/.config/gtk-4.0/colors.css.template",
             "modules/features/wm/theming/.config/gtk-4.0/colors.css",
+        ),
+        (
+            "modules/features/wm/theming/.config/gtk-3.0/settings.ini.template",
+            "modules/features/wm/theming/.config/gtk-3.0/settings.ini",
+        ),
+        (
+            "modules/features/wm/theming/.config/gtk-4.0/settings.ini.template",
+            "modules/features/wm/theming/.config/gtk-4.0/settings.ini",
         ),
         (
             "modules/features/wm/theming/.config/qt5ct/style-colors.conf.template",

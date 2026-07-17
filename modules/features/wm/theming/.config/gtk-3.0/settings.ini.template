@@ -1,0 +1,25 @@
+[Settings]
+gtk-theme-name=wabi
+gtk-icon-theme-name={{gtk_icon_theme}}
+gtk-font-name=FiraCode Nerd Font 9
+gtk-cursor-theme-name=capitaine-cursors
+gtk-cursor-theme-size=24
+gtk-toolbar-style=3
+gtk-toolbar-icon-size=GTK_ICON_SIZE_LARGE_TOOLBAR
+gtk-button-images=0
+gtk-menu-images=0
+gtk-enable-event-sounds=1
+gtk-enable-input-feedback-sounds=0
+gtk-xft-antialias=1
+gtk-xft-hinting=1
+gtk-xft-hintstyle=hintslight
+gtk-xft-rgba=rgb
+gtk-application-prefer-dark-theme={{gtk_prefer_dark}}
+gtk-cursor-blink=true
+gtk-cursor-blink-time=1000
+gtk-decoration-layout=icon:minimize,maximize,close
+gtk-enable-animations=true
+gtk-modules=colorreload-gtk-module:window-decorations-gtk-module
+gtk-primary-button-warps-slider=true
+gtk-sound-theme-name=ocean
+gtk-xft-dpi=98304
