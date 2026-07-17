@@ -294,6 +294,8 @@ fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     vars.insert("prefers_color_scheme".to_string(), if is_light { "1" } else { "0" }.to_string());
     vars.insert("gtk_icon_theme".to_string(), (if is_light { "Papirus" } else { "Papirus-Dark" }).to_string());
     vars.insert("gtk_prefer_dark".to_string(), (if is_light { "0" } else { "1" }).to_string());
+    vars.insert("respect_darkness".to_string(), (if is_light { "false" } else { "true" }).to_string());
+    vars.insert("dark_titlebar".to_string(), (if is_light { "false" } else { "true" }).to_string());
 
     vars.insert("bg".to_string(), bg.clone());
     vars.insert("bg_hex".to_string(), bg.replace("#", ""));
