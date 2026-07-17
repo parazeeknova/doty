@@ -1,14 +1,5 @@
 [config]
 
-# VS Code matugen extension
-[templates.vscode-raw]
-input_path = './templates/vscode-colors'
-output_path = '~/.cache/matugen/vscode-colors'
-
-[templates.vscode-json]
-input_path = './templates/vscode-colors.json'
-output_path = '~/.cache/matugen/vscode-colors.json'
-
 # Neovim dynamic theme
 [templates.nvim-theme]
 input_path = './templates/nvim-colors'

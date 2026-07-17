@@ -829,6 +829,20 @@ fn main() {
         }
     }
 
+    // Render VSCode theme colors directly to matugen cache directory
+    let matugen_cache = home_dir().join(".cache").join("matugen");
+    let t_colors = doty.join("modules/features/applications/vscodeinsiders/vscode-colors.template");
+    let d_colors = matugen_cache.join("vscode-colors");
+    if t_colors.exists() && render_template(&t_colors, &d_colors, &vars) {
+        println!("Rendered: ~/.cache/matugen/vscode-colors");
+    }
+
+    let t_colors_json = doty.join("modules/features/applications/vscodeinsiders/vscode-colors.json.template");
+    let d_colors_json = matugen_cache.join("vscode-colors.json");
+    if t_colors_json.exists() && render_template(&t_colors_json, &d_colors_json, &vars) {
+        println!("Rendered: ~/.cache/matugen/vscode-colors.json");
+    }
+
     // Patch Kvantum SVG
     let svg_tmpl = doty.join("modules/features/wm/theming/.config/Kvantum/wabi/wabi.svg.template");
     let svg_dest = doty.join("modules/features/wm/theming/.config/Kvantum/wabi/wabi.svg");

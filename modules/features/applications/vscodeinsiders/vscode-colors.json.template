@@ -1,0 +1,28 @@
+{
+  "checksum": ":)",
+  "wallpaper": "none",
+  "alpha": "100",
+  "special": {
+    "background": "{{bg}}",
+    "foreground": "{{fg}}",
+    "cursor": "{{accent}}"
+  },
+  "colors": {
+    "color0": "{{bg}}",
+    "color1": "{{fg}}",
+    "color2": "{{secondary}}",
+    "color3": "{{tertiary}}",
+    "color4": "{{accent}}",
+    "color5": "{{tertiary}}",
+    "color6": "{{secondary}}",
+    "color7": "{{fg_light}}",
+    "color8": "{{bg_light}}",
+    "color9": "{{accent}}",
+    "color10": "{{secondary}}",
+    "color11": "{{tertiary}}",
+    "color12": "{{accent}}",
+    "color13": "{{tertiary}}",
+    "color14": "{{secondary}}",
+    "color15": "{{fg}}"
+  }
+}
