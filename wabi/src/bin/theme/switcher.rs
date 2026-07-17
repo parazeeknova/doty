@@ -181,7 +181,7 @@ fn load_preset_palette(name: &str) -> Option<HashMap<String, String>> {
         .join(format!("{}.toml", name));
 
     let content = fs::read_to_string(&path).ok()?;
-    let value: toml::Value = content.parse().ok()?;
+    let value: toml::Value = toml::from_str(&content).ok()?;
     let colors_table = value.get("colors")?.as_table()?;
     let mut palette = HashMap::new();
     for (key, val) in colors_table {
@@ -1360,12 +1360,11 @@ fn apply_papirus_folders(accent_hex: &str, is_light: bool) {
     // If accent is very desaturated, use grey
     if accent_s < 0.15 {
         println!("Setting Papirus folders to: grey (desaturated accent) for {}", folder_theme);
-        let _ = Command::new("papirus-folders")
-            .arg("-t")
-            .arg(folder_theme)
-            .arg("-C")
-            .arg("grey")
-            .arg("-u")
+        let _ = Command::new("nix-shell")
+            .arg("-p")
+            .arg("gtk3")
+            .arg("--run")
+            .arg(format!("papirus-folders -t {} -C grey -u", folder_theme))
             .spawn();
         return;
     }
@@ -1398,12 +1397,11 @@ fn apply_papirus_folders(accent_hex: &str, is_light: bool) {
     }
 
     println!("Setting Papirus folders to: {} for {}", best_color, folder_theme);
-    let _ = Command::new("papirus-folders")
-        .arg("-t")
-        .arg(folder_theme)
-        .arg("-C")
-        .arg(best_color)
-        .arg("-u")
+    let _ = Command::new("nix-shell")
+        .arg("-p")
+        .arg("gtk3")
+        .arg("--run")
+        .arg(format!("papirus-folders -t {} -C {} -u", folder_theme, best_color))
         .spawn();
 }
 

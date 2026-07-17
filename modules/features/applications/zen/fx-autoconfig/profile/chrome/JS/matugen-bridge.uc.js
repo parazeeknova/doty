@@ -746,6 +746,16 @@ function syncWorkspaceTheme(data, force = false) {
       `syncWorkspaceTheme: accent=${accentHex} → hsl(${h.toFixed(1)}°, ${(s * 100).toFixed(0)}%, ${(l * 100).toFixed(0)}%)`,
     );
 
+    let isLightMode = false;
+    try {
+      const bgHex = data ? data["bg"] : Services.prefs.getStringPref("matugen.theme.bg", "");
+      const bgRgb = hexToRgb01(bgHex);
+      if (bgRgb) {
+        const { l: bgL } = rgbToHsl(bgRgb[0], bgRgb[1], bgRgb[2]);
+        isLightMode = bgL > 0.5;
+      }
+    } catch (e) {}
+
     let syncedWorkspace = false;
 
     // Path 1: try to push into the active Zen workspace gradient
@@ -816,6 +826,7 @@ function syncWorkspaceTheme(data, force = false) {
         boostData.dotAngleDeg = h;
         boostData.saturation = 1 - s;
         boostData.brightness = Math.max(0, Math.min(1, (l - 0.1) / 0.9));
+        boostData.secondaryDotAngleDegDelta = isLightMode ? 0 : 55;
         boostData.enableColorBoost = true;
         boostData.changeWasMade = true;
         boostsManager.updateBoost(boost);
