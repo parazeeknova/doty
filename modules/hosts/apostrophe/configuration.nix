@@ -47,6 +47,7 @@
       boot.loader.limine.enable = true;
       boot.loader.limine.efiInstallAsRemovable = true;
       boot.loader.limine.secureBoot.enable = true;
+      boot.loader.limine.extraConfig = builtins.readFile ../../../modules/features/wm/theming/limine-theme.conf;
       boot.loader.efi.canTouchEfiVariables = true;
       boot.kernelPackages = pkgs.linuxPackages_latest;
       # boot.kernelParams = [

@@ -792,6 +792,10 @@ fn main() {
             "modules/features/applications/vscodeinsiders/settings.json.template",
             "modules/features/applications/vscodeinsiders/settings.json",
         ),
+        (
+            "modules/features/wm/theming/limine-theme.conf.template",
+            "modules/features/wm/theming/limine-theme.conf",
+        ),
     ];
 
     for (tmpl, dest) in mappings {

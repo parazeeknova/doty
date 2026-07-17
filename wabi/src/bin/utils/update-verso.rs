@@ -30,8 +30,8 @@ fn get_latest_verso_version() -> Option<String> {
     let tag = extract_field(&json, "\"tag_name\":\"", "\"")?;
     
     // Strip leading 'v' if present
-    if tag.starts_with('v') {
-        Some(tag[1..].to_string())
+    if let Some(stripped) = tag.strip_prefix('v') {
+        Some(stripped.to_string())
     } else {
         Some(tag)
     }
