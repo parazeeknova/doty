@@ -959,6 +959,18 @@ fn main() {
     }
 
     if applied {
+        // Copy spicetifyWrapper.js to the patched directory (fixes NixOS spicetify-cli package bug)
+        let wrapper_dest = home_dir().join(".local/share/spotify-patched/Apps/xpui/helper/spicetifyWrapper.js");
+        let wrapper_src = doty.join("modules/features/applications/spicetify/spicetifyWrapper.js");
+        if wrapper_src.exists() {
+            if let Some(parent) = wrapper_dest.parent() {
+                let _ = std::fs::create_dir_all(parent);
+            }
+            if let Err(e) = std::fs::copy(&wrapper_src, &wrapper_dest) {
+                eprintln!("Failed to copy spicetifyWrapper.js: {}", e);
+            }
+        }
+
         let reload_script = doty.join("modules/scripts/spotify-reload");
         let reload_status = if reload_script.exists() {
             Command::new(&reload_script)
