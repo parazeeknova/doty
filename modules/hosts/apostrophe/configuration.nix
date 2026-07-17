@@ -275,12 +275,6 @@
         group = "users";
         mode = "0400";
       };
-      sops.secrets.azure-api-key = {
-        path = "/run/secrets/azure-api-key";
-        owner = config.users.users.parazeeknova.name;
-        group = "users";
-        mode = "0400";
-      };
       sops.secrets.cloudflare-api-token = {
         path = "/run/secrets/cloudflare-api-token";
         owner = config.users.users.parazeeknova.name;

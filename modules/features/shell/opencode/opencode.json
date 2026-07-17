@@ -78,18 +78,6 @@
           "name": "GLM-5.1"
         }
       }
-    },
-    "azure": {
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
-        "baseURL": "https://asmedia-resource.openai.azure.com/openai/v1",
-        "apiKey": "{env:AZURE_API_KEY}"
-      },
-      "models": {
-        "Kimi-K2.6": {
-          "name": "Kimi-K2.6"
-        }
-      }
     }
   }
 }
