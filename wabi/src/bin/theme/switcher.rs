@@ -69,13 +69,23 @@ fn get_image_stats(image_path: &Path) -> Option<(f64, f64)> {
 }
 
 fn get_matugen_palette(wallpaper_path: &Path) -> Option<HashMap<String, String>> {
+    let mode_file = home_dir().join(".cache").join("quickshell").join("colorscheme_mode");
+    let force_mode = if mode_file.exists() {
+        fs::read_to_string(&mode_file)
+            .ok()
+            .map(|s| s.trim().to_string())
+            .unwrap_or_else(|| "auto".to_string())
+    } else {
+        "auto".to_string()
+    };
+
     let hash = stable_hash(wallpaper_path);
     let cache_dir = home_dir()
         .join(".cache")
         .join("quickshell")
         .join("wallpaper_switcher")
         .join("thumbs");
-    let cache_path = cache_dir.join(format!("{}.json", hash));
+    let cache_path = cache_dir.join(format!("{}_{}.json", hash, force_mode));
 
     // Treat the cache as stale when it's older than the wallpaper itself — a user may
     // have overwritten the file in place, leaving the path unchanged but the content new.
@@ -104,10 +114,14 @@ fn get_matugen_palette(wallpaper_path: &Path) -> Option<HashMap<String, String>>
 
         let stats = get_image_stats(&matugen_input).unwrap_or((0.5, 1.0));
         let is_monochrome = stats.1 < 0.08;
-        let is_light = stats.0 > 0.55;
+        let is_light = match force_mode.as_str() {
+            "light" => true,
+            "dark" => false,
+            _ => stats.0 > 0.55,
+        };
         println!(
-            "Wallpaper stats: brightness = {:.3}, saturation = {:.3} (monochrome = {}, light = {})",
-            stats.0, stats.1, is_monochrome, is_light
+            "Wallpaper stats: brightness = {:.3}, saturation = {:.3} (monochrome = {}, light = {}, forced_mode = {})",
+            stats.0, stats.1, is_monochrome, is_light, force_mode
         );
 
         let mut cmd = Command::new("matugen");

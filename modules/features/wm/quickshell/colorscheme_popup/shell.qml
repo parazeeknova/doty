@@ -11,6 +11,7 @@ Scope {
     property string currentWallpaperPath: ""
     property string currentThemeMode: ""
     property string currentThemeValue: ""
+    property string colorschemeMode: "auto"
     property bool glassEnabled: true
     property bool waybarEnabled: true
     property bool wallpaperPaused: false
@@ -147,6 +148,30 @@ Scope {
             root.wallpaperPaused = (wallpaperPauseWatcher.text().trim() === "true");
         }
         onFileChanged: reload()
+    }
+
+    FileView {
+        id: colorschemeModeWatcher
+
+        path: "file://" + root.homeDir + "/.cache/quickshell/colorscheme_mode"
+        watchChanges: true
+        onLoaded: {
+            var val = colorschemeModeWatcher.text().trim();
+            if (val === "light" || val === "dark") {
+                root.colorschemeMode = val;
+            } else {
+                root.colorschemeMode = "auto";
+            }
+        }
+        onFileChanged: reload()
+    }
+
+    function setColorschemeMode(mode) {
+        root.colorschemeMode = mode;
+        Quickshell.execDetached(["sh", "-c", "mkdir -p " + root.homeDir + "/.cache/quickshell && printf %s \"" + mode + "\" > " + root.homeDir + "/.cache/quickshell/colorscheme_mode"]);
+        if (root.currentThemeMode === "wallpaper" && root.currentWallpaperPath !== "") {
+            Quickshell.execDetached([root.homeDir + "/doty/modules/scripts/theme_switcher", "wallpaper", root.currentWallpaperPath]);
+        }
     }
 
     // Watch presets dir for add/remove (directory mtime changes when entries change)
@@ -489,6 +514,109 @@ Scope {
                                         if (root.currentWallpaperPath !== "") {
                                             root.applyWallpaper(root.currentWallpaperPath);
                                             win.closePopup();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // --- SECTION 1B: WALLPAPER GENERATION MODE ---
+                        Column {
+                            width: parent.width
+                            spacing: 6
+
+                            Text {
+                                text: "Theme Generation Mode"
+                                color: theme.accent
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 8
+                                font.bold: true
+                                opacity: 0.5
+                                renderType: Text.NativeRendering
+                            }
+
+                            Row {
+                                width: parent.width
+                                spacing: 4
+
+                                Repeater {
+                                    model: ["auto", "dark", "light"]
+
+                                    delegate: MouseArea {
+                                        width: (parent.width - 8) / 3
+                                        height: 16
+                                        onClicked: {
+                                            root.setColorschemeMode(modelData);
+                                        }
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            color: (root.colorschemeMode === modelData) ? theme.accent : theme.bg_dark
+                                            border.color: theme.accent
+                                            border.width: 1
+                                            radius: 0
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: modelData.toUpperCase()
+                                                color: (root.colorschemeMode === modelData) ? theme.bg : theme.fg
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 7
+                                                font.bold: true
+                                                renderType: Text.NativeRendering
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Text {
+                                text: "Active Colors"
+                                color: theme.accent
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 8
+                                font.bold: true
+                                opacity: 0.5
+                                renderType: Text.NativeRendering
+                                topPadding: 4
+                            }
+
+                            Grid {
+                                width: parent.width
+                                columns: 4
+                                spacing: 4
+
+                                Repeater {
+                                    model: [
+                                        { name: "bg", color: theme.bg },
+                                        { name: "bg_dark", color: theme.bg_dark },
+                                        { name: "bg_light", color: theme.bg_light },
+                                        { name: "fg", color: theme.fg },
+                                        { name: "fg_light", color: theme.fg_light },
+                                        { name: "accent", color: theme.accent },
+                                        { name: "secondary", color: theme.secondary },
+                                        { name: "tertiary", color: theme.tertiary }
+                                    ]
+
+                                    delegate: Rectangle {
+                                        width: (parent.width - 12) / 4
+                                        height: 18
+                                        color: modelData.color
+                                        border.color: theme.accent
+                                        border.width: 1
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: modelData.name
+                                            color: {
+                                                var c = modelData.color;
+                                                var l = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
+                                                return (l > 0.5) ? "#000000" : "#ffffff";
+                                            }
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 6
+                                            font.bold: true
+                                            renderType: Text.NativeRendering
                                         }
                                     }
                                 }
