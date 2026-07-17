@@ -112,27 +112,7 @@ const HOST_TO_FILE = {
 // C++ tint layer would fight the customCSS. Zen's own editor can
 // override these per-site if a user wants the tint instead.
 let boostsManager = null;
-const BOOST_SITES = {
-  "github.com": {
-    cssFile: "matugen-userstyles-github.css",
-    options: {
-      boostName: "matugen github",
-      enableColorBoost: false,
-      autoTheme: false,
-      smartInvert: false,
-      brightness: 0.5,
-      saturation: 0.5,
-      contrast: 0.75,
-      dotAngleDeg: 131.61,
-      dotPos: { x: 0.76, y: 0.66 },
-      dotDistance: 0.91,
-      secondaryDotAngleDegDelta: 55,
-      secondaryDotPos: { x: 0.5, y: 0.81 },
-      changeWasMade: true, // <-- required: parent actor checks this
-      //     before returning the stylesheet
-    },
-  },
-};
+const BOOST_SITES = {};
 
 let chromeDir = null;
 let jsonFile = null;
@@ -454,6 +434,7 @@ function syncUniversalBoosts() {
             continue;
           }
           const { boostData } = boost.boostEntry;
+          boostData.customCSS = "";
           for (const [k, v] of Object.entries(UNIVERSAL_BOOST_OPTIONS)) {
             boostData[k] = v;
           }

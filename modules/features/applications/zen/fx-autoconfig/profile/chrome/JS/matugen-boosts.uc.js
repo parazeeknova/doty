@@ -44,26 +44,7 @@ const PREF_TO_VAR = {
 // sites where you want Zen's automatic color filter (no customCSS).
 //
 // `boostName` is just the human label in the Zen boost editor.
-const BOOST_SITES = {
-  "github.com": {
-    cssFile: "matugen-userstyles-github.css",
-    options: {
-      boostName: "matugen github",
-      enableColorBoost: false,
-      autoTheme: false,
-      smartInvert: false,
-      brightness: 0.5,
-      saturation: 0.5,
-      contrast: 0.75,
-      dotAngleDeg: 131.61,
-      dotPos: { x: 0.76, y: 0.66 },
-      dotDistance: 0.91,
-      secondaryDotAngleDegDelta: 55,
-      secondaryDotPos: { x: 0.5, y: 0.81 },
-      changeWasMade: true,
-    },
-  },
-};
+const BOOST_SITES = {};
 
 let chromeDir = null;
 let jsonFile = null;
