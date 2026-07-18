@@ -76,6 +76,11 @@ fn get_cmd_output(cmd: &str, args: &[&str]) -> std::io::Result<String> {
 fn main() {
     print_header("Starting Rust-powered Rebuild Pipeline");
 
+    // Read GitHub token if available to prevent API rate limiting on nix commands
+    let token = std::fs::read_to_string("/run/secrets/github-token")
+        .ok()
+        .map(|s| s.trim().to_string());
+
     // Step 0: Check Git Working Directory status
     print_step("Checking Git working tree status...");
     match get_cmd_output("git", &["status", "--porcelain"]) {
@@ -122,7 +127,15 @@ fn main() {
 
     // Step 0.7: Update Nix Flake inputs
     print_step("Updating Nix flake inputs...");
-    if run_cmd("nix", &["flake", "update"]).map(|s| s.success()).unwrap_or(false) {
+    let mut update_args = vec!["flake", "update"];
+    let token_arg;
+    if let Some(ref t) = token {
+        token_arg = format!("github.com={}", t);
+        update_args.push("--option");
+        update_args.push("access-tokens");
+        update_args.push(&token_arg);
+    }
+    if run_cmd("nix", &update_args).map(|s| s.success()).unwrap_or(false) {
         print_success("Flake inputs updated successfully.");
         match get_cmd_output("git", &["status", "--porcelain", "flake.lock"]) {
             Ok(status) if !status.trim().is_empty() => {
@@ -258,7 +271,15 @@ fn main() {
 
     // Step 3: Nix flake check
     print_step("Running nix flake check...");
-    if run_cmd_silent("nix", &["flake", "check"]) {
+    let mut check_args = vec!["flake", "check"];
+    let check_token_arg;
+    if let Some(ref t) = token {
+        check_token_arg = format!("github.com={}", t);
+        check_args.push("--option");
+        check_args.push("access-tokens");
+        check_args.push(&check_token_arg);
+    }
+    if run_cmd_silent("nix", &check_args) {
         print_success("nix flake check passed.");
     } else {
         print_error("nix flake check failed.");
