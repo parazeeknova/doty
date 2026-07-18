@@ -233,6 +233,9 @@
               sed -i 's/#define BORDER_RADIUS 8/#define BORDER_RADIUS 0/g' thunar/thunar-util.c
             '';
           });
+          vesktop = prev.vesktop.override {
+            electron_40 = final.electron_41;
+          };
         })
       ];
       programs.nix-ld.enable = true;
