@@ -56,38 +56,40 @@
         })
 
         # -- Verso --
-        (let
-          verso-extracted = pkgs.appimageTools.extractType2 {
+        (
+          let
+            verso-extracted = pkgs.appimageTools.extractType2 {
+              pname = "verso";
+              version = "0.3.78";
+              src = pkgs.fetchurl {
+                url = "https://github.com/parazeeknova/verso/releases/download/v0.3.78/Verso-0.3.78-x86_64.AppImage";
+                sha256 = "0dbyjv0696nk5hyiry1c9aiaz2ahv24ws20z2hihqs2h7y8wx9cz";
+              };
+              postExtract = ''
+                ln -s $out/usr/bin/bin/launcher $out/usr/bin/Verso
+              '';
+            };
+          in
+          pkgs.appimageTools.wrapAppImage {
             pname = "verso";
             version = "0.3.78";
-            src = pkgs.fetchurl {
-              url = "https://github.com/parazeeknova/verso/releases/download/v0.3.78/Verso-0.3.78-x86_64.AppImage";
-              sha256 = "0dbyjv0696nk5hyiry1c9aiaz2ahv24ws20z2hihqs2h7y8wx9cz";
-            };
-            postExtract = ''
-              ln -s $out/usr/bin/bin/launcher $out/usr/bin/Verso
+            src = verso-extracted;
+            extraInstallCommands = ''
+              mkdir -p $out/share/applications
+              cat > $out/share/applications/verso.desktop <<EOF
+              [Desktop Entry]
+              Name=Verso
+              Exec=verso %U
+              Terminal=false
+              Type=Application
+              Icon=verso
+              StartupWMClass=Verso
+              Comment=Verso Application
+              Categories=Network;
+              EOF
             '';
-          };
-        in
-        pkgs.appimageTools.wrapAppImage {
-          pname = "verso";
-          version = "0.3.78";
-          src = verso-extracted;
-          extraInstallCommands = ''
-            mkdir -p $out/share/applications
-            cat > $out/share/applications/verso.desktop <<EOF
-            [Desktop Entry]
-            Name=Verso
-            Exec=verso %U
-            Terminal=false
-            Type=Application
-            Icon=verso
-            StartupWMClass=Verso
-            Comment=Verso Application
-            Categories=Network;
-            EOF
-          '';
-        })
+          }
+        )
 
         # -- Multi Media --
         freetube
