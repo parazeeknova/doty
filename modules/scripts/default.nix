@@ -67,7 +67,7 @@ in
               Type=Application
               Name=SKLauncher
               GenericName=Minecraft Launcher
-              Exec=nvidia-offload steam-run java -jar /home/parazeeknova/jars/SKlauncher-3.2.18.jar
+              Exec=sh -c 'jar=$(find /home/parazeeknova/jars -name "SKlauncher-*.jar" -print -quit); if [ -n "$jar" ]; then exec nvidia-offload steam-run java -jar "$jar"; else notify-send "SKLauncher" "No SKlauncher-*.jar found in ~/jars/"; fi'
               Comment=Minecraft Launcher with Nvidia GPU acceleration.
               Icon=minecraft
               Categories=Game;
