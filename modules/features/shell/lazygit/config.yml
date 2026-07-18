@@ -7,32 +7,32 @@ gui:
   border: rounded
   theme:
     activeBorderColor:
-      - "#a9b665"
+      - "#fcb974"
       - bold
     inactiveBorderColor:
-      - "#3c3836"
+      - "#50453a"
     searchingActiveBorderColor:
-      - "#d8a657"
+      - "#bfcc9b"
       - bold
     optionsTextColor:
-      - "#7daea3"
+      - "#e1c1a3"
     selectedLineBgColor:
-      - "#282828"
+      - "#261e18"
     inactiveViewSelectedLineBgColor:
       - bold
     cherryPickedCommitFgColor:
-      - "#1d2021"
+      - "#19120c"
       - bold
     cherryPickedCommitBgColor:
-      - "#a9b665"
+      - "#fcb974"
     markedBaseCommitFgColor:
-      - "#1d2021"
+      - "#19120c"
       - bold
     markedBaseCommitBgColor:
-      - "#d8a657"
+      - "#bfcc9b"
     unstagedChangesColor:
-      - "#cc241d"
+      - "#ffb4ab"
     defaultFgColor:
-      - "#ebdbb2"
+      - "#eee0d5"
   authorColors:
-    "*": "#7daea3"
+    "*": "#e1c1a3"
