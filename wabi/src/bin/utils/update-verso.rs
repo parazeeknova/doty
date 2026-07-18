@@ -10,13 +10,33 @@ fn extract_field(content: &str, start_pattern: &str, end_pattern: &str) -> Optio
 }
 
 fn get_latest_verso_version() -> Option<String> {
+    let mut args = vec![
+        "-s",
+        "-H",
+        "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
+    ];
+
+    let mut token = fs::read_to_string("/run/secrets/github-token")
+        .ok()
+        .map(|s| s.trim().to_string());
+
+    if token.is_none() {
+        token = std::env::var("GITHUB_PERSONAL_ACCESS_TOKEN")
+            .ok()
+            .or_else(|| std::env::var("GITHUB_TOKEN").ok());
+    }
+
+    let auth_header;
+    if let Some(t) = token {
+        auth_header = format!("Authorization: Bearer {}", t);
+        args.push("-H");
+        args.push(&auth_header);
+    }
+
+    args.push("https://api.github.com/repos/parazeeknova/verso/releases/latest");
+
     let output = Command::new("curl")
-        .args([
-            "-s",
-            "-H",
-            "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
-            "https://api.github.com/repos/parazeeknova/verso/releases/latest",
-        ])
+        .args(&args)
         .output()
         .ok()?;
 
