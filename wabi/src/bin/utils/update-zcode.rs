@@ -75,7 +75,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let current_version =
         extract_field(zcode_block, "version = \"", "\";").ok_or("Cannot find current version")?;
-    let current_hash =
+    let _current_hash =
         extract_field(zcode_block, "sha256 = \"", "\";").ok_or("Cannot find current hash")?;
 
     println!("Current local version: {}", current_version);
@@ -100,7 +100,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         latest_version
     );
     let new_url = format!(
-        "https://cdn-zcode.z.ai/zcode/electron/releases/{}/ZCode-{}-linux-x64.AppImage",
+        "https://cdn-zcode.z.ai/zcode/electron/releases/{}/linux-x64/ZCode-{}-linux-x64.AppImage",
         latest_version, latest_version
     );
 
@@ -128,24 +128,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .ok_or("Cannot find end of ZCode block")?
         + start_idx
         + 2;
-    let old_block = &content[start_idx..end_idx];
 
-    let mut new_block = old_block.to_string();
-    new_block = new_block.replace(
-        &format!("version = \"{}\";", current_version),
-        &format!("version = \"{}\";", latest_version),
-    );
-    new_block = new_block.replace(
-        &format!("releases/{}/", current_version),
-        &format!("releases/{}/", latest_version),
-    );
-    new_block = new_block.replace(
-        &format!("ZCode-{}-linux", current_version),
-        &format!("ZCode-{}-linux", latest_version),
-    );
-    new_block = new_block.replace(
-        &format!("sha256 = \"{}\";", current_hash),
-        &format!("sha256 = \"{}\";", new_hash),
+    let new_block = format!(
+        r#"# -- ZCode --
+        (appimageTools.wrapType2 {{
+          pname = "zcode";
+          version = "{}";
+          src = fetchurl {{
+            url = "https://cdn-zcode.z.ai/zcode/electron/releases/{}/linux-x64/ZCode-{}-linux-x64.AppImage";
+            sha256 = "{}";
+          }};
+          extraInstallCommands = ''
+            mkdir -p $out/share/applications
+            cat > $out/share/applications/zcode.desktop <<EOF
+            [Desktop Entry]
+            Name=ZCode
+            Exec=zcode %U
+            Terminal=false
+            Type=Application
+            Icon=zcode
+            StartupWMClass=ZCode
+            Comment=AI Coding Assistant
+            Categories=Development;
+            EOF
+          '';
+        }})"#,
+        latest_version, latest_version, latest_version, new_hash
     );
 
     let mut new_content = content.clone();
