@@ -455,31 +455,15 @@ Scope {
                                         smooth: true
                                     }
 
-                                    Loader {
-                                        id: videoLoader
-
-                                        anchors.fill: parent
-                                        active: root.allowVideoPreview && (delegateItem.wallpaperPath.endsWith(".mp4") || delegateItem.wallpaperPath.endsWith(".webm")) && (index === listView.currentIndex) && !listView.moving && !listView.flicking
-
-                                        sourceComponent: Video {
-                                            anchors.fill: parent
-                                            source: "file://" + thumbnailPath.replace(/\.jpg$/, ".mp4")
-                                            fillMode: VideoOutput.PreserveAspectCrop
-                                            muted: true
-                                            loops: MediaPlayer.Infinite
-                                            autoPlay: true
-                                        }
-                                    }
-
-                                    // Animated Video Indicator on Top Right
+                                    // Premium Live/Video Wallpaper Indicator Badge
                                     Rectangle {
                                         id: videoIndicator
 
-                                        width: 20
-                                        height: 20
-                                        radius: 10
-                                        color: delegateItem.colorsList[4]
-                                        opacity: 0.85
+                                        width: 38
+                                        height: 16
+                                        radius: 4
+                                        color: "#d32f2f" // Premium warning/live red
+                                        opacity: 0.9
                                         border.width: 1
                                         border.color: "#30ffffff"
                                         anchors.right: parent.right
@@ -488,12 +472,23 @@ Scope {
                                         z: 3
                                         visible: delegateItem.wallpaperPath.endsWith(".mp4") || delegateItem.wallpaperPath.endsWith(".webm")
 
-                                        Text {
+                                        Row {
                                             anchors.centerIn: parent
-                                            text: "" // Nerd Font video camera icon
-                                            color: delegateItem.colorsList[5]
-                                            font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 8
+                                            spacing: 3
+                                            Text {
+                                                text: "●" // Dot
+                                                color: "#ffffff"
+                                                font.pixelSize: 6
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                            Text {
+                                                text: "LIVE"
+                                                color: "#ffffff"
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 7
+                                                font.bold: true
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
                                         }
                                     }
 
