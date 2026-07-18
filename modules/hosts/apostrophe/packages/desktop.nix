@@ -66,7 +66,19 @@
                 sha256 = "0dbyjv0696nk5hyiry1c9aiaz2ahv24ws20z2hihqs2h7y8wx9cz";
               };
               postExtract = ''
-                ln -s $out/usr/bin/bin/launcher $out/usr/bin/Verso
+                # Extract the embedded Electrobun tarball into a temp directory
+                mkdir temp_extract
+                tar_zst=$(find $out -name "*.tar.zst")
+                if [ -n "$tar_zst" ]; then
+                  chmod +w -R $out
+                  ${pkgs.zstd}/bin/zstd -d -c "$tar_zst" | ${pkgs.gnutar}/bin/tar -xf - -C temp_extract
+                  cp -r temp_extract/Verso/* $out/usr/bin/
+                  rm -rf temp_extract
+                  ln -s bin/launcher $out/usr/bin/Verso
+                else
+                  echo "Error: no .tar.zst archive found inside the AppImage!"
+                  exit 1
+                fi
               '';
             };
           in
