@@ -225,6 +225,9 @@
       # -- Misc --
       nixpkgs.config.allowUnfree = true;
       nixpkgs.config.cudaSupport = true;
+      nixpkgs.config.permittedInsecurePackages = [
+        "electron-40.10.5"
+      ];
       nixpkgs.overlays = [
         inputs.vscode-insiders.overlays.default
         (final: prev: {
@@ -233,9 +236,6 @@
               sed -i 's/#define BORDER_RADIUS 8/#define BORDER_RADIUS 0/g' thunar/thunar-util.c
             '';
           });
-          vesktop = prev.vesktop.override {
-            electron_40 = final.electron_41;
-          };
         })
       ];
       programs.nix-ld.enable = true;
