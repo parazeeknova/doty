@@ -35,10 +35,7 @@ fn get_latest_verso_version() -> Option<String> {
 
     args.push("https://api.github.com/repos/parazeeknova/verso/releases/latest");
 
-    let output = Command::new("curl")
-        .args(&args)
-        .output()
-        .ok()?;
+    let output = Command::new("curl").args(&args).output().ok()?;
 
     if !output.status.success() {
         eprintln!("Failed to fetch Verso release info from GitHub API.");
