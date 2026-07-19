@@ -24,6 +24,7 @@ Scope {
     property var gitRepoSearchResults: []
     property var bookmarks: []
     property var bookmarkDisplayList: []
+    property bool isLoaded: false
     property bool isWebSearchMode: root.activeTab === 1 || searchQuery.trim().startsWith("!")
     property bool isFileSearchMode: root.activeTab === 2 || searchQuery.trim().startsWith("@")
     property bool isGitRepoMode: root.activeTab === 3 || searchQuery.trim().startsWith("#")
@@ -602,6 +603,7 @@ Scope {
                     root.fileHistory = data.file_history || [];
                     root.bookmarks = data.bookmarks || [];
                     root.filterApps();
+                    root.isLoaded = true;
                 } catch (e) {
                     console.log("Failed to parse apps: " + e);
                 }
@@ -850,7 +852,9 @@ Scope {
                 implicitHeight: {
                     var spacingAndStatic = activeWindowsArea.visible ? 94 : 52;
                     var contentH = 0;
-                    if (root.isBookmarkMode)
+                    if (!root.isLoaded)
+                        contentH = 200;
+                    else if (root.isBookmarkMode)
                         contentH = bookmarkList ? bookmarkList.contentHeight : 0;
                     else if (root.isGitRepoMode)
                         contentH = gitRepoList ? gitRepoList.contentHeight : 0;
