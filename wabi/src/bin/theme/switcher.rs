@@ -840,6 +840,14 @@ fn main() {
         }
     }
 
+    // Render kdeglobals color scheme directly to user config
+    let kdeglobals_tmpl =
+        doty.join("modules/features/wm/theming/.config/color-schemes/Kvantum.colors.template");
+    let kdeglobals_dest = home_dir().join(".config").join("kdeglobals");
+    if kdeglobals_tmpl.exists() && render_template(&kdeglobals_tmpl, &kdeglobals_dest, &vars) {
+        println!("Rendered: ~/.config/kdeglobals");
+    }
+
     // Render VSCode theme colors directly to matugen cache directory
     let matugen_cache = home_dir().join(".cache").join("matugen");
     let t_colors = doty.join("modules/features/applications/vscodeinsiders/vscode-colors.template");
