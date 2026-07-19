@@ -90,6 +90,7 @@
               pkgs: with pkgs; [
                 webkitgtk_4_1
                 libsoup_3
+                libayatana-appindicator
               ];
             extraInstallCommands = ''
               mkdir -p $out/share/applications
