@@ -58,25 +58,27 @@
         # -- Verso --
         (
           let
-            verso-extracted = pkgs.stdenv.mkDerivation {
-              pname = "verso-extracted";
+            verso-extracted = pkgs.appimageTools.extractType2 {
+              pname = "verso";
               version = "0.3.78";
-              src = /home/parazeeknova/Projects/verso/packages/native/artifacts/stable-linux-x64-Verso.tar.zst;
-              dontBuild = true;
-              dontConfigure = true;
-              unpackPhase = ''
-                mkdir -p temp
-                ${pkgs.zstd}/bin/zstd -d -c $src | ${pkgs.gnutar}/bin/tar -xf - -C temp
-              '';
-              installPhase = ''
-                mkdir -p $out/usr/bin
-                mkdir -p $out/usr/lib
-                cp -r temp/Verso/bin/* $out/usr/bin/
-                cp -r temp/Verso/Resources $out/usr/bin/
-                if [ -d temp/Verso/lib ]; then
-                  cp -r temp/Verso/lib/* $out/usr/lib/
+              src = pkgs.fetchurl {
+                url = "https://github.com/parazeeknova/verso/releases/download/v0.3.78/Verso-0.3.78-x86_64.AppImage";
+                sha256 = "1pkgmq8xjjs0sq8dxfxjgzfl2yghmpml00rlp1n5f4cjd3arjfb4";
+              };
+              postExtract = ''
+                # Extract the embedded Electrobun tarball into a temp directory
+                mkdir temp_extract
+                tar_zst=$(find $out -name "*.tar.zst")
+                if [ -n "$tar_zst" ]; then
+                  chmod +w -R $out
+                  ${pkgs.zstd}/bin/zstd -d -c "$tar_zst" | ${pkgs.gnutar}/bin/tar -xf - -C temp_extract
+                  cp -r temp_extract/Verso/* $out/usr/bin/
+                  rm -rf temp_extract
+                  ln -s bin/launcher $out/usr/bin/Verso
+                else
+                  echo "Error: no .tar.zst archive found inside the AppImage!"
+                  exit 1
                 fi
-                ln -s bin/launcher $out/usr/bin/Verso
               '';
             };
           in
