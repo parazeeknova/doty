@@ -99,7 +99,7 @@ in
           };
 
           home.sessionVariables = {
-            QT_QPA_PLATFORMTHEME = "qt6ct";
+            QT_QPA_PLATFORMTHEME = "qt5ct";
             QT_STYLE_OVERRIDE = "kvantum";
             NIXPKGS_QT6_QML_IMPORT_PATH = "${pkgs.qt6.qtmultimedia}/lib/qt-6/qml";
           };
