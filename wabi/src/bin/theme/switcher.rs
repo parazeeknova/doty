@@ -307,7 +307,12 @@ fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     );
     vars.insert(
         "gtk_icon_theme".to_string(),
-        (if is_light { "Papirus-Light" } else { "Papirus-Dark" }).to_string(),
+        (if is_light {
+            "Papirus-Light"
+        } else {
+            "Papirus-Dark"
+        })
+        .to_string(),
     );
     vars.insert(
         "gtk_prefer_dark".to_string(),
@@ -1396,7 +1401,11 @@ fn apply_papirus_folders(accent_hex: &str, is_light: bool) {
         ("yellow", (255.0, 235.0, 59.0)),
     ];
 
-    let folder_theme = if is_light { "Papirus-Light" } else { "Papirus-Dark" };
+    let folder_theme = if is_light {
+        "Papirus-Light"
+    } else {
+        "Papirus-Dark"
+    };
 
     // If accent is very desaturated, use grey
     if accent_s < 0.15 {
