@@ -307,7 +307,7 @@ fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     );
     vars.insert(
         "gtk_icon_theme".to_string(),
-        (if is_light { "Papirus" } else { "Papirus-Dark" }).to_string(),
+        (if is_light { "Papirus-Light" } else { "Papirus-Dark" }).to_string(),
     );
     vars.insert(
         "gtk_prefer_dark".to_string(),
@@ -1044,7 +1044,7 @@ fn main() {
         "prefer-dark"
     };
     let icon_theme = if is_light_theme {
-        "Papirus"
+        "Papirus-Light"
     } else {
         "Papirus-Dark"
     };
@@ -1396,7 +1396,7 @@ fn apply_papirus_folders(accent_hex: &str, is_light: bool) {
         ("yellow", (255.0, 235.0, 59.0)),
     ];
 
-    let folder_theme = if is_light { "Papirus" } else { "Papirus-Dark" };
+    let folder_theme = if is_light { "Papirus-Light" } else { "Papirus-Dark" };
 
     // If accent is very desaturated, use grey
     if accent_s < 0.15 {
@@ -1408,7 +1408,7 @@ fn apply_papirus_folders(accent_hex: &str, is_light: bool) {
             .arg("-p")
             .arg("gtk3")
             .arg("--run")
-            .arg("papirus-folders -t Papirus -C grey -u && papirus-folders -t Papirus-Dark -C grey -u")
+            .arg("papirus-folders -t Papirus -C grey -u && papirus-folders -t Papirus-Dark -C grey -u && papirus-folders -t Papirus-Light -C grey -u")
             .spawn();
         return;
     }
@@ -1449,8 +1449,8 @@ fn apply_papirus_folders(accent_hex: &str, is_light: bool) {
         .arg("gtk3")
         .arg("--run")
         .arg(format!(
-            "papirus-folders -t Papirus -C {} -u && papirus-folders -t Papirus-Dark -C {} -u",
-            best_color, best_color
+            "papirus-folders -t Papirus -C {} -u && papirus-folders -t Papirus-Dark -C {} -u && papirus-folders -t Papirus-Light -C {} -u",
+            best_color, best_color, best_color
         ))
         .spawn();
 }

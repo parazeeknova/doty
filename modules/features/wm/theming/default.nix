@@ -105,12 +105,14 @@ in
           };
 
           home.activation.copyPapirusIcons = lib.mkAfter ''
-            if [ ! -d "$HOME/.local/share/icons/Papirus-Dark" ]; then
+            if [ ! -d "$HOME/.local/share/icons/Papirus-Light" ]; then
               mkdir -p "$HOME/.local/share/icons"
               cp -rL ${pkgs.papirus-icon-theme}/share/icons/Papirus "$HOME/.local/share/icons/Papirus"
               cp -rL ${pkgs.papirus-icon-theme}/share/icons/Papirus-Dark "$HOME/.local/share/icons/Papirus-Dark"
+              cp -rL ${pkgs.papirus-icon-theme}/share/icons/Papirus-Light "$HOME/.local/share/icons/Papirus-Light"
               chmod -R u+w "$HOME/.local/share/icons/Papirus"
               chmod -R u+w "$HOME/.local/share/icons/Papirus-Dark"
+              chmod -R u+w "$HOME/.local/share/icons/Papirus-Light"
             fi
           '';
         };
