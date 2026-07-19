@@ -60,6 +60,7 @@
         opencode
         vscode-fhs
         vscode-insiders
+        code-cursor-fhs
         zed-editor-fhs
         ghostty
         kitty

@@ -86,10 +86,11 @@
             pname = "verso";
             version = "0.3.78";
             src = verso-extracted;
-            extraPkgs = pkgs: with pkgs; [
-              webkitgtk_4_1
-              libsoup_3
-            ];
+            extraPkgs =
+              pkgs: with pkgs; [
+                webkitgtk_4_1
+                libsoup_3
+              ];
             extraInstallCommands = ''
               mkdir -p $out/share/applications
               cat > $out/share/applications/verso.desktop <<EOF
