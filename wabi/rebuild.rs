@@ -280,6 +280,7 @@ fn main() {
     // Step 3: Nix flake check
     print_step("Running nix flake check...");
     let mut check_args = vec!["flake", "check"];
+    check_args.push("--impure");
     let check_token_arg;
     if let Some(ref t) = token {
         check_token_arg = format!("github.com={}", t);
