@@ -108,6 +108,30 @@
           }
         )
 
+        # -- Tldraw Offline --
+        (pkgs.appimageTools.wrapType2 {
+          pname = "tldraw-offline";
+          version = "1.11.0";
+          src = pkgs.fetchurl {
+            url = "https://github.com/tldraw/tldraw-offline/releases/download/v1.11.0/tldraw-offline-linux-x86_64.AppImage";
+            sha256 = "018f8irpd83swz4k3rr2aa5rd3073lhgnmsyc476inrkfrs0cj89";
+          };
+          extraInstallCommands = ''
+            mkdir -p $out/share/applications
+            cat > $out/share/applications/tldraw-offline.desktop <<EOF
+            [Desktop Entry]
+            Name=Tldraw Offline
+            Exec=tldraw-offline %U
+            Terminal=false
+            Type=Application
+            Icon=tldraw-offline
+            StartupWMClass=tldraw-offline
+            Comment=Collaborative digital whiteboard (offline)
+            Categories=Graphics;
+            EOF
+          '';
+        })
+
         # -- Multi Media --
         freetube
         audacity

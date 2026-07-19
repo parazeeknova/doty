@@ -183,3 +183,7 @@ path = "src/bin/utils/update-zcode.rs"
 [[bin]]
 name = "update_verso"
 path = "src/bin/utils/update-verso.rs"
+
+[[bin]]
+name = "update_tldraw"
+path = "src/bin/utils/update-tldraw.rs"

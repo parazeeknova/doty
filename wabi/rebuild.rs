@@ -125,6 +125,14 @@ fn main() {
         print_warning("Verso check/update failed or skipped.");
     }
 
+    // Step 0.65: Check and update Tldraw Offline
+    print_step("Checking and updating Tldraw Offline...");
+    if run_cmd("./wabi/target/release/update_tldraw", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
+        print_success("Tldraw Offline check/update completed.");
+    } else {
+        print_warning("Tldraw Offline check/update failed or skipped.");
+    }
+
     // Step 0.7: Update Nix Flake inputs
     print_step("Updating Nix flake inputs...");
     let mut update_args = vec!["flake", "update"];
