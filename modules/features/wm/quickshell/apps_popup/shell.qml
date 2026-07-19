@@ -27,6 +27,11 @@ Scope {
     property bool isWebSearchMode: root.activeTab === 1 || searchQuery.trim().startsWith("!")
     property bool isFileSearchMode: root.activeTab === 2 || searchQuery.trim().startsWith("@")
     property bool isGitRepoMode: root.activeTab === 3 || searchQuery.trim().startsWith("#")
+    onIsGitRepoModeChanged: {
+        if (isGitRepoMode && gitRepos.length === 0 && !gitRepoListProc.running) {
+            gitRepoListProc.running = true;
+        }
+    }
     property bool isBookmarkMode: root.activeTab === 4 || searchQuery.trim().startsWith("~")
     property string searchQuery: ""
     property int selectedIndex: 0
@@ -567,7 +572,6 @@ Scope {
     Component.onCompleted: {
         getAppsProc.running = true;
         getRecentsProc.running = true;
-        gitRepoListProc.running = true;
     }
 
     Theme {
@@ -939,7 +943,9 @@ Scope {
                 Rectangle {
                     id: mainContainer
 
-                    anchors.fill: parent
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: parent.height
                     opacity: win.animOpacity
                     y: win.animOffsetY
                     color: theme.popupBgColor
