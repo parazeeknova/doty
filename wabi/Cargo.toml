@@ -196,4 +196,9 @@ path = "src/bin/utils/update-opencode-desktop.rs"
 name = "update_qoder"
 path = "src/bin/utils/update-qoder.rs"
 
+[[bin]]
+name = "update_harper"
+path = "src/bin/utils/update-harper.rs"
+
+
 

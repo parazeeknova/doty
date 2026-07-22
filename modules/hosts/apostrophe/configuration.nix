@@ -125,16 +125,34 @@
           ExecStart = "/home/parazeeknova/doty/wabi/target/release/update_qoder --commit";
         };
       };
+      systemd.services.update-harper = {
+        description = "Check and update Harper package version and hash";
+        path = [
+          pkgs.git
+          pkgs.nix
+          pkgs.curl
+          pkgs.openssh
+        ];
+        serviceConfig = {
+          Type = "oneshot";
+          User = "parazeeknova";
+          WorkingDirectory = "/home/parazeeknova/doty";
+          ExecStart = "/home/parazeeknova/doty/wabi/target/release/update_harper --commit";
+        };
+      };
       systemd.services.nixos-upgrade.wants = [
         "update-zcode.service"
         "update-opencode-desktop.service"
         "update-qoder.service"
+        "update-harper.service"
       ];
       systemd.services.nixos-upgrade.after = [
         "update-zcode.service"
         "update-opencode-desktop.service"
         "update-qoder.service"
+        "update-harper.service"
       ];
+
 
 
       # -- Automatic cleanup --

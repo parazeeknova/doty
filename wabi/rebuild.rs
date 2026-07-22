@@ -149,6 +149,15 @@ fn main() {
         print_warning("Qoder check/update failed or skipped.");
     }
 
+    // Step 0.68: Check and update Harper
+    print_step("Checking and updating Harper...");
+    if run_cmd("./wabi/target/release/update_harper", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
+        print_success("Harper check/update completed.");
+    } else {
+        print_warning("Harper check/update failed or skipped.");
+    }
+
+
 
 
     // Step 0.7: Update Nix Flake inputs

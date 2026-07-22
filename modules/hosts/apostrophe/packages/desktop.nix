@@ -244,6 +244,43 @@
           '';
         })
 
+        # -- Harper --
+        (stdenv.mkDerivation rec {
+          pname = "harper";
+          version = "2.6.0";
+
+          cli_src = fetchurl {
+            url = "https://github.com/Automattic/harper/releases/download/v${version}/harper-cli-x86_64-unknown-linux-gnu.tar.gz";
+            sha256 = "0pvjaxbx09d4id9k7hxr2vmw6sjxhd80f7lgn1hmiq2pkn30cxsc";
+          };
+
+          ls_src = fetchurl {
+            url = "https://github.com/Automattic/harper/releases/download/v${version}/harper-ls-x86_64-unknown-linux-gnu.tar.gz";
+            sha256 = "177zky1pzq1ck4x9hs51fkhl24bbnkrb87h1bw8ani6k0vk44gys";
+          };
+
+          nativeBuildInputs = [
+            autoPatchelfHook
+          ];
+
+          buildInputs = [
+            stdenv.cc.cc.lib
+          ];
+
+          unpackPhase = ''
+            tar -xf $cli_src
+            tar -xf $ls_src
+          '';
+
+          installPhase = ''
+            mkdir -p $out/bin
+            cp harper-cli $out/bin/
+            cp harper-ls $out/bin/
+            chmod +x $out/bin/harper-cli $out/bin/harper-ls
+          '';
+        })
+
+
 
         # -- Verso --
         (
