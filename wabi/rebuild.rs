@@ -133,6 +133,15 @@ fn main() {
         print_warning("Tldraw Offline check/update failed or skipped.");
     }
 
+    // Step 0.66: Check and update OpenCode Desktop
+    print_step("Checking and updating OpenCode Desktop...");
+    if run_cmd("./wabi/target/release/update_opencode_desktop", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
+        print_success("OpenCode Desktop check/update completed.");
+    } else {
+        print_warning("OpenCode Desktop check/update failed or skipped.");
+    }
+
+
     // Step 0.7: Update Nix Flake inputs
     print_step("Updating Nix flake inputs...");
     let mut update_args = vec!["flake", "update"];

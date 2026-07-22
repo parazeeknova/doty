@@ -95,8 +95,24 @@
           ExecStart = "/home/parazeeknova/doty/wabi/target/release/update_zcode --commit";
         };
       };
-      systemd.services.nixos-upgrade.wants = [ "update-zcode.service" ];
-      systemd.services.nixos-upgrade.after = [ "update-zcode.service" ];
+      systemd.services.update-opencode-desktop = {
+        description = "Check and update OpenCode Desktop package version and hash";
+        path = [
+          pkgs.git
+          pkgs.nix
+          pkgs.curl
+          pkgs.openssh
+        ];
+        serviceConfig = {
+          Type = "oneshot";
+          User = "parazeeknova";
+          WorkingDirectory = "/home/parazeeknova/doty";
+          ExecStart = "/home/parazeeknova/doty/wabi/target/release/update_opencode_desktop --commit";
+        };
+      };
+      systemd.services.nixos-upgrade.wants = [ "update-zcode.service" "update-opencode-desktop.service" ];
+      systemd.services.nixos-upgrade.after = [ "update-zcode.service" "update-opencode-desktop.service" ];
+
 
       # -- Automatic cleanup --
       nix.gc.automatic = true;

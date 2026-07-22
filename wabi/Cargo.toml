@@ -187,3 +187,8 @@ path = "src/bin/utils/update-verso.rs"
 [[bin]]
 name = "update_tldraw"
 path = "src/bin/utils/update-tldraw.rs"
+
+[[bin]]
+name = "update_opencode_desktop"
+path = "src/bin/utils/update-opencode-desktop.rs"
+
