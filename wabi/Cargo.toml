@@ -192,3 +192,8 @@ path = "src/bin/utils/update-tldraw.rs"
 name = "update_opencode_desktop"
 path = "src/bin/utils/update-opencode-desktop.rs"
 
+[[bin]]
+name = "update_qoder"
+path = "src/bin/utils/update-qoder.rs"
+
+

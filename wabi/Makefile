@@ -67,6 +67,8 @@ install: build
 	cp --remove-destination target/release/update_zcode $(HOME)/.local/bin/update_zcode
 	cp --remove-destination target/release/update_verso $(HOME)/.local/bin/update_verso
 	cp --remove-destination target/release/update_opencode_desktop $(HOME)/.local/bin/update_opencode_desktop
+	cp --remove-destination target/release/update_qoder $(HOME)/.local/bin/update_qoder
+
 
 	@echo "==> Restarting daemons..."
 	@uwsm app -- ~/.config/quickshell/battery_popup/battery_daemon >/dev/null 2>&1 &
