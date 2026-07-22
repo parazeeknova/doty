@@ -65,14 +65,14 @@ local function apply_dynamic_cursors_config()
 			["plugin:dynamic-cursors:stretch:window"] = 100,
 
 			["plugin:dynamic-cursors:shake:enabled"] = false,
-			["plugin:dynamic-cursors:shake:threshold"] = 6.0,
+			["plugin:dynamic-cursors:shake:threshold"] = 10.0,
 			["plugin:dynamic-cursors:shake:base"] = 4.0,
 			["plugin:dynamic-cursors:shake:speed"] = 4.0,
 			["plugin:dynamic-cursors:shake:influence"] = 0.0,
 			["plugin:dynamic-cursors:shake:limit"] = 0.0,
 			["plugin:dynamic-cursors:shake:timeout"] = 2000,
-			["plugin:dynamic-cursors:shake:effects"] = false,
-			["plugin:dynamic-cursors:shake:ipc"] = false,
+			["plugin:dynamic-cursors:shake:effects"] = true,
+			["plugin:dynamic-cursors:shake:ipc"] = true,
 
 			["plugin:dynamic-cursors:hyprcursor:nearest"] = 1,
 			["plugin:dynamic-cursors:hyprcursor:enabled"] = true,
