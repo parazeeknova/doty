@@ -83,5 +83,56 @@
           mv $out/lib/libscrolloverview.so $out/lib/libhyprland-scroll-overview.so
         '';
       };
+
+      packages.hypr-dynamic-cursors = pkgs.stdenv.mkDerivation {
+        pname = "hypr-dynamic-cursors";
+        version = "0.55.4-pinned";
+
+        src = inputs.hypr-dynamic-cursors;
+
+        nativeBuildInputs = [
+          pkgs.pkg-config
+          pkgs.gcc14
+        ];
+        buildInputs = [
+          pkgs.hyprland
+          pkgs.aquamarine
+          pkgs.hyprgraphics
+          pkgs.hyprutils
+          pkgs.hyprlang
+          pkgs.hyprcursor
+          pkgs.libGL
+          pkgs.libxcb-wm
+          pkgs.libxcb-errors
+          pkgs.wayland-protocols
+          pkgs.lua5_4
+          pkgs.pixman
+          pkgs.libdrm
+          pkgs.libinput
+          pkgs.systemd
+          pkgs.wayland
+          pkgs.libxkbcommon
+          pkgs.pango
+          pkgs.cairo
+          pkgs.glslang
+          pkgs.libgbm
+        ];
+
+
+
+        buildPhase = ''
+          runHook preBuild
+          make
+          runHook postBuild
+        '';
+
+        installPhase = ''
+          runHook preInstall
+          mkdir -p $out/lib
+          cp out/dynamic-cursors.so $out/lib/libdynamic-cursors.so
+          runHook postInstall
+        '';
+      };
     };
 }
+

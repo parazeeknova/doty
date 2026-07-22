@@ -111,8 +111,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         std::process::exit(1);
     }
 
-    let new_cli_hash = String::from_utf8_lossy(&output_cli.stdout).trim().to_string();
-    let new_ls_hash = String::from_utf8_lossy(&output_ls.stdout).trim().to_string();
+    let new_cli_hash = String::from_utf8_lossy(&output_cli.stdout)
+        .trim()
+        .to_string();
+    let new_ls_hash = String::from_utf8_lossy(&output_ls.stdout)
+        .trim()
+        .to_string();
 
     if new_cli_hash.is_empty() || new_ls_hash.is_empty() {
         eprintln!("nix-prefetch-url returned an empty hash.");

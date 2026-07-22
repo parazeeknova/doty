@@ -47,11 +47,12 @@
           systemd.enable = false;
           configType = "lua";
           plugins = [
-            pkgs.hyprlandPlugins.hypr-dynamic-cursors
+            self.packages.${pkgs.stdenv.hostPlatform.system}.hypr-dynamic-cursors
             pkgs.hyprlandPlugins.hyprfocus
             self.packages.${pkgs.stdenv.hostPlatform.system}.hypr-kinetic-scroll
             self.packages.${pkgs.stdenv.hostPlatform.system}.hyprland-scroll-overview
           ];
+
           extraConfig = ''
             -- Load main hyprland configuration modules
             local function safe_require(module)

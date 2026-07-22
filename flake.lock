@@ -245,6 +245,23 @@
         "type": "github"
       }
     },
+    "hypr-dynamic-cursors": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1780484690,
+        "narHash": "sha256-G3VOjqBgsnwaYQicqC4zjaUVCdsnzZ5sMPoUOPPnfXQ=",
+        "owner": "VirtCode",
+        "repo": "hypr-dynamic-cursors",
+        "rev": "da447486c84e0be81f2cdd208af1ef92469f0a88",
+        "type": "github"
+      },
+      "original": {
+        "owner": "VirtCode",
+        "repo": "hypr-dynamic-cursors",
+        "rev": "da447486c84e0be81f2cdd208af1ef92469f0a88",
+        "type": "github"
+      }
+    },
     "hypr-kinetic-scroll": {
       "flake": false,
       "locked": {
@@ -432,6 +449,7 @@
         "flake-parts": "flake-parts",
         "helium": "helium",
         "home-manager": "home-manager",
+        "hypr-dynamic-cursors": "hypr-dynamic-cursors",
         "hypr-kinetic-scroll": "hypr-kinetic-scroll",
         "hyprland-preview-share-picker": "hyprland-preview-share-picker",
         "hyprland-scroll-overview": "hyprland-scroll-overview",

@@ -46,6 +46,13 @@
       url = "github:yayuuu/hyprland-scroll-overview/cfc23b194ba9378d1606c7aa73060f6ffbe38445";
       flake = false;
     };
+    hypr-dynamic-cursors = {
+      url = "github:VirtCode/hypr-dynamic-cursors/da447486c84e0be81f2cdd208af1ef92469f0a88";
+      flake = false;
+    };
+
+
+
 
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";

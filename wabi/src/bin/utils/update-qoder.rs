@@ -31,7 +31,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let download_url = "https://download.qoder.com/release/latest/qoder_amd64.deb";
 
-    let output = Command::new("nix-prefetch-url").arg(download_url).output()?;
+    let output = Command::new("nix-prefetch-url")
+        .arg(download_url)
+        .output()?;
 
     if !output.status.success() {
         eprintln!("Failed to get hash from nix-prefetch-url.");
