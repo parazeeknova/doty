@@ -194,10 +194,22 @@ return {
             filetypes = { "java" },
         })
 
+        vim.lsp.config("harper_ls", {
+            cmd = { "harper-ls", "--stdio" },
+            filetypes = { "markdown", "gitcommit", "html", "toml" },
+            settings = {
+                ["harper-ls"] = {
+                    userDictPath = "~/dict.txt",
+                },
+            },
+        })
+
         vim.lsp.enable({
             "lua_ls", "cssls", "emmet_language_server", "emmet_ls",
             "ts_ls", "gopls", "rust_analyzer", "astro", "tailwindcss", "marksman",
             "clangd", "nil_ls", "pyright", "elixirls", "dockerls", "sqlls", "jsonls", "jdtls",
+            "harper_ls",
         })
     end,
 }
+
