@@ -200,5 +200,10 @@ path = "src/bin/utils/update-qoder.rs"
 name = "update_harper"
 path = "src/bin/utils/update-harper.rs"
 
+[[bin]]
+name = "update_t3code"
+path = "src/bin/utils/update-t3code.rs"
+
+
 
 

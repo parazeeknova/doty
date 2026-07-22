@@ -280,6 +280,19 @@
           '';
         })
 
+        # -- T3 Code --
+        (pkgs.appimageTools.wrapType2 rec {
+          pname = "t3code";
+          version = "0.0.28";
+
+          src = fetchurl {
+            url = "https://github.com/pingdotgg/t3code/releases/download/v${version}/T3-Code-${version}-x86_64.AppImage";
+            sha256 = "02ifqip5ahjk4p53cn8gjylv06x8vh0rk8ln3rzia9gb0gxnjq7s";
+          };
+
+        })
+
+
 
 
         # -- Verso --

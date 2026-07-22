@@ -140,18 +140,36 @@
           ExecStart = "/home/parazeeknova/doty/wabi/target/release/update_harper --commit";
         };
       };
+      systemd.services.update-t3code = {
+        description = "Check and update T3 Code package version and hash";
+        path = [
+          pkgs.git
+          pkgs.nix
+          pkgs.curl
+          pkgs.openssh
+        ];
+        serviceConfig = {
+          Type = "oneshot";
+          User = "parazeeknova";
+          WorkingDirectory = "/home/parazeeknova/doty";
+          ExecStart = "/home/parazeeknova/doty/wabi/target/release/update_t3code --commit";
+        };
+      };
       systemd.services.nixos-upgrade.wants = [
         "update-zcode.service"
         "update-opencode-desktop.service"
         "update-qoder.service"
         "update-harper.service"
+        "update-t3code.service"
       ];
       systemd.services.nixos-upgrade.after = [
         "update-zcode.service"
         "update-opencode-desktop.service"
         "update-qoder.service"
         "update-harper.service"
+        "update-t3code.service"
       ];
+
 
 
 

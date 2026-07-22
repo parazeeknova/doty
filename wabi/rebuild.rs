@@ -157,6 +157,15 @@ fn main() {
         print_warning("Harper check/update failed or skipped.");
     }
 
+    // Step 0.69: Check and update T3 Code
+    print_step("Checking and updating T3 Code...");
+    if run_cmd("./wabi/target/release/update_t3code", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
+        print_success("T3 Code check/update completed.");
+    } else {
+        print_warning("T3 Code check/update failed or skipped.");
+    }
+
+
 
 
 

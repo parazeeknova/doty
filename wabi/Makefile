@@ -69,6 +69,8 @@ install: build
 	cp --remove-destination target/release/update_opencode_desktop $(HOME)/.local/bin/update_opencode_desktop
 	cp --remove-destination target/release/update_qoder $(HOME)/.local/bin/update_qoder
 	cp --remove-destination target/release/update_harper $(HOME)/.local/bin/update_harper
+	cp --remove-destination target/release/update_t3code $(HOME)/.local/bin/update_t3code
+
 
 
 
