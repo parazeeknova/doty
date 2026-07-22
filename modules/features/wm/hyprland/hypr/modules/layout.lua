@@ -88,7 +88,6 @@ hl.config({
 	},
 })
 
-
 -- This requires https://github.com/hyprnux/hyprglass plugin
 -- hyprpm add https://github.com/hyprnux/hyprglass && hyprpm enable hyprglass
 if hl.plugin.hyprglass then
