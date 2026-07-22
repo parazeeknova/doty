@@ -58,45 +58,36 @@ hl.config({
 			-- minimum angle difference in degrees after which the shape is changed
 			threshold = 1,
 
-			rotate = {
-				length = 20,
-				offset = 0.0,
-			},
+			["rotate:length"] = 20,
+			["rotate:offset"] = 0.0,
 
-			tilt = {
-				limit = 2000,
-				activation = "negative_quadratic",
-				window = 100,
-				full = 40,
-			},
+			["tilt:limit"] = 2000,
+			["tilt:activation"] = "negative_quadratic",
+			["tilt:window"] = 100,
+			["tilt:full"] = 40,
 
-			stretch = {
-				limit = 3000,
-				activation = "quadratic",
-				window = 100,
-			},
+			["stretch:limit"] = 3000,
+			["stretch:activation"] = "quadratic",
+			["stretch:window"] = 100,
 
-			shake = {
-				enabled = false,
-				threshold = 6.0,
-				base = 4.0,
-				speed = 4.0,
-				influence = 0.0,
-				limit = 0.0,
-				timeout = 2000,
-				effects = false,
-				ipc = false,
-			},
+			["shake:enabled"] = false,
+			["shake:threshold"] = 6.0,
+			["shake:base"] = 4.0,
+			["shake:speed"] = 4.0,
+			["shake:influence"] = 0.0,
+			["shake:limit"] = 0.0,
+			["shake:timeout"] = 2000,
+			["shake:effects"] = false,
+			["shake:ipc"] = false,
 
-			hyprcursor = {
-				nearest = 1,
-				enabled = true,
-				resolution = -1,
-				fallback = "clientside",
-			},
+			["hyprcursor:nearest"] = 1,
+			["hyprcursor:enabled"] = true,
+			["hyprcursor:resolution"] = -1,
+			["hyprcursor:fallback"] = "clientside",
 		},
 	},
 })
+
 
 -- This requires https://github.com/hyprnux/hyprglass plugin
 -- hyprpm add https://github.com/hyprnux/hyprglass && hyprpm enable hyprglass
