@@ -45,41 +45,48 @@ end
 
 -- This requires https://github.com/VirtCode/hypr-dynamic-cursors plugin
 -- hyprpm add https://github.com/virtcode/hypr-dynamic-cursors && hyprpm enable dynamic-cursors
--- NOTE: This plugin uses colon-separated config keys (e.g. "shake:enabled"),
--- so we must use ["key:subkey"] syntax instead of nested Lua tables,
--- because nested tables produce dot-separated keys which the plugin won't recognize.
-hl.config({
-	["plugin:dynamic-cursors:enabled"] = true,
-	["plugin:dynamic-cursors:mode"] = "tilt",
-	["plugin:dynamic-cursors:threshold"] = 1,
+local function apply_dynamic_cursors_config()
+	pcall(function()
+		hl.config({
+			["plugin:dynamic-cursors:enabled"] = true,
+			["plugin:dynamic-cursors:mode"] = "tilt",
+			["plugin:dynamic-cursors:threshold"] = 1,
 
-	["plugin:dynamic-cursors:rotate:length"] = 20,
-	["plugin:dynamic-cursors:rotate:offset"] = 0.0,
+			["plugin:dynamic-cursors:rotate:length"] = 20,
+			["plugin:dynamic-cursors:rotate:offset"] = 0.0,
 
-	["plugin:dynamic-cursors:tilt:limit"] = 2000,
-	["plugin:dynamic-cursors:tilt:activation"] = "negative_quadratic",
-	["plugin:dynamic-cursors:tilt:window"] = 100,
-	["plugin:dynamic-cursors:tilt:full"] = 40,
+			["plugin:dynamic-cursors:tilt:limit"] = 2000,
+			["plugin:dynamic-cursors:tilt:activation"] = "negative_quadratic",
+			["plugin:dynamic-cursors:tilt:window"] = 100,
+			["plugin:dynamic-cursors:tilt:full"] = 40,
 
-	["plugin:dynamic-cursors:stretch:limit"] = 3000,
-	["plugin:dynamic-cursors:stretch:activation"] = "quadratic",
-	["plugin:dynamic-cursors:stretch:window"] = 100,
+			["plugin:dynamic-cursors:stretch:limit"] = 3000,
+			["plugin:dynamic-cursors:stretch:activation"] = "quadratic",
+			["plugin:dynamic-cursors:stretch:window"] = 100,
 
-	["plugin:dynamic-cursors:shake:enabled"] = false,
-	["plugin:dynamic-cursors:shake:threshold"] = 6.0,
-	["plugin:dynamic-cursors:shake:base"] = 4.0,
-	["plugin:dynamic-cursors:shake:speed"] = 4.0,
-	["plugin:dynamic-cursors:shake:influence"] = 0.0,
-	["plugin:dynamic-cursors:shake:limit"] = 0.0,
-	["plugin:dynamic-cursors:shake:timeout"] = 2000,
-	["plugin:dynamic-cursors:shake:effects"] = false,
-	["plugin:dynamic-cursors:shake:ipc"] = false,
+			["plugin:dynamic-cursors:shake:enabled"] = false,
+			["plugin:dynamic-cursors:shake:threshold"] = 6.0,
+			["plugin:dynamic-cursors:shake:base"] = 4.0,
+			["plugin:dynamic-cursors:shake:speed"] = 4.0,
+			["plugin:dynamic-cursors:shake:influence"] = 0.0,
+			["plugin:dynamic-cursors:shake:limit"] = 0.0,
+			["plugin:dynamic-cursors:shake:timeout"] = 2000,
+			["plugin:dynamic-cursors:shake:effects"] = false,
+			["plugin:dynamic-cursors:shake:ipc"] = false,
 
-	["plugin:dynamic-cursors:hyprcursor:nearest"] = 1,
-	["plugin:dynamic-cursors:hyprcursor:enabled"] = true,
-	["plugin:dynamic-cursors:hyprcursor:resolution"] = -1,
-	["plugin:dynamic-cursors:hyprcursor:fallback"] = "clientside",
-})
+			["plugin:dynamic-cursors:hyprcursor:nearest"] = 1,
+			["plugin:dynamic-cursors:hyprcursor:enabled"] = true,
+			["plugin:dynamic-cursors:hyprcursor:resolution"] = -1,
+			["plugin:dynamic-cursors:hyprcursor:fallback"] = "clientside",
+		})
+	end)
+end
+
+if hl.on then
+	hl.on("hyprland.start", apply_dynamic_cursors_config)
+end
+apply_dynamic_cursors_config()
+
 
 -- This requires https://github.com/hyprnux/hyprglass plugin
 -- hyprpm add https://github.com/hyprnux/hyprglass && hyprpm enable hyprglass
