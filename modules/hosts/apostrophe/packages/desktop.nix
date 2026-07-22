@@ -55,6 +55,102 @@
           '';
         })
 
+        # -- OpenCode Desktop --
+        (stdenv.mkDerivation rec {
+          pname = "opencode-desktop";
+          version = "1.18.4";
+
+          src = fetchurl {
+            url = "https://opencode.ai/download/stable/linux-x64-deb";
+            sha256 = "16b59lml6l0lm4nj6lndjrcvb034w6ijzwx8wxsh5lfyk1xc8yx6";
+          };
+
+          nativeBuildInputs = [
+            dpkg
+            autoPatchelfHook
+            makeWrapper
+          ];
+
+          buildInputs = [
+            alsa-lib
+            at-spi2-atk
+            at-spi2-core
+            cairo
+            cups
+            dbus
+            expat
+            fontconfig
+            freetype
+            gdk-pixbuf
+            glib
+            gtk3
+            libGL
+            libappindicator-gtk3
+            libdrm
+            libnotify
+            libpulseaudio
+            libsecret
+            libuuid
+            libxkbcommon
+            mesa
+            nspr
+            nss
+            pango
+            systemd
+            wayland
+            xorg.libX11
+            xorg.libXcomposite
+            xorg.libXcursor
+            xorg.libXdamage
+            xorg.libXext
+            xorg.libXfixes
+            xorg.libXi
+            xorg.libXrandr
+            xorg.libXrender
+            xorg.libXtst
+            xorg.libxcb
+            xorg.libxshmfence
+          ];
+
+          unpackPhase = ''
+            dpkg-deb -x $src .
+          '';
+
+          installPhase = ''
+            mkdir -p $out/opt $out/bin $out/share
+
+            cp -r opt/OpenCode $out/opt/opencode
+            cp -r usr/share/* $out/share/
+
+            # Remove unused musl node native modules to avoid patchelf errors
+            find $out/opt/opencode -name "*musl*" -exec rm -rf {} + || true
+
+            chmod +x $out/opt/opencode/ai.opencode.desktop
+
+            makeWrapper $out/opt/opencode/ai.opencode.desktop $out/bin/opencode-desktop \
+              --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath buildInputs}" \
+              --add-flags "--no-sandbox"
+
+            mkdir -p $out/share/applications
+            cat > $out/share/applications/opencode-desktop.desktop <<EOF
+            [Desktop Entry]
+            Name=OpenCode Desktop
+            Exec=opencode-desktop %U
+            Terminal=false
+            Type=Application
+            Icon=ai.opencode.desktop
+            StartupWMClass=ai.opencode.desktop
+            Comment=Open source AI coding agent
+            Categories=Development;
+            EOF
+          '';
+
+          preFixup = ''
+            autoPatchelfIgnoreMissing=(libc.musl-x86_64.so.1)
+          '';
+        })
+
+
         # -- Verso --
         (
           let

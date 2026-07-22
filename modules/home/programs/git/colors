@@ -6,75 +6,75 @@
   ui = auto
 
 [color "diff"]
-  meta = "#d5c3b5 bold"
-  frag = "#fcb974"
-  func = "#e1c1a3"
-  context = "#eee0d5"
-  whitespace = "#bfcc9b reverse"
+  meta = "#d2c5b4 bold"
+  frag = "#efbf6d"
+  func = "#dac3a1"
+  context = "#ece1d4"
+  whitespace = "#b4cea5 reverse"
   old = "#ffb4ab"
-  new = "#fcb974"
-  commit = "#bfcc9b"
+  new = "#efbf6d"
+  commit = "#b4cea5"
 
 [color "diff-highlight"]
   oldNormal = "#ffb4ab"
   oldHighlight = "#ffb4ab reverse"
-  newNormal = "#fcb974"
-  newHighlight = "#fcb974 reverse"
+  newNormal = "#efbf6d"
+  newHighlight = "#efbf6d reverse"
 
 [color "branch"]
-  current = "#fcb974 bold"
-  local = "#eee0d5"
-  remote = "#bfcc9b"
-  upstream = "#e1c1a3"
-  plain = "#d5c3b5"
+  current = "#efbf6d bold"
+  local = "#ece1d4"
+  remote = "#b4cea5"
+  upstream = "#dac3a1"
+  plain = "#d2c5b4"
 
 [color "decorate"]
   HEAD = "#ffb4ab bold"
-  branch = "#fcb974"
-  tag = "#bfcc9b"
-  remoteBranch = "#e1c1a3"
-  stash = "#d5c3b5"
+  branch = "#efbf6d"
+  tag = "#b4cea5"
+  remoteBranch = "#dac3a1"
+  stash = "#d2c5b4"
 
 [color "status"]
-  header = "#d5c3b5"
-  added = "#fcb974"
-  updated = "#bfcc9b"
-  changed = "#e1c1a3"
+  header = "#d2c5b4"
+  added = "#efbf6d"
+  updated = "#b4cea5"
+  changed = "#dac3a1"
   untracked = "#ffb4ab"
-  branch = "#fcb974 bold"
+  branch = "#efbf6d bold"
   nobranch = "#ffb4ab"
-  localBranch = "#fcb974"
-  remoteBranch = "#e1c1a3"
+  localBranch = "#efbf6d"
+  remoteBranch = "#dac3a1"
   unmerged = "#ffb4ab bold"
 
 [color "interactive"]
-  prompt = "#fcb974 bold"
-  header = "#d5c3b5"
-  help = "#e1c1a3"
+  prompt = "#efbf6d bold"
+  header = "#d2c5b4"
+  help = "#dac3a1"
   error = "#ffb4ab bold"
 
 [color "grep"]
-  context = "#eee0d5"
-  filename = "#fcb974"
-  function = "#e1c1a3"
-  linenumber = "#bfcc9b"
-  match = "#bfcc9b bold"
-  matchContext = "#bfcc9b"
-  matchSelected = "#fcb974 reverse"
-  selected = "#eee0d5"
-  separator = "#50453a"
+  context = "#ece1d4"
+  filename = "#efbf6d"
+  function = "#dac3a1"
+  linenumber = "#b4cea5"
+  match = "#b4cea5 bold"
+  matchContext = "#b4cea5"
+  matchSelected = "#efbf6d reverse"
+  selected = "#ece1d4"
+  separator = "#4e4639"
 
 [color "push"]
   error = "#ffb4ab bold"
 
 [color "remote"]
-  hint = "#d5c3b5"
-  warning = "#bfcc9b"
-  success = "#fcb974"
+  hint = "#d2c5b4"
+  warning = "#b4cea5"
+  success = "#efbf6d"
   error = "#ffb4ab bold"
 
 [color "blame"]
-  highlightRecent = "#d5c3b5,14 days ago,#e1c1a3,3 months ago,#fcb974,1 year ago,#bfcc9b"
+  highlightRecent = "#d2c5b4,14 days ago,#dac3a1,3 months ago,#efbf6d,1 year ago,#b4cea5"
 
 [color "advice"]
-  hint = "#e1c1a3"
+  hint = "#dac3a1"
