@@ -110,9 +110,14 @@
           ExecStart = "/home/parazeeknova/doty/wabi/target/release/update_opencode_desktop --commit";
         };
       };
-      systemd.services.nixos-upgrade.wants = [ "update-zcode.service" "update-opencode-desktop.service" ];
-      systemd.services.nixos-upgrade.after = [ "update-zcode.service" "update-opencode-desktop.service" ];
-
+      systemd.services.nixos-upgrade.wants = [
+        "update-zcode.service"
+        "update-opencode-desktop.service"
+      ];
+      systemd.services.nixos-upgrade.after = [
+        "update-zcode.service"
+        "update-opencode-desktop.service"
+      ];
 
       # -- Automatic cleanup --
       nix.gc.automatic = true;
