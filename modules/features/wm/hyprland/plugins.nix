@@ -127,9 +127,10 @@
         installPhase = ''
           runHook preInstall
           mkdir -p $out/lib
-          cp out/dynamic-cursors.so $out/lib/libdynamic-cursors.so
+          cp out/dynamic-cursors.so $out/lib/libhypr-dynamic-cursors.so
           runHook postInstall
         '';
+
       };
     };
 }
