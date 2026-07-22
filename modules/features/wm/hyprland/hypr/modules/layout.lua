@@ -85,7 +85,7 @@ end
 if hl.on then
 	hl.on("hyprland.start", apply_dynamic_cursors_config)
 end
-apply_dynamic_cursors_config()
+
 
 
 -- This requires https://github.com/hyprnux/hyprglass plugin
