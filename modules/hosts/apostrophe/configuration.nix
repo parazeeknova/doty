@@ -107,25 +107,10 @@
           Type = "oneshot";
           User = "parazeeknova";
           WorkingDirectory = "/home/parazeeknova/doty";
-          ExecStart = "/home/parazeeknova/doty/wabi/target/release/update_opencode_desktop --commit";
-        };
-      };
-      systemd.services.update-qoder = {
-        description = "Check and update Qoder package version and hash";
-        path = [
-          pkgs.git
-          pkgs.nix
-          pkgs.curl
-          pkgs.openssh
-        ];
-        serviceConfig = {
-          Type = "oneshot";
-          User = "parazeeknova";
-          WorkingDirectory = "/home/parazeeknova/doty";
-          ExecStart = "/home/parazeeknova/doty/wabi/target/release/update_qoder --commit";
         };
       };
       systemd.services.update-harper = {
+
         description = "Check and update Harper package version and hash";
         path = [
           pkgs.git
@@ -158,17 +143,17 @@
       systemd.services.nixos-upgrade.wants = [
         "update-zcode.service"
         "update-opencode-desktop.service"
-        "update-qoder.service"
         "update-harper.service"
         "update-t3code.service"
       ];
       systemd.services.nixos-upgrade.after = [
         "update-zcode.service"
         "update-opencode-desktop.service"
-        "update-qoder.service"
         "update-harper.service"
         "update-t3code.service"
       ];
+
+
 
       # -- Automatic cleanup --
       nix.gc.automatic = true;

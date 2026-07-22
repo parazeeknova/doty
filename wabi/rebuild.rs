@@ -141,13 +141,6 @@ fn main() {
         print_warning("OpenCode Desktop check/update failed or skipped.");
     }
 
-    // Step 0.67: Check and update Qoder
-    print_step("Checking and updating Qoder...");
-    if run_cmd("./wabi/target/release/update_qoder", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("Qoder check/update completed.");
-    } else {
-        print_warning("Qoder check/update failed or skipped.");
-    }
 
     // Step 0.68: Check and update Harper
     print_step("Checking and updating Harper...");

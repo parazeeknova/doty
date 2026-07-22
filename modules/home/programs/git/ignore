@@ -10,3 +10,6 @@ __pycache__/
 node_modules/
 .direnv/
 result
+# Qoder local files (private, not committed)
+AGENTS.local.md
+*.local.md
