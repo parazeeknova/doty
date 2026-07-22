@@ -170,9 +170,6 @@
         "update-t3code.service"
       ];
 
-
-
-
       # -- Automatic cleanup --
       nix.gc.automatic = true;
       nix.gc.dates = "daily";

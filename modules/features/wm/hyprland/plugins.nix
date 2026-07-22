@@ -118,8 +118,6 @@
           pkgs.libgbm
         ];
 
-
-
         buildPhase = ''
           runHook preBuild
           make
@@ -135,4 +133,3 @@
       };
     };
 }
-
