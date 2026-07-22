@@ -86,8 +86,6 @@ if hl.on then
 	hl.on("hyprland.start", apply_dynamic_cursors_config)
 end
 
-
-
 -- This requires https://github.com/hyprnux/hyprglass plugin
 -- hyprpm add https://github.com/hyprnux/hyprglass && hyprpm enable hyprglass
 if hl.plugin.hyprglass then
