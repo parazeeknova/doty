@@ -46,9 +46,7 @@
           portalPackage = null;
           systemd.enable = false;
           configType = "lua";
-          plugins = [
-            inputs.hyprland-scroll-overview.packages.${pkgs.stdenv.hostPlatform.system}.default
-          ];
+          plugins = [ ];
 
           extraConfig = ''
             -- Load main hyprland configuration modules
@@ -89,7 +87,6 @@
           "hypr/hyprsunset.conf".source = ./hypr/hyprsunset.conf;
           "hypr/modules".source =
             config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/modules";
-          "hypr/plugins".source = ./plugins;
           "hypr/sunset.state".source =
             config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/sunset.state";
           "hypr/xdph.conf".source = ./hypr/xdph.conf;

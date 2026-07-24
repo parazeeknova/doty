@@ -9,7 +9,6 @@ local dotfiles = os.getenv("WABI_DOTFILES_DIR") or (os.getenv("HOME") .. "/doty"
 
 hl.on("hyprland.start", function()
 	-- System Startups
-	hl.exec_cmd("hyprctl plugin load " .. os.getenv("HOME") .. "/.config/hypr/plugins/hyprglass.so")
 	hl.exec_cmd(dotfiles .. "/modules/scripts/theme_switcher restore")
 	hl.exec_cmd("hyprctl setcursor capitaine-cursors 24")
 	hl.exec_cmd("uwsm app -- udiskie --tray --notify")

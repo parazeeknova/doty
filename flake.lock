@@ -263,6 +263,22 @@
         "type": "github"
       }
     },
+    "hyprglass": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784579282,
+        "narHash": "sha256-x/584kY+XXlU/OWKtZAFo89VtowjLXs1DiP9PC0o0Os=",
+        "owner": "hyprnux",
+        "repo": "hyprglass",
+        "rev": "5bc835dcc909cef6980291688143048cf16942b5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hyprnux",
+        "repo": "hyprglass",
+        "type": "github"
+      }
+    },
     "hyprgraphics": {
       "inputs": {
         "hyprutils": [
@@ -735,6 +751,7 @@
         "flake-parts": "flake-parts",
         "helium": "helium",
         "home-manager": "home-manager",
+        "hyprglass": "hyprglass",
         "hyprland-preview-share-picker": "hyprland-preview-share-picker",
         "hyprland-scroll-overview": "hyprland-scroll-overview",
         "import-tree": "import-tree",

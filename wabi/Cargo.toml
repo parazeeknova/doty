@@ -184,6 +184,10 @@ path = "src/bin/utils/update-verso.rs"
 name = "update_tldraw"
 path = "src/bin/utils/update-tldraw.rs"
 
+[[bin]]
+name = "update_hypr_plugins"
+path = "src/bin/utils/update-hypr-plugins.rs"
+
 
 
 
