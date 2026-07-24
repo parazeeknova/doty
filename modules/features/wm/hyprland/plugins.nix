@@ -76,9 +76,46 @@
         '';
       };
 
+      dynamic_cursors = pkgs.stdenv.mkDerivation {
+        pname = "hypr-dynamic-cursors";
+        version = "0.1";
+        src = inputs.hypr-dynamic-cursors;
+
+        dontUseCmakeConfigure = true;
+
+        inherit (pkgs.hyprland) buildInputs;
+        nativeBuildInputs = pkgs.hyprland.nativeBuildInputs ++ [
+          pkgs.hyprland
+          pkgs.gcc14
+          pkgs.pkg-config
+          pkgs.pixman
+          pkgs.libdrm
+          pkgs.hyprcursor
+          pkgs.hyprgraphics
+        ];
+
+        enableParallelBuilding = true;
+
+        buildPhase = ''
+          runHook preBuild
+          make all
+          runHook postBuild
+        '';
+
+        installPhase = ''
+          runHook preInstall
+          mkdir -p "$out/lib"
+          cp out/dynamic-cursors.so "$out/lib/libdynamic-cursors.so"
+          cp out/dynamic-cursors.so "$out/lib/dynamic-cursors.so"
+          cp out/dynamic-cursors.so "$out/lib/libhypr-dynamic-cursors.so"
+          runHook postInstall
+        '';
+      };
+
       hyprPlugins = [
         scrolloverview
         hyprglass
+        dynamic_cursors
       ];
     in
     {

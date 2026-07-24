@@ -17,6 +17,11 @@
       flake = false;
     };
 
+    hypr-dynamic-cursors = {
+      url = "github:VirtCode/hypr-dynamic-cursors";
+      flake = false;
+    };
+
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs = {

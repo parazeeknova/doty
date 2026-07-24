@@ -22,6 +22,38 @@ hl.config({
 			wallpaper = 0,
 			blur = true,
 		},
+		dynamic_cursors = {
+			enabled = true,
+			mode = "tilt",
+			threshold = 1,
+			rotate = {
+				length = 20,
+				offset = 0.0,
+			},
+			tilt = {
+				limit = 5000,
+				activation = "negative_quadratic",
+				window = 100,
+				full = 60,
+			},
+			shake = {
+				enabled = false,
+				threshold = 6.0,
+				base = 4.0,
+				speed = 4.0,
+				influence = 0.0,
+				limit = 0.0,
+				timeout = 2000,
+				effects = false,
+				ipc = false,
+			},
+			hyprcursor = {
+				nearest = 1,
+				enabled = true,
+				resolution = -1,
+				fallback = "clientside",
+			},
+		},
 	},
 })
 

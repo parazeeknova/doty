@@ -7,7 +7,9 @@ fn get_cmd_output(cmd: &str, args: &[&str]) -> std::io::Result<String> {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("Checking for Hyprland plugin updates (hyprland-scroll-overview, hyprglass)...");
+    println!(
+        "Checking for Hyprland plugin updates (hyprland-scroll-overview, hyprglass, hypr-dynamic-cursors)..."
+    );
 
     let token = fs::read_to_string("/run/secrets/github-token")
         .ok()
@@ -15,7 +17,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .or_else(|| std::env::var("GITHUB_PERSONAL_ACCESS_TOKEN").ok())
         .or_else(|| std::env::var("GITHUB_TOKEN").ok());
 
-    let mut update_args = vec!["flake", "update", "hyprland-scroll-overview", "hyprglass"];
+    let mut update_args = vec![
+        "flake",
+        "update",
+        "hyprland-scroll-overview",
+        "hyprglass",
+        "hypr-dynamic-cursors",
+    ];
     let token_arg;
     if let Some(ref t) = token {
         token_arg = format!("github.com={}", t);
@@ -44,8 +52,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     std::process::exit(1);
                 }
 
-                let commit_msg =
-                    "chore: auto-update Hyprland plugins (hyprland-scroll-overview, hyprglass)";
+                let commit_msg = "chore: auto-update Hyprland plugins (hyprland-scroll-overview, hyprglass, hypr-dynamic-cursors)";
                 let status = Command::new("git")
                     .args(["commit", "--no-gpg-sign", "-m", commit_msg])
                     .status()?;
