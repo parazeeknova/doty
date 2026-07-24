@@ -30,21 +30,9 @@ in
           };
 
           home.packages = with pkgs; [
-            git
-            tree-sitter
-            gnumake
-            llvmPackages.clang
-            clang-tools
             lua-language-server
-            nodejs
-            ripgrep
-            fd
             stylua
             prettierd
-            biome
-            imagemagick
-            xclip
-            wl-clipboard
           ];
         };
     };

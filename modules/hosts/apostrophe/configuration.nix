@@ -31,11 +31,9 @@
       ];
       nix.settings.substituters = [
         "https://cache.nixos.org"
-        "https://cache.nixos-cuda.org"
       ];
       nix.settings.trusted-public-keys = [
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
       ];
       nix.settings.trusted-users = [
         "root"
@@ -206,7 +204,6 @@
 
       # -- Misc --
       nixpkgs.config.allowUnfree = true;
-      nixpkgs.config.cudaSupport = true;
       nixpkgs.config.permittedInsecurePackages = [
         "electron-40.10.5"
       ];

@@ -8,23 +8,7 @@
       ...
     }:
     {
-      # Enable the Ollama service
-      services.ollama = {
-        enable = true;
-        package = pkgs.ollama-cuda;
-      };
-
-      # Enable the Open WebUI service
-      services.open-webui = {
-        enable = true;
-        package = pkgs.open-webui;
-        stateDir = "/var/lib/open-webui";
-        host = "127.0.0.1";
-        port = 1101;
-      };
-
       environment.systemPackages = with pkgs; [
-        ollama-cuda
         pi-coding-agent
         codex
         github-copilot-cli

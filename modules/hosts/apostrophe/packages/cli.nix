@@ -11,7 +11,6 @@
 
       environment.systemPackages = with pkgs; [
         # -- JFR --
-        suwayomi-server
         cmatrix
         cowsay
         pokemon-colorscripts
@@ -39,7 +38,6 @@
         fd
         eza
         fzf
-        tree
         file
         which
         tree-sitter
@@ -51,10 +49,8 @@
         gnused
         gawk
         gnugrep
-        xclip
 
         # -- System Utils --
-        htop
         iotop
         powertop
         inxi
@@ -87,7 +83,6 @@
         ffmpeg
 
         # -- Misc --
-        screen
         less
         man-db
         tldr

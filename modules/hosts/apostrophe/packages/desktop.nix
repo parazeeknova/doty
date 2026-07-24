@@ -127,7 +127,6 @@
         hyprpicker
         hyprsunset
         hyprpaper
-        pyprland
         quickshell
         grim
         slurp
@@ -152,7 +151,6 @@
         mpv
         pavucontrol
         pamixer
-        pulseaudio
 
         # -- System Tray / Apps --
         networkmanagerapplet
@@ -188,7 +186,6 @@
         # -- Documents --
         zathura
         zathuraPkgs.zathura_pdf_mupdf
-        evince
       ];
     };
 }

@@ -48,7 +48,6 @@
           configType = "lua";
           plugins = [
             pkgs.hyprlandPlugins.hyprfocus
-            self.packages.${pkgs.stdenv.hostPlatform.system}.hyprland-scroll-overview
           ];
 
           extraConfig = ''

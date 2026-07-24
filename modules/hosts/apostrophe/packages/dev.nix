@@ -11,7 +11,6 @@
 
       environment.systemPackages = with pkgs; [
         devenv
-        cudatoolkit
         wrangler
         appimage-run
 

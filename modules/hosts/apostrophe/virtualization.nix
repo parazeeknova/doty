@@ -171,20 +171,6 @@
 
       programs.virt-manager.enable = true;
 
-      services.cockpit = {
-        enable = true;
-        settings = {
-          WebService = {
-            AllowUnencrypted = true;
-            Origins = lib.mkForce "http://localhost:9090 https://localhost:9090 http://127.0.0.1:9090 https://127.0.0.1:9090";
-          };
-        };
-        plugins = with pkgs; [
-          cockpit-podman
-          cockpit-machines
-        ];
-      };
-
       # Automatically define and autostart the default NAT network
       systemd.services.libvirtd-default-network = {
         description = "Autostart libvirt default network";
@@ -203,7 +189,6 @@
         podman-desktop
         podman-compose
         distrobox
-        cockpit
         libvirt
       ];
     };
