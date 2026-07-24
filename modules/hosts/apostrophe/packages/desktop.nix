@@ -27,8 +27,6 @@
         inputs.helium.packages.${pkgs.stdenv.hostPlatform.system}.default
         vesktop
         telegram-desktop
-        localsend
-        megasync
         phototonic
 
         # -- Verso --
@@ -111,12 +109,7 @@
 
         # -- Multi Media --
         freetube
-        audacity
-        blender
         vlc
-        krita
-        gimp
-        inkscape
         obs-studio
         kdePackages.kdenlive
         ncmpcpp
@@ -164,8 +157,6 @@
         # -- System Tray / Apps --
         networkmanagerapplet
         blueman
-        gnome-calculator
-        gnome-clocks
 
         # -- Qt / GTK Themes --
         qt6Packages.qt6ct
@@ -189,7 +180,6 @@
         lm_sensors
         upower
         kdePackages.ark
-        gnome-disk-utility
 
         # -- Security --
         seahorse
@@ -199,7 +189,6 @@
         zathura
         zathuraPkgs.zathura_pdf_mupdf
         evince
-        onlyoffice-desktopeditors
       ];
     };
 }

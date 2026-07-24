@@ -13,12 +13,7 @@
         devenv
         cudatoolkit
         wrangler
-        google-cloud-sdk
-        awscli
-        cloudflare-cli
         appimage-run
-        azure-cli
-        terraform
 
         # -- Languages --
         nodejs
@@ -76,7 +71,6 @@
         gitkraken
         difftastic
         diff-so-fancy
-        beekeeper-studio
         figma-linux
         figma-agent
 

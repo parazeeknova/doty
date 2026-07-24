@@ -25,15 +25,9 @@
 
       environment.systemPackages = with pkgs; [
         ollama-cuda
-        llama-cpp
         pi-coding-agent
-        claude-code
         codex
         github-copilot-cli
-        cudaPackages.nccl
-        cudaPackages.cudnn
-        cudaPackages.libnpp
-        whisper-cpp
       ];
     };
 }
