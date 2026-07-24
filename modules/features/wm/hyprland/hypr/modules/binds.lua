@@ -280,6 +280,9 @@ hl.bind(
 		"quickshell -c recents_popup ipc call recents_popup close || (quickshell -c apps_popup ipc call apps_popup close; quickshell --config recents_popup)"
 	)
 )
+hl.bind("ALT + TAB", function()
+	hl.plugin.scrolloverview.overview("toggle")
+end)
 hl.bind(
 	mainMod .. " + X",
 	hl.dsp.exec_cmd("quickshell -c power_popup ipc call power_popup close || quickshell --config power_popup")

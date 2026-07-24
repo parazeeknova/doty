@@ -46,7 +46,9 @@
           portalPackage = null;
           systemd.enable = false;
           configType = "lua";
-          plugins = [ ];
+          plugins = [
+            inputs.hyprland-scroll-overview.packages.${pkgs.stdenv.hostPlatform.system}.default
+          ];
 
           extraConfig = ''
             -- Load main hyprland configuration modules

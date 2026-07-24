@@ -75,7 +75,7 @@ if hl.plugin.hyprglass then
 		preset = "clear",
 	})
 
-	-- Clear Preset for semi glass effect
+	-- @parazeeknova's lg config
 	hg.preset("clear", {
 		blur_strength = 1.0,
 		blur_iterations = 0.82,

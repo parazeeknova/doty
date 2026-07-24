@@ -43,5 +43,6 @@ voxtype_models/
 *.bin
 *.onnx
 
+result/
 squashfs-temp
 asar-unpacked
