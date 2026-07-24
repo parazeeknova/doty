@@ -177,29 +177,12 @@ name = "get_voxtype_status"
 path = "src/bin/status/voxtype.rs"
 
 [[bin]]
-name = "update_zcode"
-path = "src/bin/utils/update-zcode.rs"
-
-[[bin]]
 name = "update_verso"
 path = "src/bin/utils/update-verso.rs"
 
 [[bin]]
 name = "update_tldraw"
 path = "src/bin/utils/update-tldraw.rs"
-
-[[bin]]
-name = "update_opencode_desktop"
-path = "src/bin/utils/update-opencode-desktop.rs"
-
-[[bin]]
-name = "update_harper"
-path = "src/bin/utils/update-harper.rs"
-
-
-[[bin]]
-name = "update_t3code"
-path = "src/bin/utils/update-t3code.rs"
 
 
 

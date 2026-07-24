@@ -64,12 +64,7 @@ install: build
 	cp --remove-destination target/release/check_daemons $(HOME)/.local/bin/check_daemons
 	cp --remove-destination target/release/mtp_notify $(HOME)/.local/bin/mtp_notify
 	cp --remove-destination target/release/mail_notifier $(HOME)/.local/bin/mail_notifier
-	cp --remove-destination target/release/update_zcode $(HOME)/.local/bin/update_zcode
 	cp --remove-destination target/release/update_verso $(HOME)/.local/bin/update_verso
-	cp --remove-destination target/release/update_opencode_desktop $(HOME)/.local/bin/update_opencode_desktop
-	cp --remove-destination target/release/update_harper $(HOME)/.local/bin/update_harper
-
-	cp --remove-destination target/release/update_t3code $(HOME)/.local/bin/update_t3code
 
 
 

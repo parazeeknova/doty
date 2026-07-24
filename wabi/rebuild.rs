@@ -109,14 +109,6 @@ fn main() {
         }
     }
 
-    // Step 0.5: Check and update ZCode
-    print_step("Checking and updating ZCode...");
-    if run_cmd("./wabi/target/release/update_zcode", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("ZCode check/update completed.");
-    } else {
-        print_warning("ZCode check/update failed or skipped.");
-    }
-
     // Step 0.6: Check and update Verso
     print_step("Checking and updating Verso...");
     if run_cmd("./wabi/target/release/update_verso", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
@@ -132,35 +124,6 @@ fn main() {
     } else {
         print_warning("Tldraw Offline check/update failed or skipped.");
     }
-
-    // Step 0.66: Check and update OpenCode Desktop
-    print_step("Checking and updating OpenCode Desktop...");
-    if run_cmd("./wabi/target/release/update_opencode_desktop", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("OpenCode Desktop check/update completed.");
-    } else {
-        print_warning("OpenCode Desktop check/update failed or skipped.");
-    }
-
-
-    // Step 0.68: Check and update Harper
-    print_step("Checking and updating Harper...");
-    if run_cmd("./wabi/target/release/update_harper", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("Harper check/update completed.");
-    } else {
-        print_warning("Harper check/update failed or skipped.");
-    }
-
-    // Step 0.69: Check and update T3 Code
-    print_step("Checking and updating T3 Code...");
-    if run_cmd("./wabi/target/release/update_t3code", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("T3 Code check/update completed.");
-    } else {
-        print_warning("T3 Code check/update failed or skipped.");
-    }
-
-
-
-
 
     // Step 0.7: Update Nix Flake inputs
     print_step("Updating Nix flake inputs...");
