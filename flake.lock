@@ -353,11 +353,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784797331,
-        "narHash": "sha256-EPPfTygsf2Ti+/IYNf+xZOVWXpU7Vem9j+WBAY6OeoE=",
+        "lastModified": 1784883689,
+        "narHash": "sha256-3nBHQbfCUKBK4AC2nxiWyApTuDAbd0As0nizXg4eiNc=",
         "owner": "auguwu",
         "repo": "vscode-insiders-nix",
-        "rev": "46ffcf66637caed5e3cfd0965d88094f436950dd",
+        "rev": "fb4d439a1c7e46218d20571c7c0a13d9fcd3ee1c",
         "type": "github"
       },
       "original": {
