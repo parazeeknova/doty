@@ -52,6 +52,8 @@
 
         # -- Apps --
         opencode
+        opencode-desktop
+        t3code
         vscode-fhs
         vscode-insiders
         code-cursor-fhs
