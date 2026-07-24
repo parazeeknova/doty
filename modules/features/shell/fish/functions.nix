@@ -11,6 +11,10 @@
 
       home-manager.users.parazeeknova.programs.fish = {
         functions = {
+          hyprctl = {
+            wraps = "hyprctl";
+            body = "env -u LD_LIBRARY_PATH (command -s hyprctl) $argv";
+          };
           fish_greeting = {
             body = "";
           };
