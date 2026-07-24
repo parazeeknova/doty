@@ -245,39 +245,6 @@
         "type": "github"
       }
     },
-    "hypr-dynamic-cursors": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1780484690,
-        "narHash": "sha256-G3VOjqBgsnwaYQicqC4zjaUVCdsnzZ5sMPoUOPPnfXQ=",
-        "owner": "VirtCode",
-        "repo": "hypr-dynamic-cursors",
-        "rev": "da447486c84e0be81f2cdd208af1ef92469f0a88",
-        "type": "github"
-      },
-      "original": {
-        "owner": "VirtCode",
-        "repo": "hypr-dynamic-cursors",
-        "rev": "da447486c84e0be81f2cdd208af1ef92469f0a88",
-        "type": "github"
-      }
-    },
-    "hypr-kinetic-scroll": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1783259504,
-        "narHash": "sha256-Vt8l9PMAgcmbBynqLa91N2nW0Caij52YUYg3mWXYwSE=",
-        "owner": "savonovv",
-        "repo": "hypr-kinetic-scroll",
-        "rev": "378e29c8ec9650965fe2713d53d1fff3ce137003",
-        "type": "github"
-      },
-      "original": {
-        "owner": "savonovv",
-        "repo": "hypr-kinetic-scroll",
-        "type": "github"
-      }
-    },
     "hyprland-preview-share-picker": {
       "inputs": {
         "nixpkgs": [
@@ -449,8 +416,6 @@
         "flake-parts": "flake-parts",
         "helium": "helium",
         "home-manager": "home-manager",
-        "hypr-dynamic-cursors": "hypr-dynamic-cursors",
-        "hypr-kinetic-scroll": "hypr-kinetic-scroll",
         "hyprland-preview-share-picker": "hyprland-preview-share-picker",
         "hyprland-scroll-overview": "hyprland-scroll-overview",
         "import-tree": "import-tree",

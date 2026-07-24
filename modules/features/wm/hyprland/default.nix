@@ -47,9 +47,7 @@
           systemd.enable = false;
           configType = "lua";
           plugins = [
-            self.packages.${pkgs.stdenv.hostPlatform.system}.hypr-dynamic-cursors
             pkgs.hyprlandPlugins.hyprfocus
-            self.packages.${pkgs.stdenv.hostPlatform.system}.hypr-kinetic-scroll
             self.packages.${pkgs.stdenv.hostPlatform.system}.hyprland-scroll-overview
           ];
 
