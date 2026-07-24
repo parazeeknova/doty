@@ -14,7 +14,6 @@ local osdctl = os.getenv("HOME") .. "/.config/quickshell/osd/bin/osdctl"
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + SHIFT + RETURN", hl.dsp.exec_cmd("uwsm app -- ghostty --class=ghostty.floating"))
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("uwsm app -- kitty"))
-hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd("uwsm app -- warp-terminal"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 
 -- Browsers
@@ -198,13 +197,6 @@ hl.bind(
 		prev = true,
 	})
 )
-
--- This is enabled because the scroll overview plugin is now supported on nix
-hl.bind("ALT + TAB", function()
-	if hl.plugin and hl.plugin.scrolloverview then
-		hl.plugin.scrolloverview.overview("toggle")
-	end
-end)
 
 hl.bind(mainMod .. " + backslash", function()
 	local ws = hl.get_active_workspace()

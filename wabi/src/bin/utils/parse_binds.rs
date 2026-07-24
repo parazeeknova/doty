@@ -337,8 +337,6 @@ fn clean_description(desc: &str, cmd: &str) -> String {
             return "Launch Ghostty Terminal".to_string();
         } else if cmd.contains("kitty") {
             return "Launch Kitty Terminal".to_string();
-        } else if cmd.contains("warp-terminal") {
-            return "Launch Warp Terminal".to_string();
         } else if cmd.contains("thunar --class=thunar.floating") {
             return "Launch Floating File Manager".to_string();
         } else if cmd.contains("thunar") {
@@ -357,8 +355,6 @@ fn clean_description(desc: &str, cmd: &str) -> String {
             return "Show Occupied Network Ports".to_string();
         } else if cmd.contains("uwsm stop") || cmd.contains("uwsm check") {
             return "Logout / Exit".to_string();
-        } else if cmd.contains("scrolloverview") {
-            return "Toggle Window Overview".to_string();
         } else if cmd.contains("column_width") {
             return "Cycle Column Width".to_string();
         } else if cmd.contains("grim") && cmd.contains("slurp") && cmd.contains("swappy") {
@@ -769,12 +765,7 @@ fn parse_single_bind(
             description = "Toggle window properties (e.g. opaque)".to_string();
         }
     } else if action_expr.contains("function()") {
-        if action_expr.contains("scrolloverview") {
-            cmd = "hyprctl dispatch overview:toggle".to_string();
-            if description.is_empty() {
-                description = "Toggle Window Overview".to_string();
-            }
-        } else if action_expr.contains("column_width") {
+        if action_expr.contains("column_width") {
             if description.is_empty() {
                 description = "Cycle Column Width".to_string();
             }

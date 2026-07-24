@@ -61,7 +61,6 @@
         actionlint
         inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
         inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-cli
-        warp-terminal
 
         # -- Dev Tools --
         jupyter

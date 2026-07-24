@@ -147,7 +147,7 @@ hl.layer_rule({
 -- Workspace assignments for specific applications using exact class names (anchored regex)
 local workspace_assignments = {
 	["1"] = { "^zen.*$", "^[Vv]ivaldi.*$" },
-	["2"] = { "^code-insiders$", "^dev\\.warp\\.Warp$", "^[Ee]macs$" },
+	["2"] = { "^code-insiders$", "^[Ee]macs$" },
 	["3"] = { "^com\\.mitchellh\\.ghostty$", "^Code$", "^code$" },
 	["4"] = { "^[Ff]ree[Tt]ube$" },
 	["5 silent"] = { "^[Ss]potify$" },
