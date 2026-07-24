@@ -9,7 +9,7 @@
 
     hyprland-scroll-overview = {
       url = "github:yayuuu/hyprland-scroll-overview";
-      inputs.nixpkgs.follows = "nixpkgs";
+      flake = false;
     };
 
     hyprglass = {

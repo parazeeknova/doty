@@ -13,6 +13,16 @@ hl.config({
 	dwindle = {
 		preserve_split = true,
 	},
+	plugin = {
+		scrolloverview = {
+			gesture_distance = 300,
+			scale = 0.65,
+			workspace_gap = 2,
+			layout = "vertical",
+			wallpaper = 0,
+			blur = true,
+		},
+	},
 })
 
 local colors = {}
@@ -25,8 +35,6 @@ else
 	}
 end
 
--- This requires https://github.com/hyprnux/hyprglass plugin
--- hyprpm add https://github.com/hyprnux/hyprglass && hyprpm enable hyprglass
 if hl.plugin.hyprglass then
 	local hg = hl.plugin.hyprglass
 
