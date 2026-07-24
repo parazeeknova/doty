@@ -46,9 +46,7 @@
           portalPackage = null;
           systemd.enable = false;
           configType = "lua";
-          plugins = [
-            pkgs.hyprlandPlugins.hyprfocus
-          ];
+          plugins = [];
 
           extraConfig = ''
             -- Load main hyprland configuration modules
