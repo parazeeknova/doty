@@ -2,8 +2,10 @@
 
 {
   flake.nixosModules.parazeeknovaLlms =
-    { pkgs, ... }:
-
+    {
+      pkgs,
+      ...
+    }:
     {
       environment.systemPackages = with pkgs; [
         pi-coding-agent
@@ -12,11 +14,10 @@
         lmstudio
         yt-dlp
         cudatoolkit
-
-        (llama-cpp.override {
+        pkgs.ollama-cuda
+        (pkgs.llama-cpp.override {
           cudaSupport = true;
         })
-        ollama-cuda
       ];
 
       services.ollama = {
@@ -27,29 +28,13 @@
       services.open-webui = {
         enable = true;
         package = pkgs.open-webui;
-
+        stateDir = "/var/lib/open-webui";
         host = "127.0.0.1";
         port = 8181;
-
+        openFirewall = false;
         environment = {
           OLLAMA_BASE_URL = "http://127.0.0.1:11434";
         };
-      };
-
-      services.llama-cpp = {
-        enable = true;
-        package = pkgs.llama-cpp.override {
-          cudaSupport = true;
-        };
-        host = "127.0.0.1";
-        port = 8787;
-        extraFlags = [
-          "--flash-attn"
-          "-ngl" "999"
-          "-c" "4096"
-          "-b" "1024"
-          "-t" "8"
-        ];
       };
     };
 }
