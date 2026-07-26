@@ -7,6 +7,8 @@ use std::process::Command;
 use std::thread;
 use std::time::{Duration, SystemTime};
 
+use serde::Serialize;
+
 const PREVIEW_SIZE: &str = "440x248";
 const DEFAULT_INTERVAL_SECS: u64 = 2;
 
@@ -14,6 +16,55 @@ const DEFAULT_INTERVAL_SECS: u64 = 2;
 struct Wallpaper {
     path: PathBuf,
     modified: SystemTime,
+}
+
+#[derive(Serialize, Clone, Debug)]
+struct SearchEntry {
+    path: String,
+    thumb: String,
+    stem: String,
+    words: Vec<String>,
+}
+
+fn fuzzy_score(query: &str, text: &str) -> i64 {
+    let q = query.to_lowercase();
+    let t = text.to_lowercase();
+
+    if t == q {
+        return 1000;
+    }
+    if t.starts_with(&q) {
+        return 800 + (100 - t.len().min(100) as i64);
+    }
+    if t.contains(&q) {
+        return 600 + (100 - t.len().min(100) as i64);
+    }
+
+    let q_chars: Vec<char> = q.chars().collect();
+    let t_chars: Vec<char> = t.chars().collect();
+    let mut qi = 0;
+    let mut score: i64 = 0;
+    let mut last_match: Option<usize> = None;
+
+    for (ti, &tc) in t_chars.iter().enumerate() {
+        if qi < q_chars.len() && tc == q_chars[qi] {
+            score += 10;
+            if last_match.map_or(false, |lm| lm + 1 == ti) {
+                score += 15;
+            }
+            last_match = Some(ti);
+            qi += 1;
+        }
+    }
+
+    if qi == q_chars.len() {
+        score += 200;
+        let coverage = q.len() as f64 / t.len().max(1) as f64;
+        score += (coverage * 100.0) as i64;
+        score
+    } else {
+        -1
+    }
 }
 
 fn home_dir() -> PathBuf {
@@ -524,12 +575,140 @@ fn print_wallpapers(dirs: &[PathBuf], cache_dir: &Path) {
     }
 }
 
+fn build_search_index(dirs: &[PathBuf], cache_dir: &Path) -> Vec<SearchEntry> {
+    let wallpapers = scan_wallpapers(dirs);
+    let mut entries = Vec::new();
+
+    for wallpaper in wallpapers.values() {
+        let thumb = thumb_path(cache_dir, &wallpaper.path);
+        let thumb_str = if thumb.exists() {
+            thumb.to_string_lossy().into_owned()
+        } else {
+            wallpaper.path.to_string_lossy().into_owned()
+        };
+
+        let stem = wallpaper
+            .path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("")
+            .to_string();
+
+        let words: Vec<String> = stem
+            .replace(['-', '_', '.'], " ")
+            .split_whitespace()
+            .map(|w| w.to_lowercase())
+            .filter(|w| w.len() > 1)
+            .collect();
+
+        entries.push(SearchEntry {
+            path: wallpaper.path.to_string_lossy().into_owned(),
+            thumb: thumb_str,
+            stem,
+            words,
+        });
+    }
+
+    entries
+}
+
+fn write_search_index(dirs: &[PathBuf], cache_dir: &Path) {
+    let entries = build_search_index(dirs, cache_dir);
+    let index_path = cache_dir.join("search_index.json");
+
+    if let Some(parent) = index_path.parent() {
+        let _ = fs::create_dir_all(parent);
+    }
+
+    match serde_json::to_string(&entries) {
+        Ok(json) => {
+            if let Err(err) = fs::write(&index_path, json) {
+                eprintln!("failed to write search index: {err}");
+            }
+        }
+        Err(err) => {
+            eprintln!("failed to serialize search index: {err}");
+        }
+    }
+}
+
+fn search_wallpapers(query: &str, dirs: &[PathBuf], cache_dir: &Path) {
+    let index_path = cache_dir.join("search_index.json");
+
+    let entries: Vec<SearchEntry> = if index_path.exists() {
+        let data = match fs::read_to_string(&index_path) {
+            Ok(d) => d,
+            Err(_) => {
+                eprintln!("failed to read search index, falling back to scan");
+                let fallback = build_search_index(dirs, cache_dir);
+                let json = serde_json::to_string(&fallback).unwrap_or_default();
+                json
+            }
+        };
+        serde_json::from_str(&data).unwrap_or_else(|_| build_search_index(dirs, cache_dir))
+    } else {
+        build_search_index(dirs, cache_dir)
+    };
+
+    let q = query.trim().to_lowercase();
+    if q.is_empty() {
+        for entry in &entries {
+            println!("{}\t{}", entry.path, entry.thumb);
+        }
+        return;
+    }
+
+    let query_words: Vec<&str> = q.split_whitespace().collect();
+
+    let mut scored: Vec<(i64, &SearchEntry)> = entries
+        .iter()
+        .filter_map(|entry| {
+            let mut total_score = 0i64;
+
+            for qw in &query_words {
+                let mut best_word_score = fuzzy_score(qw, &entry.stem);
+
+                for word in &entry.words {
+                    let ws = fuzzy_score(qw, word);
+                    if ws > best_word_score {
+                        best_word_score = ws;
+                    }
+                }
+
+                if best_word_score < 0 {
+                    return None;
+                }
+                total_score += best_word_score;
+            }
+
+            Some((total_score, entry))
+        })
+        .collect();
+
+    scored.sort_by(|a, b| b.0.cmp(&a.0));
+
+    for (_, entry) in scored {
+        println!("{}\t{}", entry.path, entry.thumb);
+    }
+}
+
 fn main() {
     let once = env::args().any(|arg| arg == "--once");
     let print_mode = env::args().any(|arg| arg == "--print");
     let clean = !env::args().any(|arg| arg == "--no-clean");
     let dirs = watch_dirs();
     let cache = cache_dir();
+
+    let args: Vec<String> = env::args().collect();
+    let search_query = args
+        .windows(2)
+        .find(|w| w[0] == "--search")
+        .map(|w| w[1].clone());
+
+    if let Some(query) = search_query {
+        search_wallpapers(&query, &dirs, &cache);
+        return;
+    }
 
     if print_mode {
         print_wallpapers(&dirs, &cache);
@@ -538,11 +717,13 @@ fn main() {
 
     if once {
         sync_once(&dirs, &cache, clean);
+        write_search_index(&dirs, &cache);
         return;
     }
 
     loop {
         sync_once(&dirs, &cache, clean);
+        write_search_index(&dirs, &cache);
         thread::sleep(interval());
     }
 }
