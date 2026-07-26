@@ -416,6 +416,10 @@ hl.bind(
 		ignore_mods = true,
 	}
 )
+hl.bind(
+	mainMod .. " + SHIFT + K",
+	hl.dsp.exec_cmd("quickshell -c chat_sidebar ipc call chat_sidebar close || quickshell --config chat_sidebar")
+)
 
 ---------------------
 ---   Screenshots ---
