@@ -12,6 +12,14 @@
         pi-coding-agent
         codex
         github-copilot-cli
+        llama-cpp
+        lm-studio
+        yt-dlp
       ];
+
+      services.ollama = {
+        enable = true;
+        package = pkgs.ollama-cuda;
+      };
     };
 }
