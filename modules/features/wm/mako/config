@@ -1,7 +1,7 @@
 font=FiraCode Nerd Font 9
-background-color=#18120b
-text-color=#f6bc6f
-border-color=#f6bc6f
+background-color=#18130b
+text-color=#f1be6d
+border-color=#f1be6d
 border-size=1
 border-radius=0
 padding=6
@@ -13,12 +13,12 @@ layer=overlay
 max-visible=10
 
 [urgency=low]
-border-color=#f6bc6f
-text-color=#f6bc6f
+border-color=#f1be6d
+text-color=#f1be6d
 
 [urgency=normal]
-border-color=#f6bc6f
-text-color=#f6bc6f
+border-color=#f1be6d
+text-color=#f1be6d
 
 [urgency=critical]
 border-color=#ffb4ab
