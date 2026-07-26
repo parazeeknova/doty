@@ -3,6 +3,8 @@
   flake.nixosModules.parazeeknovaLlms =
     {
       pkgs,
+      lib,
+      config,
       ...
     }:
     {
@@ -29,7 +31,7 @@
         (pkgs.llama-cpp.override {
           cudaSupport = true;
         })
-        inputs.hermes-agent.packages.${pkgs.system}.desktop
+        # inputs.hermes-agent.packages.${pkgs.system}.desktop
       ];
 
       services.ollama = {
@@ -39,7 +41,20 @@
         host = "127.0.0.1";
         port = 11434;
         openFirewall = false;
+        user = "ollama";
+        group = "ollama";
       };
+
+      systemd.services.ollama.serviceConfig = {
+        ProtectHome = lib.mkForce false;
+        PrivateUsers = lib.mkForce false;
+      };
+
+      users.users.ollama.extraGroups = [ "users" ];
+
+      system.activationScripts.ollamaHomePerm = ''
+        chmod 710 /home/parazeeknova || true
+      '';
 
       services.open-webui = {
         enable = true;
