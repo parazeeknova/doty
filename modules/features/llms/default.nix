@@ -29,6 +29,7 @@
         (pkgs.llama-cpp.override {
           cudaSupport = true;
         })
+        inputs.hermes-agent.packages.${pkgs.system}.desktop
       ];
 
       services.ollama = {
