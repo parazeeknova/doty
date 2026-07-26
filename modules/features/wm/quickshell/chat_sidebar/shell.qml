@@ -13,7 +13,9 @@ Scope {
 
     readonly property string fontName: "FiraCode Nerd Font"
 
-    Theme { id: theme }
+    Theme {
+        id: theme
+    }
 
     property var chatHistory: []
     property int selectedChatIndex: -1
@@ -23,101 +25,116 @@ Scope {
     property bool chatPanelVisible: true
 
     Component.onCompleted: {
-        chatHistory = loadChatHistory()
+        chatHistory = loadChatHistory();
         if (chatHistory.length > 0) {
-            selectedChatIndex = 0
-            currentChatId = chatHistory[0].id
-            messages = loadMessages(currentChatId)
+            selectedChatIndex = 0;
+            currentChatId = chatHistory[0].id;
+            messages = loadMessages(currentChatId);
         }
-        chatPanelVisible = true
+        chatPanelVisible = true;
     }
 
     function loadChatHistory() {
-        var fileView = Qt.createQmlObject(
-            'import Quickshell.Io; FileView { path: "file://' + root.homeDir + '/.cache/quickshell/chat_sidebar/chats.json"; watchChanges: false }',
-            root, "chatsFileView"
-        )
+        var fileView = Qt.createQmlObject('import Quickshell.Io; FileView { path: "file://' + root.homeDir + '/.cache/quickshell/chat_sidebar/chats.json"; watchChanges: false }', root, "chatsFileView");
         if (fileView) {
-            var txt = fileView.text()
+            var txt = fileView.text();
             if (txt && txt.trim().length > 0) {
-                try { return JSON.parse(txt) } catch (e) { return [] }
+                try {
+                    return JSON.parse(txt);
+                } catch (e) {
+                    return [];
+                }
             }
         }
-        return []
+        return [];
     }
 
     function loadMessages(chatId) {
-        var fileView = Qt.createQmlObject(
-            'import Quickshell.Io; FileView { path: "file://' + root.homeDir + '/.cache/quickshell/chat_sidebar/' + chatId + '.json"; watchChanges: false }',
-            root, "msgFileView"
-        )
+        var fileView = Qt.createQmlObject('import Quickshell.Io; FileView { path: "file://' + root.homeDir + '/.cache/quickshell/chat_sidebar/' + chatId + '.json"; watchChanges: false }', root, "msgFileView");
         if (fileView) {
-            var txt = fileView.text()
+            var txt = fileView.text();
             if (txt && txt.trim().length > 0) {
-                try { return JSON.parse(txt) } catch (e) { return [] }
+                try {
+                    return JSON.parse(txt);
+                } catch (e) {
+                    return [];
+                }
             }
         }
-        return []
+        return [];
     }
 
     function writeFile(path, content) {
-        var fileView = Qt.createQmlObject(
-            'import Quickshell.Io; FileView { path: "file://' + path + '" }',
-            root, "writeFileView"
-        )
-        if (fileView) fileView.write(content)
+        var fileView = Qt.createQmlObject('import Quickshell.Io; FileView { path: "file://' + path + '" }', root, "writeFileView");
+        if (fileView)
+            fileView.write(content);
     }
 
     function saveChatHistory() {
-        writeFile(root.homeDir + "/.cache/quickshell/chat_sidebar/chats.json", JSON.stringify(chatHistory))
+        writeFile(root.homeDir + "/.cache/quickshell/chat_sidebar/chats.json", JSON.stringify(chatHistory));
     }
 
     function saveMessages() {
-        if (!currentChatId) return
-        writeFile(root.homeDir + "/.cache/quickshell/chat_sidebar/" + currentChatId + ".json", JSON.stringify(messages))
+        if (!currentChatId)
+            return;
+        writeFile(root.homeDir + "/.cache/quickshell/chat_sidebar/" + currentChatId + ".json", JSON.stringify(messages));
     }
 
     function newChat() {
-        var id = "chat_" + Date.now()
-        chatHistory.unshift({ id: id, name: "New Chat", created: new Date().toISOString() })
-        saveChatHistory()
-        selectedChatIndex = 0
-        currentChatId = id
-        messages = []
-        chatPanelVisible = true
+        var id = "chat_" + Date.now();
+        chatHistory.unshift({
+            id: id,
+            name: "New Chat",
+            created: new Date().toISOString()
+        });
+        saveChatHistory();
+        selectedChatIndex = 0;
+        currentChatId = id;
+        messages = [];
+        chatPanelVisible = true;
     }
 
     function deleteChat(index) {
-        if (index < 0 || index >= chatHistory.length) return
-        var chatId = chatHistory[index].id
-        chatHistory.splice(index, 1)
-        saveChatHistory()
-        saveMessages()
+        if (index < 0 || index >= chatHistory.length)
+            return;
+        var chatId = chatHistory[index].id;
+        chatHistory.splice(index, 1);
+        saveChatHistory();
+        saveMessages();
         if (chatHistory.length > 0) {
-            selectedChatIndex = Math.min(index, chatHistory.length - 1)
-            currentChatId = chatHistory[selectedChatIndex].id
-            messages = loadMessages(currentChatId)
+            selectedChatIndex = Math.min(index, chatHistory.length - 1);
+            currentChatId = chatHistory[selectedChatIndex].id;
+            messages = loadMessages(currentChatId);
         } else {
-            selectedChatIndex = -1
-            currentChatId = ""
-            messages = []
+            selectedChatIndex = -1;
+            currentChatId = "";
+            messages = [];
         }
     }
 
     function sendMessage() {
-        if (inputText.trim().length === 0) return
-        if (!currentChatId) newChat()
-        messages.push({ role: "user", text: inputText.trim(), timestamp: new Date().toISOString() })
-        inputText = ""
-        saveMessages()
+        if (inputText.trim().length === 0)
+            return;
+        if (!currentChatId)
+            newChat();
+        messages.push({
+            role: "user",
+            text: inputText.trim(),
+            timestamp: new Date().toISOString()
+        });
+        inputText = "";
+        saveMessages();
     }
 
     function formatTimestamp(isoStr) {
-        if (!isoStr) return ""
+        if (!isoStr)
+            return "";
         try {
-            var d = new Date(isoStr)
-            return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0")
-        } catch (e) { return "" }
+            var d = new Date(isoStr);
+            return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+        } catch (e) {
+            return "";
+        }
     }
 
     Rectangle {
@@ -188,7 +205,10 @@ Scope {
                                 text: "New"
                                 font.family: root.fontName
                                 font.pointSize: 8
-                                background: Rectangle { color: theme.accent; radius: 0 }
+                                background: Rectangle {
+                                    color: theme.accent
+                                    radius: 0
+                                }
                                 contentItem: Text {
                                     text: "New"
                                     color: "#ffffff"
@@ -204,7 +224,12 @@ Scope {
                         }
                     }
 
-                    Rectangle { Layout.fillWidth: true; height: 1; color: theme.accent; opacity: 0.3 }
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 1
+                        color: theme.accent
+                        opacity: 0.3
+                    }
 
                     ComboBox {
                         id: chatDropdown
@@ -224,7 +249,12 @@ Scope {
                             border.width: 1
                             border.color: theme.accent
                             opacity: chatDropdown.activeFocus ? 1 : 0.4
-                            Behavior on border.color { ColorAnimation { duration: 150; easing.type: Easing.OutQuad } }
+                            Behavior on border.color {
+                                ColorAnimation {
+                                    duration: 150
+                                    easing.type: Easing.OutQuad
+                                }
+                            }
                         }
                         delegate: Item {
                             width: chatDropdown.width
@@ -249,14 +279,20 @@ Scope {
                             padding: 0
                             modal: true
                             closePolicy: Popup.CloseOnPressOutsideParent
-                            background: Rectangle { color: theme.bg_dark; radius: 0; border.width: 1; border.color: theme.accent; opacity: 0.6 }
+                            background: Rectangle {
+                                color: theme.bg_dark
+                                radius: 0
+                                border.width: 1
+                                border.color: theme.accent
+                                opacity: 0.6
+                            }
                         }
                         onCurrentIndexChanged: {
                             if (index >= 0 && index < chatHistory.length) {
-                                selectedChatIndex = index
-                                currentChatId = chatHistory[index].id
-                                messages = loadMessages(currentChatId)
-                                chatPanelVisible = true
+                                selectedChatIndex = index;
+                                currentChatId = chatHistory[index].id;
+                                messages = loadMessages(currentChatId);
+                                chatPanelVisible = true;
                             }
                         }
                     }
@@ -270,7 +306,11 @@ Scope {
                         Layout.rightMargin: 8
                         Layout.topMargin: 4
                         Layout.preferredHeight: 28
-                        background: Rectangle { color: theme.error; opacity: 0.85; radius: 0 }
+                        background: Rectangle {
+                            color: theme.error
+                            opacity: 0.85
+                            radius: 0
+                        }
                         contentItem: Text {
                             text: "Delete Chat"
                             color: "#ffffff"
@@ -282,7 +322,8 @@ Scope {
                             verticalAlignment: Text.AlignVCenter
                         }
                         onClicked: {
-                            if (selectedChatIndex >= 0) deleteChat(selectedChatIndex)
+                            if (selectedChatIndex >= 0)
+                                deleteChat(selectedChatIndex);
                         }
                     }
 
@@ -329,11 +370,11 @@ Scope {
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: {
-                                        chatDropdown.currentIndex = index
-                                        root.selectedChatIndex = index
-                                        currentChatId = chatHistory[index].id
-                                        messages = loadMessages(currentChatId)
-                                        chatPanelVisible = true
+                                        chatDropdown.currentIndex = index;
+                                        root.selectedChatIndex = index;
+                                        currentChatId = chatHistory[index].id;
+                                        messages = loadMessages(currentChatId);
+                                        chatPanelVisible = true;
                                     }
                                 }
                             }
@@ -343,7 +384,12 @@ Scope {
             }
 
             // DIVIDER
-            Rectangle { Layout.preferredWidth: 1; Layout.fillHeight: true; color: theme.accent; opacity: 0.3 }
+            Rectangle {
+                Layout.preferredWidth: 1
+                Layout.fillHeight: true
+                color: theme.accent
+                opacity: 0.3
+            }
 
             // RIGHT CHAT PANEL
             Rectangle {
@@ -392,7 +438,12 @@ Scope {
                         }
                     }
 
-                    Rectangle { Layout.fillWidth: true; height: 1; color: theme.accent; opacity: 0.2 }
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 1
+                        color: theme.accent
+                        opacity: 0.2
+                    }
 
                     ListView {
                         id: messagesList
@@ -457,7 +508,12 @@ Scope {
                         }
                     }
 
-                    Rectangle { Layout.fillWidth: true; height: 1; color: theme.accent; opacity: 0.2 }
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 1
+                        color: theme.accent
+                        opacity: 0.2
+                    }
 
                     Rectangle {
                         id: inputArea
@@ -491,7 +547,12 @@ Scope {
                                     border.width: 1
                                     border.color: theme.accent
                                     opacity: messageInput.activeFocus ? 1 : 0.4
-                                    Behavior on border.color { ColorAnimation { duration: 150; easing.type: Easing.OutQuad } }
+                                    Behavior on border.color {
+                                        ColorAnimation {
+                                            duration: 150
+                                            easing.type: Easing.OutQuad
+                                        }
+                                    }
                                 }
                             }
 
@@ -501,7 +562,10 @@ Scope {
                                 font.pointSize: 8
                                 Layout.preferredWidth: 70
                                 Layout.fillHeight: true
-                                background: Rectangle { color: theme.accent; radius: 0 }
+                                background: Rectangle {
+                                    color: theme.accent
+                                    radius: 0
+                                }
                                 contentItem: Text {
                                     text: "Send"
                                     color: "#ffffff"

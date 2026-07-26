@@ -11,7 +11,8 @@
           ollama-cuda = prev.ollama-cuda.overrideAttrs (old: {
             preConfigure = ''
               export CUDAToolkit_ROOT="${final.cudaPackages.cudatoolkit}"
-            '' + (old.preConfigure or "");
+            ''
+            + (old.preConfigure or "");
           });
         })
       ];
