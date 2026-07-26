@@ -206,6 +206,7 @@
 
       # -- Misc --
       nixpkgs.config.allowUnfree = true;
+      nixpkgs.config.cudaSupport = true;
       nixpkgs.config.permittedInsecurePackages = [
         "electron-40.10.5"
       ];

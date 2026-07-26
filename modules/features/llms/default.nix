@@ -1,5 +1,4 @@
 { self, inputs, ... }:
-
 {
   flake.nixosModules.parazeeknovaLlms =
     {
@@ -7,6 +6,16 @@
       ...
     }:
     {
+      nixpkgs.overlays = [
+        (final: prev: {
+          ollama-cuda = prev.ollama-cuda.overrideAttrs (old: {
+            preConfigure = ''
+              export CUDAToolkit_ROOT="${final.cudaPackages.cudatoolkit}"
+            '' + (old.preConfigure or "");
+          });
+        })
+      ];
+
       environment.systemPackages = with pkgs; [
         pi-coding-agent
         codex
@@ -19,12 +28,7 @@
           cudaSupport = true;
         })
       ];
-
-      services.ollama = {
-        enable = true;
-        package = pkgs.ollama-cuda;
-      };
-
+      services.ollama.package = pkgs.ollama-cuda;
       services.open-webui = {
         enable = true;
         package = pkgs.open-webui;
