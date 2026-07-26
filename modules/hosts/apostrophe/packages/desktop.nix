@@ -111,6 +111,10 @@
         freetube
         vlc
         obs-studio
+        blender
+        gimp
+        inkscape
+        krita-unwrapped
         kdePackages.kdenlive
         ncmpcpp
         qbittorrent-enhanced

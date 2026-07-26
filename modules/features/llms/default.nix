@@ -20,6 +20,7 @@
       environment.systemPackages = with pkgs; [
         pi-coding-agent
         codex
+        claude-code
         github-copilot-cli
         lmstudio
         yt-dlp
@@ -29,7 +30,16 @@
           cudaSupport = true;
         })
       ];
-      services.ollama.package = pkgs.ollama-cuda;
+
+      services.ollama = {
+        enable = true;
+        home = "/home/parazeeknova/ollama";
+        package = pkgs.ollama-cuda;
+        host = "127.0.0.1";
+        port = 11434;
+        openFirewall = false;
+      };
+
       services.open-webui = {
         enable = true;
         package = pkgs.open-webui;
