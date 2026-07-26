@@ -7,7 +7,7 @@ use std::process::Command;
 use std::thread;
 use std::time::{Duration, SystemTime};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 const PREVIEW_SIZE: &str = "440x248";
 const DEFAULT_INTERVAL_SECS: u64 = 2;
@@ -18,7 +18,7 @@ struct Wallpaper {
     modified: SystemTime,
 }
 
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 struct SearchEntry {
     path: String,
     thumb: String,
@@ -49,7 +49,7 @@ fn fuzzy_score(query: &str, text: &str) -> i64 {
     for (ti, &tc) in t_chars.iter().enumerate() {
         if qi < q_chars.len() && tc == q_chars[qi] {
             score += 10;
-            if last_match.map_or(false, |lm| lm + 1 == ti) {
+            if last_match.is_some_and(|lm| lm + 1 == ti) {
                 score += 15;
             }
             last_match = Some(ti);
@@ -636,16 +636,15 @@ fn search_wallpapers(query: &str, dirs: &[PathBuf], cache_dir: &Path) {
     let index_path = cache_dir.join("search_index.json");
 
     let entries: Vec<SearchEntry> = if index_path.exists() {
-        let data = match fs::read_to_string(&index_path) {
-            Ok(d) => d,
+        match fs::read_to_string(&index_path) {
+            Ok(data) => {
+                serde_json::from_str(&data).unwrap_or_else(|_| build_search_index(dirs, cache_dir))
+            }
             Err(_) => {
                 eprintln!("failed to read search index, falling back to scan");
-                let fallback = build_search_index(dirs, cache_dir);
-                let json = serde_json::to_string(&fallback).unwrap_or_default();
-                json
+                build_search_index(dirs, cache_dir)
             }
-        };
-        serde_json::from_str(&data).unwrap_or_else(|_| build_search_index(dirs, cache_dir))
+        }
     } else {
         build_search_index(dirs, cache_dir)
     };
@@ -685,7 +684,7 @@ fn search_wallpapers(query: &str, dirs: &[PathBuf], cache_dir: &Path) {
         })
         .collect();
 
-    scored.sort_by(|a, b| b.0.cmp(&a.0));
+    scored.sort_by_key(|b| std::cmp::Reverse(b.0));
 
     for (_, entry) in scored {
         println!("{}\t{}", entry.path, entry.thumb);

@@ -115,10 +115,15 @@ Scope {
                 }
 
                 if (matched)
-                    scored.push({score: totalScore, wp: wp});
+                    scored.push({
+                        score: totalScore,
+                        wp: wp
+                    });
             }
 
-            scored.sort(function(a, b) { return b.score - a.score; });
+            scored.sort(function (a, b) {
+                return b.score - a.score;
+            });
             var temp = [];
             for (var k = 0; k < scored.length; k++)
                 temp.push(scored[k].wp);

@@ -13,13 +13,25 @@
         codex
         github-copilot-cli
         llama-cpp
-        lm-studio
+        lmstudio
         yt-dlp
+        cudatoolkit
       ];
 
       services.ollama = {
         enable = true;
-        package = pkgs.ollama-cuda;
+      };
+
+      services.open-webui = {
+        enable = true;
+        package = pkgs.open-webui;
+        stateDir = "/var/lib/open-webui";
+        port = 8181;
+        host = "127.0.0.1";
+        openFirewall = false;
+        environment = {
+          OLLAMA_BASE_URL = "http://127.0.0.1:11434";
+        };
       };
     };
 }
