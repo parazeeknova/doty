@@ -45,6 +45,19 @@ window#waybar {
   padding: 4px 0;
 }
 
+#custom-tailscale {
+  font-size: 0.8rem;
+  padding: 4px 0;
+}
+
+#custom-tailscale.connected {
+  color: @accent;
+}
+
+#custom-tailscale.disconnected {
+  color: @grey1;
+}
+
 #custom-tray_toggle {
   font-size: 0.8rem;
   color: @fg1;

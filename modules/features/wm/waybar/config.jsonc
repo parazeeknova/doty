@@ -10,11 +10,20 @@
   "modules-center": ["custom/voxtype", "clock#date"],
   "modules-right": [
     "custom/tray_toggle",
+    "custom/tailscale",
     "network",
     "pulseaudio",
     "battery",
     "clock",
   ],
+  "custom/tailscale": {
+    "rotate": 270,
+    "exec": "/home/parazeeknova/.config/waybar/scripts/get_tailscale_status",
+    "return-type": "json",
+    "interval": 5,
+    "on-click": "quickshell --config network_popup",
+    "tooltip": true
+  },
   "custom/voxtype": {
     "exec": "/home/parazeeknova/.config/waybar/scripts/get_voxtype_status",
     "return-type": "json",

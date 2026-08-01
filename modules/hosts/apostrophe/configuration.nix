@@ -117,7 +117,7 @@
         Defaults insults
       '';
       security.pki.certificateFiles = [
-        /tmp/portless/ca.pem
+        ../../../certs/portless-ca.pem
       ];
 
       # -- Audio --

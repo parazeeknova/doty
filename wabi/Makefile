@@ -47,6 +47,7 @@ install: build
 	cp --remove-destination target/release/wabi_power ../modules/features/wm/waybar/scripts/wabi_power
 	cp --remove-destination target/release/tray_count ../modules/features/wm/waybar/scripts/tray_count
 	cp --remove-destination target/release/get_voxtype_status ../modules/features/wm/waybar/scripts/get_voxtype_status
+	cp --remove-destination target/release/get_tailscale_status ../modules/features/wm/waybar/scripts/get_tailscale_status
 	cp --remove-destination target/release/wallpaper_thumb_watcher ../modules/features/wm/quickshell/wallpaper_switcher/wallpaper_thumb_watcher
 	cp --remove-destination target/release/get_github_graph ../modules/features/wm/quickshell/github_graph/get_github_graph
 	cp --remove-destination target/release/theme_switcher ../modules/scripts/theme_switcher

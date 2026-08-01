@@ -40,6 +40,8 @@ struct NetworkStatus {
     active_signal: i32,
     active_speed: String,
     warp_connected: bool,
+    tailscale_connected: bool,
+    tailscale_ip: String,
     details: ConnectionDetails,
     networks: Vec<WifiNetwork>,
     vpns: Vec<VpnConnection>,
@@ -316,6 +318,27 @@ fn main() {
         .lines()
         .any(|l| l.to_lowercase().contains("status update: connected"));
 
+    // 5. Check Tailscale status
+    let ts_out = run_cmd("tailscale", &["status", "--json"]).unwrap_or_default();
+    let mut tailscale_connected = false;
+    let mut tailscale_ip = String::new();
+    if let Ok(v) = serde_json::from_str::<serde_json::Value>(&ts_out) {
+        if let Some(state) = v.get("BackendState").and_then(|s| s.as_str()) {
+            if state == "Running" {
+                tailscale_connected = true;
+            }
+        }
+        if let Some(ips) = v
+            .get("Self")
+            .and_then(|s| s.get("TailscaleIPs"))
+            .and_then(|i| i.as_array())
+        {
+            if let Some(ip) = ips.first().and_then(|i| i.as_str()) {
+                tailscale_ip = ip.to_string();
+            }
+        }
+    }
+
     let status = NetworkStatus {
         wifi_enabled,
         airplane_mode,
@@ -324,6 +347,8 @@ fn main() {
         active_signal,
         active_speed,
         warp_connected,
+        tailscale_connected,
+        tailscale_ip,
         details,
         networks,
         vpns,

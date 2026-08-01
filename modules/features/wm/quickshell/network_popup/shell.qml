@@ -14,6 +14,8 @@ Scope {
     property string activeSsid: ""
     property int activeSignal: 0
     property bool warpConnected: false
+    property bool tailscaleConnected: false
+    property string tailscaleIp: ""
     property var details: ({
             "ip_address": "",
             "gateway": "",
@@ -152,6 +154,8 @@ Scope {
                 root.activeSsid = data.active_ssid || "";
                 root.activeSignal = data.active_signal || 0;
                 root.warpConnected = data.warp_connected || false;
+                root.tailscaleConnected = data.tailscale_connected || false;
+                root.tailscaleIp = data.tailscale_ip || "";
                 root.details = data.details || ({
                         "ip_address": "",
                         "gateway": "",
@@ -197,6 +201,8 @@ Scope {
                     root.activeSsid = data.active_ssid || "";
                     root.activeSignal = data.active_signal || 0;
                     root.warpConnected = data.warp_connected || false;
+                    root.tailscaleConnected = data.tailscale_connected || false;
+                    root.tailscaleIp = data.tailscale_ip || "";
                     root.details = data.details || ({
                             "ip_address": "",
                             "gateway": "",
@@ -287,7 +293,7 @@ Scope {
                     else if (win.activeSection === 1)
                         maxItems = 1;
                     else if (win.activeSection === 2)
-                        maxItems = 1 + root.vpns.length;
+                        maxItems = 2 + root.vpns.length;
                     else if (win.activeSection === 3)
                         maxItems = root.getNetworkSectionItemsCount();
                     else if (win.activeSection === 4)
@@ -323,8 +329,14 @@ Scope {
                             else
                                 Quickshell.execDetached(["warp-cli", "connect"]);
                             root.triggerRefresh();
+                        } else if (win.activeSubIndex === 1) {
+                            if (root.tailscaleConnected)
+                                Quickshell.execDetached(["tailscale", "down"]);
+                            else
+                                Quickshell.execDetached(["tailscale", "up"]);
+                            root.triggerRefresh();
                         } else {
-                            var idx = win.activeSubIndex - 1;
+                            var idx = win.activeSubIndex - 2;
                             if (idx >= 0 && idx < root.vpns.length) {
                                 var vpn = root.vpns[idx];
                                 if (vpn.active)
@@ -797,6 +809,50 @@ Scope {
                                 }
                             }
 
+                            // Tailscale Toggle
+                            Rectangle {
+                                width: parent.width
+                                height: 16
+                                color: (win.activeSection === 2 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
+                                radius: 0
+
+                                Text {
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Tailscale: " + (root.tailscaleConnected ? ("Connected" + (root.tailscaleIp !== "" ? (" (" + root.tailscaleIp + ")") : "")) : "Disconnected")
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                    renderType: Text.NativeRendering
+                                }
+
+                                Text {
+                                    id: tailscaleToggleBtn
+
+                                    anchors.right: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: root.tailscaleConnected ? "disconnect" : "connect"
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                    renderType: Text.NativeRendering
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        onEntered: tailscaleToggleBtn.color = theme.accent
+                                        onExited: tailscaleToggleBtn.color = theme.accent
+                                        onClicked: {
+                                            if (root.tailscaleConnected)
+                                                Quickshell.execDetached(["tailscale", "down"]);
+                                            else
+                                                Quickshell.execDetached(["tailscale", "up"]);
+                                            root.triggerRefresh();
+                                        }
+                                    }
+                                }
+                            }
+
                             Column {
                                 width: parent.width
                                 spacing: 2
@@ -808,7 +864,7 @@ Scope {
                                     delegate: Rectangle {
                                         width: parent.width
                                         height: 16
-                                        color: (win.activeSection === 2 && win.activeSubIndex === (index + 1)) ? win.focusHighlightColor : "transparent"
+                                        color: (win.activeSection === 2 && win.activeSubIndex === (index + 2)) ? win.focusHighlightColor : "transparent"
                                         radius: 0
 
                                         Text {

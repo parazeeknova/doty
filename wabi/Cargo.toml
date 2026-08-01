@@ -72,6 +72,10 @@ name = "get_vm_status"
 path = "src/bin/status/vm.rs"
 
 [[bin]]
+name = "get_tailscale_status"
+path = "src/bin/status/tailscale.rs"
+
+[[bin]]
 name = "log_battery"
 path = "src/bin/utils/battery_log.rs"
 
