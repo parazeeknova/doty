@@ -1,0 +1,60 @@
+diff --git a/src/other/Shake.cpp b/src/other/Shake.cpp
+index 2d486c0..d2b87b7 100644
+--- a/src/other/Shake.cpp
++++ b/src/other/Shake.cpp
+@@ -6,7 +6,6 @@
+ #include <hyprland/src/Compositor.hpp>
+ #include <hyprland/src/debug/log/Logger.hpp>
+ #include <hyprland/src/animation/AnimationManager.hpp>
+-#include <hyprland/src/ipc/s2/S2.hpp>
+ #include <hyprutils/animation/AnimationConfig.hpp>
+ #include <hyprland/src/render/Renderer.hpp>
+ #include <hyprland/src/event/EventBus.hpp>
+@@ -87,22 +86,6 @@ double CShake::update(Vector2D pos) {
+         }
+     }
+ 
+-    if (CONFIG(shakeIPC)) {
+-        if (started || this->zoom->value() > 1) {
+-            if (!ipc) {
+-                IPC::Socket2::sock()->postEvent({IPC_SHAKE_START});
+-                ipc = true;
+-            }
+-
+-            IPC::Socket2::sock()->postEvent({IPC_SHAKE_UPDATE, std::format("{},{},{},{},{}", (int)pos.x, (int)pos.y, trail, diagonal, this->zoom->value())});
+-        } else {
+-            if (ipc) {
+-                IPC::Socket2::sock()->postEvent({IPC_SHAKE_END});
+-                ipc = false;
+-            }
+-        }
+-    }
+-
+     return this->zoom->value();
+ }
+ 
+diff --git a/src/other/Shake.hpp b/src/other/Shake.hpp
+index 6b9d4a8..d45c3c6 100644
+--- a/src/other/Shake.hpp
++++ b/src/other/Shake.hpp
+@@ -3,10 +3,6 @@
+ #include <hyprutils/math/Vector2D.hpp>
+ #include <vector>
+ 
+-#define IPC_SHAKE_START  "shakestart"
+-#define IPC_SHAKE_UPDATE "shakeupdate"
+-#define IPC_SHAKE_END    "shakeend"
+-
+ using namespace Hyprutils::Math;
+ using namespace Hyprutils::Animation;
+ using namespace std::chrono;
+@@ -24,9 +20,6 @@ class CShake {
+     void force(std::optional<int> duration, std::optional<float> size);
+ 
+   private:
+-    /* tracks whether the current shake has already been announced in the ipc */
+-    bool ipc = false;
+-
+     bool                     started = false;
+     PHLANIMVAR<float>        zoom;
+     steady_clock::time_point end;
