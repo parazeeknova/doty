@@ -31,6 +31,12 @@
       # Allow traffic through Tailscale interface
       networking.firewall.trustedInterfaces = [ "tailscale0" ];
 
+      # Enable Mosh (Mobile Shell) for resilient mobile terminal connections
+      programs.mosh = {
+        enable = true;
+        openFirewall = true;
+      };
+
       # System packages
       environment.systemPackages = [ pkgs.tailscale ];
     };
