@@ -17,12 +17,9 @@
         tty-clock
         fortune
         ani-cli
-        bitwarden-desktop
-        libreoffice
 
         # -- Editors --
         vim
-        helix
         neovim
 
         # -- Shell Tools --

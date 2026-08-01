@@ -14,6 +14,8 @@
         wrangler
         appimage-run
         azure-cli
+        cloudflare-cli
+        awscli
 
         # -- Languages --
         nodejs
@@ -54,7 +56,6 @@
         # -- Apps --
         opencode
         opencode-desktop
-        t3code
         vscode-fhs
         vscode-insiders
         code-cursor-fhs
