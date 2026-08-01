@@ -206,11 +206,11 @@
     "hypr-dynamic-cursors": {
       "flake": false,
       "locked": {
-        "lastModified": 1784620401,
-        "narHash": "sha256-HKzJtEkafkWjTx35spDp6pm1oClN7vIipJ2wwU4ocNY=",
+        "lastModified": 1785339147,
+        "narHash": "sha256-VNA0EGCQCPcedIDv82VKnm94cJzgErONQgkrkYp4ldc=",
         "owner": "VirtCode",
         "repo": "hypr-dynamic-cursors",
-        "rev": "f5ba36c7622098b53bf62ddb8ddf03b914abbdf8",
+        "rev": "e62e326e6302f82d933c885d0df1d8ccb9830093",
         "type": "github"
       },
       "original": {
@@ -260,11 +260,11 @@
     "hyprland-scroll-overview": {
       "flake": false,
       "locked": {
-        "lastModified": 1785026864,
-        "narHash": "sha256-rl3UnVvIFgef0fJfTy0ITG25heofKj42NVIk/94wTx4=",
+        "lastModified": 1785585632,
+        "narHash": "sha256-rK6M/T3cJjmzbfYvSujsb8qxWDMFgM1XuuWf3MIATzI=",
         "owner": "yayuuu",
         "repo": "hyprland-scroll-overview",
-        "rev": "df519f6702bedfc4cb9f7c5cb7e65554c5286a4b",
+        "rev": "48da39f7a9a6fc902405ae58d6cc5af4d6afcc68",
         "type": "github"
       },
       "original": {
