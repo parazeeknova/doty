@@ -7,62 +7,62 @@
 
 [color "diff"]
   meta = "#d2c4b4 bold"
-  frag = "#f1be6d"
-  func = "#dcc3a1"
+  frag = "#f0bf6d"
+  func = "#dbc3a1"
   context = "#ece1d4"
   whitespace = "#b5cea4 reverse"
   old = "#ffb4ab"
-  new = "#f1be6d"
+  new = "#f0bf6d"
   commit = "#b5cea4"
 
 [color "diff-highlight"]
   oldNormal = "#ffb4ab"
   oldHighlight = "#ffb4ab reverse"
-  newNormal = "#f1be6d"
-  newHighlight = "#f1be6d reverse"
+  newNormal = "#f0bf6d"
+  newHighlight = "#f0bf6d reverse"
 
 [color "branch"]
-  current = "#f1be6d bold"
+  current = "#f0bf6d bold"
   local = "#ece1d4"
   remote = "#b5cea4"
-  upstream = "#dcc3a1"
+  upstream = "#dbc3a1"
   plain = "#d2c4b4"
 
 [color "decorate"]
   HEAD = "#ffb4ab bold"
-  branch = "#f1be6d"
+  branch = "#f0bf6d"
   tag = "#b5cea4"
-  remoteBranch = "#dcc3a1"
+  remoteBranch = "#dbc3a1"
   stash = "#d2c4b4"
 
 [color "status"]
   header = "#d2c4b4"
-  added = "#f1be6d"
+  added = "#f0bf6d"
   updated = "#b5cea4"
-  changed = "#dcc3a1"
+  changed = "#dbc3a1"
   untracked = "#ffb4ab"
-  branch = "#f1be6d bold"
+  branch = "#f0bf6d bold"
   nobranch = "#ffb4ab"
-  localBranch = "#f1be6d"
-  remoteBranch = "#dcc3a1"
+  localBranch = "#f0bf6d"
+  remoteBranch = "#dbc3a1"
   unmerged = "#ffb4ab bold"
 
 [color "interactive"]
-  prompt = "#f1be6d bold"
+  prompt = "#f0bf6d bold"
   header = "#d2c4b4"
-  help = "#dcc3a1"
+  help = "#dbc3a1"
   error = "#ffb4ab bold"
 
 [color "grep"]
   context = "#ece1d4"
-  filename = "#f1be6d"
-  function = "#dcc3a1"
+  filename = "#f0bf6d"
+  function = "#dbc3a1"
   linenumber = "#b5cea4"
   match = "#b5cea4 bold"
   matchContext = "#b5cea4"
-  matchSelected = "#f1be6d reverse"
+  matchSelected = "#f0bf6d reverse"
   selected = "#ece1d4"
-  separator = "#4f4539"
+  separator = "#4e4539"
 
 [color "push"]
   error = "#ffb4ab bold"
@@ -70,11 +70,11 @@
 [color "remote"]
   hint = "#d2c4b4"
   warning = "#b5cea4"
-  success = "#f1be6d"
+  success = "#f0bf6d"
   error = "#ffb4ab bold"
 
 [color "blame"]
-  highlightRecent = "#d2c4b4,14 days ago,#dcc3a1,3 months ago,#f1be6d,1 year ago,#b5cea4"
+  highlightRecent = "#d2c4b4,14 days ago,#dbc3a1,3 months ago,#f0bf6d,1 year ago,#b5cea4"
 
 [color "advice"]
-  hint = "#dcc3a1"
+  hint = "#dbc3a1"

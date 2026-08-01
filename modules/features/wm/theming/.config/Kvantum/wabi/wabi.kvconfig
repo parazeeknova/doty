@@ -71,15 +71,15 @@ intensity=1.00
 saturation=1.00
 
 [GeneralColors]
-window.color=#18130b
-base.color=#18130b
+window.color=#17130b
+base.color=#17130b
 alt.base.color=#241f17
-button.color=#4f4539
+button.color=#4e4539
 light.color=#241f17
 mid.light.color=#241f17
 dark.color=#241f17
 mid.color=#241f17
-highlight.color=#f1be6d
+highlight.color=#f0bf6d
 inactive.highlight.color=#241f17
 text.color=#ece1d4
 window.text.color=#ece1d4
@@ -87,8 +87,8 @@ button.text.color=#ece1d4
 disabled.text.color=#d2c4b4
 tooltip.text.color=#ece1d4
 highlight.text.color=#ece1d4
-link.color=#dcc3a1
-link.visited.color=#dcc3a1
+link.color=#dbc3a1
+link.visited.color=#dbc3a1
 progress.indicator.text.color=#ece1d4
 
 [Hacks]

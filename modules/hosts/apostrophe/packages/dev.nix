@@ -13,6 +13,7 @@
         devenv
         wrangler
         appimage-run
+        azure-cli
 
         # -- Languages --
         nodejs
