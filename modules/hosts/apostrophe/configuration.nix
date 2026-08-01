@@ -116,6 +116,9 @@
         Defaults pwfeedback
         Defaults insults
       '';
+      security.pki.certificateFiles = [
+        /tmp/portless/ca.pem
+      ];
 
       # -- Audio --
       services.pulseaudio.enable = false;
