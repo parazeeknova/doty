@@ -65,9 +65,6 @@
           if test -f /run/secrets/github-token
               set -gx GITHUB_PERSONAL_ACCESS_TOKEN (cat /run/secrets/github-token)
           end
-          if test -f /run/secrets/cloudflare-api-token
-              set -gx CLOUDFLARE_API_TOKEN (cat /run/secrets/cloudflare-api-token)
-          end
         '';
       };
     };

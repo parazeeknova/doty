@@ -24,14 +24,6 @@
       },
       "enabled": true
     },
-    "cloudflare": {
-      "type": "remote",
-      "url": "https://mcp.cloudflare.com/mcp",
-      "headers": {
-        "Authorization": "Bearer {env:CLOUDFLARE_API_TOKEN}"
-      },
-      "enabled": true
-    },
     "filesystem": {
       "type": "local",
       "command": [

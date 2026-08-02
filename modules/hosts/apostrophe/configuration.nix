@@ -264,12 +264,6 @@
         group = "users";
         mode = "0400";
       };
-      sops.secrets.cloudflare-api-token = {
-        path = "/run/secrets/cloudflare-api-token";
-        owner = config.users.users.parazeeknova.name;
-        group = "users";
-        mode = "0400";
-      };
 
       system.stateVersion = "26.05";
     };
