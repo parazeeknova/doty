@@ -14,19 +14,17 @@ fn main() {
     let mut tailscale_ip = String::new();
 
     if let Ok(v) = serde_json::from_str::<serde_json::Value>(&ts_out) {
-        if let Some(state) = v.get("BackendState").and_then(|s| s.as_str()) {
-            if state == "Running" {
-                tailscale_connected = true;
-            }
+        if v.get("BackendState").and_then(|s| s.as_str()) == Some("Running") {
+            tailscale_connected = true;
         }
-        if let Some(ips) = v
+        if let Some(ip) = v
             .get("Self")
             .and_then(|s| s.get("TailscaleIPs"))
             .and_then(|i| i.as_array())
+            .and_then(|ips| ips.first())
+            .and_then(|i| i.as_str())
         {
-            if let Some(ip) = ips.first().and_then(|i| i.as_str()) {
-                tailscale_ip = ip.to_string();
-            }
+            tailscale_ip = ip.to_string();
         }
     }
 

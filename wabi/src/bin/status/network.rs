@@ -131,7 +131,10 @@ fn get_adguard_status() -> (bool, bool, u64, u64) {
     let mut queries = 0u64;
     let mut blocked = 0u64;
 
-    let status_out = run_cmd("curl", &["-s", "--max-time", "2", &format!("{base}/control/status")]);
+    let status_out = run_cmd(
+        "curl",
+        &["-s", "--max-time", "2", &format!("{base}/control/status")],
+    );
     if let Some(out) = status_out
         && let Ok(v) = serde_json::from_str::<serde_json::Value>(&out)
     {
@@ -143,7 +146,10 @@ fn get_adguard_status() -> (bool, bool, u64, u64) {
     }
 
     if running {
-        let stats_out = run_cmd("curl", &["-s", "--max-time", "2", &format!("{base}/control/stats")]);
+        let stats_out = run_cmd(
+            "curl",
+            &["-s", "--max-time", "2", &format!("{base}/control/stats")],
+        );
         if let Some(out) = stats_out
             && let Ok(v) = serde_json::from_str::<serde_json::Value>(&out)
         {
@@ -366,19 +372,17 @@ fn main() {
     let mut tailscale_connected = false;
     let mut tailscale_ip = String::new();
     if let Ok(v) = serde_json::from_str::<serde_json::Value>(&ts_out) {
-        if let Some(state) = v.get("BackendState").and_then(|s| s.as_str()) {
-            if state == "Running" {
-                tailscale_connected = true;
-            }
+        if v.get("BackendState").and_then(|s| s.as_str()) == Some("Running") {
+            tailscale_connected = true;
         }
-        if let Some(ips) = v
+        if let Some(ip) = v
             .get("Self")
             .and_then(|s| s.get("TailscaleIPs"))
             .and_then(|i| i.as_array())
+            .and_then(|ips| ips.first())
+            .and_then(|i| i.as_str())
         {
-            if let Some(ip) = ips.first().and_then(|i| i.as_str()) {
-                tailscale_ip = ip.to_string();
-            }
+            tailscale_ip = ip.to_string();
         }
     }
 

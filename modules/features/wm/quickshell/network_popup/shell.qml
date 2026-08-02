@@ -394,10 +394,10 @@ Scope {
                             Quickshell.execDetached(["sh", "-c", "sleep 0.5 && nmcli radio wifi on"]);
                             root.triggerRefresh();
                         } else if (win.activeSubIndex === 2) {
-                            Quickshell.execDetached(["sh", "-c", "sudo resolvectl flush-caches 2>/dev/null || true; sudo systemctl restart adguardhome 2>/dev/null || true"]);
+                            Quickshell.execDetached(["sh", "-c", "sudo resolvectl flush-caches 2>/dev/null || true; sudo systemctl restart adguardhome 2>/dev/null || true; notify-send -u low -i network-wireless -a 'Network' 'DNS Flushed' 'System & AdGuard Home DNS caches cleared.'"]);
                             root.triggerRefresh();
                         } else if (win.activeSubIndex === 3) {
-                            Quickshell.execDetached(["sh", "-c", "sudo ip route flush cache 2>/dev/null || true; nmcli networking off && sleep 0.5 && nmcli networking on"]);
+                            Quickshell.execDetached(["sh", "-c", "sudo ip route flush cache 2>/dev/null || true; nmcli networking off && sleep 0.5 && nmcli networking on; notify-send -u low -i network-wireless -a 'Network' 'Network Offloaded' 'IP route cache & network stack reset.'"]);
                             root.triggerRefresh();
                         }
                     }
@@ -1319,7 +1319,7 @@ Scope {
                                         onEntered: flushDnsBtn.color = theme.accent
                                         onExited: flushDnsBtn.color = theme.accent
                                         onClicked: {
-                                            Quickshell.execDetached(["sh", "-c", "sudo resolvectl flush-caches 2>/dev/null || true; sudo systemctl restart adguardhome 2>/dev/null || true"]);
+                                            Quickshell.execDetached(["sh", "-c", "sudo resolvectl flush-caches 2>/dev/null || true; sudo systemctl restart adguardhome 2>/dev/null || true; notify-send -u low -i network-wireless -a 'Network' 'DNS Flushed' 'System & AdGuard Home DNS caches cleared.'"]);
                                             root.triggerRefresh();
                                         }
                                     }
@@ -1347,7 +1347,7 @@ Scope {
                                         onEntered: offloadBtn.color = theme.accent
                                         onExited: offloadBtn.color = theme.accent
                                         onClicked: {
-                                            Quickshell.execDetached(["sh", "-c", "sudo ip route flush cache 2>/dev/null || true; nmcli networking off && sleep 0.5 && nmcli networking on"]);
+                                            Quickshell.execDetached(["sh", "-c", "sudo ip route flush cache 2>/dev/null || true; nmcli networking off && sleep 0.5 && nmcli networking on; notify-send -u low -i network-wireless -a 'Network' 'Network Offloaded' 'IP route cache & network stack reset.'"]);
                                             root.triggerRefresh();
                                         }
                                     }
