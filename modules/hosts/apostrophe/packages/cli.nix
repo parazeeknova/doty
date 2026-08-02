@@ -16,6 +16,7 @@
         pokemon-colorscripts
         tty-clock
         fortune
+        adguardian
         ani-cli
 
         # -- Editors --
