@@ -309,7 +309,7 @@ Scope {
                     else if (win.activeSection === 3)
                         maxItems = root.getNetworkSectionItemsCount();
                     else if (win.activeSection === 4)
-                        maxItems = 2;
+                        maxItems = 4;
                     if (maxItems > 0)
                         win.activeSubIndex = (win.activeSubIndex + dir + maxItems) % maxItems;
                     else
@@ -343,9 +343,9 @@ Scope {
                             root.triggerRefresh();
                         } else if (win.activeSubIndex === 1) {
                             if (root.tailscaleConnected)
-                                Quickshell.execDetached(["tailscale", "down"]);
+                                Quickshell.execDetached(["sudo", "tailscale", "down"]);
                             else
-                                Quickshell.execDetached(["tailscale", "up"]);
+                                Quickshell.execDetached(["sudo", "tailscale", "up"]);
                             root.triggerRefresh();
                         } else {
                             var idx = win.activeSubIndex - 2;
@@ -392,6 +392,12 @@ Scope {
                         } else if (win.activeSubIndex === 1) {
                             Quickshell.execDetached(["nmcli", "radio", "wifi", "off"]);
                             Quickshell.execDetached(["sh", "-c", "sleep 0.5 && nmcli radio wifi on"]);
+                            root.triggerRefresh();
+                        } else if (win.activeSubIndex === 2) {
+                            Quickshell.execDetached(["sh", "-c", "sudo resolvectl flush-caches 2>/dev/null || true; sudo systemctl restart adguardhome 2>/dev/null || true"]);
+                            root.triggerRefresh();
+                        } else if (win.activeSubIndex === 3) {
+                            Quickshell.execDetached(["sh", "-c", "sudo ip route flush cache 2>/dev/null || true; nmcli networking off && sleep 0.5 && nmcli networking on"]);
                             root.triggerRefresh();
                         }
                     }
@@ -869,9 +875,9 @@ Scope {
                                         onExited: tailscaleToggleBtn.color = theme.accent
                                         onClicked: {
                                             if (root.tailscaleConnected)
-                                                Quickshell.execDetached(["tailscale", "down"]);
+                                                Quickshell.execDetached(["sudo", "tailscale", "down"]);
                                             else
-                                                Quickshell.execDetached(["tailscale", "up"]);
+                                                Quickshell.execDetached(["sudo", "tailscale", "up"]);
                                             root.triggerRefresh();
                                         }
                                     }
@@ -1221,64 +1227,129 @@ Scope {
                         }
 
                         // --- SECTION 6: FOOTER ACTIONS ---
-                        Row {
-                            spacing: 20
-                            anchors.horizontalCenter: parent.horizontalCenter
+                        Column {
+                            width: parent.width
+                            spacing: 4
 
-                            // Network Settings
-                            Text {
-                                id: settingsBtn
+                            Row {
+                                spacing: 20
+                                anchors.horizontalCenter: parent.horizontalCenter
 
-                                text: "Settings"
-                                color: theme.accent
-                                font.family: "FiraCode Nerd Font"
-                                font.pixelSize: 9
-                                renderType: Text.NativeRendering
+                                // Network Settings
+                                Text {
+                                    id: settingsBtn
 
-                                Rectangle {
-                                    anchors.fill: parent
-                                    color: (win.activeSection === 4 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
-                                    radius: 0
+                                    text: "Settings"
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 9
+                                    renderType: Text.NativeRendering
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: (win.activeSection === 4 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                        radius: 0
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        onEntered: settingsBtn.color = theme.accent
+                                        onExited: settingsBtn.color = theme.accent
+                                        onClicked: {
+                                            Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] ghostty --title=impala -e impala")']);
+                                            win.closePopup();
+                                        }
+                                    }
                                 }
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    onEntered: settingsBtn.color = theme.accent
-                                    onExited: settingsBtn.color = theme.accent
-                                    onClicked: {
-                                        Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] ghostty --title=impala -e impala")']);
-                                        win.closePopup(); // Close popup when launching settings editor
+                                // Restart WiFi
+                                Text {
+                                    id: restartBtn
+
+                                    text: "Restart Wi-Fi"
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 9
+                                    renderType: Text.NativeRendering
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: (win.activeSection === 4 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
+                                        radius: 0
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        onEntered: restartBtn.color = theme.accent
+                                        onExited: restartBtn.color = theme.accent
+                                        onClicked: {
+                                            Quickshell.execDetached(["nmcli", "radio", "wifi", "off"]);
+                                            Quickshell.execDetached(["sh", "-c", "sleep 0.5 && nmcli radio wifi on"]);
+                                            root.triggerRefresh();
+                                        }
                                     }
                                 }
                             }
 
-                            // Restart WiFi
-                            Text {
-                                id: restartBtn
+                            Row {
+                                spacing: 20
+                                anchors.horizontalCenter: parent.horizontalCenter
 
-                                text: "Restart Wi-Fi"
-                                color: theme.accent
-                                font.family: "FiraCode Nerd Font"
-                                font.pixelSize: 9
-                                renderType: Text.NativeRendering
+                                // Flush DNS
+                                Text {
+                                    id: flushDnsBtn
 
-                                Rectangle {
-                                    anchors.fill: parent
-                                    color: (win.activeSection === 4 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
-                                    radius: 0
+                                    text: "Flush DNS"
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 9
+                                    renderType: Text.NativeRendering
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: (win.activeSection === 4 && win.activeSubIndex === 2) ? win.focusHighlightColor : "transparent"
+                                        radius: 0
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        onEntered: flushDnsBtn.color = theme.accent
+                                        onExited: flushDnsBtn.color = theme.accent
+                                        onClicked: {
+                                            Quickshell.execDetached(["sh", "-c", "sudo resolvectl flush-caches 2>/dev/null || true; sudo systemctl restart adguardhome 2>/dev/null || true"]);
+                                            root.triggerRefresh();
+                                        }
+                                    }
                                 }
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    onEntered: restartBtn.color = theme.accent
-                                    onExited: restartBtn.color = theme.accent
-                                    onClicked: {
-                                        Quickshell.execDetached(["nmcli", "radio", "wifi", "off"]);
-                                        // Detached delay helper or execute sequential shell command
-                                        Quickshell.execDetached(["sh", "-c", "sleep 0.5 && nmcli radio wifi on"]);
-                                        root.triggerRefresh();
+                                // Offload / Reset Network
+                                Text {
+                                    id: offloadBtn
+
+                                    text: "Offload Network"
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 9
+                                    renderType: Text.NativeRendering
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: (win.activeSection === 4 && win.activeSubIndex === 3) ? win.focusHighlightColor : "transparent"
+                                        radius: 0
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        onEntered: offloadBtn.color = theme.accent
+                                        onExited: offloadBtn.color = theme.accent
+                                        onClicked: {
+                                            Quickshell.execDetached(["sh", "-c", "sudo ip route flush cache 2>/dev/null || true; nmcli networking off && sleep 0.5 && nmcli networking on"]);
+                                            root.triggerRefresh();
+                                        }
                                     }
                                 }
                             }

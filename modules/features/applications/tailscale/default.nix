@@ -16,7 +16,23 @@
         extraUpFlags = [
           "--ssh"
         ];
+        extraSetFlags = [
+          "--operator=parazeeknova"
+        ];
       };
+
+      # Allow user parazeeknova to run tailscale up/down/set without password
+      security.sudo.extraRules = [
+        {
+          users = [ "parazeeknova" ];
+          commands = [
+            {
+              command = "/run/current-system/sw/bin/tailscale";
+              options = [ "NOPASSWD" ];
+            }
+          ];
+        }
+      ];
 
       # Enable OpenSSH server for SSH access from phone / remote devices
       services.openssh = {

@@ -56,5 +56,26 @@
       };
       # Route laptop local DNS queries to AdGuard Home
       networking.nameservers = [ "127.0.0.1" ];
+
+      # Passwordless sudo rules for network popup flush DNS & offload actions
+      security.sudo.extraRules = [
+        {
+          users = [ "parazeeknova" ];
+          commands = [
+            {
+              command = "/run/current-system/sw/bin/systemctl restart adguardhome";
+              options = [ "NOPASSWD" ];
+            }
+            {
+              command = "/run/current-system/sw/bin/resolvectl";
+              options = [ "NOPASSWD" ];
+            }
+            {
+              command = "/run/current-system/sw/bin/ip";
+              options = [ "NOPASSWD" ];
+            }
+          ];
+        }
+      ];
     };
 }
