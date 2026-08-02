@@ -16,6 +16,10 @@ Scope {
     property bool warpConnected: false
     property bool tailscaleConnected: false
     property string tailscaleIp: ""
+    property bool adguardRunning: false
+    property bool adguardProtection: false
+    property int adguardQueries: 0
+    property int adguardBlocked: 0
     property var details: ({
             "ip_address": "",
             "gateway": "",
@@ -156,6 +160,10 @@ Scope {
                 root.warpConnected = data.warp_connected || false;
                 root.tailscaleConnected = data.tailscale_connected || false;
                 root.tailscaleIp = data.tailscale_ip || "";
+                root.adguardRunning = data.adguard_running || false;
+                root.adguardProtection = data.adguard_protection || false;
+                root.adguardQueries = data.adguard_dns_queries || 0;
+                root.adguardBlocked = data.adguard_blocked || 0;
                 root.details = data.details || ({
                         "ip_address": "",
                         "gateway": "",
@@ -203,6 +211,10 @@ Scope {
                     root.warpConnected = data.warp_connected || false;
                     root.tailscaleConnected = data.tailscale_connected || false;
                     root.tailscaleIp = data.tailscale_ip || "";
+                    root.adguardRunning = data.adguard_running || false;
+                    root.adguardProtection = data.adguard_protection || false;
+                    root.adguardQueries = data.adguard_dns_queries || 0;
+                    root.adguardBlocked = data.adguard_blocked || 0;
                     root.details = data.details || ({
                             "ip_address": "",
                             "gateway": "",
@@ -812,18 +824,31 @@ Scope {
                             // Tailscale Toggle
                             Rectangle {
                                 width: parent.width
-                                height: 16
+                                height: root.tailscaleConnected ? 28 : 16
                                 color: (win.activeSection === 2 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
                                 radius: 0
 
-                                Text {
+                                Column {
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
-                                    text: "Tailscale: " + (root.tailscaleConnected ? ("Connected" + (root.tailscaleIp !== "" ? (" (" + root.tailscaleIp + ")") : "")) : "Disconnected")
-                                    color: theme.accent
-                                    font.family: "FiraCode Nerd Font"
-                                    font.pixelSize: 8
-                                    renderType: Text.NativeRendering
+                                    spacing: 1
+
+                                    Text {
+                                        text: "Tailscale: " + (root.tailscaleConnected ? "Connected" : "Disconnected")
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    Text {
+                                        text: "  IP: " + root.tailscaleIp
+                                        visible: root.tailscaleConnected
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        renderType: Text.NativeRendering
+                                    }
                                 }
 
                                 Text {
@@ -848,6 +873,61 @@ Scope {
                                             else
                                                 Quickshell.execDetached(["tailscale", "up"]);
                                             root.triggerRefresh();
+                                        }
+                                    }
+                                }
+                            }
+
+                            // AdGuard Home Status
+                            Rectangle {
+                                width: parent.width
+                                height: root.adguardRunning ? 28 : 16
+                                color: "transparent"
+                                radius: 0
+
+                                Column {
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 1
+
+                                    Text {
+                                        text: "AdGuard: " + (root.adguardRunning ? "Running" : "Stopped")
+                                        color: theme.accent
+                                        opacity: root.adguardRunning ? 1.0 : 0.5
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    Text {
+                                        text: "  Q: " + root.adguardQueries + " | Blocked: " + root.adguardBlocked + (root.adguardQueries > 0 ? " (" + Math.round(root.adguardBlocked / root.adguardQueries * 100) + "%)" : "")
+                                        visible: root.adguardRunning
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        renderType: Text.NativeRendering
+                                    }
+                                }
+
+                                Text {
+                                    id: adguardVisitBtn
+
+                                    anchors.right: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "visit"
+                                    visible: root.adguardRunning
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                    renderType: Text.NativeRendering
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        onEntered: adguardVisitBtn.color = theme.accent
+                                        onExited: adguardVisitBtn.color = theme.accent
+                                        onClicked: {
+                                            Quickshell.execDetached(["xdg-open", "http://localhost:3080"]);
                                         }
                                     }
                                 }

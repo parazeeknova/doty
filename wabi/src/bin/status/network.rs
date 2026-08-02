@@ -42,6 +42,10 @@ struct NetworkStatus {
     warp_connected: bool,
     tailscale_connected: bool,
     tailscale_ip: String,
+    adguard_running: bool,
+    adguard_protection: bool,
+    adguard_dns_queries: u64,
+    adguard_blocked: u64,
     details: ConnectionDetails,
     networks: Vec<WifiNetwork>,
     vpns: Vec<VpnConnection>,
@@ -116,6 +120,45 @@ fn wifi_autoconnect_by_ssid() -> HashMap<String, bool> {
     }
 
     map
+}
+
+fn get_adguard_status() -> (bool, bool, u64, u64) {
+    let base = "http://127.0.0.1:3080";
+
+    // returns (running, protection_enabled, dns_queries, blocked)
+    let mut running = false;
+    let mut protection = false;
+    let mut queries = 0u64;
+    let mut blocked = 0u64;
+
+    let status_out = run_cmd("curl", &["-s", "--max-time", "2", &format!("{base}/control/status")]);
+    if let Some(out) = status_out
+        && let Ok(v) = serde_json::from_str::<serde_json::Value>(&out)
+    {
+        running = v.get("running").and_then(|r| r.as_bool()).unwrap_or(false);
+        protection = v
+            .get("protection_enabled")
+            .and_then(|p| p.as_bool())
+            .unwrap_or(false);
+    }
+
+    if running {
+        let stats_out = run_cmd("curl", &["-s", "--max-time", "2", &format!("{base}/control/stats")]);
+        if let Some(out) = stats_out
+            && let Ok(v) = serde_json::from_str::<serde_json::Value>(&out)
+        {
+            queries = v
+                .get("num_dns_queries")
+                .and_then(|q| q.as_u64())
+                .unwrap_or(0);
+            blocked = v
+                .get("num_blocked_filtering")
+                .and_then(|q| q.as_u64())
+                .unwrap_or(0);
+        }
+    }
+
+    (running, protection, queries, blocked)
 }
 
 fn main() {
@@ -339,6 +382,10 @@ fn main() {
         }
     }
 
+    // 6. Check AdGuard Home status on port 3080
+    let (adguard_running, adguard_protection, adguard_queries, adguard_blocked) =
+        get_adguard_status();
+
     let status = NetworkStatus {
         wifi_enabled,
         airplane_mode,
@@ -349,6 +396,10 @@ fn main() {
         warp_connected,
         tailscale_connected,
         tailscale_ip,
+        adguard_running,
+        adguard_protection,
+        adguard_dns_queries: adguard_queries,
+        adguard_blocked,
         details,
         networks,
         vpns,
