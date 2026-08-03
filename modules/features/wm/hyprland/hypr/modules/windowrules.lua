@@ -149,9 +149,9 @@ local workspace_assignments = {
 	["1"] = { "^zen.*$", "^[Vv]ivaldi.*$" },
 	["2"] = { "^code-insiders$", "^[Ee]macs$" },
 	["3"] = { "^com\\.mitchellh\\.ghostty$", "^Code$", "^code$" },
-	["4"] = { "^[Ff]ree[Tt]ube$" },
+	["4"] = { "^[Ff]ree[Tt]ube$", "^[Gg]oogle-chrome.*$" },
 	["5 silent"] = { "^[Ss]potify$" },
-	["6"] = { "^vesktop$", "^TelegramDesktop$" },
+	["6"] = { "^vesktop$" },
 	["8"] = { "^[Ss]team$", "^[Ll]utris$", "^[Hh]eroic$" },
 	["9"] = { "^virt-manager$", "^qemu.*$", "^Qemu.*$" },
 	["10"] = { "^[Vv]mware.*$", "^[Pp]odman-[Dd]esktop$" },
@@ -281,4 +281,21 @@ hl.window_rule({
 	float = true,
 	size = { 400, 500 },
 	move = { "40", "monitor_h - window_h - 30" },
+})
+
+hl.window_rule({
+	name = "chrome-starting-width",
+	match = {
+		class = "^[Gg]oogle-chrome.*$",
+	},
+	scrolling_width = 0.7,
+})
+
+hl.window_rule({
+	name = "telegram-floating-pip",
+	match = {
+		class = "^([Tt]elegram.*|org\\.telegram\\.desktop)$",
+	},
+	float = true,
+	size = { 300, 200 },
 })
