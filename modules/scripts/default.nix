@@ -35,11 +35,19 @@ in
                 exec ${pkgs.tmux}/bin/tmux attach-session -t $SESSION_NAME
             fi
           '';
+
+          lcc-bin = pkgs.writeShellScriptBin "lcc" ''
+            exec ${scriptsDir}/lcc "$@"
+          '';
         in
         {
-          home.packages = [ ghostty-tmux ];
+          home.packages = [
+            ghostty-tmux
+            lcc-bin
+          ];
 
           home.file = {
+            "scripts/lcc".source = mkOutOfStoreSymlink "${scriptsDir}/lcc";
             "scripts/ghostty-tmux".source = mkOutOfStoreSymlink "${scriptsDir}/ghostty_tmux";
             "scripts/kbd_aura".source = mkOutOfStoreSymlink "${scriptsDir}/kbd_aura";
             "scripts/presets_lister".source = mkOutOfStoreSymlink "${scriptsDir}/presets_lister";

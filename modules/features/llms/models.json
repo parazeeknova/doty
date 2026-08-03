@@ -1,0 +1,75 @@
+{
+  "providers": {
+    "llama-cpp": {
+      "baseUrl": "http://127.0.0.1:8899/v1",
+      "api": "openai-completions",
+      "apiKey": "none",
+      "compat": {
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": false
+      },
+      "models": [
+        {
+          "id": "Jackrong/Qwen3.5-4B-Claude-4.6-Opus-Reasoning-Distilled-v2-GGUF:Q5_K_M",
+          "reasoning": true,
+          "contextWindow": 32768
+        },
+        {
+          "id": "Jackrong/Negentropy-claude-opus-4.7-4B-GGUF:Q4_K_M",
+          "reasoning": true,
+          "contextWindow": 32768
+        },
+        {
+          "id": "Qwen3.5-4B.Q5_K_M",
+          "reasoning": true,
+          "contextWindow": 32768
+        },
+        {
+          "id": "Negentropy-claude-opus-4.7-4B-Q4_K_M",
+          "reasoning": true,
+          "contextWindow": 32768
+        },
+        {
+          "id": "mmproj-BF16",
+          "reasoning": true,
+          "contextWindow": 32768
+        },
+        {
+          "id": "Qwen3.5-4B.Q8_0",
+          "reasoning": true,
+          "contextWindow": 32768
+        },
+        {
+          "id": "mmproj",
+          "reasoning": true,
+          "contextWindow": 32768
+        },
+        {
+          "id": "Qwen3.5-4B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
+          "reasoning": true,
+          "contextWindow": 32768
+        },
+        {
+          "id": "mmproj-Qwen3.5-4B-Uncensored-HauhauCS-Aggressive-BF16",
+          "reasoning": true,
+          "contextWindow": 32768
+        },
+        {
+          "id": "Qwen3-Embedding-0.6B-Q8_0",
+          "reasoning": true,
+          "contextWindow": 32768
+        },
+        {
+          "id": "Qwen_Qwen3.5-4B-Q5_K_M",
+          "reasoning": true,
+          "contextWindow": 32768
+        },
+        {
+          "id": "mmproj-Qwen_Qwen3.5-4B-bf16",
+          "reasoning": true,
+          "contextWindow": 32768
+        }
+      ]
+    }
+  }
+}

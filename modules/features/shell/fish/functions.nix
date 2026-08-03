@@ -88,6 +88,9 @@
               end
             '';
           };
+          lcc = {
+            body = "/home/parazeeknova/doty/modules/scripts/lcc $argv";
+          };
         };
         interactiveShellInit = ''
           if [ "$fish_key_bindings" = fish_vi_key_bindings ]

@@ -1,0 +1,344 @@
+#!/usr/bin/env python3
+import os
+import sys
+import glob
+import json
+import shutil
+import subprocess
+from pathlib import Path
+
+HOME = Path.home()
+MODELS_DIR = HOME / "Models"
+CACHE_DIR = HOME / ".cache" / "huggingface" / "hub"
+MODELS_JSON_PRIMARY = HOME / ".pi" / "agent" / "models.json"
+MODELS_JSON_DOTY = HOME / "doty" / "modules/features/llms/models.json"
+
+# ANSI Colors
+GREEN = "\033[1;32m"
+BLUE = "\033[1;34m"
+YELLOW = "\033[1;33m"
+RED = "\033[1;31m"
+CYAN = "\033[1;36m"
+BOLD = "\033[1m"
+RESET = "\033[0m"
+
+def get_models_json_path():
+    if MODELS_JSON_DOTY.exists():
+        return MODELS_JSON_DOTY
+    return MODELS_JSON_PRIMARY
+
+def load_models_config():
+    target = get_models_json_path()
+    if not target.exists():
+        return {
+            "providers": {
+                "llama-cpp": {
+                    "baseUrl": "http://127.0.0.1:8899/v1",
+                    "api": "openai-completions",
+                    "apiKey": "none",
+                    "compat": {
+                        "supportsDeveloperRole": False,
+                        "supportsReasoningEffort": False
+                    },
+                    "models": []
+                }
+            }
+        }
+    with open(target, "r") as f:
+        return json.load(f)
+
+def save_models_config(config):
+    paths = [MODELS_JSON_DOTY, MODELS_JSON_PRIMARY]
+    for p in paths:
+        if p.exists() or p.parent.exists():
+            p.parent.mkdir(parents=True, exist_ok=True)
+            # If p is a symlink, write to target if possible or unlink if broken
+            if p.is_symlink():
+                target = p.resolve()
+                if target.parent.exists():
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    with open(target, "w") as f:
+                        json.dump(config, f, indent=2)
+                    continue
+            with open(p, "w") as f:
+                json.dump(config, f, indent=2)
+
+def add_model_to_json(model_id):
+    config = load_models_config()
+    try:
+        models = config["providers"]["llama-cpp"]["models"]
+    except KeyError:
+        models = []
+        config.setdefault("providers", {}).setdefault("llama-cpp", {})["models"] = models
+
+    existing_ids = [m.get("id") for m in models if isinstance(m, dict)]
+    if model_id not in existing_ids:
+        models.append({
+            "id": model_id,
+            "reasoning": True,
+            "contextWindow": 32768
+        })
+        save_models_config(config)
+        print(f"{GREEN}✔ Added model '{model_id}' to models.json{RESET}")
+
+def remove_model_from_json(model_id_or_file):
+    config = load_models_config()
+    try:
+        models = config["providers"]["llama-cpp"]["models"]
+    except KeyError:
+        return
+
+    new_models = []
+    removed = False
+    for m in models:
+        mid = m.get("id", "")
+        if model_id_or_file.lower() in mid.lower():
+            removed = True
+        else:
+            new_models.append(m)
+
+    if removed:
+        config["providers"]["llama-cpp"]["models"] = new_models
+        save_models_config(config)
+        print(f"{GREEN}✔ Removed model entry from models.json{RESET}")
+
+def list_models():
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    symlinks = list(MODELS_DIR.glob("*.gguf"))
+    config = load_models_config()
+    json_models = [m.get("id") for m in config.get("providers", {}).get("llama-cpp", {}).get("models", [])]
+
+    print(f"\n{BOLD}{CYAN}=== Local GGUF Models in ~/Models ==={RESET}\n")
+    if not symlinks:
+        print(f"{YELLOW}No models found in ~/Models/{RESET}")
+        return []
+
+    results = []
+    for idx, sym in enumerate(symlinks, 1):
+        target = sym.resolve() if sym.is_symlink() else sym
+        exists = target.exists()
+        size_str = "N/A"
+        if exists:
+            size_gb = target.stat().st_size / (1024 ** 3)
+            size_str = f"{size_gb:.2f} GB"
+        
+        in_json = any(sym.name in m or sym.stem in m for m in json_models)
+        status_tag = f"{GREEN}[Active in JSON]{RESET}" if in_json else f"{YELLOW}[Not in JSON]{RESET}"
+        
+        print(f" {BOLD}{idx}.{RESET} {BOLD}{sym.name}{RESET}")
+        print(f"    Target: {target}")
+        print(f"    Size: {size_str} | Status: {status_tag}\n")
+        results.append((sym, target))
+
+    return results
+
+def download_and_link(model_spec):
+    print(f"\n{BOLD}{BLUE}==> Downloading GGUF model via llama-cli...{RESET}")
+    print(f"{CYAN}Model Spec: {model_spec}{RESET}\n")
+
+    # Parse user/repo
+    parts = model_spec.split(":")
+    repo_part = parts[0]
+    quant_part = parts[1] if len(parts) > 1 else ""
+
+    if "/" in repo_part:
+        org, repo = repo_part.split("/", 1)
+    else:
+        org, repo = "", repo_part
+
+    # Run llama-cli to download model
+    cmd = ["llama-cli", "-hf", model_spec, "-p", "init", "-n", "1", "--log-disable"]
+    try:
+        res = subprocess.run(cmd)
+    except FileNotFoundError:
+        print(f"{RED}Error: llama-cli not found in PATH.{RESET}")
+        sys.exit(1)
+
+    # Search in HF cache
+    hf_folder_name = f"models--{org}--{repo}" if org else f"models--{repo}"
+    target_cache_dir = CACHE_DIR / hf_folder_name
+
+    gguf_files = []
+    if target_cache_dir.exists():
+        gguf_files = list(target_cache_dir.glob("snapshots/*/*.gguf"))
+
+    if not gguf_files:
+        # Fallback search across all HF hub snapshots for latest file matching quant/repo
+        all_snapshots = CACHE_DIR.glob("models--*/snapshots/*/*.gguf")
+        gguf_files = sorted(all_snapshots, key=os.path.getmtime, reverse=True)
+
+    if not gguf_files:
+        print(f"{RED}Could not locate downloaded .gguf file in {CACHE_DIR}{RESET}")
+        sys.exit(1)
+
+    # Filter best match
+    best_match = None
+    if quant_part:
+        for gf in gguf_files:
+            if quant_part.lower() in gf.name.lower():
+                best_match = gf
+                break
+    if not best_match:
+        best_match = max(gguf_files, key=lambda f: f.stat().st_mtime)
+
+    # Ensure ~/Models directory
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    symlink_path = MODELS_DIR / best_match.name
+
+    if symlink_path.exists() or symlink_path.is_symlink():
+        symlink_path.unlink()
+
+    symlink_path.symlink_to(best_match)
+    print(f"\n{GREEN}✔ Created symlink: {symlink_path} -> {best_match}{RESET}")
+
+    # Add to models.json
+    model_id = model_spec
+    add_model_to_json(model_id)
+
+    print(f"\n{BOLD}{GREEN}=== Model Setup Complete! ==={RESET}")
+    print(f"You can now query '{model_id}' via llama-server (http://127.0.0.1:8899).\n")
+
+def nuke_model(search_term=None):
+    models = list_models()
+    if not models:
+        return
+
+    selected_sym = None
+    selected_target = None
+
+    if search_term:
+        for sym, target in models:
+            if search_term.lower() in sym.name.lower() or search_term.lower() in str(target).lower():
+                selected_sym, selected_target = sym, target
+                break
+        if not selected_sym:
+            print(f"{RED}No model found matching '{search_term}'.{RESET}")
+            return
+    else:
+        # Try fzf if available
+        if shutil.which("fzf"):
+            model_names = [f"{sym.name} ({target})" for sym, target in models]
+            try:
+                proc = subprocess.run(["fzf", "--prompt=Select model to NUKE > "], input="\n".join(model_names), text=True, capture_output=True)
+                if proc.returncode == 0 and proc.stdout.strip():
+                    selected_name = proc.stdout.strip().split(" (")[0]
+                    for sym, target in models:
+                        if sym.name == selected_name:
+                            selected_sym, selected_target = sym, target
+                            break
+            except Exception:
+                pass
+
+        if not selected_sym:
+            print(f"{BOLD}{YELLOW}Select model number to NUKE (or Ctrl+C to cancel):{RESET}")
+            try:
+                choice = int(input("Number: "))
+                if 1 <= choice <= len(models):
+                    selected_sym, selected_target = models[choice - 1]
+            except (ValueError, KeyboardInterrupt):
+                print(f"\n{YELLOW}Cancelled.{RESET}")
+                return
+
+    if not selected_sym:
+        print(f"{YELLOW}No model selected.{RESET}")
+        return
+
+    print(f"\n{BOLD}{RED}WARNING: You are about to NUKE:{RESET}")
+    print(f" Symlink: {selected_sym}")
+    print(f" HF Target: {selected_target}\n")
+
+    confirm = input(f"{BOLD}Type 'yes' or 'y' to confirm deletion: {RESET}").strip().lower()
+    if confirm not in ("y", "yes"):
+        print(f"{YELLOW}Aborted.{RESET}")
+        return
+
+    # Remove symlink
+    if selected_sym.exists() or selected_sym.is_symlink():
+        selected_sym.unlink()
+        print(f"{GREEN}✔ Removed symlink {selected_sym}{RESET}")
+
+    # Remove HF cache directory if it's in huggingface cache
+    if "huggingface" in str(selected_target):
+        # Locate models--... directory parent
+        current = selected_target
+        while current != current.parent:
+            if current.parent.name == "hub" or current.name.startswith("models--"):
+                break
+            current = current.parent
+
+        if current.name.startswith("models--"):
+            shutil.rmtree(current, ignore_errors=True)
+            print(f"{GREEN}✔ Deleted HF Cache directory: {current}{RESET}")
+        elif selected_target.exists():
+            selected_target.unlink()
+            print(f"{GREEN}✔ Deleted cached model file: {selected_target}{RESET}")
+
+    # Remove from models.json
+    remove_model_from_json(selected_sym.name)
+    remove_model_from_json(selected_sym.stem)
+
+    print(f"\n{BOLD}{GREEN}=== Model Nuked Successfully! ==={RESET}\n")
+
+def sync_models():
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    symlinks = list(MODELS_DIR.glob("*.gguf"))
+    if not symlinks:
+        print(f"{YELLOW}No .gguf models found in ~/Models/{RESET}")
+        return
+
+    for sym in symlinks:
+        add_model_to_json(sym.stem)
+
+    print(f"{GREEN}✔ Synced {len(symlinks)} model(s) to models.json{RESET}")
+
+def show_status():
+    print(f"\n{BOLD}{CYAN}=== llama-server Service Status ==={RESET}\n")
+    subprocess.run(["systemctl", "--user", "status", "llama-server"])
+
+def print_help():
+    print(f"""
+{BOLD}{CYAN}lcc - llama.cpp Model Manager & Downloader{RESET}
+
+{BOLD}Usage:{RESET}
+  lcc <hf_repo:quant>           Download model, create symlink in ~/Models, and add to models.json
+  lcc download <hf_repo:quant>  Same as above
+  lcc add <hf_repo:quant>       Same as above
+  lcc list / lcc ls             List all local GGUF models in ~/Models
+  lcc nuke [name] / lcc rm     Remove model symlink, delete HF cache, and update models.json
+  lcc sync                      Sync all GGUF files in ~/Models into models.json
+  lcc status                    Show llama-server systemd user service status
+  lcc help                      Show this help message
+
+{BOLD}Examples:{RESET}
+  lcc unsloth/Qwen3-4B-Instruct-2507-GGUF:UD-Q5_K_XL
+  lcc Jackrong/Negentropy-claude-opus-4.7-4B-GGUF:Q4_K_M
+  lcc nuke
+""")
+
+def main():
+    if len(sys.argv) < 2:
+        list_models()
+        return
+
+    cmd = sys.argv[1]
+
+    if cmd in ("-h", "--help", "help"):
+        print_help()
+    elif cmd in ("ls", "list"):
+        list_models()
+    elif cmd in ("nuke", "rm", "remove", "delete"):
+        term = sys.argv[2] if len(sys.argv) > 2 else None
+        nuke_model(term)
+    elif cmd == "sync":
+        sync_models()
+    elif cmd == "status":
+        show_status()
+    elif cmd in ("download", "add") and len(sys.argv) > 2:
+        download_and_link(sys.argv[2])
+    elif not cmd.startswith("-"):
+        download_and_link(cmd)
+    else:
+        print_help()
+
+if __name__ == "__main__":
+    main()
