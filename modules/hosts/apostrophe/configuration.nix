@@ -216,6 +216,9 @@
       nixpkgs.overlays = [
         inputs.vscode-insiders.overlays.default
         (final: prev: {
+          hyprland = prev.hyprland.overrideAttrs (oldAttrs: {
+            buildInputs = (oldAttrs.buildInputs or [ ]) ++ [ prev.glaze ];
+          });
           thunar-unwrapped = prev.thunar-unwrapped.overrideAttrs (oldAttrs: {
             postPatch = (oldAttrs.postPatch or "") + ''
               sed -i 's/#define BORDER_RADIUS 8/#define BORDER_RADIUS 0/g' thunar/thunar-util.c
