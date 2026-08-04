@@ -34,10 +34,10 @@
           let
             verso-extracted = pkgs.appimageTools.extractType2 {
               pname = "verso";
-              version = "0.5.35";
+              version = "0.7.41";
               src = pkgs.fetchurl {
-                url = "https://github.com/parazeeknova/verso/releases/download/v0.5.35/Verso-0.5.35-x86_64.AppImage";
-                sha256 = "1avn8pa6r3z2xnvharx2vfb5avmhz48ald8ffs5kipdp35mhy1jq";
+                url = "https://github.com/parazeeknova/amemorymachine/releases/download/v0.7.41/Verso-0.7.41-x86_64.AppImage";
+                sha256 = "0ndf061ycyg75gwyshgqgsq5mgqmmkav6hxvbigm1y1qirpfdpcj";
               };
               postExtract = ''
                 # Extract the embedded Electrobun tarball into a temp directory
@@ -58,7 +58,7 @@
           in
           pkgs.appimageTools.wrapAppImage {
             pname = "verso";
-            version = "0.5.35";
+            version = "0.7.41";
             src = verso-extracted;
             extraPkgs =
               pkgs: with pkgs; [
