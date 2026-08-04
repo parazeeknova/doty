@@ -218,6 +218,9 @@
         (final: prev: {
           hyprland = prev.hyprland.overrideAttrs (oldAttrs: {
             buildInputs = (oldAttrs.buildInputs or [ ]) ++ [ prev.glaze ];
+            cmakeFlags = (oldAttrs.cmakeFlags or [ ]) ++ [
+              "-Dglaze_DIR=${prev.glaze}/share/glaze"
+            ];
           });
           thunar-unwrapped = prev.thunar-unwrapped.overrideAttrs (oldAttrs: {
             postPatch = (oldAttrs.postPatch or "") + ''
