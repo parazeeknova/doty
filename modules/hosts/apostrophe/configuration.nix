@@ -218,9 +218,9 @@
         (final: prev: {
           hyprland = prev.hyprland.overrideAttrs (oldAttrs: {
             buildInputs = (oldAttrs.buildInputs or [ ]) ++ [ prev.glaze ];
-            cmakeFlags = (oldAttrs.cmakeFlags or [ ]) ++ [
-              "-Dglaze_DIR=${prev.glaze}/share/glaze"
-            ];
+            postPatch = (oldAttrs.postPatch or "") + ''
+              sed -i 's/find_package(glaze 7\.\.\.<8 QUIET)/find_package(glaze QUIET)/g' CMakeLists.txt
+            '';
           });
           thunar-unwrapped = prev.thunar-unwrapped.overrideAttrs (oldAttrs: {
             postPatch = (oldAttrs.postPatch or "") + ''
