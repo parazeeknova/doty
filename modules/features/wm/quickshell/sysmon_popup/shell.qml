@@ -42,6 +42,22 @@ Scope {
     property double disk1FreeGb: 0
     property int disk1UsagePct: 0
 
+    function getUsageColor(pct) {
+        if (pct > 80)
+            return "#f38ba8";
+        if (pct > 50)
+            return "#f9e2af";
+        return "#a6e3a1";
+    }
+
+    function getTempColor(temp) {
+        if (temp > 80)
+            return "#f38ba8";
+        if (temp > 65)
+            return "#fab387";
+        return "#a6e3a1";
+    }
+
     function centerText(str, width) {
         var pad = width - str.length;
         if (pad <= 0)
@@ -52,13 +68,13 @@ Scope {
         return " ".repeat(left) + str + " ".repeat(right);
     }
 
-    function formatLabelVal(label, valStr, unit, width) {
+    function formatLabelValHtml(label, valStr, unit, width, valColor) {
         var contentWidth = width - 2;
         var pad = contentWidth - label.length - valStr.length - unit.length;
         if (pad < 0)
             pad = 0;
 
-        return " " + label + " ".repeat(pad) + valStr + unit + " ";
+        return " " + label + " ".repeat(pad) + "<font color='" + valColor + "'>" + valStr + unit + "</font> ";
     }
 
     Theme {
@@ -270,7 +286,7 @@ Scope {
                                 anchors.right: parent.right
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: "launch btop"
-                                color: theme.accent
+                                color: "#89dceb"
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 renderType: Text.NativeRendering
@@ -279,7 +295,7 @@ Scope {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: btnBtop.color = theme.accent
-                                    onExited: btnBtop.color = theme.accent
+                                    onExited: btnBtop.color = "#89dceb"
                                     onClicked: {
                                         Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] ghostty --title=btop -e btop --force-utf")']);
                                         win.closePopup();
@@ -288,7 +304,7 @@ Scope {
                             }
                         }
 
-                        // --- SERVICES TOGGLES SECTION (Text-only) ---
+                        // --- SERVICES TOGGLES SECTION (Text-only with color indicators) ---
                         Column {
                             width: parent.width
                             spacing: 3
@@ -319,7 +335,7 @@ Scope {
                                             anchors.left: parent.left
                                             anchors.verticalCenter: parent.verticalCenter
                                             text: modelData.label || modelData.name
-                                            color: theme.accent
+                                            color: "#cdd6f4"
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 9
                                             font.bold: true
@@ -380,7 +396,8 @@ Scope {
                                     }
 
                                     Text {
-                                        text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelVal("usage:", String(root.cpuUsage), "%", 17) + "┃\n" + "┃" + root.formatLabelVal("temp:", String(root.cpuTemp), "°C", 17) + "┃\n" + "┃" + root.formatLabelVal("freq:", root.cpuFreq.toFixed(2), "GHz", 17) + "┃\n" + "┃" + root.formatLabelVal("power:", root.cpuPower.toFixed(1), "W", 17) + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
+                                        textFormat: Text.StyledText
+                                        text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelValHtml("usage:", String(root.cpuUsage), "%", 17, root.getUsageColor(root.cpuUsage)) + "┃\n" + "┃" + root.formatLabelValHtml("temp:", String(root.cpuTemp), "°C", 17, root.getTempColor(root.cpuTemp)) + "┃\n" + "┃" + root.formatLabelValHtml("freq:", root.cpuFreq.toFixed(2), "GHz", 17, "#89dceb") + "┃\n" + "┃" + root.formatLabelValHtml("power:", root.cpuPower.toFixed(1), "W", 17, "#fab387") + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
                                         color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
@@ -409,7 +426,8 @@ Scope {
                                     }
 
                                     Text {
-                                        text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelVal("usage:", String(root.gpuUsage), "%", 17) + "┃\n" + "┃" + root.formatLabelVal("temp:", String(root.gpuTemp), "°C", 17) + "┃\n" + "┃" + root.formatLabelVal("used:", String(root.gpuMemUsed), "M", 17) + "┃\n" + "┃" + root.formatLabelVal("power:", root.gpuPower.toFixed(1), "W", 17) + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
+                                        textFormat: Text.StyledText
+                                        text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelValHtml("usage:", String(root.gpuUsage), "%", 17, root.getUsageColor(root.gpuUsage)) + "┃\n" + "┃" + root.formatLabelValHtml("temp:", String(root.gpuTemp), "°C", 17, root.getTempColor(root.gpuTemp)) + "┃\n" + "┃" + root.formatLabelValHtml("used:", String(root.gpuMemUsed), "M", 17, "#89dceb") + "┃\n" + "┃" + root.formatLabelValHtml("power:", root.gpuPower.toFixed(1), "W", 17, "#fab387") + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
                                         color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
@@ -433,7 +451,8 @@ Scope {
                             }
 
                             Text {
-                                text: "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelVal("type:", root.ramName, "", 18) + " " + root.formatLabelVal("speed:", root.ramSpeed, "", 18) + "┃\n" + "┃" + root.formatLabelVal("ram:", (root.ramUsed.toFixed(2) + "/" + root.ramTotal.toFixed(2)), "G", 18) + " " + root.formatLabelVal("usg:", String(root.ramUsage), "%", 18) + "┃\n" + "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+                                textFormat: Text.StyledText
+                                text: "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelValHtml("type:", root.ramName, "", 18, "#cdd6f4") + " " + root.formatLabelValHtml("speed:", root.ramSpeed, "", 18, "#89dceb") + "┃\n" + "┃" + root.formatLabelValHtml("ram:", (root.ramUsed.toFixed(2) + "/" + root.ramTotal.toFixed(2)), "G", 18, "#cdd6f4") + " " + root.formatLabelValHtml("usg:", String(root.ramUsage), "%", 18, root.getUsageColor(root.ramUsage)) + "┃\n" + "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
                                 color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
@@ -476,7 +495,8 @@ Scope {
                                     }
 
                                     Text {
-                                        text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelVal("R:", root.disk0ReadRate.toFixed(1), "M/s", 17) + "┃\n" + "┃" + root.formatLabelVal("W:", root.disk0WriteRate.toFixed(1), "M/s", 17) + "┃\n" + "┃" + root.formatLabelVal("total:", root.disk0TotalGb.toFixed(0), "G", 17) + "┃\n" + "┃" + root.formatLabelVal("used:", root.disk0UsedGb.toFixed(0), "G", 17) + "┃\n" + "┃" + root.formatLabelVal("free:", root.disk0FreeGb.toFixed(0), "G", 17) + "┃\n" + "┃" + root.formatLabelVal("usg:", String(root.disk0UsagePct), "%", 17) + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
+                                        textFormat: Text.StyledText
+                                        text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelValHtml("R:", root.disk0ReadRate.toFixed(1), "M/s", 17, root.disk0ReadRate > 0 ? "#89dceb" : "#6c7086") + "┃\n" + "┃" + root.formatLabelValHtml("W:", root.disk0WriteRate.toFixed(1), "M/s", 17, root.disk0WriteRate > 0 ? "#89dceb" : "#6c7086") + "┃\n" + "┃" + root.formatLabelValHtml("total:", root.disk0TotalGb.toFixed(0), "G", 17, "#cdd6f4") + "┃\n" + "┃" + root.formatLabelValHtml("used:", root.disk0UsedGb.toFixed(0), "G", 17, "#cdd6f4") + "┃\n" + "┃" + root.formatLabelValHtml("free:", root.disk0FreeGb.toFixed(0), "G", 17, "#a6e3a1") + "┃\n" + "┃" + root.formatLabelValHtml("usg:", String(root.disk0UsagePct), "%", 17, root.getUsageColor(root.disk0UsagePct)) + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
                                         color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
@@ -505,7 +525,8 @@ Scope {
                                     }
 
                                     Text {
-                                        text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelVal("R:", root.disk1ReadRate.toFixed(1), "M/s", 17) + "┃\n" + "┃" + root.formatLabelVal("W:", root.disk1WriteRate.toFixed(1), "M/s", 17) + "┃\n" + "┃" + root.formatLabelVal("total:", root.disk1TotalGb.toFixed(0), "G", 17) + "┃\n" + "┃" + root.formatLabelVal("used:", root.disk1UsedGb.toFixed(0), "G", 17) + "┃\n" + "┃" + root.formatLabelVal("free:", root.disk1FreeGb.toFixed(0), "G", 17) + "┃\n" + "┃" + root.formatLabelVal("usg:", String(root.disk1UsagePct), "%", 17) + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
+                                        textFormat: Text.StyledText
+                                        text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelValHtml("R:", root.disk1ReadRate.toFixed(1), "M/s", 17, root.disk1ReadRate > 0 ? "#89dceb" : "#6c7086") + "┃\n" + "┃" + root.formatLabelValHtml("W:", root.disk1WriteRate.toFixed(1), "M/s", 17, root.disk1WriteRate > 0 ? "#89dceb" : "#6c7086") + "┃\n" + "┃" + root.formatLabelValHtml("total:", root.disk1TotalGb.toFixed(0), "G", 17, "#cdd6f4") + "┃\n" + "┃" + root.formatLabelValHtml("used:", root.disk1UsedGb.toFixed(0), "G", 17, "#cdd6f4") + "┃\n" + "┃" + root.formatLabelValHtml("free:", root.disk1FreeGb.toFixed(0), "G", 17, "#a6e3a1") + "┃\n" + "┃" + root.formatLabelValHtml("usg:", String(root.disk1UsagePct), "%", 17, root.getUsageColor(root.disk1UsagePct)) + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
                                         color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
@@ -519,7 +540,7 @@ Scope {
                             }
                         }
 
-                        // --- TOP 5 PROCESSES LIST (100% Full-Width Row Grid) ---
+                        // --- PROCESSES LIST (Color-coded Grid) ---
                         Column {
                             width: parent.width
                             spacing: 3
@@ -545,7 +566,7 @@ Scope {
                                     Text {
                                         width: parent.width * 0.36
                                         text: "NAME"
-                                        color: theme.accent
+                                        color: "#f9e2af"
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -556,7 +577,7 @@ Scope {
                                     Text {
                                         width: parent.width * 0.16
                                         text: "CPU%"
-                                        color: theme.accent
+                                        color: "#f9e2af"
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -567,7 +588,7 @@ Scope {
                                     Text {
                                         width: parent.width * 0.16
                                         text: "RAM%"
-                                        color: theme.accent
+                                        color: "#f9e2af"
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -578,7 +599,7 @@ Scope {
                                     Text {
                                         width: parent.width * 0.16
                                         text: "R(M/s)"
-                                        color: theme.accent
+                                        color: "#f9e2af"
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -589,7 +610,7 @@ Scope {
                                     Text {
                                         width: parent.width * 0.16
                                         text: "W(M/s)"
-                                        color: theme.accent
+                                        color: "#f9e2af"
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -611,7 +632,7 @@ Scope {
                                         Text {
                                             width: parent.width * 0.36
                                             text: modelData.name
-                                            color: theme.accent
+                                            color: "#cdd6f4"
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             elide: Text.ElideRight
@@ -621,7 +642,7 @@ Scope {
                                         Text {
                                             width: parent.width * 0.16
                                             text: modelData.cpu_pct.toFixed(1)
-                                            color: theme.accent
+                                            color: root.getUsageColor(modelData.cpu_pct)
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             horizontalAlignment: Text.AlignRight
@@ -631,7 +652,7 @@ Scope {
                                         Text {
                                             width: parent.width * 0.16
                                             text: modelData.ram_pct.toFixed(1)
-                                            color: theme.accent
+                                            color: root.getUsageColor(modelData.ram_pct * 5)
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             horizontalAlignment: Text.AlignRight
@@ -641,7 +662,7 @@ Scope {
                                         Text {
                                             width: parent.width * 0.16
                                             text: modelData.read_rate.toFixed(1)
-                                            color: theme.accent
+                                            color: modelData.read_rate > 0 ? "#89dceb" : "#6c7086"
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             horizontalAlignment: Text.AlignRight
@@ -651,7 +672,7 @@ Scope {
                                         Text {
                                             width: parent.width * 0.16
                                             text: modelData.write_rate.toFixed(1)
-                                            color: theme.accent
+                                            color: modelData.write_rate > 0 ? "#89dceb" : "#6c7086"
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             horizontalAlignment: Text.AlignRight
