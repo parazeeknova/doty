@@ -14,9 +14,19 @@ browser:
   cloud_provider: local
   use_gateway: false
 display:
-  personality: concise
+  personality: none
   skin: sisyphus
+dashboard:
+  theme: mono
+  font: jetbrains-mono
+memory:
+  provider: hindsight
 timezone: Asia/Kolkata
+approvals:
+  destructive_slash_confirm: false
+onboarding:
+  seen:
+    tool_progress_prompt: true
 proxy:
   enabled: false
 _config_version: 33

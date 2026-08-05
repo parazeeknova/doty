@@ -1,0 +1,150 @@
+name: hermes-firecrawl
+
+# Self-hosted Firecrawl for the Hermes local stack.
+# - API on host port 48002 (container 3002)
+# - LLM: GeneralCompute (OpenAI-compatible), gemma-4-31B-it
+# Uses prebuilt ghcr images (no source build).
+
+x-common-env: &common-env
+  REDIS_URL: redis://redis:6379
+  REDIS_RATE_LIMIT_URL: redis://redis:6379
+  PLAYWRIGHT_MICROSERVICE_URL: http://playwright-service:3000/scrape
+  POSTGRES_USER: firecrawl
+  POSTGRES_PASSWORD: ${FIRECRAWL_DB_PASSWORD:?set FIRECRAWL_DB_PASSWORD}
+  POSTGRES_DB: postgres
+  POSTGRES_HOST: nuq-postgres
+  POSTGRES_PORT: 5432
+  USE_DB_AUTHENTICATION: "false"
+  NUM_WORKERS_PER_QUEUE: "4"
+  CRAWL_CONCURRENT_REQUESTS: "4"
+  MAX_CONCURRENT_JOBS: "3"
+  BROWSER_POOL_SIZE: "3"
+  OPENAI_API_KEY: ${GENERALCOMPUTE_API_KEY:?set GENERALCOMPUTE_API_KEY}
+  OPENAI_BASE_URL: https://api.generalcompute.com/v1
+  MODEL_NAME: gemma-4-31B-it
+  BULL_AUTH_KEY: ${FIRECRAWL_BULL_AUTH_KEY:?set FIRECRAWL_BULL_AUTH_KEY}
+  LOGGING_LEVEL: info
+
+services:
+  api:
+    image: ghcr.io/firecrawl/firecrawl:latest
+    environment:
+      <<: *common-env
+      HOST: "0.0.0.0"
+      PORT: "3002"
+      ENV: local
+      EXTRACT_WORKER_PORT: "3004"
+      WORKER_PORT: "3005"
+      NUQ_RABBITMQ_URL: amqp://rabbitmq:5672
+      HARNESS_STARTUP_TIMEOUT_MS: "60000"
+    depends_on:
+      redis:
+        condition: service_started
+      playwright-service:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "48002:3002"
+    command: node dist/src/harness.js --start-docker
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    networks:
+      - firecrawl-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
+
+  playwright-service:
+    image: ghcr.io/firecrawl/playwright-service:latest
+    environment:
+      PORT: 3000
+      MAX_CONCURRENT_PAGES: "4"
+    networks:
+      - firecrawl-net
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cpus: 2.0
+    mem_limit: 4G
+    memswap_limit: 4G
+    tmpfs:
+      - /tmp/.cache:noexec,nosuid,size=1g
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
+
+  redis:
+    image: redis:alpine
+    networks:
+      - firecrawl-net
+    command: redis-server --bind 0.0.0.0
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+        compress: "true"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: hermes-firecrawl-rabbitmq
+    networks:
+      - firecrawl-net
+    command: rabbitmq-server
+    # Rootless podman: the image's default uid-0 maps to the host user, and
+    # .erlang.cookie must be writable. Run as the rabbitmq user with a
+    # dedicated volume owned correctly.
+    user: "rabbitmq"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_log:/var/log/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+        compress: "true"
+
+  nuq-postgres:
+    image: ghcr.io/firecrawl/nuq-postgres:latest
+    container_name: hermes-firecrawl-nuq-postgres
+    environment:
+      POSTGRES_USER: firecrawl
+      POSTGRES_PASSWORD: ${FIRECRAWL_DB_PASSWORD:?set FIRECRAWL_DB_PASSWORD}
+      # Must be "postgres": the image's 010-nuq.sql init creates pg_cron,
+      # which only works in the cron.database_name DB (default: postgres).
+      POSTGRES_DB: postgres
+    networks:
+      - firecrawl-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
+
+networks:
+  firecrawl-net:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+  rabbitmq_log:

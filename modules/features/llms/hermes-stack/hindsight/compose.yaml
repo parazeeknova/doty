@@ -1,0 +1,73 @@
+name: hermes-hindsight
+
+# Hindsight memory backend for the Hermes local stack.
+# - API on host port 48888 (container 8888)
+# - UI on host port 49999 (container 9999)
+# - LLM: GeneralCompute (OpenAI-compatible), gemma-4-31B-it
+# - PostgreSQL + pgvector for persistent memory storage
+
+x-common: &hindsight-env
+  HINDSIGHT_API_LLM_PROVIDER: openai
+  HINDSIGHT_API_LLM_BASE_URL: https://api.generalcompute.com/v1
+  HINDSIGHT_API_LLM_MODEL: gemma-4-31B-it
+  HINDSIGHT_API_LLM_API_KEY: ${GENERALCOMPUTE_API_KEY:?set GENERALCOMPUTE_API_KEY}
+  HINDSIGHT_API_DATABASE_URL: postgresql://hindsight_user:${HINDSIGHT_DB_PASSWORD:?set HINDSIGHT_DB_PASSWORD}@db:5432/hindsight_db
+
+services:
+  db:
+    image: pgvector/pgvector:pg18
+    container_name: hermes-hindsight-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hindsight_user
+      POSTGRES_PASSWORD: ${HINDSIGHT_DB_PASSWORD:?set HINDSIGHT_DB_PASSWORD}
+      POSTGRES_DB: hindsight_db
+    volumes:
+      - hindsight_pg:/var/lib/postgresql/18/docker
+    networks:
+      - hindsight-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hindsight_user -d hindsight_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "2"
+        compress: "true"
+
+  hindsight:
+    image: ghcr.io/vectorize-io/hindsight:latest
+    container_name: hermes-hindsight-app
+    restart: unless-stopped
+    ports:
+      - "48888:8888"
+      - "49999:9999"
+    environment:
+      <<: *hindsight-env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - hindsight_data:/home/hindsight/.pg0
+    networks:
+      - hindsight-net
+    # Resource conservation: cap usage; the stack is idle most of the time.
+    cpus: 2.0
+    mem_limit: 3G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "2"
+        compress: "true"
+
+networks:
+  hindsight-net:
+    driver: bridge
+
+volumes:
+  hindsight_pg:
+  hindsight_data:

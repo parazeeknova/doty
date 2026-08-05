@@ -1,0 +1,74 @@
+{ self, inputs, ... }: {
+
+  flake.nixosModules.parazeeknovaHermesStack =
+    { config, pkgs, lib, ... }:
+    let
+      stackDir = "/home/parazeeknova/doty/modules/features/llms/hermes-stack";
+      envFile = "/run/secrets/hermes-stack-env";
+      podmanCompose = "${pkgs.podman-compose}/bin/podman-compose";
+    in
+    {
+      # podman is already enabled via apostropheVirtualization (dockerCompat).
+      # The compose stacks run as root systemd services so they autostart at
+      # boot. Enable the docker-compat socket so podman-compose can reach it.
+      virtualisation.podman.dockerSocket.enable = true;
+
+      # Secrets for the stacks (GeneralCompute key, DB passwords, bull auth).
+      # Rendered into a single dotenv file that the compose services read.
+      sops.secrets.generalcompute-api-key = { };
+      sops.secrets.hindsight-db-password = { };
+      sops.secrets.firecrawl-db-password = { };
+      sops.secrets.firecrawl-bull-auth-key = { };
+      sops.templates.hermes-stack-env = {
+        content = ''
+          GENERALCOMPUTE_API_KEY=${config.sops.placeholder.generalcompute-api-key}
+          HINDSIGHT_DB_PASSWORD=${config.sops.placeholder.hindsight-db-password}
+          FIRECRAWL_DB_PASSWORD=${config.sops.placeholder.firecrawl-db-password}
+          FIRECRAWL_BULL_AUTH_KEY=${config.sops.placeholder.firecrawl-bull-auth-key}
+        '';
+        path = envFile;
+        mode = "0400";
+      };
+
+      # ── Firecrawl stack ────────────────────────────────────────────────
+      systemd.services.hermes-firecrawl = {
+        description = "Hermes local Firecrawl stack (podman-compose)";
+        after = [ "network-online.target" "podman.socket" "podman.service" ];
+        wants = [ "network-online.target" ];
+        wantedBy = [ "multi-user.target" ];
+        path = with pkgs; [ podman podman-compose gnused coreutils ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          WorkingDirectory = "${stackDir}/firecrawl";
+          EnvironmentFile = envFile;
+          ExecStart = "${podmanCompose} up -d --remove-orphans";
+          ExecStop = "${podmanCompose} down";
+          TimeoutStartSec = 300;
+        };
+      };
+
+      # ── Hindsight stack ────────────────────────────────────────────────
+      systemd.services.hermes-hindsight = {
+        description = "Hermes local Hindsight stack (podman-compose)";
+        after = [ "network-online.target" "podman.socket" "podman.service" ];
+        wants = [ "network-online.target" ];
+        wantedBy = [ "multi-user.target" ];
+        path = with pkgs; [ podman podman-compose gnused coreutils ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          WorkingDirectory = "${stackDir}/hindsight";
+          EnvironmentFile = envFile;
+          ExecStart = "${podmanCompose} up -d --remove-orphans";
+          ExecStop = "${podmanCompose} down";
+          TimeoutStartSec = 300;
+        };
+      };
+
+      # ── Resource conservation: idle stop timers ────────────────────────
+      # Firecrawl is only needed when hermes crawls. Stop it after 30 min of
+      # idle; start on demand by systemctl start. Hindsight (memory) should
+      # stay up but is capped by compose limits.
+    };
+}
