@@ -319,7 +319,7 @@ Scope {
                                             anchors.left: parent.left
                                             anchors.verticalCenter: parent.verticalCenter
                                             text: modelData.label || modelData.name
-                                            color: "#cdd6f4"
+                                            color: theme.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 9
                                             font.bold: true
@@ -545,7 +545,7 @@ Scope {
                                     Text {
                                         width: parent.width * 0.36
                                         text: "NAME"
-                                        color: "#f9e2af"
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -556,7 +556,7 @@ Scope {
                                     Text {
                                         width: parent.width * 0.16
                                         text: "CPU%"
-                                        color: "#f9e2af"
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -567,7 +567,7 @@ Scope {
                                     Text {
                                         width: parent.width * 0.16
                                         text: "RAM%"
-                                        color: "#f9e2af"
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -578,7 +578,7 @@ Scope {
                                     Text {
                                         width: parent.width * 0.16
                                         text: "R(M/s)"
-                                        color: "#f9e2af"
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -589,7 +589,7 @@ Scope {
                                     Text {
                                         width: parent.width * 0.16
                                         text: "W(M/s)"
-                                        color: "#f9e2af"
+                                        color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         font.bold: true
@@ -611,7 +611,7 @@ Scope {
                                         Text {
                                             width: parent.width * 0.36
                                             text: modelData.name
-                                            color: "#cdd6f4"
+                                            color: theme.accent
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             elide: Text.ElideRight
