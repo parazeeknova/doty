@@ -3,6 +3,7 @@ import os
 import sys
 import glob
 import json
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -146,8 +147,8 @@ def download_and_link(model_spec):
     else:
         org, repo = "", repo_part
 
-    # Run llama-cli to download model
-    cmd = ["llama-cli", "-hf", model_spec, "-p", "init", "-n", "1", "--log-disable"]
+    # Run llama-cli to download model (single-turn, non-interactive)
+    cmd = ["llama-cli", "-hf", model_spec, "-p", "init", "-n", "1", "-st", "--log-disable"]
     try:
         res = subprocess.run(cmd)
     except FileNotFoundError:
@@ -211,8 +212,10 @@ def download_and_link(model_spec):
     symlink_path.symlink_to(best_match)
     print(f"\n{GREEN}✔ Created symlink: {symlink_path} -> {best_match}{RESET}")
 
-    # Add to models.json using the actual file stem so llama-server can find it
-    model_id = model_spec
+    # Add to models.json using the same id form llama-server exposes (org/repo:quant)
+    model_id = _derive_hf_id(symlink_path)
+    if not model_id:
+        model_id = model_spec
     add_model_to_json(model_id)
 
     print(f"\n{BOLD}{GREEN}=== Model Setup Complete! ==={RESET}")
@@ -483,15 +486,11 @@ def _derive_hf_id(sym):
             segments = part[len("models--"):].split("--", 1)
             if len(segments) == 2:
                 org, repo = segments
-                # Try to extract quant from filename
-                name = sym.stem  # e.g. "Qwen3.5-4B.Q5_K_M"
-                # Common pattern: quant is after the last dot or dash
-                for sep in [".", "-"]:
-                    idx = name.rfind(sep)
-                    if idx > 0:
-                        candidate = name[idx+1:]
-                        if any(q in candidate.upper() for q in ["Q4", "Q5", "Q6", "Q8", "F16", "BF16", "IQ", "UD"]):
-                            return f"{org}/{repo}:{candidate}"
+                # Extract quant suffix from filename (e.g. "Q4_K_M", "Q5_K_XL", "BF16")
+                name = sym.stem
+                quant_match = re.search(r"(?:Q[0-9]_[A-Z0-9_]+|IQ[0-9]_[A-Z0-9_]+|F16|BF16|FP16)$", name, re.IGNORECASE)
+                if quant_match:
+                    return f"{org}/{repo}:{quant_match.group(0)}"
                 return f"{org}/{repo}"
     return None
 

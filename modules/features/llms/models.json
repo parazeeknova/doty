@@ -63,6 +63,16 @@
           "id": "unsloth/Qwen3-4B-Instruct-2507-GGUF:Q5_K_XL",
           "reasoning": true,
           "contextWindow": 32768
+        },
+        {
+          "id": "LiquidAI/LFM2.5-2.6B-GGUF:Q4_K_M",
+          "reasoning": true,
+          "contextWindow": 32768
+        },
+        {
+          "id": "noctrex/Shieldstral-1.0-3B-GGUF:Q8_0",
+          "reasoning": true,
+          "contextWindow": 32768
         }
       ]
     }
