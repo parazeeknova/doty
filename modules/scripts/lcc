@@ -311,6 +311,190 @@ def sync_models():
 
     print(f"{GREEN}✔ Synced {len(symlinks)} model(s) to models.json{RESET}")
 
+def doctor():
+    """Auto-fix pi agent config, models.json, and ~/Models symlinks."""
+    print(f"\n{BOLD}{CYAN}=== lcc doctor — diagnosing & fixing ==={RESET}\n")
+    fixed = 0
+
+    # --- 1. Remove anthropic models-store.json (pi's cached catalog) ---
+    models_store = HOME / ".pi" / "agent" / "models-store.json"
+    if models_store.exists():
+        models_store.unlink()
+        print(f"{GREEN}✔ Removed {models_store} (anthropic catalog cache){RESET}")
+        fixed += 1
+    else:
+        print(f"  {CYAN}✓ No stale models-store.json{RESET}")
+
+    # --- 2. Fix pi settings.json ---
+    settings_path = HOME / ".pi" / "agent" / "settings.json"
+    if settings_path.exists():
+        try:
+            with open(settings_path, "r") as f:
+                settings = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            settings = {}
+
+        changed = False
+        if settings.get("defaultProvider") != "llama-cpp":
+            settings["defaultProvider"] = "llama-cpp"
+            changed = True
+
+        # Check if defaultModel is a valid model in models.json
+        config = load_models_config()
+        json_model_ids = [m.get("id") for m in config.get("providers", {}).get("llama-cpp", {}).get("models", [])]
+        current_default = settings.get("defaultModel", "")
+        if current_default not in json_model_ids and json_model_ids:
+            # Pick the first non-mmproj, non-embedding model
+            valid = [m for m in json_model_ids if "mmproj" not in m.lower() and "embedding" not in m.lower()]
+            new_default = valid[0] if valid else json_model_ids[0]
+            settings["defaultModel"] = new_default
+            changed = True
+            print(f"{GREEN}✔ Fixed defaultModel: '{current_default}' → '{new_default}'{RESET}")
+
+        if changed:
+            with open(settings_path, "w") as f:
+                json.dump(settings, f, indent=2)
+            fixed += 1
+        else:
+            print(f"  {CYAN}✓ pi settings.json looks good{RESET}")
+
+    # --- 3. Find orphan .gguf files in HF cache that have no ~/Models symlink ---
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    existing_targets = set()
+    for sym in MODELS_DIR.glob("*.gguf"):
+        if sym.is_symlink():
+            existing_targets.add(sym.resolve())
+
+    hf_ggufs = list(CACHE_DIR.glob("models--*/snapshots/*/*.gguf"))
+    orphans = []
+    for gf in hf_ggufs:
+        resolved = gf.resolve()
+        if resolved not in existing_targets:
+            # Skip mmproj files from auto-linking
+            orphans.append(gf)
+
+    if orphans:
+        print(f"\n  {YELLOW}Found {len(orphans)} .gguf file(s) in HF cache without ~/Models symlink:{RESET}")
+        for gf in orphans:
+            sym_path = MODELS_DIR / gf.name
+            if sym_path.exists() or sym_path.is_symlink():
+                # Name collision — skip
+                print(f"    {YELLOW}⚠ Skipped {gf.name} (name collision in ~/Models){RESET}")
+                continue
+            sym_path.symlink_to(gf)
+            print(f"    {GREEN}✔ Linked: {gf.name}{RESET}")
+            fixed += 1
+    else:
+        print(f"  {CYAN}✓ All HF cache models are linked in ~/Models{RESET}")
+
+    # --- 4. Add missing models.json entries for files in ~/Models ---
+    config = load_models_config()
+    try:
+        models = config["providers"]["llama-cpp"]["models"]
+    except KeyError:
+        models = []
+        config.setdefault("providers", {}).setdefault("llama-cpp", {})["models"] = models
+
+    json_ids = {m.get("id", "") for m in models}
+    all_symlinks = list(MODELS_DIR.glob("*.gguf"))
+    added_count = 0
+
+    for sym in all_symlinks:
+        # Try to derive a HF-style ID from the symlink target path
+        hf_id = _derive_hf_id(sym)
+        stem = sym.stem
+
+        # Check if either the HF ID or the stem is already in JSON
+        if hf_id and hf_id in json_ids:
+            continue
+        if stem in json_ids:
+            continue
+        # Check partial matches too
+        if any(stem in mid or (hf_id and hf_id in mid) for mid in json_ids):
+            continue
+
+        model_id = hf_id if hf_id else stem
+        models.append({
+            "id": model_id,
+            "reasoning": True,
+            "contextWindow": 32768
+        })
+        json_ids.add(model_id)
+        print(f"  {GREEN}✔ Added to models.json: {model_id}{RESET}")
+        added_count += 1
+        fixed += 1
+
+    # --- 5. Remove stale JSON entries (no matching file in ~/Models) ---
+    # Build a comprehensive set of identifiers from all symlinks
+    known_ids = set()
+    for s in all_symlinks:
+        known_ids.add(s.name.lower())
+        known_ids.add(s.stem.lower())
+        hf = _derive_hf_id(s)
+        if hf:
+            known_ids.add(hf.lower())
+            # Also add without the quant suffix
+            if ":" in hf:
+                known_ids.add(hf.split(":")[0].lower())
+
+    clean_models = []
+    removed_count = 0
+    for m in models:
+        mid = m.get("id", "")
+        mid_lower = mid.lower()
+        # Also check without quant suffix for HF-style IDs
+        mid_base = mid_lower.split(":")[0] if ":" in mid_lower else mid_lower
+        # Extract just the last component after "/" for matching file stems
+        mid_tail = mid_lower.rsplit("/", 1)[-1].split(":")[0] if "/" in mid_lower else ""
+
+        found = (
+            mid_lower in known_ids
+            or mid_base in known_ids
+            or any(mid_tail and mid_tail in kid for kid in known_ids)
+            or any(kid in mid_lower for kid in known_ids if len(kid) > 5)
+        )
+        if found:
+            clean_models.append(m)
+        else:
+            print(f"  {YELLOW}✘ Removed stale entry: {mid}{RESET}")
+            removed_count += 1
+            fixed += 1
+
+    if added_count > 0 or removed_count > 0:
+        config["providers"]["llama-cpp"]["models"] = clean_models
+        save_models_config(config)
+
+    # --- Summary ---
+    if fixed == 0:
+        print(f"\n{BOLD}{GREEN}Everything looks healthy! No fixes needed.{RESET}\n")
+    else:
+        print(f"\n{BOLD}{GREEN}=== Doctor applied {fixed} fix(es) ==={RESET}\n")
+
+
+def _derive_hf_id(sym):
+    """Try to derive a HuggingFace-style model ID (org/repo:quant) from a symlink's target path."""
+    if not sym.is_symlink():
+        return None
+    target = str(sym.resolve())
+    # Look for models--org--repo pattern in the path
+    parts = target.split("/")
+    for part in parts:
+        if part.startswith("models--"):
+            segments = part[len("models--"):].split("--", 1)
+            if len(segments) == 2:
+                org, repo = segments
+                # Try to extract quant from filename
+                name = sym.stem  # e.g. "Qwen3.5-4B.Q5_K_M"
+                # Common pattern: quant is after the last dot or dash
+                for sep in [".", "-"]:
+                    idx = name.rfind(sep)
+                    if idx > 0:
+                        candidate = name[idx+1:]
+                        if any(q in candidate.upper() for q in ["Q4", "Q5", "Q6", "Q8", "F16", "BF16", "IQ", "UD"]):
+                            return f"{org}/{repo}:{candidate}"
+                return f"{org}/{repo}"
+    return None
+
 def show_status():
     print(f"\n{BOLD}{CYAN}=== llama-server Service Status ==={RESET}\n")
     subprocess.run(["systemctl", "--user", "status", "llama-server"])
@@ -326,12 +510,14 @@ def print_help():
   lcc list / lcc ls             List all local GGUF models in ~/Models
   lcc nuke [name] / lcc rm     Remove model symlink, delete HF cache, and update models.json
   lcc sync                      Sync all GGUF files in ~/Models into models.json
+  lcc doctor                    Auto-fix models.json, ~/Models symlinks, and pi agent config
   lcc status                    Show llama-server systemd user service status
   lcc help                      Show this help message
 
 {BOLD}Examples:{RESET}
   lcc unsloth/Qwen3-4B-Instruct-2507-GGUF:UD-Q5_K_XL
   lcc Jackrong/Negentropy-claude-opus-4.7-4B-GGUF:Q4_K_M
+  lcc doctor
   lcc nuke
 """)
 
@@ -351,6 +537,8 @@ def main():
         nuke_model(term)
     elif cmd == "sync":
         sync_models()
+    elif cmd == "doctor":
+        doctor()
     elif cmd == "status":
         show_status()
     elif cmd in ("download", "add") and len(sys.argv) > 2:
@@ -362,3 +550,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

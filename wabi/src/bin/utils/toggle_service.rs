@@ -9,7 +9,13 @@ fn is_active(service: &str, user: bool) -> bool {
     }
     cmd.args(["is-active", service]);
     match cmd.output() {
-        Ok(out) => String::from_utf8_lossy(&out.stdout).trim() == "active",
+        Ok(out) => {
+            let state = String::from_utf8_lossy(&out.stdout);
+            matches!(
+                state.trim(),
+                "active" | "activating" | "deactivating" | "reloading"
+            )
+        }
         Err(_) => false,
     }
 }

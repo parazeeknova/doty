@@ -58,13 +58,20 @@ struct SysmonStatus {
     disk1: DiskInfo,
 }
 
+fn is_running(state: &str) -> bool {
+    matches!(
+        state,
+        "active" | "activating" | "deactivating" | "reloading"
+    )
+}
+
 fn check_service(name: &str, label: &str, unit: &str, user: bool) -> ServiceItem {
     let active_cmd = if user {
         run_cmd("systemctl", &["--user", "is-active", unit])
     } else {
         run_cmd("systemctl", &["is-active", unit])
     };
-    let active = active_cmd.map(|s| s.trim() == "active").unwrap_or(false);
+    let active = active_cmd.map(|s| is_running(s.trim())).unwrap_or(false);
 
     let enabled_cmd = if user {
         run_cmd("systemctl", &["--user", "is-enabled", unit])
