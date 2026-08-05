@@ -43,6 +43,7 @@
         llama-cpp-cuda
         hermes-desktop-patched
         hermes-cli
+        opus
       ];
 
       home-manager.users.parazeeknova =

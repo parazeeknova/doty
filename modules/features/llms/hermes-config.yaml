@@ -7,6 +7,9 @@ agent:
 terminal:
   backend: local
   font_family: FiraCode Nerd Font
+web:
+  backend: firecrawl
+  use_gateway: false
 browser:
   cloud_provider: local
   use_gateway: false

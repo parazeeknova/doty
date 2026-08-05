@@ -260,6 +260,14 @@
         "L /usr/share/applications - - - - /run/current-system/sw/share/applications"
       ];
 
+      # Some installers (hermes cua-driver, etc.) hardcode /bin/bash, but
+      # NixOS has no FHS /bin. Mirror the built-in `binsh` activation snippet
+      # to provide /bin/bash for those scripts.
+      system.activationScripts.binbash = lib.mkAfter ''
+        ln -sfn ${pkgs.bashInteractive}/bin/bash /bin/.bash.tmp
+        mv /bin/.bash.tmp /bin/bash # atomically replace /bin/bash
+      '';
+
       # -- SOPS Decryption Config --
       sops.defaultSopsFile = ../../../secrets/secrets.yaml;
       sops.age.keyFile = "${config.users.users.parazeeknova.home}/.config/sops/age/keys.txt";
