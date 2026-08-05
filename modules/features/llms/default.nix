@@ -36,7 +36,7 @@
             Service = {
               Type = "simple";
               ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p %h/Models";
-              ExecStart = "${llama-cpp-cuda}/bin/llama-server --models-dir=%h/Models --models-max 1 --sleep-idle-seconds 300 -ngl 999 -t 8 -fa on --port 8899 -c 32768";
+              ExecStart = "${llama-cpp-cuda}/bin/llama-server --models-dir %h/Models --models-max 1 --sleep-idle-seconds 300 -ngl 999 -t 8 -fa on --port 8899 -c 32768";
               Restart = "on-failure";
               RestartSec = 5;
               Nice = 10;

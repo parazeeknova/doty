@@ -198,6 +198,7 @@
       users.users."parazeeknova" = {
         isNormalUser = true;
         description = "przknv.cc";
+        linger = true;
         extraGroups = [
           "networkmanager"
           "wheel"
