@@ -80,6 +80,40 @@
           xdg.dataFile."icons/hermes.png".source =
             "${hermes-desktop-patched}/share/hermes-desktop/dist/hermes.png";
 
+          systemd.user.services.hermes-gateway = {
+            Unit = {
+              Description = "Hermes Agent Gateway - Messaging Platform Integration";
+              After = [ "network-online.target" ];
+              Wants = [ "network-online.target" ];
+              StartLimitIntervalSec = 0;
+            };
+
+            Service = {
+              Type = "simple";
+              # Must run via the `hermes` wrapper, not the raw venv python —
+              # the wrapper sets HERMES_BUNDLED_PLUGINS, without which the
+              # telegram/discord adapters are never discovered ("No adapter
+              # available"). /run/current-system/sw keeps it valid across
+              # rebuilds.
+              ExecStart = "hermes gateway run";
+              WorkingDirectory = "%h/.hermes";
+              Environment = "HERMES_HOME=%h/.hermes";
+              Restart = "always";
+              RestartSec = 5;
+              RestartForceExitStatus = 75;
+              RestartPreventExitStatus = 78;
+              KillMode = "mixed";
+              KillSignal = "SIGTERM";
+              TimeoutStopSec = 60;
+              StandardOutput = "journal";
+              StandardError = "journal";
+            };
+
+            Install = {
+              WantedBy = [ "default.target" ];
+            };
+          };
+
           systemd.user.services.llama-server = {
             Unit = {
               Description = "llama.cpp Server";
