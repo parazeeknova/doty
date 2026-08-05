@@ -81,6 +81,9 @@
         version = "0.1";
         src = inputs.hypr-dynamic-cursors;
 
+        # Hyprland 0.56.1 removed src/ipc (moved out to hyprwire), so drop s2 IPC call from shake.cpp
+        patches = [ ./patches/hypr-dynamic-cursors-0.56.1.patch ];
+
         dontUseCmakeConfigure = true;
 
         inherit (pkgs.hyprland) buildInputs;
