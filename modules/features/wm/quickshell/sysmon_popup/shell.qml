@@ -300,7 +300,7 @@ Scope {
                             }
                         }
 
-                        // --- SERVICES TOGGLES SECTION (ABOVE existing monitor) ---
+                        // --- SERVICES TOGGLES SECTION (Text-only) ---
                         Column {
                             width: parent.width
                             spacing: 3
@@ -316,80 +316,48 @@ Scope {
 
                             Column {
                                 width: parent.width
-                                spacing: 4
+                                spacing: 2
 
                                 Repeater {
                                     model: root.servicesList
 
-                                    delegate: Rectangle {
+                                    delegate: Item {
                                         required property var modelData
 
                                         width: parent.width
-                                        height: 22
-                                        color: theme.popupBgColor
-                                        border.width: 1
-                                        border.color: theme.accent
+                                        height: 16
 
-                                        Row {
-                                            anchors.fill: parent
-                                            anchors.leftMargin: 6
-                                            anchors.rightMargin: 6
-                                            spacing: 4
+                                        Text {
+                                            anchors.left: parent.left
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: modelData.label || modelData.name
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 9
+                                            font.bold: true
+                                            renderType: Text.NativeRendering
+                                        }
 
-                                            Text {
-                                                width: 80
-                                                text: modelData.label || modelData.name
-                                                color: theme.accent
-                                                font.family: "FiraCode Nerd Font"
-                                                font.pixelSize: 9
-                                                font.bold: true
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                elide: Text.ElideRight
-                                                renderType: Text.NativeRendering
-                                            }
+                                        Text {
+                                            id: toggleText
 
-                                            Text {
-                                                text: modelData.active ? "[ACTIVE]" : "[INACTIVE]"
-                                                color: modelData.active ? "#a6e3a1" : "#f38ba8"
-                                                font.family: "FiraCode Nerd Font"
-                                                font.pixelSize: 8
-                                                font.bold: true
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                renderType: Text.NativeRendering
-                                            }
+                                            anchors.right: parent.right
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: modelData.active ? "[ON]" : "[OFF]"
+                                            color: modelData.active ? "#a6e3a1" : "#f38ba8"
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 9
+                                            font.bold: true
+                                            renderType: Text.NativeRendering
 
-                                            Item {
-                                                width: 1
-                                                height: 1
-                                                // Spacer
-                                            }
-
-                                            Rectangle {
-                                                id: toggleBtn
-
-                                                width: 44
-                                                height: 16
-                                                color: modelData.active ? theme.accent : "transparent"
-                                                border.width: 1
-                                                border.color: theme.accent
-                                                anchors.verticalCenter: parent.verticalCenter
-
-                                                Text {
-                                                    anchors.centerIn: parent
-                                                    text: modelData.active ? "ON" : "OFF"
-                                                    color: modelData.active ? theme.popupBgColor : theme.accent
-                                                    font.family: "FiraCode Nerd Font"
-                                                    font.pixelSize: 8
-                                                    font.bold: true
-                                                    renderType: Text.NativeRendering
-                                                }
-
-                                                MouseArea {
-                                                    anchors.fill: parent
-                                                    onClicked: {
-                                                        Quickshell.execDetached([root.homeDir + "/.config/quickshell/sysmon_popup/toggle_service", modelData.name]);
-                                                        checkStatusProc.running = true;
-                                                    }
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                onEntered: toggleText.opacity = 0.7
+                                                onExited: toggleText.opacity = 1.0
+                                                onClicked: {
+                                                    Quickshell.execDetached([root.homeDir + "/.config/quickshell/sysmon_popup/toggle_service", modelData.name]);
+                                                    checkStatusProc.running = true;
                                                 }
                                             }
                                         }
@@ -563,7 +531,7 @@ Scope {
                             }
                         }
 
-                        // --- TOP 5 PROCESSES LIST ---
+                        // --- TOP 5 PROCESSES LIST (Full Width, No Box) ---
                         Column {
                             width: parent.width
                             spacing: 3
@@ -577,40 +545,33 @@ Scope {
                                 renderType: Text.NativeRendering
                             }
 
-                            Rectangle {
+                            Column {
                                 width: parent.width
-                                height: 16 + (root.topProcessesList.length * 14) + 4
-                                color: theme.popupBgColor
-                                border.width: 1
-                                border.color: theme.accent
+                                spacing: 2
 
-                                Column {
-                                    anchors.fill: parent
-                                    anchors.margins: 4
-                                    spacing: 2
+                                // Header
+                                Text {
+                                    width: parent.width
+                                    text: root.padRight("NAME", 11) + " " + root.padLeft("CPU%", 5) + " " + root.padLeft("RAM%", 5) + " " + root.padLeft("R(M/s)", 6) + " " + root.padLeft("W(M/s)", 6)
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                    font.bold: true
+                                    renderType: Text.NativeRendering
+                                }
 
-                                    // Header
-                                    Text {
-                                        text: root.padRight("NAME", 10) + " " + root.padLeft("CPU%", 5) + " " + root.padLeft("RAM%", 5) + " " + root.padLeft("R(M/s)", 6) + " " + root.padLeft("W(M/s)", 6)
+                                Repeater {
+                                    model: root.topProcessesList
+
+                                    delegate: Text {
+                                        required property var modelData
+
+                                        width: parent.width
+                                        text: root.padRight(modelData.name, 11) + " " + root.padLeft(modelData.cpu_pct.toFixed(1), 5) + " " + root.padLeft(modelData.ram_pct.toFixed(1), 5) + " " + root.padLeft(modelData.read_rate.toFixed(1), 6) + " " + root.padLeft(modelData.write_rate.toFixed(1), 6)
                                         color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
-                                        font.bold: true
                                         renderType: Text.NativeRendering
-                                    }
-
-                                    Repeater {
-                                        model: root.topProcessesList
-
-                                        delegate: Text {
-                                            required property var modelData
-
-                                            text: root.padRight(modelData.name, 10) + " " + root.padLeft(modelData.cpu_pct.toFixed(1), 5) + " " + root.padLeft(modelData.ram_pct.toFixed(1), 5) + " " + root.padLeft(modelData.read_rate.toFixed(1), 6) + " " + root.padLeft(modelData.write_rate.toFixed(1), 6)
-                                            color: theme.accent
-                                            font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 8
-                                            renderType: Text.NativeRendering
-                                        }
                                     }
                                 }
                             }
