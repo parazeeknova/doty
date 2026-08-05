@@ -81,11 +81,6 @@
         version = "0.1";
         src = inputs.hypr-dynamic-cursors;
 
-        # Hyprland 0.56.1 removed src/ipc (moved out to hyprwire), so the plugin's
-        # shake:ipc socket2 events cannot compile or function. Drop them until
-        # upstream adds 0.56.1 support (https://github.com/VirtCode/hypr-dynamic-cursors).
-        patches = [ ./patches/hypr-dynamic-cursors-0.56.1.patch ];
-
         dontUseCmakeConfigure = true;
 
         inherit (pkgs.hyprland) buildInputs;
