@@ -292,35 +292,6 @@
         mode = "0400";
       };
 
-      # -- Sudo rules for service management --
-      security.sudo.extraRules = [
-        {
-          users = [ "parazeeknova" ];
-          commands = [
-            {
-              command = "/run/current-system/sw/bin/systemctl * suwayomi-server.service";
-              options = [ "NOPASSWD" ];
-            }
-            {
-              command = "/run/current-system/sw/bin/systemctl * adguardhome.service";
-              options = [ "NOPASSWD" ];
-            }
-          ];
-        }
-      ];
-
-      security.polkit.extraConfig = ''
-        polkit.addRule(function(action, subject) {
-          if (action.id == "org.freedesktop.systemd1.manage-units" &&
-              subject.user == "parazeeknova") {
-            var unit = action.lookup("unit");
-            if (unit == "suwayomi-server.service" || unit == "adguardhome.service") {
-              return polkit.Result.YES;
-            }
-          }
-        });
-      '';
-
       system.stateVersion = "26.05";
     };
 }
