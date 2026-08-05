@@ -222,7 +222,8 @@
       ];
       security.polkit.extraConfig = ''
         polkit.addRule(function(action, subject) {
-            if (action.id == "org.freedesktop.systemd1.manage-units" &&
+            if ((action.id == "org.freedesktop.systemd1.manage-units" ||
+                 action.id == "org.freedesktop.systemd1.manage-unit-files") &&
                 subject.user == "parazeeknova") {
                 return polkit.Result.YES;
             }

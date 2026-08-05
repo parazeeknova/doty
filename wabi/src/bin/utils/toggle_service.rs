@@ -14,29 +14,18 @@ fn is_active(service: &str, user: bool) -> bool {
     }
 }
 
-fn run_systemctl(action: &str, service: &str, user: bool) {
+fn run_systemctl(service: &str, user: bool, currently_active: bool) {
+    let action = if currently_active { "stop" } else { "start" };
+    let mut cmd = Command::new("systemctl");
     if user {
-        let _ = Command::new("systemctl")
-            .args(["--user", action, "--now", service])
-            .status();
-    } else {
-        let status = Command::new("systemctl")
-            .args([action, "--now", service])
-            .status();
-        if status.map(|s| !s.success()).unwrap_or(true) {
-            let _ = Command::new("sudo")
-                .args(["systemctl", action, "--now", service])
-                .status();
-        }
+        cmd.arg("--user");
     }
+    cmd.args([action, service]);
+    let _ = cmd.status();
 }
 
 fn send_notification(service_label: &str, turning_on: bool) {
-    let status_str = if turning_on {
-        "Enabled & Started"
-    } else {
-        "Disabled & Stopped"
-    };
+    let status_str = if turning_on { "Started" } else { "Stopped" };
     let icon = if turning_on {
         "emblem-default"
     } else {
@@ -44,7 +33,7 @@ fn send_notification(service_label: &str, turning_on: bool) {
     };
     let _ = Notification::new()
         .summary("Service Manager")
-        .body(&format!("{service_label} service is now {status_str}"))
+        .body(&format!("{service_label} — {status_str}"))
         .icon(icon)
         .timeout(3000)
         .show();
@@ -61,20 +50,17 @@ fn main() {
     match target {
         "suwayomi" => {
             let active = is_active("suwayomi-server.service", false);
-            let action = if active { "disable" } else { "enable" };
-            run_systemctl(action, "suwayomi-server.service", false);
+            run_systemctl("suwayomi-server.service", false, active);
             send_notification("Suwayomi Server", !active);
         }
         "llama" => {
             let active = is_active("llama-server.service", true);
-            let action = if active { "disable" } else { "enable" };
-            run_systemctl(action, "llama-server.service", true);
+            run_systemctl("llama-server.service", true, active);
             send_notification("llama.cpp Server", !active);
         }
         "adguard" => {
             let active = is_active("adguardhome.service", false);
-            let action = if active { "disable" } else { "enable" };
-            run_systemctl(action, "adguardhome.service", false);
+            run_systemctl("adguardhome.service", false, active);
             send_notification("AdGuard Home", !active);
         }
         _ => {
