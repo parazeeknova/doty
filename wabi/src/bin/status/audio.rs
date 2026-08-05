@@ -92,10 +92,10 @@ struct AudioResult {
 }
 
 fn pactl_cmd() -> Command {
-    if let Ok(output) = Command::new("pactl").arg("--version").output() {
-        if output.status.success() {
-            return Command::new("pactl");
-        }
+    if let Ok(output) = Command::new("pactl").arg("--version").output()
+        && output.status.success()
+    {
+        return Command::new("pactl");
     }
     if std::path::Path::new("/run/current-system/sw/bin/pactl").exists() {
         return Command::new("/run/current-system/sw/bin/pactl");
@@ -104,10 +104,7 @@ fn pactl_cmd() -> Command {
 }
 
 fn get_pactl_json(category: &str) -> serde_json::Value {
-    let Ok(output) = pactl_cmd()
-        .args(["-f", "json", "list", category])
-        .output()
-    else {
+    let Ok(output) = pactl_cmd().args(["-f", "json", "list", category]).output() else {
         return serde_json::Value::Array(Vec::new());
     };
 
