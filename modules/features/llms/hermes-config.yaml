@@ -8,7 +8,7 @@ terminal:
   backend: local
   font_family: FiraCode Nerd Font
 web:
-  backend: searxng
+  backend: firecrawl
   search_backend: searxng
   extract_backend: firecrawl
   use_gateway: false
@@ -21,16 +21,16 @@ display:
 dashboard:
   theme: mono
   font: jetbrains-mono
-memory:
-  provider: hindsight
-stt:
-  enabled: true
-  provider: local
-  language: en
 tts:
   provider: edge
   edge:
     voice: en-US-AriaNeural
+stt:
+  enabled: true
+  provider: local
+  language: en
+memory:
+  provider: hindsight
 timezone: Asia/Kolkata
 approvals:
   destructive_slash_confirm: false

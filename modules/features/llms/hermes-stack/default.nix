@@ -49,6 +49,11 @@
           # First start pulls multi-GB images into the root podman store.
           # Give it 30 min; subsequent starts are near-instant (--policy missing).
           TimeoutStartSec = 1800;
+          # Transient startup races (port bind collisions between stacks,
+          # slow first pull) should auto-retry rather than leave the stack down.
+          Restart = "on-failure";
+          RestartSec = 10;
+          StartLimitIntervalSec = 0;
         };
       };
 
@@ -69,6 +74,11 @@
           # First start pulls multi-GB images into the root podman store.
           # Give it 30 min; subsequent starts are near-instant (--policy missing).
           TimeoutStartSec = 1800;
+          # The 48888 port bind collided with a stale bind on first start
+          # (transient race). Auto-retry so a one-off collision self-heals.
+          Restart = "on-failure";
+          RestartSec = 10;
+          StartLimitIntervalSec = 0;
         };
       };
 
@@ -87,6 +97,9 @@
           ExecStart = "${podmanCompose} up -d --remove-orphans";
           ExecStop = "${podmanCompose} down";
           TimeoutStartSec = 600;
+          Restart = "on-failure";
+          RestartSec = 10;
+          StartLimitIntervalSec = 0;
         };
       };
 
