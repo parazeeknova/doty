@@ -154,7 +154,14 @@ def download_and_link(model_spec):
         print(f"{RED}Error: llama-cli not found in PATH.{RESET}")
         sys.exit(1)
 
-    # Search in HF cache
+    # Abort early if llama-cli failed (non-GGUF repo, network error, etc.)
+    if res.returncode != 0:
+        print(f"\n{RED}✘ llama-cli failed (exit code {res.returncode}).{RESET}")
+        print(f"{YELLOW}  The repo '{model_spec}' may not contain a GGUF model,")
+        print(f"  or requires a quant suffix (e.g. {model_spec}:Q4_K_M).{RESET}")
+        sys.exit(1)
+
+    # Search in HF cache — only look in the specific repo's cache directory
     hf_folder_name = f"models--{org}--{repo}" if org else f"models--{repo}"
     target_cache_dir = CACHE_DIR / hf_folder_name
 
@@ -163,12 +170,25 @@ def download_and_link(model_spec):
         gguf_files = list(target_cache_dir.glob("snapshots/*/*.gguf"))
 
     if not gguf_files:
-        # Fallback search across all HF hub snapshots for latest file matching quant/repo
-        all_snapshots = CACHE_DIR.glob("models--*/snapshots/*/*.gguf")
-        gguf_files = sorted(all_snapshots, key=os.path.getmtime, reverse=True)
+        # Scoped fallback: search for cache dirs that contain the repo name
+        repo_lower = repo.lower()
+        org_lower = org.lower() if org else ""
+        for cache_entry in CACHE_DIR.iterdir():
+            if not cache_entry.is_dir() or not cache_entry.name.startswith("models--"):
+                continue
+            entry_lower = cache_entry.name.lower()
+            # Match if the cache dir name contains the repo name (and org if given)
+            if repo_lower in entry_lower and (not org_lower or org_lower in entry_lower):
+                found = list(cache_entry.glob("snapshots/*/*.gguf"))
+                gguf_files.extend(found)
+        if gguf_files:
+            gguf_files = sorted(gguf_files, key=os.path.getmtime, reverse=True)
+            print(f"{YELLOW}⚠ Could not find exact cache dir '{hf_folder_name}',")
+            print(f"  but found {len(gguf_files)} matching .gguf file(s) in related cache dirs.{RESET}")
 
     if not gguf_files:
-        print(f"{RED}Could not locate downloaded .gguf file in {CACHE_DIR}{RESET}")
+        print(f"{RED}✘ Could not locate any downloaded .gguf files for '{model_spec}' in {CACHE_DIR}{RESET}")
+        print(f"{YELLOW}  Ensure the repo contains GGUF files and retry.{RESET}")
         sys.exit(1)
 
     # Filter best match
@@ -191,7 +211,7 @@ def download_and_link(model_spec):
     symlink_path.symlink_to(best_match)
     print(f"\n{GREEN}✔ Created symlink: {symlink_path} -> {best_match}{RESET}")
 
-    # Add to models.json
+    # Add to models.json using the actual file stem so llama-server can find it
     model_id = model_spec
     add_model_to_json(model_id)
 
