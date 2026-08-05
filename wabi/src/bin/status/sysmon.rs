@@ -108,16 +108,17 @@ fn get_proc_io_rates(pid: u32) -> (f64, f64) {
     let mut read_bytes: u64 = 0;
     let mut write_bytes: u64 = 0;
     for line in content.lines() {
-        if line.starts_with("read_bytes:") {
-            if let Some(val) = line.split_whitespace().nth(1) {
-                read_bytes = val.parse().unwrap_or(0);
-            }
-        } else if line.starts_with("write_bytes:") {
-            if let Some(val) = line.split_whitespace().nth(1) {
-                write_bytes = val.parse().unwrap_or(0);
-            }
+        if line.starts_with("read_bytes:")
+            && let Some(val) = line.split_whitespace().nth(1)
+        {
+            read_bytes = val.parse().unwrap_or(0);
+        } else if line.starts_with("write_bytes:")
+            && let Some(val) = line.split_whitespace().nth(1)
+        {
+            write_bytes = val.parse().unwrap_or(0);
         }
     }
+
 
     let _ = fs::create_dir_all(STAT_DIR);
     let prev_file = format!("{STAT_DIR}/proc_{pid}");

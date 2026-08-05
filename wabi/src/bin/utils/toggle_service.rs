@@ -6,7 +6,7 @@ fn is_active(service: &str, user: bool) -> bool {
     if user {
         cmd.arg("--user");
     }
-    cmd.args(&["is-active", service]);
+    cmd.args(["is-active", service]);
     match cmd.output() {
         Ok(out) => String::from_utf8_lossy(&out.stdout).trim() == "active",
         Err(_) => false,
@@ -26,21 +26,21 @@ fn main() {
             let active = is_active("suwayomi-server.service", false);
             let action = if active { "disable" } else { "enable" };
             let _ = Command::new("sudo")
-                .args(&["systemctl", action, "--now", "suwayomi-server.service"])
+                .args(["systemctl", action, "--now", "suwayomi-server.service"])
                 .status();
         }
         "llama" => {
             let active = is_active("llama-server.service", true);
             let action = if active { "disable" } else { "enable" };
             let _ = Command::new("systemctl")
-                .args(&["--user", action, "--now", "llama-server.service"])
+                .args(["--user", action, "--now", "llama-server.service"])
                 .status();
         }
         "adguard" => {
             let active = is_active("adguardhome.service", false);
             let action = if active { "disable" } else { "enable" };
             let _ = Command::new("sudo")
-                .args(&["systemctl", action, "--now", "adguardhome.service"])
+                .args(["systemctl", action, "--now", "adguardhome.service"])
                 .status();
         }
         _ => {
