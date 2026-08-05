@@ -44,7 +44,9 @@
           EnvironmentFile = envFile;
           ExecStart = "${podmanCompose} up -d --remove-orphans";
           ExecStop = "${podmanCompose} down";
-          TimeoutStartSec = 300;
+          # First start pulls multi-GB images into the root podman store.
+          # Give it 30 min; subsequent starts are near-instant (--policy missing).
+          TimeoutStartSec = 1800;
         };
       };
 
@@ -62,7 +64,9 @@
           EnvironmentFile = envFile;
           ExecStart = "${podmanCompose} up -d --remove-orphans";
           ExecStop = "${podmanCompose} down";
-          TimeoutStartSec = 300;
+          # First start pulls multi-GB images into the root podman store.
+          # Give it 30 min; subsequent starts are near-instant (--policy missing).
+          TimeoutStartSec = 1800;
         };
       };
 
