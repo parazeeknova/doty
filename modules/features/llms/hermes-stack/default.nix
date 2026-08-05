@@ -1,7 +1,12 @@
 { self, inputs, ... }: {
 
   flake.nixosModules.parazeeknovaHermesStack =
-    { config, pkgs, lib, ... }:
+    {
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
     let
       stackDir = "/home/parazeeknova/doty/modules/features/llms/hermes-stack";
       envFile = "/run/secrets/hermes-stack-env";
@@ -35,10 +40,19 @@
       # ── Firecrawl stack ────────────────────────────────────────────────
       systemd.services.hermes-firecrawl = {
         description = "Hermes local Firecrawl stack (podman-compose)";
-        after = [ "network-online.target" "podman.socket" "podman.service" ];
+        after = [
+          "network-online.target"
+          "podman.socket"
+          "podman.service"
+        ];
         wants = [ "network-online.target" ];
         wantedBy = [ "multi-user.target" ];
-        path = with pkgs; [ podman podman-compose gnused coreutils ];
+        path = with pkgs; [
+          podman
+          podman-compose
+          gnused
+          coreutils
+        ];
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
@@ -60,10 +74,19 @@
       # ── Hindsight stack ────────────────────────────────────────────────
       systemd.services.hermes-hindsight = {
         description = "Hermes local Hindsight stack (podman-compose)";
-        after = [ "network-online.target" "podman.socket" "podman.service" ];
+        after = [
+          "network-online.target"
+          "podman.socket"
+          "podman.service"
+        ];
         wants = [ "network-online.target" ];
         wantedBy = [ "multi-user.target" ];
-        path = with pkgs; [ podman podman-compose gnused coreutils ];
+        path = with pkgs; [
+          podman
+          podman-compose
+          gnused
+          coreutils
+        ];
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
@@ -85,10 +108,19 @@
       # ── SearXNG stack ──────────────────────────────────────────────────
       systemd.services.hermes-searxng = {
         description = "Hermes local SearXNG (podman-compose)";
-        after = [ "network-online.target" "podman.socket" "podman.service" ];
+        after = [
+          "network-online.target"
+          "podman.socket"
+          "podman.service"
+        ];
         wants = [ "network-online.target" ];
         wantedBy = [ "multi-user.target" ];
-        path = with pkgs; [ podman podman-compose gnused coreutils ];
+        path = with pkgs; [
+          podman
+          podman-compose
+          gnused
+          coreutils
+        ];
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
