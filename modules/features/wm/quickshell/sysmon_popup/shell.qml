@@ -525,7 +525,7 @@ Scope {
                             spacing: 3
 
                             Text {
-                                text: "󰍹 TOP 5 PROCESSES"
+                                text: "󰍹 PROCESSES"
                                 color: theme.accent
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
