@@ -93,9 +93,10 @@
               # Must run via the `hermes` wrapper, not the raw venv python —
               # the wrapper sets HERMES_BUNDLED_PLUGINS, without which the
               # telegram/discord adapters are never discovered ("No adapter
-              # available"). /run/current-system/sw keeps it valid across
-              # rebuilds.
-              ExecStart = "hermes gateway run";
+              # available"). Use the absolute /run/current-system/sw path:
+              # user systemd units have no PATH, so a bare `hermes` fails
+              # with status 203/EXEC.
+              ExecStart = "/run/current-system/sw/bin/hermes gateway run";
               WorkingDirectory = "%h/.hermes";
               Environment = "HERMES_HOME=%h/.hermes";
               Restart = "always";

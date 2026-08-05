@@ -37,6 +37,7 @@ approvals:
 onboarding:
   seen:
     tool_progress_prompt: true
+    busy_input_prompt: true
 proxy:
   enabled: false
 _config_version: 33
@@ -194,6 +195,10 @@ known_builtin_toolsets:
     - web
     - x_search
     - yuanbao
+voice:
+  auto_tts: false
+wake_word:
+  enabled: true
 
 # ── Security ──────────────────────────────────────────────────────────
 # Secret redaction is ON by default — strings that look like API keys,
