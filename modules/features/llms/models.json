@@ -73,6 +73,11 @@
           "id": "mistralai/Shieldstral-1.0-3B",
           "reasoning": true,
           "contextWindow": 32768
+        },
+        {
+          "id": "LiquidAI/LFM2.5-2.6B",
+          "reasoning": true,
+          "contextWindow": 32768
         }
       ]
     }
