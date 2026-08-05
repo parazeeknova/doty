@@ -15,7 +15,7 @@ x-common: &hindsight-env
 
 services:
   db:
-    image: pgvector/pgvector:pg18
+    image: docker.io/pgvector/pgvector:pg18
     container_name: hermes-hindsight-db
     restart: unless-stopped
     environment:

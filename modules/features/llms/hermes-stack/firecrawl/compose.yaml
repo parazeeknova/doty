@@ -86,7 +86,7 @@ services:
         compress: "true"
 
   redis:
-    image: redis:alpine
+    image: docker.io/redis:alpine
     networks:
       - firecrawl-net
     command: redis-server --bind 0.0.0.0
@@ -98,7 +98,7 @@ services:
         compress: "true"
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: docker.io/rabbitmq:3-management
     container_name: hermes-firecrawl-rabbitmq
     networks:
       - firecrawl-net

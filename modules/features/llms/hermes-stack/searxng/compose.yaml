@@ -7,7 +7,7 @@ name: hermes-searxng
 
 services:
   searxng:
-    image: searxng/searxng:latest
+    image: docker.io/searxng/searxng:latest
     container_name: hermes-searxng
     restart: unless-stopped
     ports:
