@@ -207,6 +207,27 @@
         shell = pkgs.fish;
       };
 
+      # -- Polkit & Sudo rules for systemctl --
+      security.sudo.extraRules = [
+        {
+          users = [ "parazeeknova" ];
+          commands = [
+            {
+              command = "/run/current-system/sw/bin/systemctl";
+              options = [ "NOPASSWD" ];
+            }
+          ];
+        }
+      ];
+      security.polkit.extraConfig = ''
+        polkit.addRule(function(action, subject) {
+            if (action.id == "org.freedesktop.systemd1.manage-units" &&
+                subject.user == "parazeeknova") {
+                return polkit.Result.YES;
+            }
+        });
+      '';
+
       # -- Misc --
       nixpkgs.config.allowUnfree = true;
       nixpkgs.config.permittedInsecurePackages = [

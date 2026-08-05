@@ -192,6 +192,11 @@ path = "src/bin/utils/update-tldraw.rs"
 name = "update_hypr_plugins"
 path = "src/bin/utils/update-hypr-plugins.rs"
 
+[[bin]]
+name = "toggle_service"
+path = "src/bin/utils/toggle_service.rs"
+
+
 
 
 

@@ -7,6 +7,8 @@ Scope {
     id: root
 
     property string homeDir: Quickshell.env("HOME")
+    property var servicesList: []
+    property var topProcessesList: []
     property string cpuName: ""
     property int cpuUsage: 0
     property int cpuTemp: 0
@@ -50,7 +52,6 @@ Scope {
         return " ".repeat(left) + str + " ".repeat(right);
     }
 
-    // Label value formatting helper. Ensure floating values are properly passed as strings.
     function formatLabelVal(label, valStr, unit, width) {
         var contentWidth = width - 2;
         var pad = contentWidth - label.length - valStr.length - unit.length;
@@ -60,11 +61,22 @@ Scope {
         return " " + label + " ".repeat(pad) + valStr + unit + " ";
     }
 
+    function padRight(str, width) {
+        if (str.length >= width)
+            return str.substring(0, width);
+        return str + " ".repeat(width - str.length);
+    }
+
+    function padLeft(str, width) {
+        if (str.length >= width)
+            return str.substring(0, width);
+        return " ".repeat(width - str.length) + str;
+    }
+
     Theme {
         id: theme
     }
 
-    // Process to fetch sysmon status
     Process {
         id: checkStatusProc
 
@@ -75,6 +87,8 @@ Scope {
             onStreamFinished: {
                 try {
                     var data = JSON.parse(this.text);
+                    root.servicesList = data.services || [];
+                    root.topProcessesList = data.top_processes || [];
                     root.cpuName = data.cpu_name || "CPU";
                     root.cpuUsage = data.cpu_usage || 0;
                     root.cpuTemp = data.cpu_temp || 0;
@@ -90,7 +104,6 @@ Scope {
                     root.ramSpeed = data.ram_speed || "N/A";
                     root.ramTotal = data.ram_total || 0;
                     root.ramUsed = data.ram_used || 0;
-                    // Disk 0
                     if (data.disk0) {
                         root.disk0Name = data.disk0.name || "NVMe 0";
                         root.disk0ReadRate = data.disk0.read_rate || 0;
@@ -100,7 +113,6 @@ Scope {
                         root.disk0FreeGb = data.disk0.free_gb || 0;
                         root.disk0UsagePct = data.disk0.usage_pct || 0;
                     }
-                    // Disk 1
                     if (data.disk1) {
                         root.disk1Name = data.disk1.name || "NVMe 1";
                         root.disk1ReadRate = data.disk1.read_rate || 0;
@@ -117,7 +129,6 @@ Scope {
         }
     }
 
-    // Poll status every 2 seconds
     Timer {
         id: pollTimer
 
@@ -140,7 +151,7 @@ Scope {
 
                 required property var modelData
                 property bool isClosing: false
-                property real animLeftMargin: -260
+                property real animLeftMargin: -280
                 property real animOpacity: 0
 
                 function closePopup() {
@@ -155,7 +166,7 @@ Scope {
                 color: "transparent"
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
                 focusable: true
-                implicitWidth: 240
+                implicitWidth: 260
                 implicitHeight: mainLayout.implicitHeight + 20
                 Component.onCompleted: introAnim.start()
 
@@ -169,14 +180,13 @@ Scope {
                     left: win.animLeftMargin
                 }
 
-                // Slide-in + fade-in
                 ParallelAnimation {
                     id: introAnim
 
                     NumberAnimation {
                         target: win
                         property: "animLeftMargin"
-                        from: -260
+                        from: -280
                         to: 32
                         duration: 120
                         easing.type: Easing.OutCubic
@@ -192,7 +202,6 @@ Scope {
                     }
                 }
 
-                // Slide-out + fade-out
                 ParallelAnimation {
                     id: exitAnim
 
@@ -202,7 +211,7 @@ Scope {
                         target: win
                         property: "animLeftMargin"
                         from: 32
-                        to: -260
+                        to: -280
                         duration: 100
                         easing.type: Easing.InCubic
                     }
@@ -251,7 +260,7 @@ Scope {
                         anchors.margins: 10
                         spacing: 8
 
-                        // Heading without icon, styled like other popups (9px, bold)
+                        // Top bar
                         Item {
                             width: parent.width
                             height: 14
@@ -267,7 +276,6 @@ Scope {
                                 renderType: Text.NativeRendering
                             }
 
-                            // btop launch button
                             Text {
                                 id: btnBtop
 
@@ -292,6 +300,105 @@ Scope {
                             }
                         }
 
+                        // --- SERVICES TOGGLES SECTION (ABOVE existing monitor) ---
+                        Column {
+                            width: parent.width
+                            spacing: 3
+
+                            Text {
+                                text: "󰓅 SERVICES"
+                                color: theme.accent
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 9
+                                font.bold: true
+                                renderType: Text.NativeRendering
+                            }
+
+                            Column {
+                                width: parent.width
+                                spacing: 4
+
+                                Repeater {
+                                    model: root.servicesList
+
+                                    delegate: Rectangle {
+                                        required property var modelData
+
+                                        width: parent.width
+                                        height: 22
+                                        color: theme.popupBgColor
+                                        border.width: 1
+                                        border.color: theme.accent
+
+                                        Row {
+                                            anchors.fill: parent
+                                            anchors.leftMargin: 6
+                                            anchors.rightMargin: 6
+                                            spacing: 4
+
+                                            Text {
+                                                width: 80
+                                                text: modelData.label || modelData.name
+                                                color: theme.accent
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 9
+                                                font.bold: true
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                elide: Text.ElideRight
+                                                renderType: Text.NativeRendering
+                                            }
+
+                                            Text {
+                                                text: modelData.active ? "[ACTIVE]" : "[INACTIVE]"
+                                                color: modelData.active ? "#a6e3a1" : "#f38ba8"
+                                                font.family: "FiraCode Nerd Font"
+                                                font.pixelSize: 8
+                                                font.bold: true
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                renderType: Text.NativeRendering
+                                            }
+
+                                            Item {
+                                                width: 1
+                                                height: 1
+                                                // Spacer
+                                            }
+
+                                            Rectangle {
+                                                id: toggleBtn
+
+                                                width: 44
+                                                height: 16
+                                                color: modelData.active ? theme.accent : "transparent"
+                                                border.width: 1
+                                                border.color: theme.accent
+                                                anchors.verticalCenter: parent.verticalCenter
+
+                                                Text {
+                                                    anchors.centerIn: parent
+                                                    text: modelData.active ? "ON" : "OFF"
+                                                    color: modelData.active ? theme.popupBgColor : theme.accent
+                                                    font.family: "FiraCode Nerd Font"
+                                                    font.pixelSize: 8
+                                                    font.bold: true
+                                                    renderType: Text.NativeRendering
+                                                }
+
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: {
+                                                        Quickshell.execDetached([root.homeDir + "/.config/quickshell/sysmon_popup/toggle_service", modelData.name]);
+                                                        checkStatusProc.running = true;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // --- HARDWARE MONITORS ---
                         Column {
                             spacing: 0
                             width: parent.width
@@ -316,7 +423,6 @@ Scope {
                                         leftPadding: 4
                                     }
 
-                                    // CPU Box
                                     Text {
                                         text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelVal("usage:", String(root.cpuUsage), "%", 17) + "┃\n" + "┃" + root.formatLabelVal("temp:", String(root.cpuTemp), "°C", 17) + "┃\n" + "┃" + root.formatLabelVal("freq:", root.cpuFreq.toFixed(2), "GHz", 17) + "┃\n" + "┃" + root.formatLabelVal("power:", root.cpuPower.toFixed(1), "W", 17) + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
                                         color: theme.accent
@@ -346,7 +452,6 @@ Scope {
                                         leftPadding: 4
                                     }
 
-                                    // GPU Box
                                     Text {
                                         text: "┏━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelVal("usage:", String(root.gpuUsage), "%", 17) + "┃\n" + "┃" + root.formatLabelVal("temp:", String(root.gpuTemp), "°C", 17) + "┃\n" + "┃" + root.formatLabelVal("used:", String(root.gpuMemUsed), "M", 17) + "┃\n" + "┃" + root.formatLabelVal("power:", root.gpuPower.toFixed(1), "W", 17) + "┃\n" + "┗━━━━━━━━━━━━━━━━━┛"
                                         color: theme.accent
@@ -361,7 +466,7 @@ Scope {
                                 }
                             }
 
-                            // 󰍛MEM label
+                            // 󰍛 MEM
                             Text {
                                 text: "󰍛 MEM: Micron Crucial CT2K16G48C40S5"
                                 color: theme.accent
@@ -371,7 +476,6 @@ Scope {
                                 renderType: Text.NativeRendering
                             }
 
-                            // RAM Box
                             Text {
                                 text: "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n" + "┃" + root.formatLabelVal("type:", root.ramName, "", 18) + " " + root.formatLabelVal("speed:", root.ramSpeed, "", 18) + "┃\n" + "┃" + root.formatLabelVal("ram:", (root.ramUsed.toFixed(2) + "/" + root.ramTotal.toFixed(2)), "G", 18) + " " + root.formatLabelVal("usg:", String(root.ramUsage), "%", 18) + "┃\n" + "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
                                 color: theme.accent
@@ -384,7 +488,7 @@ Scope {
                                 renderType: Text.NativeRendering
                             }
 
-                            // 󰋊 DISKS heading
+                            // 󰋊 DISKS
                             Text {
                                 text: "󰋊 DISKS"
                                 color: theme.accent
@@ -399,7 +503,6 @@ Scope {
                                 width: parent.width
                                 spacing: 0
 
-                                // NVMe 0 Column (Left)
                                 Column {
                                     width: parent.width / 2
                                     spacing: 0
@@ -429,7 +532,6 @@ Scope {
                                     }
                                 }
 
-                                // NVMe 1 Column (Right)
                                 Column {
                                     width: parent.width / 2
                                     spacing: 0
@@ -456,6 +558,59 @@ Scope {
                                         horizontalAlignment: Text.AlignHCenter
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         renderType: Text.NativeRendering
+                                    }
+                                }
+                            }
+                        }
+
+                        // --- TOP 5 PROCESSES LIST ---
+                        Column {
+                            width: parent.width
+                            spacing: 3
+
+                            Text {
+                                text: "󰍹 TOP 5 PROCESSES"
+                                color: theme.accent
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 9
+                                font.bold: true
+                                renderType: Text.NativeRendering
+                            }
+
+                            Rectangle {
+                                width: parent.width
+                                height: 16 + (root.topProcessesList.length * 14) + 4
+                                color: theme.popupBgColor
+                                border.width: 1
+                                border.color: theme.accent
+
+                                Column {
+                                    anchors.fill: parent
+                                    anchors.margins: 4
+                                    spacing: 2
+
+                                    // Header
+                                    Text {
+                                        text: root.padRight("NAME", 10) + " " + root.padLeft("CPU%", 5) + " " + root.padLeft("RAM%", 5) + " " + root.padLeft("R(M/s)", 6) + " " + root.padLeft("W(M/s)", 6)
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: true
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    Repeater {
+                                        model: root.topProcessesList
+
+                                        delegate: Text {
+                                            required property var modelData
+
+                                            text: root.padRight(modelData.name, 10) + " " + root.padLeft(modelData.cpu_pct.toFixed(1), 5) + " " + root.padLeft(modelData.ram_pct.toFixed(1), 5) + " " + root.padLeft(modelData.read_rate.toFixed(1), 6) + " " + root.padLeft(modelData.write_rate.toFixed(1), 6)
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                            renderType: Text.NativeRendering
+                                        }
                                     }
                                 }
                             }
