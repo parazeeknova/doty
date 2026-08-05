@@ -14,6 +14,23 @@ fn is_active(service: &str, user: bool) -> bool {
     }
 }
 
+fn run_systemctl(action: &str, service: &str, user: bool) {
+    if user {
+        let _ = Command::new("systemctl")
+            .args(["--user", action, "--now", service])
+            .status();
+    } else {
+        let status = Command::new("systemctl")
+            .args([action, "--now", service])
+            .status();
+        if status.map(|s| !s.success()).unwrap_or(true) {
+            let _ = Command::new("sudo")
+                .args(["systemctl", action, "--now", service])
+                .status();
+        }
+    }
+}
+
 fn send_notification(service_label: &str, turning_on: bool) {
     let status_str = if turning_on {
         "Enabled & Started"
@@ -45,25 +62,19 @@ fn main() {
         "suwayomi" => {
             let active = is_active("suwayomi-server.service", false);
             let action = if active { "disable" } else { "enable" };
-            let _ = Command::new("sudo")
-                .args(["systemctl", action, "--now", "suwayomi-server.service"])
-                .status();
+            run_systemctl(action, "suwayomi-server.service", false);
             send_notification("Suwayomi Server", !active);
         }
         "llama" => {
             let active = is_active("llama-server.service", true);
             let action = if active { "disable" } else { "enable" };
-            let _ = Command::new("systemctl")
-                .args(["--user", action, "--now", "llama-server.service"])
-                .status();
+            run_systemctl(action, "llama-server.service", true);
             send_notification("llama.cpp Server", !active);
         }
         "adguard" => {
             let active = is_active("adguardhome.service", false);
             let action = if active { "disable" } else { "enable" };
-            let _ = Command::new("sudo")
-                .args(["systemctl", action, "--now", "adguardhome.service"])
-                .status();
+            run_systemctl(action, "adguardhome.service", false);
             send_notification("AdGuard Home", !active);
         }
         _ => {

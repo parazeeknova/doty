@@ -345,12 +345,23 @@ Scope {
                                                 onExited: toggleText.opacity = 1.0
                                                 onClicked: {
                                                     Quickshell.execDetached([root.homeDir + "/.config/quickshell/sysmon_popup/toggle_service", modelData.name]);
-                                                    checkStatusProc.running = true;
+                                                    refreshTimer.start();
                                                 }
                                             }
                                         }
                                     }
                                 }
+                            }
+                        }
+
+                        Timer {
+                            id: refreshTimer
+
+                            interval: 400
+                            repeat: false
+                            onTriggered: {
+                                checkStatusProc.running = false;
+                                checkStatusProc.running = true;
                             }
                         }
 
