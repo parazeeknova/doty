@@ -91,8 +91,20 @@ struct AudioResult {
     current_media_source: Option<String>,
 }
 
+fn pactl_cmd() -> Command {
+    if let Ok(output) = Command::new("pactl").arg("--version").output() {
+        if output.status.success() {
+            return Command::new("pactl");
+        }
+    }
+    if std::path::Path::new("/run/current-system/sw/bin/pactl").exists() {
+        return Command::new("/run/current-system/sw/bin/pactl");
+    }
+    Command::new("pactl")
+}
+
 fn get_pactl_json(category: &str) -> serde_json::Value {
-    let Ok(output) = Command::new("pactl")
+    let Ok(output) = pactl_cmd()
         .args(["-f", "json", "list", category])
         .output()
     else {
@@ -132,7 +144,7 @@ fn main() {
     let mut default_source_name = String::new();
     let mut pipewire_version = "Running".to_string();
 
-    if let Ok(output) = Command::new("pactl").arg("info").output()
+    if let Ok(output) = pactl_cmd().arg("info").output()
         && output.status.success()
     {
         let out_str = String::from_utf8_lossy(&output.stdout);

@@ -155,6 +155,7 @@
         mpv
         pavucontrol
         pamixer
+        pulseaudio
 
         # -- System Tray / Apps --
         networkmanagerapplet
