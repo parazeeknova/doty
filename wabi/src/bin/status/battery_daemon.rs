@@ -63,6 +63,13 @@ fn default_low_kbd() -> i32 {
     0
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+enum PowerState {
+    AC,
+    Battery,
+    LowBattery,
+}
+
 fn load_settings(path: &Path) -> Settings {
     let default_settings = Settings {
         automation_enabled: true,
@@ -97,14 +104,7 @@ fn load_settings(path: &Path) -> Settings {
     }
 }
 
-fn notify(title: &str, message: &str, icon: &str) {
-    let home = std::env::var("HOME").unwrap_or_default();
-    let osdctl_path = Path::new(&home).join(".config/quickshell/osd/bin/osdctl");
-    if osdctl_path.exists() {
-        let _ = Command::new(&osdctl_path)
-            .args(["show", &format!("{}: {}", title, message), "good", "2000"])
-            .status();
-    }
+fn notify_desktop(title: &str, message: &str, icon: &str) {
     let _ = Command::new("notify-send")
         .args([title, message, "-i", icon, "-t", "3000"])
         .status();
@@ -138,6 +138,61 @@ fn set_keyboard_brightness(percent: i32) {
     }
 }
 
+fn is_ac_online() -> bool {
+    let root = Path::new("/sys/class/power_supply");
+    if let Ok(entries) = fs::read_dir(root) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if let Ok(kind) = fs::read_to_string(path.join("type")) {
+                let kind_str = kind.trim();
+                if (kind_str.eq_ignore_ascii_case("Mains")
+                    || kind_str.eq_ignore_ascii_case("USB")
+                    || kind_str.eq_ignore_ascii_case("ADP"))
+                    && let Ok(online) = fs::read_to_string(path.join("online"))
+                    && online.trim() == "1"
+                {
+                    return true;
+                }
+            }
+        }
+    }
+    false
+}
+
+fn determine_power_state(
+    bat_dir: &Path,
+    threshold: i32,
+    last_capacity: Option<i32>,
+) -> (PowerState, i32) {
+    let raw_status = fs::read_to_string(bat_dir.join("status"))
+        .map(|s| s.trim().to_string())
+        .unwrap_or_else(|_| "Unknown".to_string());
+
+    let raw_capacity = fs::read_to_string(bat_dir.join("capacity"))
+        .ok()
+        .and_then(|s| s.trim().parse::<i32>().ok());
+
+    let capacity = match raw_capacity {
+        Some(c) if c > 0 => c,
+        _ => last_capacity.unwrap_or(50),
+    };
+
+    let ac = is_ac_online()
+        || raw_status == "Charging"
+        || raw_status == "Full"
+        || (raw_status == "Not charging" && is_ac_online());
+
+    let state = if ac {
+        PowerState::AC
+    } else if capacity < threshold {
+        PowerState::LowBattery
+    } else {
+        PowerState::Battery
+    };
+
+    (state, capacity)
+}
+
 fn main() {
     let Some(bat_dir) = wabi::find_battery_dir() else {
         eprintln!("No battery supply found. Exiting daemon.");
@@ -147,14 +202,14 @@ fn main() {
     let home = std::env::var("HOME").unwrap_or_default();
     let settings_path = Path::new(&home).join(".config/quickshell/battery_popup/settings.json");
 
-    let mut last_status: Option<String> = None;
+    let mut current_state: Option<PowerState> = None;
     let mut last_capacity: Option<i32> = None;
     let mut last_mtime: Option<std::time::SystemTime> = None;
 
     let mut settings = load_settings(&settings_path);
 
     loop {
-        // Read file modification time
+        // Reload settings if file was modified
         if let Ok(metadata) = fs::metadata(&settings_path)
             && let Ok(mtime) = metadata.modified()
             && last_mtime.is_none_or(|last| mtime > last)
@@ -163,37 +218,26 @@ fn main() {
             last_mtime = Some(mtime);
         }
 
-        // Read battery state
-        let status = fs::read_to_string(bat_dir.join("status"))
-            .map(|s| s.trim().to_string())
-            .unwrap_or_else(|_| "Unknown".to_string());
-
-        let capacity = fs::read_to_string(bat_dir.join("capacity"))
-            .ok()
-            .and_then(|s| s.trim().parse::<i32>().ok())
-            .unwrap_or(0);
-
         if settings.automation_enabled {
-            let is_low = capacity < settings.low_battery_threshold;
-            let was_low = last_capacity.is_some_and(|c| c < settings.low_battery_threshold);
+            let (new_state, capacity) =
+                determine_power_state(&bat_dir, settings.low_battery_threshold, last_capacity);
 
-            let status_changed = last_status.as_ref() != Some(&status);
-            let low_crossed = is_low != was_low;
+            let state_changed = current_state != Some(new_state);
 
-            if status_changed || low_crossed || last_status.is_none() {
-                if status == "Charging" || status == "Full" {
-                    if last_status
-                        .as_ref()
-                        .is_none_or(|s| s != "Charging" && s != "Full")
-                    {
+            if state_changed {
+                match new_state {
+                    PowerState::AC => {
                         set_profile(&settings.ac_profile);
                         set_keyboard_brightness(settings.ac_kbd_brightness);
                         set_brightness(settings.ac_screen_brightness);
-                        if last_status.is_some() {
-                            notify(
+
+                        // Only notify on state transitions after startup
+                        if current_state.is_some() {
+                            notify_desktop(
                                 "Battery Automations",
                                 &format!(
-                                    "AC connected. Profile: {}. Keyboard: {}%. Brightness: {}%",
+                                    "AC Connected ({}%). Profile: {}. Keyboard: {}%. Brightness: {}%",
+                                    capacity,
                                     settings.ac_profile,
                                     settings.ac_kbd_brightness,
                                     settings.ac_screen_brightness
@@ -202,52 +246,50 @@ fn main() {
                             );
                         }
                     }
-                } else {
-                    if is_low {
-                        if !was_low || status_changed || last_status.is_none() {
-                            set_profile(&settings.low_profile);
-                            set_keyboard_brightness(settings.low_kbd_brightness);
-                            set_brightness(settings.low_screen_brightness);
-                            if last_status.is_some() {
-                                notify(
-                                    "Battery Automations",
-                                    &format!(
-                                        "Low Battery ({}%). Profile: {}. Keyboard: {}%. Brightness: {}%",
-                                        capacity,
-                                        settings.low_profile,
-                                        settings.low_kbd_brightness,
-                                        settings.low_screen_brightness
-                                    ),
-                                    "battery-low",
-                                );
-                            }
+                    PowerState::LowBattery => {
+                        set_profile(&settings.low_profile);
+                        set_keyboard_brightness(settings.low_kbd_brightness);
+                        set_brightness(settings.low_screen_brightness);
+
+                        if current_state.is_some() {
+                            notify_desktop(
+                                "Battery Automations",
+                                &format!(
+                                    "Low Battery ({}%). Profile: {}. Keyboard: {}%. Brightness: {}%",
+                                    capacity,
+                                    settings.low_profile,
+                                    settings.low_kbd_brightness,
+                                    settings.low_screen_brightness
+                                ),
+                                "battery-low",
+                            );
                         }
-                    } else {
-                        if was_low || status_changed || last_status.is_none() {
-                            set_profile(&settings.bat_profile);
-                            set_keyboard_brightness(settings.bat_kbd_brightness);
-                            set_brightness(settings.bat_screen_brightness);
-                            if last_status.is_some() {
-                                notify(
-                                    "Battery Automations",
-                                    &format!(
-                                        "On Battery ({}%). Profile: {}. Keyboard: {}%. Brightness: {}%",
-                                        capacity,
-                                        settings.bat_profile,
-                                        settings.bat_kbd_brightness,
-                                        settings.bat_screen_brightness
-                                    ),
-                                    "battery",
-                                );
-                            }
+                    }
+                    PowerState::Battery => {
+                        set_profile(&settings.bat_profile);
+                        set_keyboard_brightness(settings.bat_kbd_brightness);
+                        set_brightness(settings.bat_screen_brightness);
+
+                        if current_state.is_some() {
+                            notify_desktop(
+                                "Battery Automations",
+                                &format!(
+                                    "On Battery ({}%). Profile: {}. Keyboard: {}%. Brightness: {}%",
+                                    capacity,
+                                    settings.bat_profile,
+                                    settings.bat_kbd_brightness,
+                                    settings.bat_screen_brightness
+                                ),
+                                "battery",
+                            );
                         }
                     }
                 }
+                current_state = Some(new_state);
             }
+            last_capacity = Some(capacity);
         }
 
-        last_status = Some(status);
-        last_capacity = Some(capacity);
         std::thread::sleep(std::time::Duration::from_secs(3));
     }
 }
