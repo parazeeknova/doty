@@ -119,7 +119,6 @@ fn get_proc_io_rates(pid: u32) -> (f64, f64) {
         }
     }
 
-
     let _ = fs::create_dir_all(STAT_DIR);
     let prev_file = format!("{STAT_DIR}/proc_{pid}");
     let now = now_nanos();
