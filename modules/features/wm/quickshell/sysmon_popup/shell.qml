@@ -61,18 +61,6 @@ Scope {
         return " " + label + " ".repeat(pad) + valStr + unit + " ";
     }
 
-    function padRight(str, width) {
-        if (str.length >= width)
-            return str.substring(0, width);
-        return str + " ".repeat(width - str.length);
-    }
-
-    function padLeft(str, width) {
-        if (str.length >= width)
-            return str.substring(0, width);
-        return " ".repeat(width - str.length) + str;
-    }
-
     Theme {
         id: theme
     }
@@ -531,7 +519,7 @@ Scope {
                             }
                         }
 
-                        // --- TOP 5 PROCESSES LIST (Full Width, No Box) ---
+                        // --- TOP 5 PROCESSES LIST (100% Full-Width Row Grid) ---
                         Column {
                             width: parent.width
                             spacing: 3
@@ -549,29 +537,126 @@ Scope {
                                 width: parent.width
                                 spacing: 2
 
-                                // Header
-                                Text {
+                                // Header Row
+                                Row {
                                     width: parent.width
-                                    text: root.padRight("NAME", 11) + " " + root.padLeft("CPU%", 5) + " " + root.padLeft("RAM%", 5) + " " + root.padLeft("R(M/s)", 6) + " " + root.padLeft("W(M/s)", 6)
-                                    color: theme.accent
-                                    font.family: "FiraCode Nerd Font"
-                                    font.pixelSize: 8
-                                    font.bold: true
-                                    renderType: Text.NativeRendering
-                                }
+                                    height: 14
 
-                                Repeater {
-                                    model: root.topProcessesList
-
-                                    delegate: Text {
-                                        required property var modelData
-
-                                        width: parent.width
-                                        text: root.padRight(modelData.name, 11) + " " + root.padLeft(modelData.cpu_pct.toFixed(1), 5) + " " + root.padLeft(modelData.ram_pct.toFixed(1), 5) + " " + root.padLeft(modelData.read_rate.toFixed(1), 6) + " " + root.padLeft(modelData.write_rate.toFixed(1), 6)
+                                    Text {
+                                        width: parent.width * 0.36
+                                        text: "NAME"
                                         color: theme.accent
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
+                                        font.bold: true
+                                        elide: Text.ElideRight
                                         renderType: Text.NativeRendering
+                                    }
+
+                                    Text {
+                                        width: parent.width * 0.16
+                                        text: "CPU%"
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: true
+                                        horizontalAlignment: Text.AlignRight
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    Text {
+                                        width: parent.width * 0.16
+                                        text: "RAM%"
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: true
+                                        horizontalAlignment: Text.AlignRight
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    Text {
+                                        width: parent.width * 0.16
+                                        text: "R(M/s)"
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: true
+                                        horizontalAlignment: Text.AlignRight
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    Text {
+                                        width: parent.width * 0.16
+                                        text: "W(M/s)"
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 8
+                                        font.bold: true
+                                        horizontalAlignment: Text.AlignRight
+                                        renderType: Text.NativeRendering
+                                    }
+                                }
+
+                                // Process Data Rows
+                                Repeater {
+                                    model: root.topProcessesList
+
+                                    delegate: Row {
+                                        required property var modelData
+
+                                        width: parent.width
+                                        height: 14
+
+                                        Text {
+                                            width: parent.width * 0.36
+                                            text: modelData.name
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                            elide: Text.ElideRight
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                        Text {
+                                            width: parent.width * 0.16
+                                            text: modelData.cpu_pct.toFixed(1)
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                            horizontalAlignment: Text.AlignRight
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                        Text {
+                                            width: parent.width * 0.16
+                                            text: modelData.ram_pct.toFixed(1)
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                            horizontalAlignment: Text.AlignRight
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                        Text {
+                                            width: parent.width * 0.16
+                                            text: modelData.read_rate.toFixed(1)
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                            horizontalAlignment: Text.AlignRight
+                                            renderType: Text.NativeRendering
+                                        }
+
+                                        Text {
+                                            width: parent.width * 0.16
+                                            text: modelData.write_rate.toFixed(1)
+                                            color: theme.accent
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 8
+                                            horizontalAlignment: Text.AlignRight
+                                            renderType: Text.NativeRendering
+                                        }
                                     }
                                 }
                             }

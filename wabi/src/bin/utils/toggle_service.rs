@@ -1,3 +1,4 @@
+use notify_rust::Notification;
 use std::env;
 use std::process::Command;
 
@@ -11,6 +12,25 @@ fn is_active(service: &str, user: bool) -> bool {
         Ok(out) => String::from_utf8_lossy(&out.stdout).trim() == "active",
         Err(_) => false,
     }
+}
+
+fn send_notification(service_label: &str, turning_on: bool) {
+    let status_str = if turning_on {
+        "Enabled & Started"
+    } else {
+        "Disabled & Stopped"
+    };
+    let icon = if turning_on {
+        "emblem-default"
+    } else {
+        "process-stop"
+    };
+    let _ = Notification::new()
+        .summary("Service Manager")
+        .body(&format!("{service_label} service is now {status_str}"))
+        .icon(icon)
+        .timeout(3000)
+        .show();
 }
 
 fn main() {
@@ -28,6 +48,7 @@ fn main() {
             let _ = Command::new("sudo")
                 .args(["systemctl", action, "--now", "suwayomi-server.service"])
                 .status();
+            send_notification("Suwayomi Server", !active);
         }
         "llama" => {
             let active = is_active("llama-server.service", true);
@@ -35,6 +56,7 @@ fn main() {
             let _ = Command::new("systemctl")
                 .args(["--user", action, "--now", "llama-server.service"])
                 .status();
+            send_notification("llama.cpp Server", !active);
         }
         "adguard" => {
             let active = is_active("adguardhome.service", false);
@@ -42,6 +64,7 @@ fn main() {
             let _ = Command::new("sudo")
                 .args(["systemctl", action, "--now", "adguardhome.service"])
                 .status();
+            send_notification("AdGuard Home", !active);
         }
         _ => {
             eprintln!("Unknown service: {}", target);
