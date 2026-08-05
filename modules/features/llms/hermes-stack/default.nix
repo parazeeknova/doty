@@ -19,12 +19,14 @@
       sops.secrets.hindsight-db-password = { };
       sops.secrets.firecrawl-db-password = { };
       sops.secrets.firecrawl-bull-auth-key = { };
+      sops.secrets.searxng-secret = { };
       sops.templates.hermes-stack-env = {
         content = ''
           GENERALCOMPUTE_API_KEY=${config.sops.placeholder.generalcompute-api-key}
           HINDSIGHT_DB_PASSWORD=${config.sops.placeholder.hindsight-db-password}
           FIRECRAWL_DB_PASSWORD=${config.sops.placeholder.firecrawl-db-password}
           FIRECRAWL_BULL_AUTH_KEY=${config.sops.placeholder.firecrawl-bull-auth-key}
+          SEARXNG_SECRET=${config.sops.placeholder.searxng-secret}
         '';
         path = envFile;
         mode = "0400";
@@ -67,6 +69,24 @@
           # First start pulls multi-GB images into the root podman store.
           # Give it 30 min; subsequent starts are near-instant (--policy missing).
           TimeoutStartSec = 1800;
+        };
+      };
+
+      # ── SearXNG stack ──────────────────────────────────────────────────
+      systemd.services.hermes-searxng = {
+        description = "Hermes local SearXNG (podman-compose)";
+        after = [ "network-online.target" "podman.socket" "podman.service" ];
+        wants = [ "network-online.target" ];
+        wantedBy = [ "multi-user.target" ];
+        path = with pkgs; [ podman podman-compose gnused coreutils ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          WorkingDirectory = "${stackDir}/searxng";
+          EnvironmentFile = envFile;
+          ExecStart = "${podmanCompose} up -d --remove-orphans";
+          ExecStop = "${podmanCompose} down";
+          TimeoutStartSec = 600;
         };
       };
 

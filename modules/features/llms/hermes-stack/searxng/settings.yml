@@ -1,0 +1,26 @@
+use_default_settings: true
+
+general:
+  instance_name: "Hermes Search"
+  debug: false
+
+search:
+  formats:
+    - html
+    - json
+  default_lang: "en"
+  safe_search: 0
+  autocomplete: ""
+  default_lang: "en"
+
+server:
+  port: 8080
+  bind_address: "0.0.0.0"
+  secret_key: "hermes"
+  limiter: false
+
+outgoing:
+  request_timeout: 8.0
+  max_request_timeout: 15.0
+  pool_connections: 50
+  pool_maxsize: 50
