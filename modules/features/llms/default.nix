@@ -12,6 +12,16 @@
       hermes-desktop = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.desktop;
       hermes-cli = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
+      # Wake word ("Hey Hermes"): the default openwakeword engine isn't in
+      # nixpkgs, so hermes uses the sherpa provider (sherpa-onnx). The
+      # extraPythonPackages override on the flake package doesn't reach the
+      # runtime PYTHONPATH, so we add sherpa-onnx + sentencepiece site-packages
+      # directly via home.sessionVariables (content-addressed store paths).
+      wakePythonPath = pkgs.lib.makeSearchPath pkgs.python312.sitePackages [
+        pkgs.python312Packages.sherpa-onnx
+        pkgs.python312Packages.sentencepiece
+      ];
+
       # Hermes Desktop is built with Electron's Window Controls Overlay on
       # plain Linux, which paints native min/max/close buttons in the
       # top-right. On Hyprland those are redundant (the WM provides its own
@@ -51,8 +61,11 @@
         {
           # agent-browser downloads its own Chrome (which breaks on NixOS -
           # missing libglib etc). Point it at the system Chrome instead.
+          # PYTHONPATH adds sherpa-onnx + sentencepiece so hermes' wake word
+          # (provider: sherpa) can import them at runtime.
           home.sessionVariables = {
             AGENT_BROWSER_EXECUTABLE_PATH = "google-chrome-stable";
+            PYTHONPATH = wakePythonPath;
           };
 
           home.file.".pi/agent/models.json".source =
@@ -88,27 +101,33 @@
               StartLimitIntervalSec = 0;
             };
 
-            Service = {
-              Type = "simple";
-              # Must run via the `hermes` wrapper, not the raw venv python —
-              # the wrapper sets HERMES_BUNDLED_PLUGINS, without which the
-              # telegram/discord adapters are never discovered ("No adapter
-              # available"). Use the absolute /run/current-system/sw path:
-              # user systemd units have no PATH, so a bare `hermes` fails
-              # with status 203/EXEC.
-              ExecStart = "/run/current-system/sw/bin/hermes gateway run";
-              WorkingDirectory = "%h/.hermes";
-              Environment = "HERMES_HOME=%h/.hermes";
-              Restart = "always";
-              RestartSec = 5;
-              RestartForceExitStatus = 75;
-              RestartPreventExitStatus = 78;
-              KillMode = "mixed";
-              KillSignal = "SIGTERM";
-              TimeoutStopSec = 60;
-              StandardOutput = "journal";
-              StandardError = "journal";
-            };
+              Service = {
+                Type = "simple";
+                # Must run via the `hermes` wrapper, not the raw venv python —
+                # the wrapper sets HERMES_BUNDLED_PLUGINS, without which the
+                # telegram/discord adapters are never discovered ("No adapter
+                # available"). Use the absolute /run/current-system/sw path:
+                # user systemd units have no PATH, so a bare `hermes` fails
+                # with status 203/EXEC.
+                ExecStart = "/run/current-system/sw/bin/hermes gateway run";
+                Environment = "HERMES_HOME=%h/.hermes";
+                # sherpa-onnx + sentencepiece for the wake word
+                # (provider: sherpa). home.sessionVariables doesn't reach
+                # systemd units, so set it here explicitly.
+                EnvironmentFile = "${pkgs.writeText "hermes-gateway-pythonpath" ''
+                  PYTHONPATH=${wakePythonPath}
+                ''}";
+                WorkingDirectory = "%h/.hermes";
+                Restart = "always";
+                RestartSec = 5;
+                RestartForceExitStatus = 75;
+                RestartPreventExitStatus = 78;
+                KillMode = "mixed";
+                KillSignal = "SIGTERM";
+                TimeoutStopSec = 60;
+                StandardOutput = "journal";
+                StandardError = "journal";
+              };
 
             Install = {
               WantedBy = [ "default.target" ];

@@ -7,7 +7,7 @@
     "enabledThemes": [],
     "enableReactDevtools": false,
     "frameless": false,
-    "transparent": true,
+    "transparent": false,
     "winCtrlQ": false,
     "windowsMaterial": "none",
     "disableMinSize": false,
@@ -68,7 +68,14 @@
             "enabled": false
         },
         "BetterFolders": {
-            "enabled": true
+            "enabled": true,
+            "sidebar": true,
+            "showFolderIcon": 1,
+            "keepIcons": false,
+            "closeAllHomeButton": false,
+            "closeAllFolders": false,
+            "forceOpen": false,
+            "sidebarAnim": true
         },
         "BetterGifAltText": {
             "enabled": false
@@ -80,7 +87,9 @@
             "enabled": false
         },
         "BetterRoleDot": {
-            "enabled": true
+            "enabled": true,
+            "bothStyles": false,
+            "copyRoleColorInProfilePopout": false
         },
         "BetterSessions": {
             "enabled": false
@@ -164,7 +173,13 @@
             "enabled": false
         },
         "FakeNitro": {
-            "enabled": true
+            "enabled": true,
+            "enableStickerBypass": true,
+            "enableStreamQualityBypass": true,
+            "enableEmojiBypass": true,
+            "transformEmojis": true,
+            "transformStickers": true,
+            "transformCompoundSentence": false
         },
         "FakeProfileThemes": {
             "enabled": false
@@ -549,6 +564,15 @@
         },
         "MusicRichPresence": {
             "enabled": false
+        },
+        "TenorGifSearch": {
+            "enabled": false
+        },
+        "ContextMenuAPI": {
+            "enabled": true
+        },
+        "NoticesAPI": {
+            "enabled": true
         }
     },
     "uiElements": {
@@ -565,6 +589,6 @@
         "authenticated": false,
         "url": "https://api.vencord.dev/",
         "settingsSync": false,
-        "settingsSyncVersion": 1784457896354
+        "settingsSyncVersion": 1785991502103
     }
 }
