@@ -54,6 +54,7 @@
         hermes-desktop-patched
         hermes-cli
         opus
+        portaudio
       ];
 
       home-manager.users.parazeeknova =
@@ -77,18 +78,26 @@
           home.file.".hermes/SOUL.md".source =
             config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/hermes-SOUL.md";
 
-          xdg.dataFile."applications/hermes.desktop".text = ''
-            [Desktop Entry]
-            Type=Application
-            Name=Hermes Desktop
-            GenericName=AI Assistant
-            Comment=Hermes AI assistant desktop app
-            Exec=hermes-desktop %U
-            Icon=hermes
-            Terminal=false
-            Categories=Utility;Network;
-            StartupNotify=true
-          '';
+          xdg.dataFile."applications/hermes.desktop" = {
+            # The Hermes desktop app rewrites its own .desktop entry on every
+            # launch, replacing this managed symlink with a regular file. Then
+            # home-manager wants to back it up, finds a stale .bak, and fails
+            # the whole switch. force=true overwrites without backing up.
+            force = true;
+            text = ''
+              [Desktop Entry]
+              Type=Application
+              Name=Hermes Desktop
+              GenericName=AI Assistant
+              Comment=Hermes AI assistant desktop app
+              Exec=hermes-desktop %U
+              Icon=hermes
+              Terminal=false
+              Categories=Utility;Network;
+              StartupNotify=true
+              MimeType=x-scheme-handler/hermes;
+            '';
+          };
 
           xdg.dataFile."icons/hermes.png".source =
             "${hermes-desktop-patched}/share/hermes-desktop/dist/hermes.png";
