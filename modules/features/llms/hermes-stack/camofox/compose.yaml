@@ -1,0 +1,26 @@
+name: hermes-camofox
+
+# Camofox browser server for the Hermes local stack (anti-detection
+# browser automation backend).
+# - Host port 49377 (container 9377)
+# - Hermes connects via CAMOFOX_URL=http://127.0.0.1:49377
+
+services:
+  camofox:
+    image: ghcr.io/jo-inc/camofox-browser:1.13.0
+    container_name: hermes-camofox
+    restart: unless-stopped
+    ports:
+      - "49377:9377"
+    environment:
+      CAMOFOX_PORT: "9377"
+      MAX_OLD_SPACE_SIZE: "512"
+    # Camofox is browser automation; keep it bounded but give it room.
+    cpus: 2.0
+    mem_limit: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"

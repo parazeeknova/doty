@@ -296,13 +296,13 @@ dashboard:
 tts:
   provider: edge
   edge:
-    voice: en-US-AriaNeural
+    voice: en-US-GuyNeural
 stt:
   enabled: true
   provider: local
   language: en
 voice:
-  auto_tts: false
+  auto_tts: true
 wake_word:
   enabled: true
   provider: sherpa

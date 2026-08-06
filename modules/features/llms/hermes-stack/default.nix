@@ -135,6 +135,26 @@
         };
       };
 
+      # ── Camofox stack ──────────────────────────────────────────────────
+      systemd.services.hermes-camofox = {
+        description = "Hermes local Camofox browser server (podman-compose)";
+        after = [ "network-online.target" "podman.socket" "podman.service" ];
+        wants = [ "network-online.target" ];
+        wantedBy = [ "multi-user.target" ];
+        path = with pkgs; [ podman podman-compose gnused coreutils ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          WorkingDirectory = "${stackDir}/camofox";
+          ExecStart = "${podmanCompose} up -d --remove-orphans";
+          ExecStop = "${podmanCompose} down";
+          TimeoutStartSec = 600;
+          Restart = "on-failure";
+          RestartSec = 10;
+          StartLimitIntervalSec = 0;
+        };
+      };
+
       # ── Resource conservation: idle stop timers ────────────────────────
       # Firecrawl is only needed when hermes crawls. Stop it after 30 min of
       # idle; start on demand by systemctl start. Hindsight (memory) should
