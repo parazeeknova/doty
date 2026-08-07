@@ -15,7 +15,8 @@
         appimage-run
         azure-cli
         cloudflare-cli
-        awscli
+        awscli2
+        google-cloud-sdk
 
         # -- Languages --
         nodejs
