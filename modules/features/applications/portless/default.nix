@@ -30,6 +30,14 @@
           nodejs
           coreutils
         ];
+        environment = {
+          # Run the proxy against the user's state dir so routes registered by
+          # `portless <name> next dev` (run as parazeeknova) are shared. Without
+          # this the root service uses /root/.portless, splitting routes from the
+          # apps that register them.
+          HOME = "/home/parazeeknova";
+          PORTLESS_STATE_DIR = "/home/parazeeknova/.portless";
+        };
         serviceConfig = {
           Type = "simple";
           ExecStart = "${pkgs.nodejs}/bin/node ${portlessBin} proxy start --foreground --port 443 --https --skip-trust";
