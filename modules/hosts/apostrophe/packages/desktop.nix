@@ -86,10 +86,10 @@
         # -- Tldraw Offline --
         (pkgs.appimageTools.wrapType2 {
           pname = "tldraw-offline";
-          version = "1.12.1";
+          version = "1.13.2";
           src = pkgs.fetchurl {
-            url = "https://github.com/tldraw/tldraw-offline/releases/download/v1.12.1/tldraw-offline-linux-x86_64.AppImage";
-            sha256 = "0qmlw3dczxp2qn74p1djzdncf0b3xkvlm1qmy4w83nzm9z5a6c7w";
+            url = "https://github.com/tldraw/tldraw-offline/releases/download/v1.13.2/tldraw-offline-linux-x86_64.AppImage";
+            sha256 = "0n75qc1wy45wkckgbj31xacz2q0zynsh3k4jic1dyk13ljr5fp22";
           };
           extraInstallCommands = ''
             mkdir -p $out/share/applications
