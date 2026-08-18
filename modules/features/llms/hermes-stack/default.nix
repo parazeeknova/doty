@@ -138,10 +138,19 @@
       # ── Camofox stack ──────────────────────────────────────────────────
       systemd.services.hermes-camofox = {
         description = "Hermes local Camofox browser server (podman-compose)";
-        after = [ "network-online.target" "podman.socket" "podman.service" ];
+        after = [
+          "network-online.target"
+          "podman.socket"
+          "podman.service"
+        ];
         wants = [ "network-online.target" ];
         wantedBy = [ "multi-user.target" ];
-        path = with pkgs; [ podman podman-compose gnused coreutils ];
+        path = with pkgs; [
+          podman
+          podman-compose
+          gnused
+          coreutils
+        ];
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;

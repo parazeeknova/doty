@@ -110,33 +110,33 @@
               StartLimitIntervalSec = 0;
             };
 
-              Service = {
-                Type = "simple";
-                # Must run via the `hermes` wrapper, not the raw venv python —
-                # the wrapper sets HERMES_BUNDLED_PLUGINS, without which the
-                # telegram/discord adapters are never discovered ("No adapter
-                # available"). Use the absolute /run/current-system/sw path:
-                # user systemd units have no PATH, so a bare `hermes` fails
-                # with status 203/EXEC.
-                ExecStart = "/run/current-system/sw/bin/hermes gateway run";
-                Environment = "HERMES_HOME=%h/.hermes";
-                # sherpa-onnx + sentencepiece for the wake word
-                # (provider: sherpa). home.sessionVariables doesn't reach
-                # systemd units, so set it here explicitly.
-                EnvironmentFile = "${pkgs.writeText "hermes-gateway-pythonpath" ''
-                  PYTHONPATH=${wakePythonPath}
-                ''}";
-                WorkingDirectory = "%h/.hermes";
-                Restart = "always";
-                RestartSec = 5;
-                RestartForceExitStatus = 75;
-                RestartPreventExitStatus = 78;
-                KillMode = "mixed";
-                KillSignal = "SIGTERM";
-                TimeoutStopSec = 60;
-                StandardOutput = "journal";
-                StandardError = "journal";
-              };
+            Service = {
+              Type = "simple";
+              # Must run via the `hermes` wrapper, not the raw venv python —
+              # the wrapper sets HERMES_BUNDLED_PLUGINS, without which the
+              # telegram/discord adapters are never discovered ("No adapter
+              # available"). Use the absolute /run/current-system/sw path:
+              # user systemd units have no PATH, so a bare `hermes` fails
+              # with status 203/EXEC.
+              ExecStart = "/run/current-system/sw/bin/hermes gateway run";
+              Environment = "HERMES_HOME=%h/.hermes";
+              # sherpa-onnx + sentencepiece for the wake word
+              # (provider: sherpa). home.sessionVariables doesn't reach
+              # systemd units, so set it here explicitly.
+              EnvironmentFile = "${pkgs.writeText "hermes-gateway-pythonpath" ''
+                PYTHONPATH=${wakePythonPath}
+              ''}";
+              WorkingDirectory = "%h/.hermes";
+              Restart = "always";
+              RestartSec = 5;
+              RestartForceExitStatus = 75;
+              RestartPreventExitStatus = 78;
+              KillMode = "mixed";
+              KillSignal = "SIGTERM";
+              TimeoutStopSec = 60;
+              StandardOutput = "journal";
+              StandardError = "journal";
+            };
 
             Install = {
               WantedBy = [ "default.target" ];

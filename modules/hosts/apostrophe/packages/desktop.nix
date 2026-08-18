@@ -32,7 +32,7 @@
         # -- Verso --
         (
           let
-            verso-extracted = pkgs.appimageTools.extractType2 {
+            verso-extracted = pkgs.appimageTools.extract {
               pname = "verso";
               version = "0.7.45";
               src = pkgs.fetchurl {
