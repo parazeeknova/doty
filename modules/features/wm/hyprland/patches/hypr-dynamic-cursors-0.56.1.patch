@@ -1,13 +1,3 @@
-diff --git a/src/main.cpp b/src/main.cpp
-index 4b95f26..81643c1 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -190,3 +190,3 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
-         g_pRenderSoftwareCursorsForHook = hook(
-             pmf_address(&Pointer::CPointerManager::renderSoftwareCursorsFor),
--            "_ZN7Pointer15CPointerManager24renderSoftwareCursorsForEN9Hyprutils6Memory14CSharedPointerIN7Monitor8CMonitorEEERKNSt6chrono10time_pointINS7_3_V212steady_clockENS7_8durationIlSt5ratioILl1ELl1000000000EEEEEERNS1_4Math7CRegionESt8optionalINSI_8Vector2DEEbb",
-+            "_ZN7Pointer15CPointerManager24renderSoftwareCursorsForEN9Hyprutils6Memory14CSharedPointerIN7Monitor8CMonitorEEERKNSt6chrono10time_pointINS7_3_V212steady_clockENS7_8durationIlSt5ratioILl1ELl1000000000EEEEEERNS1_4Math7CRegionESt8optionalINSI_8Vector2DEEb",
-             (void*) &hkRenderSoftwareCursorsFor
 diff --git a/src/other/Shake.cpp b/src/other/Shake.cpp
 index 2d486c0..d2b87b7 100644
 --- a/src/other/Shake.cpp
