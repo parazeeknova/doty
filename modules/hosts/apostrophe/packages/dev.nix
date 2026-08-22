@@ -26,6 +26,21 @@
             --add-flags "$out/libexec/portless/dist/cli.js"
         '';
       };
+      herdr = pkgs.stdenv.mkDerivation rec {
+        pname = "herdr";
+        version = "0.8.2";
+
+        src = pkgs.fetchurl {
+          url = "https://github.com/herdrdev/herdr/releases/download/v${version}/herdr-linux-x86_64";
+          sha256 = "1x7cda775xin16wjs63bwc97zdnzn9z1lbpa8fr983299nhm0qcp";
+        };
+
+        dontUnpack = true;
+
+        installPhase = ''
+          install -m755 -D $src $out/bin/herdr
+        '';
+      };
     in
     {
 
@@ -34,6 +49,7 @@
         wrangler
         agent-browser
         portless
+        herdr
         appimage-run
         azure-cli
         cloudflare-cli

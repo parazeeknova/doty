@@ -209,4 +209,6 @@ known_builtin_toolsets:
     - web
     - x_search
     - yuanbao
-
+plugins:
+  enabled:
+    - herdr-agent-state

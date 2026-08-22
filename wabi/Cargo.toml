@@ -196,6 +196,10 @@ path = "src/bin/utils/update-hypr-plugins.rs"
 name = "update_portless"
 path = "src/bin/utils/update-portless.rs"
 
+[[bin]]
+name = "update_herdr"
+path = "src/bin/utils/update-herdr.rs"
+
 
 
 

@@ -141,6 +141,14 @@ fn main() {
         print_warning("Portless check/update failed or skipped.");
     }
 
+    // Step 0.69: Check and update Herdr
+    print_step("Checking and updating Herdr...");
+    if run_cmd("./wabi/target/release/update_herdr", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
+        print_success("Herdr check/update completed.");
+    } else {
+        print_warning("Herdr check/update failed or skipped.");
+    }
+
     // Step 0.7: Update Nix Flake inputs
     print_step("Updating Nix flake inputs...");
     let mut update_args = vec!["flake", "update"];
