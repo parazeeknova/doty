@@ -1,85 +1,68 @@
 {
-  "$schema": "https://opencode.ai/config.json",
-  "mcp": {
+  "mcpServers": {
     "context7": {
-      "type": "remote",
-      "url": "https://mcp.context7.com/mcp",
+      "serverUrl": "https://mcp.context7.com/mcp",
       "headers": {
         "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
-      },
-      "enabled": true
+      }
     },
     "github": {
-      "type": "local",
-      "command": [
-        "npx",
+      "command": "npx",
+      "args": [
         "-y",
         "@modelcontextprotocol/server-github"
       ],
-      "environment": {
+      "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_PERSONAL_ACCESS_TOKEN}"
-      },
-      "enabled": true
+      }
     },
     "filesystem": {
-      "type": "local",
-      "command": [
-        "npx",
+      "command": "npx",
+      "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
         "/home/parazeeknova/doty",
         "/home/parazeeknova/Repository",
         "/home/parazeeknova/Projects",
         "/home/parazeeknova"
-      ],
-      "enabled": true
+      ]
     },
     "playwright": {
-      "type": "local",
-      "command": [
-        "npx",
+      "command": "npx",
+      "args": [
         "-y",
         "@playwright/mcp"
-      ],
-      "enabled": true
+      ]
     },
     "chrome-devtools": {
-      "type": "local",
-      "command": [
-        "npx",
+      "command": "npx",
+      "args": [
         "-y",
         "chrome-devtools-mcp@latest",
         "--autoConnect"
-      ],
-      "enabled": true
+      ]
     },
     "firecrawl": {
-      "type": "local",
-      "command": [
-        "bunx",
+      "command": "bunx",
+      "args": [
         "firecrawl-mcp"
       ],
-      "environment": {
+      "env": {
         "FIRECRAWL_API_URL": "http://127.0.0.1:48002"
-      },
-      "enabled": true
+      }
     },
     "hindsight": {
-      "type": "remote",
-      "url": "http://127.0.0.1:48888/mcp/default",
-      "enabled": true
+      "serverUrl": "http://127.0.0.1:48888/mcp/default"
     },
     "camofox": {
-      "type": "local",
-      "command": [
-        "npx",
+      "command": "npx",
+      "args": [
         "-y",
         "camofox-mcp@latest"
       ],
-      "environment": {
+      "env": {
         "CAMOFOX_URL": "http://127.0.0.1:49377"
-      },
-      "enabled": true
+      }
     }
   }
 }

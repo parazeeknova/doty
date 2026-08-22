@@ -22,6 +22,8 @@
             defaultSopsFile = ../../secrets/secrets.yaml;
             age.keyFile = "/home/parazeeknova/.config/sops/age/keys.txt";
             secrets.openrouter-api-key = { };
+            secrets.context7-api-key = { };
+            secrets.github-token = { };
             templates."claude-settings" = {
               content = ''
                 {
@@ -38,7 +40,75 @@
                     "CLAUDE_CODE_SUBAGENT_MODEL": "stealth/ox-alpha",
                     "CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY": "1",
                     "CLAUDE_CODE_EFFORT_LEVEL": "max",
-                    "OPENROUTER_API_KEY": "${config.sops.placeholder.openrouter-api-key}"
+                    "OPENROUTER_API_KEY": "${config.sops.placeholder.openrouter-api-key}",
+                    "CONTEXT7_API_KEY": "${config.sops.placeholder.context7-api-key}",
+                    "GITHUB_PERSONAL_ACCESS_TOKEN": "${config.sops.placeholder.github-token}"
+                  },
+                  "mcpServers": {
+                    "context7": {
+                      "url": "https://mcp.context7.com/mcp",
+                      "headers": {
+                        "CONTEXT7_API_KEY": "${config.sops.placeholder.context7-api-key}"
+                      }
+                    },
+                    "github": {
+                      "command": "npx",
+                      "args": [
+                        "-y",
+                        "@modelcontextprotocol/server-github"
+                      ],
+                      "env": {
+                        "GITHUB_PERSONAL_ACCESS_TOKEN": "${config.sops.placeholder.github-token}"
+                      }
+                    },
+                    "filesystem": {
+                      "command": "npx",
+                      "args": [
+                        "-y",
+                        "@modelcontextprotocol/server-filesystem",
+                        "/home/parazeeknova/doty",
+                        "/home/parazeeknova/Repository",
+                        "/home/parazeeknova/Projects",
+                        "/home/parazeeknova"
+                      ]
+                    },
+                    "playwright": {
+                      "command": "npx",
+                      "args": [
+                        "-y",
+                        "@playwright/mcp"
+                      ]
+                    },
+                    "chrome-devtools": {
+                      "command": "npx",
+                      "args": [
+                        "-y",
+                        "chrome-devtools-mcp@latest",
+                        "--autoConnect"
+                      ]
+                    },
+                    "firecrawl": {
+                      "command": "bunx",
+                      "args": [
+                        "firecrawl-mcp"
+                      ],
+                      "env": {
+                        "FIRECRAWL_API_URL": "http://127.0.0.1:48002"
+                      }
+                    },
+                    "hindsight": {
+                      "url": "http://127.0.0.1:48888/mcp/default"
+                    },
+                    "camofox": {
+                      "command": "npx",
+                      "args": [
+                        "-y",
+                        "camofox-mcp@latest"
+                      ],
+                      "env": {
+                        "CAMOFOX_URL": "http://127.0.0.1:49377"
+                      }
+                    }
                   }
                 }
               '';
