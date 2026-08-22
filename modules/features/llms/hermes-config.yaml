@@ -36,7 +36,7 @@ voice:
   auto_tts: false
 wake_word:
   enabled: true
-  provider: sherpa
+  provider: openwakeword
   phrase: hey hermes
 memory:
   provider: hindsight

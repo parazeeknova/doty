@@ -12,15 +12,39 @@
       hermes-desktop = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.desktop;
       hermes-cli = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
-      # Wake word ("Hey Hermes"): the default openwakeword engine isn't in
-      # nixpkgs, so hermes uses the sherpa provider (sherpa-onnx). The
-      # extraPythonPackages override on the flake package doesn't reach the
-      # runtime PYTHONPATH, so we add sherpa-onnx + sentencepiece site-packages
-      # directly via home.sessionVariables (content-addressed store paths).
+      openwakeword = pkgs.python312Packages.buildPythonPackage {
+        pname = "openwakeword";
+        version = "0.6.0";
+        src = pkgs.fetchFromGitHub {
+          owner = "dscripka";
+          repo = "openWakeWord";
+          rev = "v0.6.0";
+          hash = "sha256-QsXV9REAHdP0Y0fVZuU+Gt9+gcPMB60bc3DOMDYuaDM=";
+        };
+        format = "setuptools";
+        postPatch = ''
+          sed -i "/tflite-runtime/d" setup.py
+        '';
+        propagatedBuildInputs = with pkgs.python312Packages; [
+          onnxruntime
+          tqdm
+          scipy
+          scikit-learn
+          requests
+        ];
+        doCheck = false;
+        pythonImportsCheck = [ "openwakeword" ];
+      };
+
+      # Wake word ("Hey Hermes"): OpenWakeWord & Sherpa providers.
+      # The extraPythonPackages override on the flake package doesn't reach the
+      # runtime PYTHONPATH, so we add openwakeword, sherpa-onnx, sentencepiece
+      # site-packages directly via home.sessionVariables (content-addressed store paths).
       wakePythonPath = pkgs.lib.makeSearchPath pkgs.python312.sitePackages [
+        openwakeword
         pkgs.python312Packages.sherpa-onnx
         pkgs.python312Packages.sentencepiece
-        pkgs.python314Packages.pyyaml
+        pkgs.python312Packages.pyyaml
       ];
 
       # Hermes Desktop is built with Electron's Window Controls Overlay on

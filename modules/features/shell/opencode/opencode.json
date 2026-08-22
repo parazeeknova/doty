@@ -56,8 +56,7 @@
     "firecrawl": {
       "type": "local",
       "command": [
-        "npx",
-        "-y",
+        "bunx",
         "firecrawl-mcp"
       ],
       "environment": {
