@@ -61,6 +61,13 @@
           set -gx CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY "1"
           set -gx CLAUDE_CODE_EFFORT_LEVEL "max"
 
+          # -- Strix Configuration --
+          set -gx STRIX_LLM "openai/deepseek/deepseek-v4-flash"
+          set -gx LLM_API_BASE "https://api-gateway.merge.dev/v1/openai"
+          set -gx OPENAI_BASE_URL "https://api-gateway.merge.dev/v1/openai"
+          set -gx LLM_API_KEY "mg_QZ7Wz9zXYfZij4DFsBJmSwyTy78XtVDxceSk_MfoOqs"
+          set -gx OPENAI_API_KEY "mg_QZ7Wz9zXYfZij4DFsBJmSwyTy78XtVDxceSk_MfoOqs"
+
           # -- SOPS Decrypted Environment Variables --
           if test -f /run/secrets/openrouter-api-key
               set -gx OPENROUTER_API_KEY (cat /run/secrets/openrouter-api-key)
