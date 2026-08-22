@@ -12,6 +12,31 @@
       hermes-desktop = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.desktop;
       hermes-cli = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
+      onnxruntime-bin = pkgs.python312Packages.buildPythonPackage {
+        pname = "onnxruntime";
+        version = "1.29.0";
+        format = "wheel";
+        src = pkgs.fetchurl {
+          url = "https://files.pythonhosted.org/packages/96/eb/e6968f5e41aac3125f2ff5708855f09cb0b70d85ed3115b625b0b58305ba/onnxruntime-1.29.0-cp312-cp312-manylinux_2_28_x86_64.whl";
+          sha256 = "2b80d8c7ec2cc7438e4da3760b88c24568cba72c9ace96d668800a6c79419acb";
+        };
+        nativeBuildInputs = [ pkgs.autoPatchelfHook ];
+        buildInputs = [
+          pkgs.stdenv.cc.cc.lib
+          pkgs.zlib
+        ];
+        propagatedBuildInputs = with pkgs.python312Packages; [
+          numpy
+          protobuf
+          coloredlogs
+          flatbuffers
+          packaging
+          sympy
+        ];
+        doCheck = false;
+        pythonImportsCheck = [ "onnxruntime" ];
+      };
+
       openwakeword = pkgs.python312Packages.buildPythonPackage {
         pname = "openwakeword";
         version = "0.6.0";
@@ -25,12 +50,12 @@
         postPatch = ''
           sed -i "/tflite-runtime/d" setup.py
         '';
-        propagatedBuildInputs = with pkgs.python312Packages; [
-          onnxruntime
-          tqdm
-          scipy
-          scikit-learn
-          requests
+        propagatedBuildInputs = [
+          onnxruntime-bin
+          pkgs.python312Packages.tqdm
+          pkgs.python312Packages.scipy
+          pkgs.python312Packages.scikit-learn
+          pkgs.python312Packages.requests
         ];
         doCheck = false;
         pythonImportsCheck = [ "openwakeword" ];
