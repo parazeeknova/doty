@@ -46,11 +46,6 @@
                     "CONTEXT7_API_KEY": "${config.sops.placeholder.context7-api-key}",
                     "GITHUB_PERSONAL_ACCESS_TOKEN": "${config.sops.placeholder.github-token}"
                   },
-                  "modelOverrides": {
-                    "stealth/ox-alpha": {
-                      "contextWindow": 1000000
-                    }
-                  },
                   "mcpServers": {
                     "context7": {
                       "url": "https://mcp.context7.com/mcp",
