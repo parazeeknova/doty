@@ -133,6 +133,14 @@ fn main() {
         print_warning("Hyprland plugins check/update failed or skipped.");
     }
 
+    // Step 0.68: Check and update Portless
+    print_step("Checking and updating Portless...");
+    if run_cmd("./wabi/target/release/update_portless", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
+        print_success("Portless check/update completed.");
+    } else {
+        print_warning("Portless check/update failed or skipped.");
+    }
+
     // Step 0.7: Update Nix Flake inputs
     print_step("Updating Nix flake inputs...");
     let mut update_args = vec!["flake", "update"];

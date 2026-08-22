@@ -196,6 +196,11 @@ path = "src/bin/utils/update-hypr-plugins.rs"
 name = "toggle_service"
 path = "src/bin/utils/toggle_service.rs"
 
+[[bin]]
+name = "update_portless"
+path = "src/bin/utils/update-portless.rs"
+
+
 
 
 
