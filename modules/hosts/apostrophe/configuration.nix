@@ -295,8 +295,8 @@
         group = "users";
         mode = "0400";
       };
-      sops.secrets.anthropic-auth-token = {
-        path = "/run/secrets/anthropic-auth-token";
+      sops.secrets.openrouter-api-key = {
+        path = "/run/secrets/openrouter-api-key";
         owner = config.users.users.parazeeknova.name;
         group = "users";
         mode = "0400";

@@ -37,6 +37,7 @@
           fish_add_path ~/.npm-global/bin
           fish_add_path /home/parazeeknova/.cache/.bun/bin
           fish_add_path /home/parazeeknova/.mimocode/bin
+          fish_add_path /home/parazeeknova/.strix/bin
 
           # -- Wabi Theme System --
           set -Ux WABI_DOTFILES_DIR "$HOME/doty"
@@ -44,24 +45,28 @@
           set -Ux WABI_GITHUB_USER "parazeeknova"
           set -Ux WABI_PRESETS_DIR "$HOME/doty/wabi/presets"
 
-          # -- Anthropic/Claude Code Configuration --
-          set -gx ANTHROPIC_BASE_URL "https://api.deepseek.com/anthropic"
-          set -gx ANTHROPIC_MODEL "deepseek-v4-pro[1m]"
-          set -gx ANTHROPIC_DEFAULT_OPUS_MODEL "deepseek-v4-pro[1m]"
-          set -gx ANTHROPIC_DEFAULT_SONNET_MODEL "deepseek-v4-pro[1m]"
-          set -gx ANTHROPIC_DEFAULT_HAIKU_MODEL "deepseek-v4-flash"
-          set -gx CLAUDE_CODE_SUBAGENT_MODEL "deepseek-v4-flash"
+          # -- Claude Code / OpenRouter Configuration --
+          set -gx ANTHROPIC_BASE_URL "https://openrouter.ai/api"
+          set -gx ANTHROPIC_API_KEY ""
+          set -gx ANTHROPIC_MODEL "stealth/ox-alpha"
+          set -gx ANTHROPIC_DEFAULT_OPUS_MODEL "stealth/ox-alpha"
+          set -gx ANTHROPIC_DEFAULT_SONNET_MODEL "stealth/ox-alpha"
+          set -gx ANTHROPIC_DEFAULT_HAIKU_MODEL "stealth/ox-alpha"
+          set -gx ANTHROPIC_DEFAULT_FABLE_MODEL "stealth/ox-alpha"
+          set -gx CLAUDE_CODE_SUBAGENT_MODEL "stealth/ox-alpha"
+          set -gx CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY "1"
           set -gx CLAUDE_CODE_EFFORT_LEVEL "max"
 
           # -- SOPS Decrypted Environment Variables --
+          if test -f /run/secrets/openrouter-api-key
+              set -gx OPENROUTER_API_KEY (cat /run/secrets/openrouter-api-key)
+              set -gx ANTHROPIC_AUTH_TOKEN (cat /run/secrets/openrouter-api-key)
+          end
           if test -f /run/secrets/context7-api-key
               set -gx CONTEXT7_API_KEY (cat /run/secrets/context7-api-key)
           end
           if test -f /run/secrets/modal-api-key
               set -gx MODAL_API_KEY (cat /run/secrets/modal-api-key)
-          end
-          if test -f /run/secrets/anthropic-auth-token
-              set -gx ANTHROPIC_AUTH_TOKEN (cat /run/secrets/anthropic-auth-token)
           end
           if test -f /run/secrets/github-token
               set -gx GITHUB_PERSONAL_ACCESS_TOKEN (cat /run/secrets/github-token)

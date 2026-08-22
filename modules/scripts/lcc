@@ -319,16 +319,6 @@ def doctor():
     print(f"\n{BOLD}{CYAN}=== lcc doctor — diagnosing & fixing ==={RESET}\n")
     fixed = 0
 
-    # --- 1. Remove anthropic models-store.json (pi's cached catalog) ---
-    models_store = HOME / ".pi" / "agent" / "models-store.json"
-    if models_store.exists():
-        models_store.unlink()
-        print(f"{GREEN}✔ Removed {models_store} (anthropic catalog cache){RESET}")
-        fixed += 1
-    else:
-        print(f"  {CYAN}✓ No stale models-store.json{RESET}")
-
-    # --- 2. Fix pi settings.json ---
     settings_path = HOME / ".pi" / "agent" / "settings.json"
     if settings_path.exists():
         try:

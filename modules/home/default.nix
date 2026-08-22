@@ -21,20 +21,24 @@
           sops = {
             defaultSopsFile = ../../secrets/secrets.yaml;
             age.keyFile = "/home/parazeeknova/.config/sops/age/keys.txt";
-            secrets.anthropic-auth-token = { };
+            secrets.openrouter-api-key = { };
             templates."claude-settings" = {
               content = ''
                 {
                   "theme": "auto",
                   "env": {
-                    "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
-                    "ANTHROPIC_MODEL": "deepseek-v4-pro[1m]",
-                    "ANTHROPIC_DEFAULT_OPUS_MODE": "deepseek-v4-pro[1m]",
-                    "ANTHROPIC_DEFAULT_SONNET_MODEL": "deepseek-v4-pro[1m]",
-                    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-v4-flash",
-                    "CLAUDE_CODE_SUBAGENT_MODEL": "deepseek-v4-flash",
+                    "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
+                    "ANTHROPIC_AUTH_TOKEN": "${config.sops.placeholder.openrouter-api-key}",
+                    "ANTHROPIC_API_KEY": "",
+                    "ANTHROPIC_MODEL": "stealth/ox-alpha",
+                    "ANTHROPIC_DEFAULT_OPUS_MODEL": "stealth/ox-alpha",
+                    "ANTHROPIC_DEFAULT_SONNET_MODEL": "stealth/ox-alpha",
+                    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "stealth/ox-alpha",
+                    "ANTHROPIC_DEFAULT_FABLE_MODEL": "stealth/ox-alpha",
+                    "CLAUDE_CODE_SUBAGENT_MODEL": "stealth/ox-alpha",
+                    "CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY": "1",
                     "CLAUDE_CODE_EFFORT_LEVEL": "max",
-                    "ANTHROPIC_AUTH_TOKEN": "${config.sops.placeholder.anthropic-auth-token}"
+                    "OPENROUTER_API_KEY": "${config.sops.placeholder.openrouter-api-key}"
                   }
                 }
               '';

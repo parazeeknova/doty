@@ -1,8 +1,5 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": [
-    "@warp-dot-dev/opencode-warp"
-  ],
   "mcp": {
     "context7": {
       "type": "remote",
@@ -55,21 +52,35 @@
         "--autoConnect"
       ],
       "enabled": true
-    }
-  },
-  "provider": {
-    "modal": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Modal",
-      "options": {
-        "baseURL": "https://api.us-west-2.modal.direct/v1",
-        "apiKey": "{env:MODAL_API_KEY}"
+    },
+    "firecrawl": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "environment": {
+        "FIRECRAWL_API_URL": "http://127.0.0.1:48002"
       },
-      "models": {
-        "zai-org/GLM-5.1-FP8": {
-          "name": "GLM-5.1"
-        }
-      }
+      "enabled": true
+    },
+    "hindsight": {
+      "type": "remote",
+      "url": "http://127.0.0.1:48888/mcp/default",
+      "enabled": true
+    },
+    "camofox": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "camofox-mcp@latest"
+      ],
+      "environment": {
+        "CAMOFOX_URL": "http://127.0.0.1:49377"
+      },
+      "enabled": true
     }
   }
 }

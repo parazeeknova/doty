@@ -20,6 +20,7 @@
       wakePythonPath = pkgs.lib.makeSearchPath pkgs.python312.sitePackages [
         pkgs.python312Packages.sherpa-onnx
         pkgs.python312Packages.sentencepiece
+        pkgs.python314Packages.pyyaml
       ];
 
       # Hermes Desktop is built with Electron's Window Controls Overlay on
@@ -45,6 +46,7 @@
     {
       environment.systemPackages = with pkgs; [
         pi-coding-agent
+        t3code
         tailscale
         codex
         claude-code
