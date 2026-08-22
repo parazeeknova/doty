@@ -52,14 +52,16 @@
           # -- Claude Code / OpenRouter Configuration --
           set -gx ANTHROPIC_BASE_URL "https://openrouter.ai/api"
           set -gx ANTHROPIC_API_KEY ""
-          set -gx ANTHROPIC_MODEL "stealth/ox-alpha"
-          set -gx ANTHROPIC_DEFAULT_OPUS_MODEL "stealth/ox-alpha"
-          set -gx ANTHROPIC_DEFAULT_SONNET_MODEL "stealth/ox-alpha"
-          set -gx ANTHROPIC_DEFAULT_HAIKU_MODEL "stealth/ox-alpha"
-          set -gx ANTHROPIC_DEFAULT_FABLE_MODEL "stealth/ox-alpha"
-          set -gx CLAUDE_CODE_SUBAGENT_MODEL "stealth/ox-alpha"
+          set -gx ANTHROPIC_MODEL "stealth/ox-alpha[1m]"
+          set -gx ANTHROPIC_DEFAULT_OPUS_MODEL "stealth/ox-alpha[1m]"
+          set -gx ANTHROPIC_DEFAULT_SONNET_MODEL "stealth/ox-alpha[1m]"
+          set -gx ANTHROPIC_DEFAULT_HAIKU_MODEL "stealth/ox-alpha[1m]"
+          set -gx ANTHROPIC_DEFAULT_FABLE_MODEL "stealth/ox-alpha[1m]"
+          set -gx CLAUDE_CODE_SUBAGENT_MODEL "stealth/ox-alpha[1m]"
           set -gx CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY "1"
           set -gx CLAUDE_CODE_EFFORT_LEVEL "max"
+          set -gx CLAUDE_CODE_MAX_CONTEXT_TOKENS "1000000"
+          set -gx CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT "1"
 
           # -- Strix Configuration --
           set -gx STRIX_LLM "openai/deepseek/deepseek-v4-flash"

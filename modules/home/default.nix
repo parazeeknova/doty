@@ -32,17 +32,24 @@
                     "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
                     "ANTHROPIC_AUTH_TOKEN": "${config.sops.placeholder.openrouter-api-key}",
                     "ANTHROPIC_API_KEY": "",
-                    "ANTHROPIC_MODEL": "stealth/ox-alpha",
-                    "ANTHROPIC_DEFAULT_OPUS_MODEL": "stealth/ox-alpha",
-                    "ANTHROPIC_DEFAULT_SONNET_MODEL": "stealth/ox-alpha",
-                    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "stealth/ox-alpha",
-                    "ANTHROPIC_DEFAULT_FABLE_MODEL": "stealth/ox-alpha",
-                    "CLAUDE_CODE_SUBAGENT_MODEL": "stealth/ox-alpha",
+                    "ANTHROPIC_MODEL": "stealth/ox-alpha[1m]",
+                    "ANTHROPIC_DEFAULT_OPUS_MODEL": "stealth/ox-alpha[1m]",
+                    "ANTHROPIC_DEFAULT_SONNET_MODEL": "stealth/ox-alpha[1m]",
+                    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "stealth/ox-alpha[1m]",
+                    "ANTHROPIC_DEFAULT_FABLE_MODEL": "stealth/ox-alpha[1m]",
+                    "CLAUDE_CODE_SUBAGENT_MODEL": "stealth/ox-alpha[1m]",
                     "CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY": "1",
                     "CLAUDE_CODE_EFFORT_LEVEL": "max",
+                    "CLAUDE_CODE_MAX_CONTEXT_TOKENS": "1000000",
+                    "CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT": "1",
                     "OPENROUTER_API_KEY": "${config.sops.placeholder.openrouter-api-key}",
                     "CONTEXT7_API_KEY": "${config.sops.placeholder.context7-api-key}",
                     "GITHUB_PERSONAL_ACCESS_TOKEN": "${config.sops.placeholder.github-token}"
+                  },
+                  "modelOverrides": {
+                    "stealth/ox-alpha": {
+                      "contextWindow": 1000000
+                    }
                   },
                   "mcpServers": {
                     "context7": {
