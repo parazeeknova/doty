@@ -34,7 +34,6 @@ install: build
 	cp --remove-destination target/release/get_brightness_status ../modules/features/wm/quickshell/brightness_popup/get_brightness_status
 	cp --remove-destination target/release/get_notif_status ../modules/features/wm/quickshell/notif_popup/get_notif_status
 	cp --remove-destination target/release/get_sysmon_status ../modules/features/wm/quickshell/sysmon_popup/get_sysmon_status
-	cp --remove-destination target/release/toggle_service ../modules/features/wm/quickshell/sysmon_popup/toggle_service
 
 	cp --remove-destination target/release/get_podman_status ../modules/features/wm/quickshell/podman_popup/get_podman_status
 	cp --remove-destination target/release/get_media_status ../modules/features/wm/quickshell/media_popup/get_media_status

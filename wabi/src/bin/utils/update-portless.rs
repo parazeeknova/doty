@@ -17,7 +17,7 @@ fn get_latest_portless_version() -> Option<String> {
         "https://registry.npmjs.org/portless/latest",
     ];
 
-    let output = Command::new("curl").args(&args).output().ok()?;
+    let output = Command::new("curl").args(args).output().ok()?;
 
     if !output.status.success() {
         eprintln!("Failed to fetch portless info from npm registry.");

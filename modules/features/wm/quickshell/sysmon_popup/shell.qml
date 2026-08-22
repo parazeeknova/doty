@@ -7,8 +7,6 @@ Scope {
     id: root
 
     property string homeDir: Quickshell.env("HOME")
-    property var servicesList: []
-    property var topProcessesList: []
     property string cpuName: ""
     property int cpuUsage: 0
     property int cpuTemp: 0
@@ -75,8 +73,6 @@ Scope {
             onStreamFinished: {
                 try {
                     var data = JSON.parse(this.text);
-                    root.servicesList = data.services || [];
-                    root.topProcessesList = data.top_processes || [];
                     root.cpuName = data.cpu_name || "CPU";
                     root.cpuUsage = data.cpu_usage || 0;
                     root.cpuTemp = data.cpu_temp || 0;
@@ -288,83 +284,6 @@ Scope {
                             }
                         }
 
-                        // --- SERVICES TOGGLES SECTION (Text-only) ---
-                        Column {
-                            width: parent.width
-                            spacing: 3
-
-                            Text {
-                                text: "󰓅 SERVICES"
-                                color: theme.accent
-                                font.family: "FiraCode Nerd Font"
-                                font.pixelSize: 9
-                                font.bold: true
-                                renderType: Text.NativeRendering
-                            }
-
-                            Column {
-                                width: parent.width
-                                spacing: 2
-
-                                Repeater {
-                                    model: root.servicesList
-
-                                    delegate: Item {
-                                        required property var modelData
-
-                                        width: parent.width
-                                        height: 16
-
-                                        Text {
-                                            anchors.left: parent.left
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            text: modelData.label || modelData.name
-                                            color: theme.accent
-                                            font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 9
-                                            font.bold: true
-                                            renderType: Text.NativeRendering
-                                        }
-
-                                        Text {
-                                            id: toggleText
-
-                                            anchors.right: parent.right
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            text: modelData.active ? "[ON]" : "[OFF]"
-                                            color: modelData.active ? "#a6e3a1" : "#f38ba8"
-                                            font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 9
-                                            font.bold: true
-                                            renderType: Text.NativeRendering
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                hoverEnabled: true
-                                                onEntered: toggleText.opacity = 0.7
-                                                onExited: toggleText.opacity = 1.0
-                                                onClicked: {
-                                                    Quickshell.execDetached([root.homeDir + "/.config/quickshell/sysmon_popup/toggle_service", modelData.name]);
-                                                    refreshTimer.start();
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        Timer {
-                            id: refreshTimer
-
-                            interval: 400
-                            repeat: false
-                            onTriggered: {
-                                checkStatusProc.running = false;
-                                checkStatusProc.running = true;
-                            }
-                        }
-
                         // --- HARDWARE MONITORS ---
                         Column {
                             spacing: 0
@@ -530,148 +449,6 @@ Scope {
                             }
                         }
 
-                        // --- TOP 5 PROCESSES LIST (100% Full-Width Row Grid) ---
-                        Column {
-                            width: parent.width
-                            spacing: 3
-
-                            Text {
-                                text: "󰍹 PROCESSES"
-                                color: theme.accent
-                                font.family: "FiraCode Nerd Font"
-                                font.pixelSize: 9
-                                font.bold: true
-                                renderType: Text.NativeRendering
-                            }
-
-                            Column {
-                                width: parent.width
-                                spacing: 2
-
-                                // Header Row
-                                Row {
-                                    width: parent.width
-                                    height: 14
-
-                                    Text {
-                                        width: parent.width * 0.36
-                                        text: "NAME"
-                                        color: theme.accent
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
-                                        font.bold: true
-                                        elide: Text.ElideRight
-                                        renderType: Text.NativeRendering
-                                    }
-
-                                    Text {
-                                        width: parent.width * 0.16
-                                        text: "CPU%"
-                                        color: theme.accent
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
-                                        font.bold: true
-                                        horizontalAlignment: Text.AlignRight
-                                        renderType: Text.NativeRendering
-                                    }
-
-                                    Text {
-                                        width: parent.width * 0.16
-                                        text: "RAM%"
-                                        color: theme.accent
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
-                                        font.bold: true
-                                        horizontalAlignment: Text.AlignRight
-                                        renderType: Text.NativeRendering
-                                    }
-
-                                    Text {
-                                        width: parent.width * 0.16
-                                        text: "R(M/s)"
-                                        color: theme.accent
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
-                                        font.bold: true
-                                        horizontalAlignment: Text.AlignRight
-                                        renderType: Text.NativeRendering
-                                    }
-
-                                    Text {
-                                        width: parent.width * 0.16
-                                        text: "W(M/s)"
-                                        color: theme.accent
-                                        font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 8
-                                        font.bold: true
-                                        horizontalAlignment: Text.AlignRight
-                                        renderType: Text.NativeRendering
-                                    }
-                                }
-
-                                // Process Data Rows
-                                Repeater {
-                                    model: root.topProcessesList
-
-                                    delegate: Row {
-                                        required property var modelData
-
-                                        width: parent.width
-                                        height: 14
-
-                                        Text {
-                                            width: parent.width * 0.36
-                                            text: modelData.name
-                                            color: theme.accent
-                                            font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 8
-                                            elide: Text.ElideRight
-                                            renderType: Text.NativeRendering
-                                        }
-
-                                        Text {
-                                            width: parent.width * 0.16
-                                            text: modelData.cpu_pct.toFixed(1)
-                                            color: "#fab387"
-                                            font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 8
-                                            horizontalAlignment: Text.AlignRight
-                                            renderType: Text.NativeRendering
-                                        }
-
-                                        Text {
-                                            width: parent.width * 0.16
-                                            text: modelData.ram_pct.toFixed(1)
-                                            color: "#89dceb"
-                                            font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 8
-                                            horizontalAlignment: Text.AlignRight
-                                            renderType: Text.NativeRendering
-                                        }
-
-                                        Text {
-                                            width: parent.width * 0.16
-                                            text: modelData.read_rate.toFixed(1)
-                                            color: modelData.read_rate > 0 ? "#89dceb" : "#6c7086"
-                                            font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 8
-                                            horizontalAlignment: Text.AlignRight
-                                            renderType: Text.NativeRendering
-                                        }
-
-                                        Text {
-                                            width: parent.width * 0.16
-                                            text: modelData.write_rate.toFixed(1)
-                                            color: modelData.write_rate > 0 ? "#89dceb" : "#6c7086"
-                                            font.family: "FiraCode Nerd Font"
-                                            font.pixelSize: 8
-                                            horizontalAlignment: Text.AlignRight
-                                            renderType: Text.NativeRendering
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
             }

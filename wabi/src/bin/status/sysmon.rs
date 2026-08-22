@@ -7,24 +7,6 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use wabi::{print_json, read_trimmed, run_cmd};
 
 #[derive(Serialize)]
-struct ServiceItem {
-    name: String,
-    label: String,
-    active: bool,
-    enabled: bool,
-}
-
-#[derive(Serialize)]
-struct ProcessItem {
-    pid: u32,
-    name: String,
-    cpu_pct: f64,
-    ram_pct: f64,
-    read_rate: f64,
-    write_rate: f64,
-}
-
-#[derive(Serialize)]
 struct DiskInfo {
     name: String,
     read_rate: f64,
@@ -37,8 +19,6 @@ struct DiskInfo {
 
 #[derive(Serialize)]
 struct SysmonStatus {
-    services: Vec<ServiceItem>,
-    top_processes: Vec<ProcessItem>,
     cpu_name: String,
     cpu_usage: i32,
     cpu_temp: i32,
@@ -56,135 +36,6 @@ struct SysmonStatus {
     ram_used: f64,
     disk0: DiskInfo,
     disk1: DiskInfo,
-}
-
-fn is_running(state: &str) -> bool {
-    matches!(
-        state,
-        "active" | "activating" | "deactivating" | "reloading"
-    )
-}
-
-fn check_service(name: &str, label: &str, unit: &str, user: bool) -> ServiceItem {
-    let active_cmd = if user {
-        run_cmd("systemctl", &["--user", "is-active", unit])
-    } else {
-        run_cmd("systemctl", &["is-active", unit])
-    };
-    let active = active_cmd.map(|s| is_running(s.trim())).unwrap_or(false);
-
-    let enabled_cmd = if user {
-        run_cmd("systemctl", &["--user", "is-enabled", unit])
-    } else {
-        run_cmd("systemctl", &["is-enabled", unit])
-    };
-    let enabled = enabled_cmd.map(|s| s.trim() == "enabled").unwrap_or(false);
-
-    ServiceItem {
-        name: name.to_string(),
-        label: label.to_string(),
-        active,
-        enabled,
-    }
-}
-
-fn get_services_status() -> Vec<ServiceItem> {
-    vec![
-        check_service("suwayomi", "Suwayomi", "suwayomi-server.service", false),
-        check_service("llama", "llama.cpp", "llama-server.service", true),
-        check_service("adguard", "AdGuard", "adguardhome.service", false),
-    ]
-}
-
-const STAT_DIR: &str = "/tmp/.doty_disk_stats";
-
-fn now_nanos() -> u64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_nanos() as u64
-}
-
-fn get_proc_io_rates(pid: u32) -> (f64, f64) {
-    let io_path = format!("/proc/{pid}/io");
-    let content = match fs::read_to_string(&io_path) {
-        Ok(c) => c,
-        Err(_) => return (0.0, 0.0),
-    };
-
-    let mut read_bytes: u64 = 0;
-    let mut write_bytes: u64 = 0;
-    for line in content.lines() {
-        if line.starts_with("read_bytes:")
-            && let Some(val) = line.split_whitespace().nth(1)
-        {
-            read_bytes = val.parse().unwrap_or(0);
-        } else if line.starts_with("write_bytes:")
-            && let Some(val) = line.split_whitespace().nth(1)
-        {
-            write_bytes = val.parse().unwrap_or(0);
-        }
-    }
-
-    let _ = fs::create_dir_all(STAT_DIR);
-    let prev_file = format!("{STAT_DIR}/proc_{pid}");
-    let now = now_nanos();
-
-    let mut read_rate = 0.0;
-    let mut write_rate = 0.0;
-
-    if let Ok(prev_content) = fs::read_to_string(&prev_file) {
-        let lines: Vec<&str> = prev_content.lines().collect();
-        if lines.len() >= 3 {
-            let prev_time: u64 = lines[0].parse().unwrap_or(0);
-            let prev_read: u64 = lines[1].parse().unwrap_or(0);
-            let prev_write: u64 = lines[2].parse().unwrap_or(0);
-            let dt_ns = now.saturating_sub(prev_time);
-            if dt_ns > 100_000_000 {
-                let dt_s = dt_ns as f64 / 1_000_000_000.0;
-                let dr = read_bytes.saturating_sub(prev_read);
-                let dw = write_bytes.saturating_sub(prev_write);
-                read_rate = (dr as f64) / (1024.0 * 1024.0) / dt_s;
-                write_rate = (dw as f64) / (1024.0 * 1024.0) / dt_s;
-            }
-        }
-    }
-
-    let snapshot = format!("{now}\n{read_bytes}\n{write_bytes}\n");
-    let _ = fs::write(&prev_file, snapshot);
-
-    (read_rate, write_rate)
-}
-
-fn get_top_processes() -> Vec<ProcessItem> {
-    let out = run_cmd("ps", &["-eo", "pid,%cpu,%mem,comm", "--sort=-%cpu"]).unwrap_or_default();
-    let mut procs = Vec::new();
-    for line in out.lines().skip(1).take(5) {
-        let parts: Vec<&str> = line.split_whitespace().collect();
-        if parts.len() >= 4 {
-            let pid: u32 = parts[0].parse().unwrap_or(0);
-            let cpu_pct: f64 = parts[1].parse().unwrap_or(0.0);
-            let ram_pct: f64 = parts[2].parse().unwrap_or(0.0);
-            let mut name = parts[3..].join(" ");
-            if name.starts_with('.') {
-                name = name.trim_start_matches('.').to_string();
-            }
-            if name.ends_with("-wrapped") {
-                name = name.trim_end_matches("-wrapped").to_string();
-            }
-
-            let (read_rate, write_rate) = get_proc_io_rates(pid);
-            procs.push(ProcessItem {
-                pid,
-                name,
-                cpu_pct: (cpu_pct * 10.0).round() / 10.0,
-                ram_pct: (ram_pct * 10.0).round() / 10.0,
-                read_rate: (read_rate * 10.0).round() / 10.0,
-                write_rate: (write_rate * 10.0).round() / 10.0,
-            });
-        }
-    }
-    procs
 }
 
 fn read_cpu_times() -> Option<(u64, u64)> {
@@ -428,6 +279,15 @@ fn get_static_ram_info() -> (String, String) {
     (ram_type, speed)
 }
 
+const STAT_DIR: &str = "/tmp/.doty_disk_stats";
+
+fn now_nanos() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_nanos() as u64
+}
+
 const SECTOR_SIZE: u64 = 512;
 
 fn read_disk_sectors(dev: &str) -> Option<(u64, u64)> {
@@ -540,8 +400,6 @@ fn get_disk_info(dev: &str) -> DiskInfo {
 }
 
 fn main() {
-    let services = get_services_status();
-    let top_processes = get_top_processes();
     let cpu_n = get_cpu_name();
     let cpu = get_cpu_usage();
     let cpu_t = get_cpu_temp();
@@ -558,8 +416,6 @@ fn main() {
     let disk1 = get_disk_info("nvme1n1");
 
     let status = SysmonStatus {
-        services,
-        top_processes,
         cpu_name: cpu_n,
         cpu_usage: cpu,
         cpu_temp: cpu_t,
