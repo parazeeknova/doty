@@ -11,10 +11,14 @@
 
       home-manager.users.parazeeknova.programs.fish = {
         shellInit = ''
-          # -- Locale --
+          # -- Locale & SSL Certificates --
           set -gx LANG en_US.UTF-8
           set -gx LC_ALL en_US.UTF-8
           set -gx DIRENV_LOG_FORMAT ""
+          set -gx SSL_CERT_FILE "/etc/ssl/certs/ca-certificates.crt"
+          set -gx SSL_CERT_DIR "/etc/ssl/certs"
+          set -gx REQUESTS_CA_BUNDLE "/etc/ssl/certs/ca-certificates.crt"
+          set -gx CURL_CA_BUNDLE "/etc/ssl/certs/ca-certificates.crt"
 
           # -- SSH / GPG --
           set -gx GPG_TTY (tty)
