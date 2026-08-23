@@ -30,7 +30,7 @@
             basicAuthUsername = "";
             basicAuthPasswordFile = null;
             downloadAsCbz = true;
-            extensionRepos = [
+            extensionStores = [
               "https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.min.json"
             ];
             localSourcePath = "/home/parazeeknova/Manga";
