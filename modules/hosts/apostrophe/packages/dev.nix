@@ -23,6 +23,136 @@
           install -m755 -D $src $out/bin/herdr
         '';
       };
+      terminal-browser = pkgs.stdenv.mkDerivation rec {
+        pname = "terminal-browser";
+        version = "0.6.0";
+
+        src = pkgs.fetchurl {
+          url = "https://github.com/zenbu-labs/terminal-browser/releases/download/v${version}/terminal-browser-linux-x64.tar.gz";
+          sha256 = "1xwzq3vg05cj2nx5bjac7hcsdrpcmv799jjyc44j38936rcpa8vw";
+        };
+
+        nativeBuildInputs = with pkgs; [
+          autoPatchelfHook
+          makeWrapper
+        ];
+
+        buildInputs = with pkgs; [
+          alsa-lib
+          at-spi2-atk
+          at-spi2-core
+          atk
+          cairo
+          cups
+          dbus
+          expat
+          gdk-pixbuf
+          glib
+          gtk3
+          mesa
+          nspr
+          nss
+          pango
+          systemd
+          libx11
+          libxcomposite
+          libxdamage
+          libxext
+          libxfixes
+          libxrandr
+          libxcb
+          libxkbfile
+          libxcursor
+          libxi
+          libxrender
+          libxtst
+          libxscrnsaver
+          libxkbcommon
+          libdrm
+          libgbm
+          vulkan-loader
+          stdenv.cc.cc.lib
+        ];
+
+        sourceRoot = "terminal-browser";
+
+        installPhase = ''
+          mkdir -p $out/opt/terminal-browser $out/bin
+          cp -r * $out/opt/terminal-browser/
+
+          chmod +x $out/opt/terminal-browser/bin/terminal-browser $out/opt/terminal-browser/electron/electron
+
+          makeWrapper $out/opt/terminal-browser/bin/terminal-browser $out/bin/terminal-browser \
+            --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath buildInputs}"
+        '';
+      };
+      terminal-code = pkgs.stdenv.mkDerivation rec {
+        pname = "terminal-code";
+        version = "0.2.0";
+
+        src = pkgs.fetchurl {
+          url = "https://github.com/zenbu-labs/terminal-code/releases/download/v${version}/tode-linux-x64.tar.gz";
+          sha256 = "1yrir153zrzn6zh30493i19zi6la01hx75wyl7v2mh1g5bymdsl3";
+        };
+
+        nativeBuildInputs = with pkgs; [
+          autoPatchelfHook
+          makeWrapper
+        ];
+
+        buildInputs = with pkgs; [
+          alsa-lib
+          at-spi2-atk
+          at-spi2-core
+          atk
+          cairo
+          cups
+          dbus
+          expat
+          gdk-pixbuf
+          glib
+          gtk3
+          mesa
+          nspr
+          nss
+          pango
+          systemd
+          libx11
+          libxcomposite
+          libxdamage
+          libxext
+          libxfixes
+          libxrandr
+          libxcb
+          libxkbfile
+          libxcursor
+          libxi
+          libxrender
+          libxtst
+          libxscrnsaver
+          libxkbcommon
+          libdrm
+          libgbm
+          vulkan-loader
+          stdenv.cc.cc.lib
+        ];
+
+        sourceRoot = "tode";
+
+        installPhase = ''
+          mkdir -p $out/opt/terminal-code $out/bin
+          cp -r * $out/opt/terminal-code/
+
+          find $out/opt/terminal-code -type f -name "electron" -exec chmod +x {} +
+          chmod +x $out/opt/terminal-code/bin/tode 2>/dev/null || true
+
+          makeWrapper $out/opt/terminal-code/bin/tode $out/bin/tode \
+            --set TODE_INSTALL_ROOT "$out/opt/terminal-code" \
+            --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath buildInputs}"
+
+          ln -s $out/bin/tode $out/bin/terminal-code
+        '';
+      };
     in
     {
 
@@ -31,6 +161,8 @@
         wrangler
         agent-browser
         herdr
+        terminal-browser
+        terminal-code
         appimage-run
         azure-cli
         cloudflare-cli

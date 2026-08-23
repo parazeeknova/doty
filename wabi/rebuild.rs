@@ -149,6 +149,22 @@ fn main() {
         print_warning("Herdr check/update failed or skipped.");
     }
 
+    // Step 0.695: Check and update Terminal Browser
+    print_step("Checking and updating Terminal Browser...");
+    if run_cmd("./wabi/target/release/update_terminal_browser", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
+        print_success("Terminal Browser check/update completed.");
+    } else {
+        print_warning("Terminal Browser check/update failed or skipped.");
+    }
+
+    // Step 0.696: Check and update Terminal Code
+    print_step("Checking and updating Terminal Code...");
+    if run_cmd("./wabi/target/release/update_terminal_code", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
+        print_success("Terminal Code check/update completed.");
+    } else {
+        print_warning("Terminal Code check/update failed or skipped.");
+    }
+
     // Step 0.7: Update Nix Flake inputs
     print_step("Updating Nix flake inputs...");
     let mut update_args = vec!["flake", "update"];

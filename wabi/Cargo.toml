@@ -200,6 +200,14 @@ path = "src/bin/utils/update-portless.rs"
 name = "update_herdr"
 path = "src/bin/utils/update-herdr.rs"
 
+[[bin]]
+name = "update_terminal_browser"
+path = "src/bin/utils/update-terminal-browser.rs"
+
+[[bin]]
+name = "update_terminal_code"
+path = "src/bin/utils/update-terminal-code.rs"
+
 
 
 
