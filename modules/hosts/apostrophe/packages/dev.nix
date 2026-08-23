@@ -148,6 +148,7 @@
 
           makeWrapper $out/opt/terminal-code/bin/tode $out/bin/tode \
             --set TODE_INSTALL_ROOT "$out/opt/terminal-code" \
+            --set TODE_TERMINAL_BROWSER_BIN "${terminal-browser}/bin/terminal-browser" \
             --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath buildInputs}"
 
           ln -s $out/bin/tode $out/bin/terminal-code
