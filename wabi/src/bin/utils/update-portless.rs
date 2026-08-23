@@ -31,18 +31,18 @@ fn get_latest_portless_version() -> Option<String> {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Checking for Portless updates...");
 
-    let dev_nix_path = Path::new("modules/hosts/apostrophe/packages/dev.nix");
-    if !dev_nix_path.exists() {
-        eprintln!("Error: {:?} not found.", dev_nix_path);
+    let portless_nix_path = Path::new("modules/features/applications/portless/default.nix");
+    if !portless_nix_path.exists() {
+        eprintln!("Error: {:?} not found.", portless_nix_path);
         std::process::exit(1);
     }
 
-    let content = fs::read_to_string(dev_nix_path)?;
+    let content = fs::read_to_string(portless_nix_path)?;
 
     // Locate Portless block
     let start_idx = content
         .find("pname = \"portless\";")
-        .ok_or("Cannot find portless definition in dev.nix")?;
+        .ok_or("Cannot find portless definition in portless/default.nix")?;
     let portless_block = &content[start_idx..];
 
     let current_version = extract_field(portless_block, "version = \"", "\";")
@@ -90,10 +90,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     println!("Fetched hash: {}", new_hash);
 
-    let content = fs::read_to_string(dev_nix_path)?;
+    let content = fs::read_to_string(portless_nix_path)?;
     let start_idx = content
         .find("pname = \"portless\";")
-        .ok_or("Cannot find portless definition in dev.nix")?;
+        .ok_or("Cannot find portless definition in portless/default.nix")?;
     let end_idx = content[start_idx..]
         .find("};")
         .ok_or("Cannot find end of portless block")?
@@ -113,10 +113,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut new_content = content.clone();
     new_content.replace_range(start_idx..end_idx, &new_block);
-    fs::write(dev_nix_path, new_content)?;
+    fs::write(portless_nix_path, new_content)?;
 
     println!(
-        "Successfully updated dev.nix to portless version {} with hash {}",
+        "Successfully updated portless/default.nix to portless version {} with hash {}",
         latest_version, new_hash
     );
 
@@ -125,7 +125,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if should_commit {
         println!("Staging and committing changes to Git...");
         let status = Command::new("git")
-            .args(["add", "modules/hosts/apostrophe/packages/dev.nix"])
+            .args(["add", "modules/features/applications/portless/default.nix"])
             .status()?;
         if !status.success() {
             eprintln!("Failed to run git add.");

@@ -8,14 +8,32 @@
       ...
     }:
     let
-      portlessBin = "/home/parazeeknova/.npm-global/bin/portless";
+      portless = pkgs.stdenv.mkDerivation rec {
+        pname = "portless";
+        version = "0.15.5";
+
+        src = pkgs.fetchurl {
+          url = "https://registry.npmjs.org/portless/-/portless-${version}.tgz";
+          sha256 = "0bix0jswg8na10vjziylmj744r86l5agkq15da1y1mlhsgwbfvzp";
+        };
+
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+
+        installPhase = ''
+          mkdir -p $out/libexec/portless $out/bin
+          cp -r * $out/libexec/portless/
+          makeWrapper ${pkgs.nodejs}/bin/node $out/bin/portless \
+            --add-flags "$out/libexec/portless/dist/cli.js"
+        '';
+      };
     in
     {
+      environment.systemPackages = [ portless ];
+
       # Portless HTTPS reverse proxy for *.localhost dev domains.
       #
-      # Runs portless (installed via npm --global) as a root systemd service so
-      # the HTTPS proxy binds to port 443 at boot and survives reboots. The
-      # portless CA is trusted system-wide via security.pki.certificateFiles,
+      # Runs portless as a root systemd service so the HTTPS proxy binds to port 443 at boot
+      # and survives reboots. The portless CA is trusted system-wide via security.pki.certificateFiles,
       # so --skip-trust avoids re-adding it to the system trust store.
       systemd.services.portless = {
         description = "Portless HTTPS proxy";
@@ -40,7 +58,7 @@
         };
         serviceConfig = {
           Type = "simple";
-          ExecStart = "${pkgs.nodejs}/bin/node ${portlessBin} proxy start --foreground --port 443 --https --skip-trust";
+          ExecStart = "${portless}/bin/portless proxy start --foreground --port 443 --https --skip-trust";
           Restart = "on-failure";
           RestartSec = 2;
           KillSignal = "SIGTERM";

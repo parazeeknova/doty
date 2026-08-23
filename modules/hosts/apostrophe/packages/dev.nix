@@ -8,24 +8,6 @@
       ...
     }:
     let
-      portless = pkgs.stdenv.mkDerivation rec {
-        pname = "portless";
-        version = "0.15.5";
-
-        src = pkgs.fetchurl {
-          url = "https://registry.npmjs.org/portless/-/portless-${version}.tgz";
-          sha256 = "0bix0jswg8na10vjziylmj744r86l5agkq15da1y1mlhsgwbfvzp";
-        };
-
-        nativeBuildInputs = [ pkgs.makeWrapper ];
-
-        installPhase = ''
-          mkdir -p $out/libexec/portless $out/bin
-          cp -r * $out/libexec/portless/
-          makeWrapper ${pkgs.nodejs}/bin/node $out/bin/portless \
-            --add-flags "$out/libexec/portless/dist/cli.js"
-        '';
-      };
       herdr = pkgs.stdenv.mkDerivation rec {
         pname = "herdr";
         version = "0.8.2";
@@ -48,7 +30,6 @@
         devenv
         wrangler
         agent-browser
-        portless
         herdr
         appimage-run
         azure-cli
