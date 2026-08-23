@@ -12,10 +12,10 @@
       services.suwayomi-server = {
         enable = true;
         package = pkgs.suwayomi-server.overrideAttrs (oldAttrs: rec {
-          version = "2.2.2100";
+          version = "2.3.2243";
           src = pkgs.fetchurl {
             url = "https://github.com/Suwayomi/Suwayomi-Server/releases/download/v${version}/Suwayomi-Server-v${version}.jar";
-            hash = "sha256-PIEypDv6m5WbDI/b3PmqAb2AkEf/T7waSq4OtxMx8F4=";
+            hash = "sha256-ghFBsy4XDUoC08vf7Vd+2PB70iOD/19BMuu1rkDpjdU=";
           };
         });
         user = "parazeeknova";
