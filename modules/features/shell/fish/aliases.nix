@@ -52,7 +52,6 @@
           tx = "tmux";
           lg = "lazygit";
           tb = "terminal-browser";
-          tc = "tode";
 
           # -- JS/TS (Bun/Pnpm) --
           pn = "pnpm";
