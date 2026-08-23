@@ -95,7 +95,6 @@
     {
       environment.systemPackages = with pkgs; [
         pi-coding-agent
-        t3code
         tailscale
         codex
         claude-code
