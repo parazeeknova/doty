@@ -69,17 +69,6 @@ in
               Icon=waydroid
               Categories=Utility;
             '';
-
-            ".local/share/applications/sklauncher.desktop".text = ''
-              [Desktop Entry]
-              Type=Application
-              Name=SKLauncher
-              GenericName=Minecraft Launcher
-              Exec=sh -c 'jar=$(find /home/parazeeknova/jars -name "SKlauncher-*.jar" -print -quit); if [ -n "$jar" ]; then exec nvidia-offload steam-run java -jar "$jar"; else notify-send "SKLauncher" "No SKlauncher-*.jar found in ~/jars/"; fi'
-              Comment=Minecraft Launcher with Nvidia GPU acceleration.
-              Icon=minecraft
-              Categories=Game;
-            '';
           };
         };
     };
