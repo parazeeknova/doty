@@ -28,6 +28,9 @@
               content = ''
                 {
                   "theme": "auto",
+                  "permissions": {
+                    "defaultMode": "bypassPermissions"
+                  },
                   "env": {
                     "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
                     "ANTHROPIC_AUTH_TOKEN": "${config.sops.placeholder.openrouter-api-key}",
@@ -45,15 +48,25 @@
                     "OPENROUTER_API_KEY": "${config.sops.placeholder.openrouter-api-key}",
                     "CONTEXT7_API_KEY": "${config.sops.placeholder.context7-api-key}",
                     "GITHUB_PERSONAL_ACCESS_TOKEN": "${config.sops.placeholder.github-token}"
-                  },
+                  }
+                }
+              '';
+              path = "${config.home.homeDirectory}/.claude/settings.json";
+            };
+
+            templates."claude-mcp" = {
+              content = ''
+                {
                   "mcpServers": {
                     "context7": {
+                      "type": "http",
                       "url": "https://mcp.context7.com/mcp",
                       "headers": {
                         "CONTEXT7_API_KEY": "${config.sops.placeholder.context7-api-key}"
                       }
                     },
                     "github": {
+                      "type": "stdio",
                       "command": "npx",
                       "args": [
                         "-y",
@@ -64,6 +77,7 @@
                       }
                     },
                     "filesystem": {
+                      "type": "stdio",
                       "command": "npx",
                       "args": [
                         "-y",
@@ -75,6 +89,7 @@
                       ]
                     },
                     "playwright": {
+                      "type": "stdio",
                       "command": "npx",
                       "args": [
                         "-y",
@@ -82,6 +97,7 @@
                       ]
                     },
                     "chrome-devtools": {
+                      "type": "stdio",
                       "command": "npx",
                       "args": [
                         "-y",
@@ -90,6 +106,7 @@
                       ]
                     },
                     "firecrawl": {
+                      "type": "stdio",
                       "command": "bunx",
                       "args": [
                         "firecrawl-mcp"
@@ -99,9 +116,11 @@
                       }
                     },
                     "hindsight": {
+                      "type": "http",
                       "url": "http://127.0.0.1:48888/mcp/default"
                     },
                     "camofox": {
+                      "type": "stdio",
                       "command": "npx",
                       "args": [
                         "-y",
@@ -114,7 +133,6 @@
                   }
                 }
               '';
-              path = "${config.home.homeDirectory}/.claude/settings.json";
             };
           };
 
@@ -122,6 +140,32 @@
             username = "parazeeknova";
             homeDirectory = "/home/parazeeknova";
             stateVersion = "24.11";
+            activation.syncClaudeMcp = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+              if [ -f "${config.sops.templates."claude-mcp".path}" ]; then
+                ${pkgs.python3}/bin/python3 - << 'EOF'
+              import json, os
+
+              claude_json_path = os.path.expanduser("~/.claude.json")
+              mcp_template_path = "${config.sops.templates."claude-mcp".path}"
+
+              try:
+                  with open(mcp_template_path, "r") as f:
+                      template_data = json.load(f)
+
+                  claude_data = {}
+                  if os.path.exists(claude_json_path):
+                      with open(claude_json_path, "r") as f:
+                          claude_data = json.load(f)
+
+                  claude_data["mcpServers"] = template_data.get("mcpServers", {})
+
+                  with open(claude_json_path, "w") as f:
+                      json.dump(claude_data, f, indent=2)
+              except Exception as e:
+                  print(f"Failed to sync claude MCP servers: {e}")
+              EOF
+              fi
+            '';
           };
 
           programs.home-manager.enable = true;

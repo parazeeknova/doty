@@ -1,6 +1,7 @@
 model:
   default: stealth/ox-alpha
   provider: nous
+  base_url: https://inference-api.nousresearch.com/v1
 agent:
   reasoning_effort: high
 terminal:
@@ -18,9 +19,9 @@ display:
   personality: none
   skin: sisyphus
   pet:
-    enabled: true
-    slug: jue
-    scale: 0.75
+    enabled: false
+    slug: makisekurisu
+    scale: 0.55
 dashboard:
   theme: mono
   font: jetbrains-mono

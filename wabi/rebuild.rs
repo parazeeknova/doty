@@ -173,6 +173,14 @@ fn main() {
         print_warning("Suwayomi Server check/update failed or skipped.");
     }
 
+    // Step 0.698: Check and update Bun
+    print_step("Checking and updating Bun...");
+    if run_cmd("./wabi/target/release/update_bun", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
+        print_success("Bun check/update completed.");
+    } else {
+        print_warning("Bun check/update failed or skipped.");
+    }
+
     // Step 0.7: Update Nix Flake inputs
     print_step("Updating Nix flake inputs...");
     let mut update_args = vec!["flake", "update"];
