@@ -37,8 +37,14 @@ prefix = "ctrl+b"
 [[keys.command]]
 key = "prefix+p"
 type = "plugin_action"
-command = "allmight-ai.herdr-pet.open"
-description = "Toggle Herdr Pet"
+command = "pet.toggle"
+description = "Toggle Pet"
+
+[[keys.command]]
+key = "prefix+P"
+type = "plugin_action"
+command = "pet.settings"
+description = "Pet Settings"
 
 [ui.toast]
 delivery = "herdr"
