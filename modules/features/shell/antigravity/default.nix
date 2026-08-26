@@ -20,8 +20,14 @@ in
         in
         {
           home.file = {
-            ".gemini/config/mcp_config.json".source = mkOutOfStoreSymlink "${antigravityDir}/mcp_config.json";
-            ".gemini/antigravity-cli/settings.json".source = mkOutOfStoreSymlink "${antigravityDir}/settings.json";
+            ".gemini/config/mcp_config.json" = {
+              source = mkOutOfStoreSymlink "${antigravityDir}/mcp_config.json";
+              force = true;
+            };
+            ".gemini/antigravity-cli/settings.json" = {
+              source = mkOutOfStoreSymlink "${antigravityDir}/settings.json";
+              force = true;
+            };
           };
         };
     };

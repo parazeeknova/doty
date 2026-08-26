@@ -20,8 +20,14 @@ in
         in
         {
           xdg.configFile = {
-            "herdr/config.toml".source = mkOutOfStoreSymlink "${herdrDir}/config.toml";
-            "herdr/config.toml.template".source = mkOutOfStoreSymlink "${herdrDir}/config.toml.template";
+            "herdr/config.toml" = {
+              source = mkOutOfStoreSymlink "${herdrDir}/config.toml";
+              force = true;
+            };
+            "herdr/config.toml.template" = {
+              source = mkOutOfStoreSymlink "${herdrDir}/config.toml.template";
+              force = true;
+            };
           };
         };
     };

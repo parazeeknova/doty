@@ -23,6 +23,7 @@ peach = "#e1c1a4"
 [ui]
 accent = "#fcb974"
 pane_gaps = false
+status_indicators = "symbols"
 
 [terminal]
 new_cwd = "follow"
@@ -30,6 +31,18 @@ shell_mode = "auto"
 
 [keys]
 prefix = "ctrl+b"
+
+[[keys.command]]
+key = "prefix+e"
+type = "plugin_action"
+command = "herdr-file-viewer.open-file-viewer"
+description = "Toggle file viewer on the right"
+
+[[keys.command]]
+key = "prefix+E"
+type = "plugin_action"
+command = "herdr-file-viewer.open-file-viewer-tab"
+description = "Open file viewer tab"
 
 [ui.toast]
 delivery = "system"

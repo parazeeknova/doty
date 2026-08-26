@@ -20,8 +20,14 @@ in
         in
         {
           home.file = {
-            ".claude/themes/matugen.json".source = mkOutOfStoreSymlink "${claudeDir}/themes/matugen.json";
-            ".claude/themes/matugen.json.template".source = mkOutOfStoreSymlink "${claudeDir}/themes/matugen.json.template";
+            ".claude/themes/matugen.json" = {
+              source = mkOutOfStoreSymlink "${claudeDir}/themes/matugen.json";
+              force = true;
+            };
+            ".claude/themes/matugen.json.template" = {
+              source = mkOutOfStoreSymlink "${claudeDir}/themes/matugen.json.template";
+              force = true;
+            };
           };
         };
     };
