@@ -23,6 +23,8 @@ peach = "{{secondary}}"
 [ui]
 accent = "{{accent}}"
 pane_gaps = false
+pane_borders = false
+pane_outer_borders = false
 status_indicators = "symbols"
 
 [terminal]
@@ -35,14 +37,14 @@ prefix = "ctrl+b"
 [[keys.command]]
 key = "prefix+e"
 type = "plugin_action"
-command = "herdr-file-viewer.open-file-viewer"
-description = "Toggle file viewer on the right"
+command = "herdr-sidebar.open-sidebar"
+description = "Toggle file explorer sidebar"
 
 [[keys.command]]
-key = "prefix+E"
+key = "prefix+g"
 type = "plugin_action"
-command = "herdr-file-viewer.open-file-viewer-tab"
-description = "Open file viewer tab"
+command = "herdr-sidebar.open-git"
+description = "Toggle git source control sidebar"
 
 [ui.toast]
 delivery = "system"
