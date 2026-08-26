@@ -47,7 +47,14 @@ command = "herdr-sidebar.open-git"
 description = "Toggle git source control sidebar"
 
 [ui.toast]
-delivery = "system"
+delivery = "herdr"
+
+[ui.toast.herdr]
+position = "top-right"
+
+[ui.toast.clipboard]
+enabled = true
+position = "top-right"
 
 [experimental]
 kitty_graphics = true
