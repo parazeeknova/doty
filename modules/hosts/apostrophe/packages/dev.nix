@@ -180,6 +180,8 @@
 
         # -- Languages --
         nodejs
+        typescript
+        typescript-language-server
         python3
         rustup
         openjdk

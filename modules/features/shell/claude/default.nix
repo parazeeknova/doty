@@ -2,10 +2,10 @@
 
 let
   repo = "/home/parazeeknova/doty";
-  antigravityDir = "${repo}/modules/features/shell/antigravity";
+  claudeDir = "${repo}/modules/features/shell/claude";
 in
 {
-  flake.nixosModules.parazeeknovaAntigravity =
+  flake.nixosModules.parazeeknovaClaude =
     {
       config,
       pkgs,
@@ -20,8 +20,8 @@ in
         in
         {
           home.file = {
-            ".gemini/config/mcp_config.json".source = mkOutOfStoreSymlink "${antigravityDir}/mcp_config.json";
-            ".gemini/antigravity-cli/settings.json".source = mkOutOfStoreSymlink "${antigravityDir}/settings.json";
+            ".claude/themes/matugen.json".source = mkOutOfStoreSymlink "${claudeDir}/themes/matugen.json";
+            ".claude/themes/matugen.json.template".source = mkOutOfStoreSymlink "${claudeDir}/themes/matugen.json.template";
           };
         };
     };

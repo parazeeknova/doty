@@ -27,11 +27,15 @@
             templates."claude-settings" = {
               content = ''
                 {
-                  "theme": "auto",
+                  "theme": "matugen",
                   "permissions": {
                     "defaultMode": "bypassPermissions"
                   },
+                  "enabledPlugins": {
+                    "typescript-lsp@claude-plugins-official": true
+                  },
                   "env": {
+                    "ENABLE_LSP_TOOL": "1",
                     "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
                     "ANTHROPIC_AUTH_TOKEN": "${config.sops.placeholder.openrouter-api-key}",
                     "ANTHROPIC_API_KEY": "",

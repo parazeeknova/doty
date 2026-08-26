@@ -1,0 +1,38 @@
+# Herdr configuration - auto-generated from wallpaper colors by wabi theme_switcher
+# Do not edit config.toml directly — edit config.toml.template instead.
+
+onboarding = false
+
+[theme]
+name = "catppuccin"
+
+[theme.custom]
+sidebar_bg = "{{bg_dark}}"
+active_row_bg = "{{bg_light}}"
+selection_bg = "{{bg_light}}"
+surface_dim = "{{bg_dark}}"
+panel_bg = "{{bg}}"
+accent = "{{accent}}"
+blue = "{{accent}}"
+mauve = "{{accent}}"
+red = "{{error}}"
+green = "{{accent}}"
+yellow = "{{tertiary}}"
+peach = "{{secondary}}"
+
+[ui]
+accent = "{{accent}}"
+pane_gaps = false
+
+[terminal]
+new_cwd = "follow"
+shell_mode = "auto"
+
+[keys]
+prefix = "ctrl+b"
+
+[ui.toast]
+delivery = "system"
+
+[experimental]
+kitty_graphics = true

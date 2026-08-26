@@ -1,0 +1,12 @@
+{
+  "name": "Matugen Wallpaper",
+  "base": "dark",
+  "overrides": {
+    "claude": "{{accent}}",
+    "error": "{{error}}",
+    "warning": "{{tertiary}}",
+    "info": "{{secondary}}",
+    "success": "{{accent}}",
+    "accent": "{{accent}}"
+  }
+}

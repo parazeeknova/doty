@@ -252,7 +252,46 @@
           });
         })
       ];
-      programs.nix-ld.enable = true;
+      programs.nix-ld = {
+        enable = true;
+        libraries = with pkgs; [
+          stdenv.cc.cc.lib
+          zlib
+          glib
+          libx11
+          libxi
+          libxtst
+          libxext
+          libxrandr
+          libxcursor
+          libxfixes
+          libxrender
+          libxcomposite
+          libxdamage
+          libxcb
+          libxkbcommon
+          libxkbfile
+          libxshmfence
+          alsa-lib
+          libdrm
+          libgbm
+          mesa
+          nss
+          nspr
+          cairo
+          pango
+          atk
+          at-spi2-atk
+          at-spi2-core
+          gtk3
+          gdk-pixbuf
+          udev
+          vulkan-loader
+          libGL
+          openssl
+          curl
+        ];
+      };
 
       # -- Fix hardcoded /usr/share/applications for non-Nix binaries --
       systemd.tmpfiles.rules = [

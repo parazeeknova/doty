@@ -830,6 +830,14 @@ fn main() {
             "modules/features/wm/theming/limine-theme.conf.template",
             "modules/features/wm/theming/limine-theme.conf",
         ),
+        (
+            "modules/features/shell/herdr/config.toml.template",
+            "modules/features/shell/herdr/config.toml",
+        ),
+        (
+            "modules/features/shell/claude/themes/matugen.json.template",
+            "modules/features/shell/claude/themes/matugen.json",
+        ),
     ];
 
     for (tmpl, dest) in mappings {
@@ -1098,6 +1106,9 @@ fn main() {
     }
     let _ = Command::new("killall").arg("-USR2").arg("cava").status();
     let _ = Command::new("killall").arg("-USR1").arg("kitty").status();
+    let _ = Command::new("herdr")
+        .args(["server", "reload-config"])
+        .status();
 
     // Apply Spicetify theme if installed
     let mut applied = false;
