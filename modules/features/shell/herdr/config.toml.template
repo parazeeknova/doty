@@ -34,6 +34,12 @@ shell_mode = "auto"
 [keys]
 prefix = "ctrl+b"
 
+[[keys.command]]
+key = "prefix+p"
+type = "plugin_action"
+command = "allmight-ai.herdr-pet.open"
+description = "Toggle Herdr Pet"
+
 [ui.toast]
 delivery = "herdr"
 
