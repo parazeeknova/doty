@@ -34,18 +34,6 @@ shell_mode = "auto"
 [keys]
 prefix = "ctrl+b"
 
-[[keys.command]]
-key = "prefix+e"
-type = "plugin_action"
-command = "herdr-sidebar.open-sidebar"
-description = "Toggle file explorer sidebar"
-
-[[keys.command]]
-key = "prefix+g"
-type = "plugin_action"
-command = "herdr-sidebar.open-git"
-description = "Toggle git source control sidebar"
-
 [ui.toast]
 delivery = "herdr"
 
