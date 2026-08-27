@@ -49,15 +49,19 @@
           set -Ux WABI_GITHUB_USER "parazeeknova"
           set -Ux WABI_PRESETS_DIR "$HOME/doty/wabi/presets"
 
-          # -- Claude Code / OpenRouter Configuration --
-          set -gx ANTHROPIC_BASE_URL "https://openrouter.ai/api"
+          # -- Claude Code / Merge Gateway Configuration --
+          set -gx ANTHROPIC_BASE_URL "https://api-gateway.merge.dev/v1/anthropic"
           set -gx ANTHROPIC_API_KEY ""
-          set -gx ANTHROPIC_MODEL "stealth/ox-alpha[1m]"
-          set -gx ANTHROPIC_DEFAULT_OPUS_MODEL "stealth/ox-alpha[1m]"
-          set -gx ANTHROPIC_DEFAULT_SONNET_MODEL "stealth/ox-alpha[1m]"
-          set -gx ANTHROPIC_DEFAULT_HAIKU_MODEL "stealth/ox-alpha[1m]"
-          set -gx ANTHROPIC_DEFAULT_FABLE_MODEL "stealth/ox-alpha[1m]"
-          set -gx CLAUDE_CODE_SUBAGENT_MODEL "stealth/ox-alpha[1m]"
+          set -gx ANTHROPIC_MODEL "zai/glm-5.3-flash"
+          set -gx ANTHROPIC_CUSTOM_MODEL "zai/glm-5.3-flash"
+          set -gx ANTHROPIC_CUSTOM_MODEL_OPTION "zai/glm-5.3-flash"
+          set -gx ANTHROPIC_CUSTOM_MODEL_OPTION_NAME "zai/glm-5.3-flash"
+          set -gx CLAUDE_CODE_CUSTOM_MODEL "zai/glm-5.3-flash"
+          set -gx ANTHROPIC_DEFAULT_OPUS_MODEL "zai/glm-5.3-flash"
+          set -gx ANTHROPIC_DEFAULT_SONNET_MODEL "zai/glm-5.3-flash"
+          set -gx ANTHROPIC_DEFAULT_HAIKU_MODEL "zai/glm-5.3-flash"
+          set -gx ANTHROPIC_DEFAULT_FABLE_MODEL "zai/glm-5.3-flash"
+          set -gx CLAUDE_CODE_SUBAGENT_MODEL "zai/glm-5.3-flash"
           set -gx CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY "1"
           set -gx CLAUDE_CODE_EFFORT_LEVEL "max"
           set -gx CLAUDE_CODE_MAX_CONTEXT_TOKENS "1000000"
@@ -71,9 +75,12 @@
           set -gx OPENAI_API_KEY "mg_QZ7Wz9zXYfZij4DFsBJmSwyTy78XtVDxceSk_MfoOqs"
 
           # -- SOPS Decrypted Environment Variables --
+          if test -f /run/secrets/merge-gateway-api-key
+              set -gx MERGE_GATEWAY_API_KEY (cat /run/secrets/merge-gateway-api-key)
+              set -gx ANTHROPIC_AUTH_TOKEN (cat /run/secrets/merge-gateway-api-key)
+          end
           if test -f /run/secrets/openrouter-api-key
               set -gx OPENROUTER_API_KEY (cat /run/secrets/openrouter-api-key)
-              set -gx ANTHROPIC_AUTH_TOKEN (cat /run/secrets/openrouter-api-key)
           end
           if test -f /run/secrets/context7-api-key
               set -gx CONTEXT7_API_KEY (cat /run/secrets/context7-api-key)

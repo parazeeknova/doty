@@ -22,6 +22,7 @@
             defaultSopsFile = ../../secrets/secrets.yaml;
             age.keyFile = "/home/parazeeknova/.config/sops/age/keys.txt";
             secrets.openrouter-api-key = { };
+            secrets.merge-gateway-api-key = { };
             secrets.context7-api-key = { };
             secrets.github-token = { };
             templates."claude-settings" = {
@@ -34,17 +35,23 @@
                   "enabledPlugins": {
                     "typescript-lsp@claude-plugins-official": true
                   },
+                  "model": "zai/glm-5.3-flash",
                   "env": {
                     "ENABLE_LSP_TOOL": "1",
-                    "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
-                    "ANTHROPIC_AUTH_TOKEN": "${config.sops.placeholder.openrouter-api-key}",
+                    "MERGE_GATEWAY_API_KEY": "${config.sops.placeholder.merge-gateway-api-key}",
+                    "ANTHROPIC_BASE_URL": "https://api-gateway.merge.dev/v1/anthropic",
+                    "ANTHROPIC_AUTH_TOKEN": "${config.sops.placeholder.merge-gateway-api-key}",
                     "ANTHROPIC_API_KEY": "",
-                    "ANTHROPIC_MODEL": "stealth/ox-alpha[1m]",
-                    "ANTHROPIC_DEFAULT_OPUS_MODEL": "stealth/ox-alpha[1m]",
-                    "ANTHROPIC_DEFAULT_SONNET_MODEL": "stealth/ox-alpha[1m]",
-                    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "stealth/ox-alpha[1m]",
-                    "ANTHROPIC_DEFAULT_FABLE_MODEL": "stealth/ox-alpha[1m]",
-                    "CLAUDE_CODE_SUBAGENT_MODEL": "stealth/ox-alpha[1m]",
+                    "ANTHROPIC_MODEL": "zai/glm-5.3-flash",
+                    "ANTHROPIC_CUSTOM_MODEL": "zai/glm-5.3-flash",
+                    "ANTHROPIC_CUSTOM_MODEL_OPTION": "zai/glm-5.3-flash",
+                    "ANTHROPIC_CUSTOM_MODEL_OPTION_NAME": "zai/glm-5.3-flash",
+                    "CLAUDE_CODE_CUSTOM_MODEL": "zai/glm-5.3-flash",
+                    "ANTHROPIC_DEFAULT_OPUS_MODEL": "zai/glm-5.3-flash",
+                    "ANTHROPIC_DEFAULT_SONNET_MODEL": "zai/glm-5.3-flash",
+                    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "zai/glm-5.3-flash",
+                    "ANTHROPIC_DEFAULT_FABLE_MODEL": "zai/glm-5.3-flash",
+                    "CLAUDE_CODE_SUBAGENT_MODEL": "zai/glm-5.3-flash",
                     "CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY": "1",
                     "CLAUDE_CODE_EFFORT_LEVEL": "max",
                     "CLAUDE_CODE_MAX_CONTEXT_TOKENS": "1000000",
