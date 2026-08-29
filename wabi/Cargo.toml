@@ -209,10 +209,6 @@ name = "update_terminal_code"
 path = "src/bin/utils/update-terminal-code.rs"
 
 [[bin]]
-name = "update_suwayomi"
-path = "src/bin/utils/update-suwayomi.rs"
-
-[[bin]]
 name = "update_bun"
 path = "src/bin/utils/update-bun.rs"
 

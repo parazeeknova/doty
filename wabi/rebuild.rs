@@ -165,14 +165,6 @@ fn main() {
         print_warning("Terminal Code check/update failed or skipped.");
     }
 
-    // Step 0.697: Check and update Suwayomi Server
-    print_step("Checking and updating Suwayomi Server...");
-    if run_cmd("./wabi/target/release/update_suwayomi", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("Suwayomi Server check/update completed.");
-    } else {
-        print_warning("Suwayomi Server check/update failed or skipped.");
-    }
-
     // Step 0.698: Check and update Bun
     print_step("Checking and updating Bun...");
     if run_cmd("./wabi/target/release/update_bun", &["--commit"]).map(|s| s.success()).unwrap_or(false) {

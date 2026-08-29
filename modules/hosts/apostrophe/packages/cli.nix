@@ -11,13 +11,7 @@
 
       environment.systemPackages = with pkgs; [
         # -- JFR --
-        cmatrix
-        cowsay
-        pokemon-colorscripts
-        tty-clock
-        fortune
         adguardian
-        ani-cli
 
         # -- Editors --
         vim

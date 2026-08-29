@@ -57,26 +57,6 @@ hl.window_rule({
 	center = true,
 })
 
-hl.window_rule({
-	name = "anime-game-launcher-rules",
-	match = {
-		class = "^moe\\.launcher\\.an-anime-game-launcher$",
-	},
-	workspace = "8",
-	float = true,
-	border_size = 0,
-})
-
-hl.window_rule({
-	name = "wavey-launcher-rules",
-	match = {
-		class = "^moe\\.launcher\\.wavey-launcher$",
-	},
-	workspace = "8",
-	float = true,
-	border_size = 0,
-})
-
 hl.layer_rule({
 	name = "quickshell-blur",
 	match = {
@@ -152,9 +132,8 @@ local workspace_assignments = {
 	["4"] = { "^[Ff]ree[Tt]ube$", "^[Gg]oogle-chrome.*$" },
 	["5 silent"] = { "^[Ss]potify$" },
 	["6"] = { "^vesktop$" },
-	["8"] = { "^[Ss]team$", "^[Ll]utris$", "^[Hh]eroic$" },
 	["9"] = { "^virt-manager$", "^qemu.*$", "^Qemu.*$" },
-	["10"] = { "^[Vv]mware.*$", "^[Pp]odman-[Dd]esktop$" },
+	["10"] = { "^[Pp]odman-[Dd]esktop$" },
 }
 
 for ws, classes in pairs(workspace_assignments) do
@@ -202,17 +181,6 @@ hl.window_rule({
 	center = true,
 })
 
-hl.window_rule({
-	name = "waydroid-scratchpad",
-	match = {
-		class = "^[Ww]aydroid$",
-	},
-	workspace = "special:waydroid",
-	float = true,
-	size = { 1610, 1010 },
-	center = true,
-})
-
 local colors = {}
 local colors_status, c = pcall(require, "modules.colors")
 if colors_status then
@@ -228,15 +196,6 @@ hl.window_rule({
 	float = true,
 	animation = "slide",
 	border_color = colors.border_color or "rgb(a9b665)",
-})
-
--- Force full opacity for VMware Workstation
-hl.window_rule({
-	name = "vmware-opacity",
-	match = {
-		class = "^[Vv]mware.*$",
-	},
-	opacity = "1.0 override 1.0 override",
 })
 
 -- Force full opacity for QEMU/KVM/Virt-manager VMs

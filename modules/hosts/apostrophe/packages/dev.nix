@@ -173,7 +173,6 @@
         terminal-browser
         terminal-code
         appimage-run
-        azure-cli
         cloudflare-cli
         awscli2
         google-cloud-sdk
@@ -184,9 +183,6 @@
         typescript-language-server
         python3
         rustup
-        openjdk
-        temurin-bin
-        temurin-jre-bin
         go
         zig
         zigimports
@@ -236,8 +232,6 @@
         gitkraken
         difftastic
         diff-so-fancy
-        figma-linux
-        figma-agent
 
         # -- Kubernetes --
         kubectl

@@ -787,10 +787,6 @@ fn main() {
             "modules/features/shell/fastfetch/config.jsonc",
         ),
         (
-            "modules/features/shell/cava/config.template",
-            "modules/features/shell/cava/config",
-        ),
-        (
             "modules/features/wm/satty/config.toml.template",
             "modules/features/wm/satty/config.toml",
         ),
