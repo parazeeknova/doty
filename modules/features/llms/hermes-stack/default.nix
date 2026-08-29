@@ -46,7 +46,7 @@
           "podman.service"
         ];
         wants = [ "network-online.target" ];
-        wantedBy = [ "multi-user.target" ];
+        unitConfig.StopWhenUnneeded = true;
         path = with pkgs; [
           podman
           podman-compose
@@ -60,14 +60,25 @@
           EnvironmentFile = envFile;
           ExecStart = "${podmanCompose} up -d --remove-orphans";
           ExecStop = "${podmanCompose} down";
-          # First start pulls multi-GB images into the root podman store.
-          # Give it 30 min; subsequent starts are near-instant (--policy missing).
           TimeoutStartSec = 1800;
-          # Transient startup races (port bind collisions between stacks,
-          # slow first pull) should auto-retry rather than leave the stack down.
           Restart = "on-failure";
           RestartSec = 10;
           StartLimitIntervalSec = 0;
+        };
+      };
+
+      systemd.sockets.hermes-firecrawl-proxy = {
+        description = "Hermes Firecrawl Socket";
+        listenStreams = [ "127.0.0.1:48002" ];
+        wantedBy = [ "sockets.target" ];
+      };
+
+      systemd.services.hermes-firecrawl-proxy = {
+        description = "Hermes Firecrawl Socket Proxy";
+        requires = [ "hermes-firecrawl.service" ];
+        after = [ "hermes-firecrawl.service" ];
+        serviceConfig = {
+          ExecStart = "${pkgs.systemd}/lib/systemd/systemd-socket-proxyd --exit-idle-time=10m 127.0.0.1:48003";
         };
       };
 
@@ -80,7 +91,7 @@
           "podman.service"
         ];
         wants = [ "network-online.target" ];
-        wantedBy = [ "multi-user.target" ];
+        unitConfig.StopWhenUnneeded = true;
         path = with pkgs; [
           podman
           podman-compose
@@ -94,14 +105,40 @@
           EnvironmentFile = envFile;
           ExecStart = "${podmanCompose} up -d --remove-orphans";
           ExecStop = "${podmanCompose} down";
-          # First start pulls multi-GB images into the root podman store.
-          # Give it 30 min; subsequent starts are near-instant (--policy missing).
           TimeoutStartSec = 1800;
-          # The 48888 port bind collided with a stale bind on first start
-          # (transient race). Auto-retry so a one-off collision self-heals.
           Restart = "on-failure";
           RestartSec = 10;
           StartLimitIntervalSec = 0;
+        };
+      };
+
+      systemd.sockets.hermes-hindsight-proxy = {
+        description = "Hermes Hindsight API Socket";
+        listenStreams = [ "127.0.0.1:48888" ];
+        wantedBy = [ "sockets.target" ];
+      };
+
+      systemd.services.hermes-hindsight-proxy = {
+        description = "Hermes Hindsight API Socket Proxy";
+        requires = [ "hermes-hindsight.service" ];
+        after = [ "hermes-hindsight.service" ];
+        serviceConfig = {
+          ExecStart = "${pkgs.systemd}/lib/systemd/systemd-socket-proxyd --exit-idle-time=10m 127.0.0.1:48889";
+        };
+      };
+
+      systemd.sockets.hermes-hindsight-ui-proxy = {
+        description = "Hermes Hindsight UI Socket";
+        listenStreams = [ "127.0.0.1:49999" ];
+        wantedBy = [ "sockets.target" ];
+      };
+
+      systemd.services.hermes-hindsight-ui-proxy = {
+        description = "Hermes Hindsight UI Socket Proxy";
+        requires = [ "hermes-hindsight.service" ];
+        after = [ "hermes-hindsight.service" ];
+        serviceConfig = {
+          ExecStart = "${pkgs.systemd}/lib/systemd/systemd-socket-proxyd --exit-idle-time=10m 127.0.0.1:49998";
         };
       };
 
@@ -114,7 +151,7 @@
           "podman.service"
         ];
         wants = [ "network-online.target" ];
-        wantedBy = [ "multi-user.target" ];
+        unitConfig.StopWhenUnneeded = true;
         path = with pkgs; [
           podman
           podman-compose
@@ -135,6 +172,21 @@
         };
       };
 
+      systemd.sockets.hermes-searxng-proxy = {
+        description = "Hermes SearXNG Socket";
+        listenStreams = [ "127.0.0.1:48080" ];
+        wantedBy = [ "sockets.target" ];
+      };
+
+      systemd.services.hermes-searxng-proxy = {
+        description = "Hermes SearXNG Socket Proxy";
+        requires = [ "hermes-searxng.service" ];
+        after = [ "hermes-searxng.service" ];
+        serviceConfig = {
+          ExecStart = "${pkgs.systemd}/lib/systemd/systemd-socket-proxyd --exit-idle-time=10m 127.0.0.1:48081";
+        };
+      };
+
       # ── Camofox stack ──────────────────────────────────────────────────
       systemd.services.hermes-camofox = {
         description = "Hermes local Camofox browser server (podman-compose)";
@@ -144,7 +196,7 @@
           "podman.service"
         ];
         wants = [ "network-online.target" ];
-        wantedBy = [ "multi-user.target" ];
+        unitConfig.StopWhenUnneeded = true;
         path = with pkgs; [
           podman
           podman-compose
@@ -164,9 +216,19 @@
         };
       };
 
-      # ── Resource conservation: idle stop timers ────────────────────────
-      # Firecrawl is only needed when hermes crawls. Stop it after 30 min of
-      # idle; start on demand by systemctl start. Hindsight (memory) should
-      # stay up but is capped by compose limits.
+      systemd.sockets.hermes-camofox-proxy = {
+        description = "Hermes Camofox Socket";
+        listenStreams = [ "127.0.0.1:49377" ];
+        wantedBy = [ "sockets.target" ];
+      };
+
+      systemd.services.hermes-camofox-proxy = {
+        description = "Hermes Camofox Socket Proxy";
+        requires = [ "hermes-camofox.service" ];
+        after = [ "hermes-camofox.service" ];
+        serviceConfig = {
+          ExecStart = "${pkgs.systemd}/lib/systemd/systemd-socket-proxyd --exit-idle-time=10m 127.0.0.1:49378";
+        };
+      };
     };
 }

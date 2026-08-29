@@ -11,7 +11,7 @@ services:
     container_name: hermes-camofox
     restart: unless-stopped
     ports:
-      - "49377:9377"
+      - "127.0.0.1:49378:9377"
     environment:
       CAMOFOX_PORT: "9377"
       MAX_OLD_SPACE_SIZE: "512"

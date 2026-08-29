@@ -45,7 +45,7 @@ services:
       rabbitmq:
         condition: service_healthy
     ports:
-      - "48002:3002"
+      - "127.0.0.1:48003:3002"
     command: node dist/src/harness.js --start-docker
     ulimits:
       nofile:

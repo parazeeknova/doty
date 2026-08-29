@@ -43,8 +43,8 @@ services:
     container_name: hermes-hindsight-app
     restart: unless-stopped
     ports:
-      - "48888:8888"
-      - "49999:9999"
+      - "127.0.0.1:48889:8888"
+      - "127.0.0.1:49998:9999"
     environment:
       <<: *hindsight-env
     depends_on:
