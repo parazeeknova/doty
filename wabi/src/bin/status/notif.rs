@@ -160,8 +160,10 @@ fn get_uptime() -> String {
 }
 
 fn main() {
-    let active_handle = std::thread::spawn(|| run_cmd("makoctl", &["list", "-j"]).unwrap_or_default());
-    let history_handle = std::thread::spawn(|| run_cmd("makoctl", &["history", "-j"]).unwrap_or_default());
+    let active_handle =
+        std::thread::spawn(|| run_cmd("makoctl", &["list", "-j"]).unwrap_or_default());
+    let history_handle =
+        std::thread::spawn(|| run_cmd("makoctl", &["history", "-j"]).unwrap_or_default());
     let audio_handle = std::thread::spawn(is_audio_muted);
 
     let bt_enabled = is_bluetooth_enabled();
