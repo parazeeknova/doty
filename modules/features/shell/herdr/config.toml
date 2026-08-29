@@ -8,20 +8,20 @@ name = "catppuccin"
 
 [theme.custom]
 sidebar_bg = "#261e18"
-active_row_bg = "#50453a"
-selection_bg = "#50453a"
+active_row_bg = "#51443b"
+selection_bg = "#51443b"
 surface_dim = "#261e18"
 panel_bg = "#19120c"
-accent = "#fcb974"
-blue = "#fcb974"
-mauve = "#fcb974"
+accent = "#ffb77b"
+blue = "#ffb77b"
+mauve = "#ffb77b"
 red = "#ffb4ab"
-green = "#fcb974"
-yellow = "#bfcc9a"
-peach = "#e1c1a4"
+green = "#ffb77b"
+yellow = "#c4cb97"
+peach = "#e3c0a5"
 
 [ui]
-accent = "#fcb974"
+accent = "#ffb77b"
 pane_gaps = false
 pane_borders = false
 pane_outer_borders = false

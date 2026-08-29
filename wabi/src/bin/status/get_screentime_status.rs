@@ -25,27 +25,14 @@ fn ensure_daemon_running() -> bool {
         let _ = std::fs::remove_file(&socket);
     }
 
-    eprintln!("Screentime daemon not running, starting...");
     let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
     let daemon_path = format!("{}/.local/bin/screentime_daemon", home);
 
-    if let Err(e) = Command::new(&daemon_path)
+    let _ = Command::new(&daemon_path)
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null())
-        .spawn()
-    {
-        eprintln!("Failed to start screentime daemon: {}", e);
-        return false;
-    }
+        .spawn();
 
-    // Wait for the daemon to initialize and bind its socket
-    for _ in 0..10 {
-        std::thread::sleep(std::time::Duration::from_millis(200));
-        if Path::new(&socket).exists() && UnixStream::connect(&socket).is_ok() {
-            return false;
-        }
-    }
-    eprintln!("Screentime daemon still not ready after start.");
     false
 }
 
@@ -131,19 +118,26 @@ fn main() {
         .and_then(|s| s.parse::<i32>().ok())
         .unwrap_or(0);
 
-    // Ensure daemon is running before querying
-    let was_already_running = ensure_daemon_running();
-
-    // If daemon was just started, give it time to write the first session to DB
-    if !was_already_running {
-        std::thread::sleep(std::time::Duration::from_millis(500));
-    }
+    // Ensure daemon is running in the background if not active
+    let _ = ensure_daemon_running();
 
     let db_path = wabi::quickshell_dir()
         .join("notif_popup")
         .join("screentime.db");
     let conn = match Connection::open(db_path) {
-        Ok(c) => c,
+        Ok(c) => {
+            let _ = c.pragma_update(None, "journal_mode", "WAL");
+            let _ = c.pragma_update(None, "synchronous", "NORMAL");
+            let _ = c.execute(
+                "CREATE INDEX IF NOT EXISTS idx_sessions_range ON sessions(end_time, start_time);",
+                [],
+            );
+            let _ = c.execute(
+                "CREATE INDEX IF NOT EXISTS idx_sessions_end ON sessions(end_time);",
+                [],
+            );
+            c
+        }
         Err(_) => {
             // Output empty state if DB doesn't exist yet
             let result = ScreentimeResult {

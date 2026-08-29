@@ -80,8 +80,14 @@ fn save_settings(settings: &Settings) {
 fn is_wf_recorder_running() -> bool {
     if let Ok(entries) = fs::read_dir("/proc") {
         for entry in entries.flatten() {
-            let path = entry.path();
-            let comm_path = path.join("comm");
+            let file_name = entry.file_name();
+            let Some(name_str) = file_name.to_str() else {
+                continue;
+            };
+            if !name_str.chars().all(|c| c.is_ascii_digit()) {
+                continue;
+            }
+            let comm_path = entry.path().join("comm");
             if fs::read_to_string(comm_path).is_ok_and(|comm| comm.trim() == "wf-recorder") {
                 return true;
             }
@@ -337,12 +343,9 @@ fn run() -> i32 {
             return 1;
         }
     };
-    // Run filesystem check in a background thread to avoid blocking startup
-    std::thread::spawn(|| {
-        if let Ok(conn) = media_db::open() {
-            let _ = media_db::check_deleted(&conn);
-        }
-    });
+
+    // Run filesystem check synchronously before querying assets to avoid stale data
+    let _ = media_db::check_deleted(&conn);
     let settings = load_settings();
     let is_recording = is_wf_recorder_running();
 

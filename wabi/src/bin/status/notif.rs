@@ -91,12 +91,34 @@ fn get_urgency(value: &Value) -> String {
     }
 }
 
+fn is_rfkill_enabled(target_type: &str) -> Option<bool> {
+    let entries = std::fs::read_dir("/sys/class/rfkill").ok()?;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        let type_path = path.join("type");
+        let state_path = path.join("state");
+        if let Ok(t) = std::fs::read_to_string(type_path)
+            && t.trim() == target_type
+            && let Ok(s) = std::fs::read_to_string(state_path)
+        {
+            return Some(s.trim() == "1");
+        }
+    }
+    None
+}
+
 fn is_bluetooth_enabled() -> bool {
+    if let Some(enabled) = is_rfkill_enabled("bluetooth") {
+        return enabled;
+    }
     let out = run_cmd("bluetoothctl", &["show"]).unwrap_or_default();
     out.lines().any(|line| line.contains("Powered: yes"))
 }
 
 fn is_wifi_enabled() -> bool {
+    if let Some(enabled) = is_rfkill_enabled("wlan") {
+        return enabled;
+    }
     let out = run_cmd("nmcli", &["radio", "wifi"]).unwrap_or_default();
     out.to_lowercase().contains("enabled")
 }
@@ -138,16 +160,25 @@ fn get_uptime() -> String {
 }
 
 fn main() {
-    let active_raw = run_cmd("makoctl", &["list", "-j"]).unwrap_or_default();
-    let history_raw = run_cmd("makoctl", &["history", "-j"]).unwrap_or_default();
+    let active_handle = std::thread::spawn(|| run_cmd("makoctl", &["list", "-j"]).unwrap_or_default());
+    let history_handle = std::thread::spawn(|| run_cmd("makoctl", &["history", "-j"]).unwrap_or_default());
+    let audio_handle = std::thread::spawn(is_audio_muted);
+
+    let bt_enabled = is_bluetooth_enabled();
+    let wifi_enabled = is_wifi_enabled();
+    let uptime = get_uptime();
+
+    let active_raw = active_handle.join().unwrap_or_default();
+    let history_raw = history_handle.join().unwrap_or_default();
+    let audio_muted = audio_handle.join().unwrap_or(false);
 
     let status = NotifStatus {
         active: parse_items(&active_raw),
         history: parse_items(&history_raw),
-        bt_enabled: is_bluetooth_enabled(),
-        wifi_enabled: is_wifi_enabled(),
-        audio_muted: is_audio_muted(),
-        uptime: get_uptime(),
+        bt_enabled,
+        wifi_enabled,
+        audio_muted,
+        uptime,
     };
     print_json(&status);
 }

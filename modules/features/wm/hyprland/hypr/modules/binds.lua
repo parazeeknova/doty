@@ -269,13 +269,13 @@ hl.bind(
 hl.bind(
 	mainMod .. " + SPACE",
 	hl.dsp.exec_cmd(
-		"quickshell -c apps_popup ipc call apps_popup close || (quickshell -c recents_popup ipc call recents_popup close; quickshell --config apps_popup)"
+		"pgrep -f '[q]uickshell --config apps_popup' >/dev/null && quickshell -c apps_popup ipc call apps_popup close || (pgrep -f '[q]uickshell --config recents_popup' >/dev/null && quickshell -c recents_popup ipc call recents_popup close; quickshell --config apps_popup)"
 	)
 )
 hl.bind(
 	mainMod .. " + TAB",
 	hl.dsp.exec_cmd(
-		"quickshell -c recents_popup ipc call recents_popup close || (quickshell -c apps_popup ipc call apps_popup close; quickshell --config recents_popup)"
+		"pgrep -f '[q]uickshell --config recents_popup' >/dev/null && quickshell -c recents_popup ipc call recents_popup close || (pgrep -f '[q]uickshell --config apps_popup' >/dev/null && quickshell -c apps_popup ipc call apps_popup close; quickshell --config recents_popup)"
 	)
 )
 hl.bind("ALT + TAB", function()
@@ -283,19 +283,27 @@ hl.bind("ALT + TAB", function()
 end)
 hl.bind(
 	mainMod .. " + X",
-	hl.dsp.exec_cmd("quickshell -c power_popup ipc call power_popup close || quickshell --config power_popup")
+	hl.dsp.exec_cmd(
+		"pgrep -f '[q]uickshell --config power_popup' >/dev/null && quickshell -c power_popup ipc call power_popup close || quickshell --config power_popup"
+	)
 )
 hl.bind(
 	mainMod .. " + I",
-	hl.dsp.exec_cmd("quickshell -c sunset_popup ipc call sunset_popup close || quickshell --config sunset_popup")
+	hl.dsp.exec_cmd(
+		"pgrep -f '[q]uickshell --config sunset_popup' >/dev/null && quickshell -c sunset_popup ipc call sunset_popup close || quickshell --config sunset_popup"
+	)
 )
 hl.bind(
 	mainMod .. " + slash",
-	hl.dsp.exec_cmd("quickshell -c ports_popup ipc call ports_popup close || quickshell --config ports_popup")
+	hl.dsp.exec_cmd(
+		"pgrep -f '[q]uickshell --config ports_popup' >/dev/null && quickshell -c ports_popup ipc call ports_popup close || quickshell --config ports_popup"
+	)
 )
 hl.bind(
 	"XF86Launch3",
-	hl.dsp.exec_cmd("quickshell -c profile_popup ipc call profile_popup close || quickshell --config profile_popup")
+	hl.dsp.exec_cmd(
+		"pgrep -f '[q]uickshell --config profile_popup' >/dev/null && quickshell -c profile_popup ipc call profile_popup close || quickshell --config profile_popup"
+	)
 )
 
 ---------------------
@@ -319,51 +327,55 @@ hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("pypr toggle term"))
 hl.bind(
 	mainMod .. " + V",
 	hl.dsp.exec_cmd(
-		"quickshell -c clipboard_popup ipc call clipboard_popup close || quickshell --config clipboard_popup"
+		"pgrep -f '[q]uickshell --config clipboard_popup' >/dev/null && quickshell -c clipboard_popup ipc call clipboard_popup close || quickshell --config clipboard_popup"
 	)
 )
 hl.bind(
 	mainMod .. " + comma",
-	hl.dsp.exec_cmd("quickshell -c emoji_popup ipc call emoji_popup close || quickshell --config emoji_popup")
+	hl.dsp.exec_cmd(
+		"pgrep -f '[q]uickshell --config emoji_popup' >/dev/null && quickshell -c emoji_popup ipc call emoji_popup close || quickshell --config emoji_popup"
+	)
 )
 hl.bind(
 	mainMod .. " + SHIFT + M",
 	hl.dsp.exec_cmd(
-		"quickshell -c volume_popup ipc call volume_popup close || env QS_KEYBOARD=1 quickshell --config volume_popup"
+		"pgrep -f '[q]uickshell --config volume_popup' >/dev/null && quickshell -c volume_popup ipc call volume_popup close || env QS_KEYBOARD=1 quickshell --config volume_popup"
 	)
 )
 hl.bind(
 	mainMod .. " + SHIFT + V",
-	hl.dsp.exec_cmd("quickshell -c vm_popup ipc call vm_popup close || quickshell --config vm_popup")
+	hl.dsp.exec_cmd(
+		"pgrep -f '[q]uickshell --config vm_popup' >/dev/null && quickshell -c vm_popup ipc call vm_popup close || quickshell --config vm_popup"
+	)
 )
 hl.bind(
 	mainMod .. " + ALT + W",
 	hl.dsp.exec_cmd(
-		"quickshell -c network_popup ipc call network_popup close || env QS_KEYBOARD=1 quickshell --config network_popup"
+		"pgrep -f '[q]uickshell --config network_popup' >/dev/null && quickshell -c network_popup ipc call network_popup close || env QS_KEYBOARD=1 quickshell --config network_popup"
 	)
 )
 hl.bind(
 	mainMod .. " + SHIFT + F",
 	hl.dsp.exec_cmd(
-		"quickshell -c bluetooth_popup ipc call bluetooth_popup close || env QS_KEYBOARD=1 quickshell --config bluetooth_popup"
+		"pgrep -f '[q]uickshell --config bluetooth_popup' >/dev/null && quickshell -c bluetooth_popup ipc call bluetooth_popup close || env QS_KEYBOARD=1 quickshell --config bluetooth_popup"
 	)
 )
 hl.bind(
 	mainMod .. " + SHIFT + B",
 	hl.dsp.exec_cmd(
-		"quickshell -c brightness_popup ipc call brightness_popup close || env QS_KEYBOARD=1 quickshell --config brightness_popup"
+		"pgrep -f '[q]uickshell --config brightness_popup' >/dev/null && quickshell -c brightness_popup ipc call brightness_popup close || env QS_KEYBOARD=1 quickshell --config brightness_popup"
 	)
 )
 hl.bind(
 	mainMod .. " + SHIFT + P",
 	hl.dsp.exec_cmd(
-		"quickshell -c battery_popup ipc call battery_popup close || env QS_KEYBOARD=1 quickshell --config battery_popup"
+		"pgrep -f '[q]uickshell --config battery_popup' >/dev/null && quickshell -c battery_popup ipc call battery_popup close || env QS_KEYBOARD=1 quickshell --config battery_popup"
 	)
 )
 hl.bind(
 	mainMod .. " + SHIFT + N",
 	hl.dsp.exec_cmd(
-		"quickshell -c notif_popup ipc call notif_popup close || env QS_KEYBOARD=1 quickshell --config notif_popup"
+		"pgrep -f '[q]uickshell --config notif_popup' >/dev/null && quickshell -c notif_popup ipc call notif_popup close || env QS_KEYBOARD=1 quickshell --config notif_popup"
 	)
 )
 hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd("$HOME/doty/modules/scripts/theme_switcher --toggle-glass"))
@@ -377,37 +389,45 @@ hl.bind(
 )
 hl.bind(
 	mainMod .. " + ALT + slash",
-	hl.dsp.exec_cmd("quickshell -c podman_popup ipc call podman_popup close || quickshell --config podman_popup")
+	hl.dsp.exec_cmd(
+		"pgrep -f '[q]uickshell --config podman_popup' >/dev/null && quickshell -c podman_popup ipc call podman_popup close || quickshell --config podman_popup"
+	)
 )
 hl.bind(
 	mainMod .. " + G",
-	hl.dsp.exec_cmd("quickshell -c media_popup ipc call media_popup close || quickshell --config media_popup")
+	hl.dsp.exec_cmd(
+		"pgrep -f '[q]uickshell --config media_popup' >/dev/null && quickshell -c media_popup ipc call media_popup close || quickshell --config media_popup"
+	)
 )
 hl.bind(
 	mainMod .. " + SHIFT + W",
 	hl.dsp.exec_cmd(
-		"quickshell -c wallpaper_switcher ipc call wallpaper_switcher close || quickshell --config wallpaper_switcher"
+		"pgrep -f '[q]uickshell --config wallpaper_switcher' >/dev/null && quickshell -c wallpaper_switcher ipc call wallpaper_switcher close || quickshell --config wallpaper_switcher"
 	)
 )
 hl.bind(mainMod .. " + CTRL + W", hl.dsp.exec_cmd("$HOME/doty/modules/scripts/toggle_wallpaper_pause"))
 hl.bind(
 	mainMod .. " + ALT + C",
 	hl.dsp.exec_cmd(
-		"quickshell -c colorscheme_popup ipc call colorscheme_popup close || quickshell --config colorscheme_popup"
+		"pgrep -f '[q]uickshell --config colorscheme_popup' >/dev/null && quickshell -c colorscheme_popup ipc call colorscheme_popup close || quickshell --config colorscheme_popup"
 	)
 )
 hl.bind(
 	mainMod .. " + K",
-	hl.dsp.exec_cmd("quickshell -c shortcut_popup ipc call shortcut_popup close || quickshell --config shortcut_popup")
+	hl.dsp.exec_cmd(
+		"pgrep -f '[q]uickshell --config shortcut_popup' >/dev/null && quickshell -c shortcut_popup ipc call shortcut_popup close || quickshell --config shortcut_popup"
+	)
 )
 hl.bind(
 	mainMod .. " + ALT + X",
-	hl.dsp.exec_cmd("quickshell -c tray_popup ipc call tray_popup close || quickshell --config tray_popup")
+	hl.dsp.exec_cmd(
+		"pgrep -f '[q]uickshell --config tray_popup' >/dev/null && quickshell -c tray_popup ipc call tray_popup close || quickshell --config tray_popup"
+	)
 )
 hl.bind(
 	"SUPER_L",
 	hl.dsp.exec_cmd(
-		"quickshell -c workspace_popup ipc call workspace_popup close || quickshell --config workspace_popup"
+		"pgrep -f '[q]uickshell --config workspace_popup' >/dev/null && quickshell -c workspace_popup ipc call workspace_popup close || quickshell --config workspace_popup"
 	),
 	{
 		release = true,

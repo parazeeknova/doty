@@ -173,5 +173,6 @@
 		"**/.gitea/workflows/*.yaml",
 		"**/.forgejo/workflows/*.yml",
 		"**/.forgejo/workflows/*.yaml"
-	]
+	],
+	"qt-core.showWelcomePageOnActivation": false
 }

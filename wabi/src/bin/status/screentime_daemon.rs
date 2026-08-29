@@ -60,6 +60,14 @@ fn db_conn() -> Result<Connection, rusqlite::Error> {
         [],
     )?;
     conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_sessions_end ON sessions(end_time);",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_sessions_range ON sessions(end_time, start_time);",
+        [],
+    )?;
+    conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_sessions_class ON sessions(app_class);",
         [],
     )?;

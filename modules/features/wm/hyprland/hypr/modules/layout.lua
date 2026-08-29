@@ -117,23 +117,23 @@ if hl.plugin.hyprglass then
 
 	-- @parazeeknova's lg config
 	hg.preset("clear", {
-		blur_strength = 1.0,
-		blur_iterations = 0.82,
-		refraction_strength = 0.96,
-		chromatic_aberration = 0.95,
-		fresnel_strength = 0.95,
-		specular_strength = 0.45,
-		glass_opacity = 0.91,
-		edge_thickness = 0.035,
-		lens_distortion = 0.8,
+		blur_strength = 0.65,
+		blur_iterations = 3,
+		refraction_strength = 0.85,
+		chromatic_aberration = 1.6,
+		fresnel_strength = 0.85,
+		specular_strength = 2,
+		glass_opacity = 0.65,
+		edge_thickness = 2,
+		lens_distortion = 1.2,
 		dark = {
-			brightness = 0.82,
-			contrast = 0.92,
-			saturation = 0.82,
-			vibrancy = 0.12,
+			brightness = 0.85,
+			contrast = 0.8,
+			saturation = 0.85,
+			vibrancy = 0.6,
 			vibrancy_darkness = 0.12,
-			adaptive_dim = 0.32,
-			adaptive_boost = 0.01,
+			adaptive_dim = 0.2,
+			adaptive_boost = 0.1,
 		},
 	})
 

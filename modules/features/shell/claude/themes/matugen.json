@@ -2,11 +2,11 @@
   "name": "Matugen Wallpaper",
   "base": "dark",
   "overrides": {
-    "claude": "#fcb974",
+    "claude": "#ffb77b",
     "error": "#ffb4ab",
-    "warning": "#bfcc9a",
-    "info": "#e1c1a4",
-    "success": "#fcb974",
-    "accent": "#fcb974"
+    "warning": "#c4cb97",
+    "info": "#e3c0a5",
+    "success": "#ffb77b",
+    "accent": "#ffb77b"
   }
 }
