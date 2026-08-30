@@ -85,7 +85,7 @@ QtObject {
         }
     }
 
-    property bool glassEnabled: true
+    property bool glassEnabled: (typeof c.glass !== "undefined") ? c.glass : false
     property color popupBgColor: glassEnabled ? Qt.rgba(bg.r, bg.g, bg.b, 0.5) : bg
     Behavior on popupBgColor {
         enabled: theme.animationsEnabled

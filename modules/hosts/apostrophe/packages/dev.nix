@@ -176,6 +176,11 @@
         cloudflare-cli
         awscli2
         google-cloud-sdk
+        zed-editor-fhs
+        helix
+        bruno
+        yaak
+        beekeeper-studio
 
         # -- Languages --
         nodejs

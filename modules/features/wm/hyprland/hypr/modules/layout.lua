@@ -92,7 +92,7 @@ if hl.plugin.hyprglass then
 		tint_color = tint_color,
 		brightness = 0.7,
 		layers = {
-			enabled = 1,
+			enabled = glass_enabled and 1 or 0,
 		},
 	})
 

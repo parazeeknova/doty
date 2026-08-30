@@ -2,6 +2,7 @@ import QtQuick
 
 QtObject {
     id: colors
+    readonly property bool glass: {{glass_enabled}}
     readonly property color bg: "{{bg}}"
     readonly property color bg_dark: "{{bg_dark}}"
     readonly property color bg_light: "{{bg_light}}"

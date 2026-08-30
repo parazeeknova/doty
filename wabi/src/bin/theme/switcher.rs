@@ -246,6 +246,13 @@ fn interpolate_color(c1: &str, c2: &str, factor: f64) -> String {
 fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     let mut vars = HashMap::new();
 
+    let glass_state_file = home_dir().join(".cache").join("quickshell").join("glass_state");
+    let glass_enabled = fs::read_to_string(&glass_state_file)
+        .map(|s| s.trim().to_string())
+        .unwrap_or_else(|_| "true".to_string())
+        == "true";
+    vars.insert("glass_enabled".to_string(), glass_enabled.to_string());
+
     let bg = palette
         .get("surface")
         .cloned()
@@ -1329,14 +1336,39 @@ fn apply_glass_state() {
         let _ = fs::write(&mako_config, updated);
     }
 
+    let colors_dest = home.join(".cache").join("quickshell").join("Colors.qml");
+    if let Ok(content) = fs::read_to_string(&colors_dest) {
+        let updated = if content.contains("readonly property bool glass:") {
+            content
+                .lines()
+                .map(|line| {
+                    if line.trim().starts_with("readonly property bool glass:") {
+                        format!("    readonly property bool glass: {}", glass_enabled)
+                    } else {
+                        line.to_string()
+                    }
+                })
+                .collect::<Vec<_>>()
+                .join("\n")
+                + if content.ends_with('\n') { "\n" } else { "" }
+        } else {
+            content.replace(
+                "id: colors\n",
+                &format!("id: colors\n    readonly property bool glass: {}\n", glass_enabled),
+            )
+        };
+        let _ = fs::write(&colors_dest, updated);
+    }
+
     let _ = Command::new("makoctl").arg("reload").status();
     let _ = Command::new("pkill")
         .args(["-USR2", "-f", "bin/waybar"])
         .status();
 
+    let layers_enabled = if glass_enabled { 1 } else { 0 };
     let hypr_eval = format!(
-        "hl.config({{ decoration = {{ active_opacity = {}, inactive_opacity = {}, blur = {{ enabled = {} }} }} }}); if hl.plugin.hyprglass then hl.plugin.hyprglass.config({{ enabled = {} }}) end",
-        opacity, inactive_opacity, blur, glass_enabled
+        "hl.config({{ decoration = {{ active_opacity = {}, inactive_opacity = {}, blur = {{ enabled = {} }} }} }}); if hl.plugin.hyprglass then hl.plugin.hyprglass.config({{ enabled = {}, layers = {{ enabled = {} }} }}) end",
+        opacity, inactive_opacity, blur, glass_enabled, layers_enabled
     );
     let _ = Command::new("hyprctl").args(["eval", &hypr_eval]).status();
 
