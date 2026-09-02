@@ -933,7 +933,7 @@ Scope {
                                         onEntered: adguardVisitBtn.color = theme.accent
                                         onExited: adguardVisitBtn.color = theme.accent
                                         onClicked: {
-                                            Quickshell.execDetached(["xdg-open", "http://localhost:3080"]);
+                                            Quickshell.execDetached(["xdg-open", "http://localhost:48982"]);
                                         }
                                     }
                                 }

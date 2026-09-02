@@ -123,7 +123,7 @@ fn wifi_autoconnect_by_ssid() -> HashMap<String, bool> {
 }
 
 fn get_adguard_status() -> (bool, bool, u64, u64) {
-    let base = "http://127.0.0.1:3080";
+    let base = "http://127.0.0.1:48982";
 
     // returns (running, protection_enabled, dns_queries, blocked)
     let mut running = false;
@@ -386,7 +386,7 @@ fn main() {
         }
     }
 
-    // 6. Check AdGuard Home status on port 3080
+    // 6. Check AdGuard Home status on port 48982
     let (adguard_running, adguard_protection, adguard_queries, adguard_blocked) =
         get_adguard_status();
 

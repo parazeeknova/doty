@@ -173,6 +173,14 @@ fn main() {
         print_warning("Bun check/update failed or skipped.");
     }
 
+    // Step 0.699: Check and update Cap
+    print_step("Checking and updating Cap...");
+    if run_cmd("./wabi/target/release/update_cap", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
+        print_success("Cap check/update completed.");
+    } else {
+        print_warning("Cap check/update failed or skipped.");
+    }
+
     // Step 0.7: Update Nix Flake inputs
     print_step("Updating Nix flake inputs...");
     let mut update_args = vec!["flake", "update"];

@@ -246,7 +246,10 @@ fn interpolate_color(c1: &str, c2: &str, factor: f64) -> String {
 fn build_vars(palette: &HashMap<String, String>) -> HashMap<String, String> {
     let mut vars = HashMap::new();
 
-    let glass_state_file = home_dir().join(".cache").join("quickshell").join("glass_state");
+    let glass_state_file = home_dir()
+        .join(".cache")
+        .join("quickshell")
+        .join("glass_state");
     let glass_enabled = fs::read_to_string(&glass_state_file)
         .map(|s| s.trim().to_string())
         .unwrap_or_else(|_| "true".to_string())
@@ -1354,7 +1357,10 @@ fn apply_glass_state() {
         } else {
             content.replace(
                 "id: colors\n",
-                &format!("id: colors\n    readonly property bool glass: {}\n", glass_enabled),
+                &format!(
+                    "id: colors\n    readonly property bool glass: {}\n",
+                    glass_enabled
+                ),
             )
         };
         let _ = fs::write(&colors_dest, updated);

@@ -1,5 +1,5 @@
 model:
-  default: tencent/hy3:free
+  default: meituan/longcat-2.0:free
   provider: nous
   base_url: https://inference-api.nousresearch.com/v1
 agent:

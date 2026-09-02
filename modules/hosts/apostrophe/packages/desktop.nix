@@ -107,6 +107,51 @@
           '';
         })
 
+        # -- Cap --
+        (pkgs.stdenv.mkDerivation rec {
+          pname = "cap";
+          version = "0.5.9";
+
+          src = pkgs.fetchurl {
+            url = "https://cdn.crabnebula.app/asset/01KZEFJYCGN6YJ32PQ7AX334RZ";
+            sha256 = "1hkc4k143ls605m395p5iqx2rbif3qi76qw608k8d75vs6cyqz70";
+          };
+
+          nativeBuildInputs = with pkgs; [
+            dpkg
+            autoPatchelfHook
+            wrapGAppsHook3
+          ];
+
+          buildInputs = with pkgs; [
+            webkitgtk_4_1
+            gtk3
+            cairo
+            gdk-pixbuf
+            glib
+            libsoup_3
+            libayatana-appindicator
+            pipewire
+            alsa-lib
+            openssl
+            libx11
+            libxkbcommon
+            libva
+            libpulseaudio
+            stdenv.cc.cc.lib
+          ];
+
+          unpackPhase = ''
+            dpkg-deb -x $src .
+          '';
+
+          installPhase = ''
+            mkdir -p $out
+            cp -r usr/* $out/
+            ln -s $out/bin/Cap $out/bin/cap
+          '';
+        })
+
         # -- Multi Media --
         freetube
         vlc
