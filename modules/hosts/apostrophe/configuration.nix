@@ -250,6 +250,17 @@
               sed -i 's/#define BORDER_RADIUS 8/#define BORDER_RADIUS 0/g' thunar/thunar-util.c
             '';
           });
+          pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+            (pfinal: pprev: {
+              inline-snapshot = pprev.inline-snapshot.overridePythonAttrs (_: {
+                doCheck = false;
+              });
+              sse-starlette = pprev.sse-starlette.overridePythonAttrs (_: {
+                doCheck = false;
+                dependencies = (pprev.dependencies or [ ]) ++ [ pfinal.starlette ];
+              });
+            })
+          ];
         })
       ];
       programs.nix-ld = {
