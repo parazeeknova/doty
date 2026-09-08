@@ -272,10 +272,7 @@ hl.bind(
 		"pgrep -f '[q]uickshell --config apps_popup' >/dev/null && quickshell -c apps_popup ipc call apps_popup close || quickshell --config apps_popup"
 	)
 )
-hl.bind(
-	mainMod .. " + TAB",
-	hl.dsp.exec_cmd("hyprctl dispatch hymission:toggle")
-)
+hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd("hyprctl dispatch hymission:toggle"))
 hl.bind("ALT + TAB", function()
 	hl.plugin.scrolloverview.overview("toggle")
 end)

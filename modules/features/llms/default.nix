@@ -97,7 +97,9 @@
         paths = [ inputs.codex-desktop-linux.packages.${pkgs.stdenv.hostPlatform.system}.default ];
         postBuild = ''
           rm $out/share/applications/codex-desktop.desktop
-          substitute ${inputs.codex-desktop-linux.packages.${pkgs.stdenv.hostPlatform.system}.default}/share/applications/codex-desktop.desktop $out/share/applications/codex-desktop.desktop \
+          substitute ${
+            inputs.codex-desktop-linux.packages.${pkgs.stdenv.hostPlatform.system}.default
+          }/share/applications/codex-desktop.desktop $out/share/applications/codex-desktop.desktop \
             --replace-fail "Name=ChatGPT Community" "Name=Codex Desktop"
         '';
       };
