@@ -145,6 +145,8 @@
         version = "0.7.1";
         src = inputs.hymission;
 
+        patches = [ ./patches/hymission-effective-alpha.patch ];
+
         nativeBuildInputs = [
           pkgs.cmake
           pkgs.pkg-config
@@ -158,6 +160,12 @@
           pkgs.libadwaita
           pkgs.gtk4-layer-shell
         ];
+
+        postInstall = ''
+          ln -s "$out/libexec/hymission-search-input" "$out/lib/hymission-search-input"
+          mkdir -p "$out/bin"
+          ln -s "$out/libexec/hymission-search-input" "$out/bin/hymission-search-input"
+        '';
 
         enableParallelBuilding = true;
       };

@@ -1,0 +1,18 @@
+--- a/src/overview_controller.cpp
++++ b/src/overview_controller.cpp
+@@ -4023,12 +4023,10 @@ void hkShouldRenderWindow(void* rendererThisptr, PHLWINDOW window, PHLMONITOR mo
+ }
+ 
+ float OverviewController::effectiveAlphaHook(void* windowThisptr) {
+-    if (!m_effectiveAlphaOriginal)
+-        return 0.0F;
+-
+-    const float originalAlpha = m_effectiveAlphaOriginal(windowThisptr);
+     if (!windowThisptr)
+-        return originalAlpha;
++        return 1.0F;
++
++    const float originalAlpha = reinterpret_cast<Desktop::View::CWindow*>(windowThisptr)->alphaTotal();
+ 
+     const auto findInState = [&](const State& state) -> const ManagedWindow* {
+         const auto it = std::find_if(state.windows.begin(), state.windows.end(),
