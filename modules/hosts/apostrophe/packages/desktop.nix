@@ -150,6 +150,24 @@
             cp -r usr/* $out/
             ln -s $out/bin/Cap $out/bin/cap
           '';
+
+          # libappindicator-sys dlopens the tray library at runtime, so it is
+          # not a DT_NEEDED entry and autoPatchelfHook never adds it to the
+          # RPATH. Inject it into the LD_LIBRARY_PATH the gapps wrapper sets.
+          preFixup = ''
+            gappsWrapperArgs+=(
+              --prefix LD_LIBRARY_PATH : "${
+                pkgs.lib.makeLibraryPath [
+                  pkgs.libayatana-appindicator
+                  pkgs.gtk3
+                  pkgs.glib
+                  pkgs.cairo
+                  pkgs.gdk-pixbuf
+                  pkgs.pango
+                ]
+              }"
+            )
+          '';
         })
 
         # -- Multi Media --

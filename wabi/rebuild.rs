@@ -109,79 +109,90 @@ fn main() {
         }
     }
 
-    // Step 0.6: Check and update Verso
-    print_step("Checking and updating Verso...");
-    if run_cmd("./wabi/target/release/update_verso", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("Verso check/update completed.");
+    // Step 1: Check and update standalone applications
+    print_step("Checking and updating standalone applications...");
+
+    println!("-> Compiling application updater tools...");
+    let update_bins = [
+        "update_verso",
+        "update_tldraw",
+        "update_hypr_plugins",
+        "update_portless",
+        "update_herdr",
+        "update_terminal_browser",
+        "update_terminal_code",
+        "update_bun",
+        "update_cap",
+    ];
+    let mut cargo_args = vec!["build", "--manifest-path", "wabi/Cargo.toml", "--release"];
+    for bin in &update_bins {
+        cargo_args.push("--bin");
+        cargo_args.push(bin);
+    }
+    if run_cmd_silent("cargo", &cargo_args) {
+        print_success("Updater tools ready.");
     } else {
-        print_warning("Verso check/update failed or skipped.");
+        print_warning("Failed to build updater tools; attempting to proceed with existing binaries.");
     }
 
-    // Step 0.65: Check and update Tldraw Offline
-    print_step("Checking and updating Tldraw Offline...");
-    if run_cmd("./wabi/target/release/update_tldraw", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("Tldraw Offline check/update completed.");
-    } else {
-        print_warning("Tldraw Offline check/update failed or skipped.");
-    }
+    let app_updates = [
+        ("Verso", "./wabi/target/release/update_verso"),
+        ("Tldraw Offline", "./wabi/target/release/update_tldraw"),
+        ("Hyprland plugins", "./wabi/target/release/update_hypr_plugins"),
+        ("Portless", "./wabi/target/release/update_portless"),
+        ("Herdr", "./wabi/target/release/update_herdr"),
+        ("Terminal Browser", "./wabi/target/release/update_terminal_browser"),
+        ("Terminal Code", "./wabi/target/release/update_terminal_code"),
+        ("Bun", "./wabi/target/release/update_bun"),
+        ("Cap", "./wabi/target/release/update_cap"),
+    ];
 
-    // Step 0.67: Check and update Hyprland Plugins
-    print_step("Checking and updating Hyprland plugins...");
-    if run_cmd("./wabi/target/release/update_hypr_plugins", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("Hyprland plugins check/update completed.");
-    } else {
-        print_warning("Hyprland plugins check/update failed or skipped.");
+    let total = app_updates.len();
+    for (i, (name, bin)) in app_updates.iter().enumerate() {
+        println!("-> [{}/{}] Checking {}...", i + 1, total, name);
+        let output = Command::new(bin).arg("--commit").output();
+        match output {
+            Ok(out) if out.status.success() => {
+                let stdout = String::from_utf8_lossy(&out.stdout);
+                let mut found_summary = false;
+                for line in stdout.lines() {
+                    let trim = line.trim();
+                    if trim.contains("already up to date") {
+                        print_success(&format!("   ✓ {} is up to date.", name));
+                        found_summary = true;
+                        break;
+                    } else if trim.contains("Successfully updated")
+                        || trim.contains("Committed:")
+                        || trim.contains("updates detected")
+                    {
+                        print_success(&format!("   ✓ {}", trim));
+                        found_summary = true;
+                    }
+                }
+                if !found_summary {
+                    print_success(&format!("   ✓ {} check completed.", name));
+                }
+            }
+            Ok(out) => {
+                let stderr = String::from_utf8_lossy(&out.stderr);
+                let stdout = String::from_utf8_lossy(&out.stdout);
+                let err_line = if !stderr.trim().is_empty() {
+                    stderr.lines().next().unwrap_or("Failed").trim()
+                } else if !stdout.trim().is_empty() {
+                    stdout.lines().next().unwrap_or("Failed").trim()
+                } else {
+                    "Failed or skipped"
+                };
+                print_warning(&format!("   ⚠ {} check failed or skipped: {}", name, err_line));
+            }
+            Err(e) => {
+                print_warning(&format!("   ⚠ Could not execute {} ({}): {}", name, bin, e));
+            }
+        }
     }
+    print_success("Standalone applications check completed.");
 
-    // Step 0.68: Check and update Portless
-    print_step("Checking and updating Portless...");
-    if run_cmd("./wabi/target/release/update_portless", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("Portless check/update completed.");
-    } else {
-        print_warning("Portless check/update failed or skipped.");
-    }
-
-    // Step 0.69: Check and update Herdr
-    print_step("Checking and updating Herdr...");
-    if run_cmd("./wabi/target/release/update_herdr", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("Herdr check/update completed.");
-    } else {
-        print_warning("Herdr check/update failed or skipped.");
-    }
-
-    // Step 0.695: Check and update Terminal Browser
-    print_step("Checking and updating Terminal Browser...");
-    if run_cmd("./wabi/target/release/update_terminal_browser", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("Terminal Browser check/update completed.");
-    } else {
-        print_warning("Terminal Browser check/update failed or skipped.");
-    }
-
-    // Step 0.696: Check and update Terminal Code
-    print_step("Checking and updating Terminal Code...");
-    if run_cmd("./wabi/target/release/update_terminal_code", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("Terminal Code check/update completed.");
-    } else {
-        print_warning("Terminal Code check/update failed or skipped.");
-    }
-
-    // Step 0.698: Check and update Bun
-    print_step("Checking and updating Bun...");
-    if run_cmd("./wabi/target/release/update_bun", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("Bun check/update completed.");
-    } else {
-        print_warning("Bun check/update failed or skipped.");
-    }
-
-    // Step 0.699: Check and update Cap
-    print_step("Checking and updating Cap...");
-    if run_cmd("./wabi/target/release/update_cap", &["--commit"]).map(|s| s.success()).unwrap_or(false) {
-        print_success("Cap check/update completed.");
-    } else {
-        print_warning("Cap check/update failed or skipped.");
-    }
-
-    // Step 0.7: Update Nix Flake inputs
+    // Step 2: Update Nix Flake inputs
     print_step("Updating Nix flake inputs...");
     let mut update_args = vec!["flake", "update"];
     let token_arg;
@@ -213,7 +224,7 @@ fn main() {
         std::process::exit(1);
     }
 
-    // Step 1: Lint, format, and build wabi
+    // Step 3: Lint, format, and build wabi
     print_step("Linting, formatting, and building wabi...");
     
     println!("-> wabi: cargo clippy --all-targets -- -D warnings");
@@ -244,7 +255,7 @@ fn main() {
         std::process::exit(1);
     }
 
-    // Step 2: Format QML, Nix, and Lua files
+    // Step 4: Format QML, Nix, and Lua files
     print_step("Formatting and linting QML / Nix / Lua files...");
     
     println!("-> Formatting QML files...");
@@ -325,7 +336,7 @@ fn main() {
         std::process::exit(1);
     }
 
-    // Step 3: Nix flake check
+    // Step 5: Nix flake check
     print_step("Running nix flake check...");
     let mut check_args = vec!["flake", "check"];
     check_args.push("--impure");
@@ -343,7 +354,7 @@ fn main() {
         std::process::exit(1);
     }
 
-    // Step 4: Git clean check & commit formatting changes if any
+    // Step 6: Git clean check & commit formatting changes if any
     print_step("Checking for auto-formatting changes...");
     match get_cmd_output("git", &["status", "--porcelain"]) {
         Ok(status) => {
@@ -376,7 +387,7 @@ fn main() {
         }
     }
 
-    // Step 4.5: Nix Garbage Collection & Generation Cleanup
+    // Step 7: Nix Garbage Collection & Generation Cleanup
     print_step("Deleting old system generations (keeping last 12)...");
     match run_cmd("sudo", &["nix-env", "-p", "/nix/var/nix/profiles/system", "--delete-generations", "+12"]) {
         Ok(status) if status.success() => print_success("Old system generations deleted."),
@@ -389,7 +400,7 @@ fn main() {
         _ => print_warning("Garbage collection failed or skipped."),
     }
 
-    // Step 5: System Rebuild
+    // Step 8: System Rebuild
     print_step("Rebuilding NixOS configuration...");
     match run_cmd("sudo", &["nixos-rebuild", "switch", "--flake", ".#apostrophe"]) {
         Ok(status) if status.success() => print_success("\n=== Rebuild Pipeline Completed Successfully ==="),
