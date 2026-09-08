@@ -48,6 +48,9 @@
         version = "0.1";
         src = inputs.hyprglass;
 
+        # Omit damageSurface hook in hyprglass so scrolloverview can hook damageSurface exclusively
+        patches = [ ./patches/hyprglass-scrolloverview-compat.patch ];
+
         dontUseCmakeConfigure = true;
 
         inherit (pkgs.hyprland) buildInputs;
@@ -121,10 +124,50 @@
         '';
       };
 
+      hypr_edgehover = pkgs.stdenv.mkDerivation {
+        pname = "hypr-edgehover";
+        version = "0.1";
+        src = inputs.hypr-edgehover;
+
+        nativeBuildInputs = [
+          pkgs.cmake
+          pkgs.pkg-config
+          pkgs.hyprland
+          pkgs.gcc14
+        ];
+        buildInputs = pkgs.hyprland.buildInputs;
+
+        enableParallelBuilding = true;
+      };
+
+      hymission = pkgs.stdenv.mkDerivation {
+        pname = "hymission";
+        version = "0.7.1";
+        src = inputs.hymission;
+
+        nativeBuildInputs = [
+          pkgs.cmake
+          pkgs.pkg-config
+          pkgs.hyprland
+          pkgs.gcc14
+        ];
+        buildInputs = pkgs.hyprland.buildInputs ++ [
+          pkgs.lua5_4
+          pkgs.glib
+          pkgs.gtk4
+          pkgs.libadwaita
+          pkgs.gtk4-layer-shell
+        ];
+
+        enableParallelBuilding = true;
+      };
+
       hyprPlugins = [
         scrolloverview
         hyprglass
         dynamic_cursors
+        hypr_edgehover
+        hymission
       ];
     in
     {

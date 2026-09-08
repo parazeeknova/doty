@@ -1,0 +1,37 @@
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -111,7 +111,7 @@
+ 
+ // Client commits are the only signal that content below a glassed layer changed
+ // (e.g. a playing video) — the scene-generation cache only sees window events.
+-static void hkDamageSurface(Render::IHyprRenderer* thisptr, SP<CWLSurfaceResource> surface, double x, double y, double scale) {
++[[maybe_unused]] static void hkDamageSurface(Render::IHyprRenderer* thisptr, SP<CWLSurfaceResource> surface, double x, double y, double scale) {
+     ((damageSurfaceFn)g_pGlobalState->damageSurfaceHook->m_original)(thisptr, surface, x, y, scale);
+ 
+     if (!g_pGlobalState || !surface)
+@@ -490,24 +490,7 @@
+         });
+     }
+ 
+-    // Hook damageSurface for live layer re-render on background content change
+-    auto damageSurfaceMatches = HyprlandAPI::findFunctionsByName(PHANDLE, "damageSurface");
+-    for (const auto& match : damageSurfaceMatches) {
+-        if (match.demangled.contains("IHyprRenderer") && match.demangled.contains("damageSurface")) {
+-            g_pGlobalState->damageSurfaceHook = HyprlandAPI::createFunctionHook(PHANDLE, match.address, (void*)hkDamageSurface);
+-            if (g_pGlobalState->damageSurfaceHook)
+-                g_pGlobalState->damageSurfaceHook->hook();
+-            break;
+-        }
+-    }
+-
+-    if (!g_pGlobalState->damageSurfaceHook) {
+-        HyprlandAPI::addNotificationV2(PHANDLE, {
+-            {"text", std::string("[hyprglass] Could not hook damageSurface — live layer re-render disabled")},
+-            {"time", (uint64_t)5000},
+-            {"color", CHyprColor{1.0, 0.8, 0.2, 1.0}},
+-        });
+-    }
++    // Skip hooking damageSurface to avoid conflicts with scrolloverview
+ 
+     HyprlandAPI::reloadConfig();
+     initConfigPointers(PHANDLE, g_pGlobalState->config);

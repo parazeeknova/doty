@@ -23,6 +23,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "hyprland-scroll-overview",
         "hyprglass",
         "hypr-dynamic-cursors",
+        "hypr-edgehover",
+        "hymission",
     ];
     let token_arg;
     if let Some(ref t) = token {

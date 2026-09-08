@@ -22,6 +22,16 @@
       flake = false;
     };
 
+    hypr-edgehover = {
+      url = "github:gfhdhytghd/hypr-edgehover";
+      flake = false;
+    };
+
+    hymission = {
+      url = "github:gfhdhytghd/hymission";
+      flake = false;
+    };
+
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs = {

@@ -269,14 +269,12 @@ hl.bind(
 hl.bind(
 	mainMod .. " + SPACE",
 	hl.dsp.exec_cmd(
-		"pgrep -f '[q]uickshell --config apps_popup' >/dev/null && quickshell -c apps_popup ipc call apps_popup close || (pgrep -f '[q]uickshell --config recents_popup' >/dev/null && quickshell -c recents_popup ipc call recents_popup close; quickshell --config apps_popup)"
+		"pgrep -f '[q]uickshell --config apps_popup' >/dev/null && quickshell -c apps_popup ipc call apps_popup close || quickshell --config apps_popup"
 	)
 )
 hl.bind(
 	mainMod .. " + TAB",
-	hl.dsp.exec_cmd(
-		"pgrep -f '[q]uickshell --config recents_popup' >/dev/null && quickshell -c recents_popup ipc call recents_popup close || (pgrep -f '[q]uickshell --config apps_popup' >/dev/null && quickshell -c apps_popup ipc call apps_popup close; quickshell --config recents_popup)"
-	)
+	hl.dsp.exec_cmd("hyprctl dispatch hymission:toggle")
 )
 hl.bind("ALT + TAB", function()
 	hl.plugin.scrolloverview.overview("toggle")

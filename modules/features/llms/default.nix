@@ -91,6 +91,16 @@
           sed -i '/function nativeOverlayWidth/,/return OVERLAY_FALLBACK_WIDTH;/{s/  if (isMac) {/  if (!isWindows) {/}' "$bundle"
         '';
       });
+
+      codex-desktop = pkgs.symlinkJoin {
+        name = "codex-desktop";
+        paths = [ inputs.codex-desktop-linux.packages.${pkgs.stdenv.hostPlatform.system}.default ];
+        postBuild = ''
+          rm $out/share/applications/codex-desktop.desktop
+          substitute ${inputs.codex-desktop-linux.packages.${pkgs.stdenv.hostPlatform.system}.default}/share/applications/codex-desktop.desktop $out/share/applications/codex-desktop.desktop \
+            --replace-fail "Name=ChatGPT Community" "Name=Codex Desktop"
+        '';
+      };
     in
     {
       environment.systemPackages = with pkgs; [
@@ -105,6 +115,7 @@
         hermes-cli
         opus
         portaudio
+        codex-desktop
       ];
 
       home-manager.users.parazeeknova =
