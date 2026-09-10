@@ -24,25 +24,30 @@
           pkgs.gamemode
         ];
       };
-      gpuDesktop = name: pkg: lib.hiPrio (pkgs.runCommand "offload-desktop-${name}" { } ''
-        mkdir -p $out/share/applications
-        for f in ${pkg}/share/applications/*.desktop; do
-          [ -e "$f" ] || continue
-          ${pkgs.gnused}/bin/sed 's#^Exec=#Exec=nvidia-offload #' "$f" > $out/share/applications/"$(basename "$f")"
-        done
-      '');
+      gpuDesktop =
+        name: pkg:
+        lib.hiPrio (
+          pkgs.runCommand "offload-desktop-${name}" { } ''
+            mkdir -p $out/share/applications
+            for f in ${pkg}/share/applications/*.desktop; do
+              [ -e "$f" ] || continue
+              ${pkgs.gnused}/bin/sed 's#^Exec=#Exec=nvidia-offload #' "$f" > $out/share/applications/"$(basename "$f")"
+            done
+          ''
+        );
     in
     {
       imports = [ inputs.aagl.nixosModules.default ];
 
       nix.settings.substituters = [ "https://ezkea.cachix.org" ];
-      nix.settings.trusted-public-keys = [ "ezkea.cachix.org-1:ioBmUbJTZIKsHmWWXPe1FSFbeVe+afhfgqgTSNd34eI=" ];
+      nix.settings.trusted-public-keys = [
+        "ezkea.cachix.org-1:ioBmUbJTZIKsHmWWXPe1FSFbeVe+afhfgqgTSNd34eI="
+      ];
 
       programs.anime-game-launcher.enable = true;
       programs.honkers-railway-launcher.enable = true;
       programs.honkers-launcher.enable = true;
       programs.wavey-launcher.enable = true;
-      programs.sleepy-launcher.enable = true;
 
       programs.steam = {
         enable = true;
@@ -122,7 +127,6 @@
         (gpuDesktop "honkers-railway-launcher" pkgs.honkers-railway-launcher)
         (gpuDesktop "honkers-launcher" pkgs.honkers-launcher)
         (gpuDesktop "wavey-launcher" pkgs.wavey-launcher)
-        (gpuDesktop "sleepy-launcher" pkgs.sleepy-launcher)
         antimicrox
         wineWow64Packages.stable
         winetricks
