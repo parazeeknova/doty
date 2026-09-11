@@ -31,7 +31,7 @@
     "exec": "/home/parazeeknova/.config/waybar/scripts/get_tailscale_status",
     "return-type": "json",
     "interval": 5,
-    "on-click": "quickshell --config network_popup",
+    "on-click": "env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config network_popup",
     "tooltip": true
   },
   "custom/voxtype": {
@@ -45,7 +45,7 @@
     "return-type": "json",
     "exec": "/home/parazeeknova/.config/waybar/scripts/tray_count",
     "signal": 5,
-    "on-click": "quickshell -c tray_popup ipc call tray_popup close || quickshell --config tray_popup",
+    "on-click": "quickshell -c tray_popup ipc call tray_popup close || env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config tray_popup",
     "tooltip": false,
   },
   "network": {
@@ -55,7 +55,7 @@
     "format-linked": "{icon}",
     "format-disconnected": "󰖪",
     "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
-    "on-click": "quickshell --config network_popup",
+    "on-click": "env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config network_popup",
     "tooltip": false,
   },
   "hyprland/workspaces": {
@@ -77,17 +77,17 @@
     "format": "{title}",
     "tooltip": false,
     "max-length": 60,
-    "on-click": "quickshell --config workspace_popup",
+    "on-click": "env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config workspace_popup",
   },
   "clock": {
     "format": "{:%I:%M %p}",
     "tooltip": false,
-    "on-click": "quickshell --config sysmon_popup",
+    "on-click": "env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config sysmon_popup",
   },
   "clock#date": {
     "format": "{:%d %m %y}",
     "tooltip": false,
-    "on-click": "quickshell --config notif_popup",
+    "on-click": "env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config notif_popup",
   },
   "pulseaudio": {
     "format": "{volume} {icon}",
@@ -106,7 +106,7 @@
     "scroll-step": 1,
     "on-scroll-up": "/home/parazeeknova/.config/quickshell/osd/bin/osdctl volume up",
     "on-scroll-down": "/home/parazeeknova/.config/quickshell/osd/bin/osdctl volume down",
-    "on-click": "quickshell --config volume_popup",
+    "on-click": "env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config volume_popup",
     "ignored-sinks": ["Easy Effects Sink"],
     "tooltip": false,
   },
@@ -116,7 +116,7 @@
     "format-charging": "{capacity} {icon}",
     "format-full": "",
     "format-plugged": "",
-    "on-click": "quickshell --config battery_popup",
+    "on-click": "env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config battery_popup",
     "tooltip": false,
     "format-icons": {
       "default": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
