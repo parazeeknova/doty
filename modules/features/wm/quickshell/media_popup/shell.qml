@@ -559,6 +559,7 @@ Scope {
                 required property var modelData
                 property bool isClosing: false
                 property real animOffsetX: -260
+                property real animTop: -320
                 property real animOpacity: 0
 
                 function closePopup() {
@@ -600,9 +601,9 @@ Scope {
                 }
 
                 margins {
-                    top: theme.floatingMode ? 28 : 4
+                    top: theme.floatingMode ? win.animTop : 4
                     left: theme.floatingMode ? 0 : win.animOffsetX
-                    right: theme.floatingMode ? Math.max(0, -win.animOffsetX - 24) : 0
+                    right: theme.floatingMode ? 8 : 0
                 }
 
                 // Slide-in + fade-in
@@ -614,6 +615,15 @@ Scope {
                         property: "animOffsetX"
                         from: -260
                         to: 32
+                        duration: 120
+                        easing.type: Easing.OutCubic
+                    }
+
+                    NumberAnimation {
+                        target: win
+                        property: "animTop"
+                        from: -320
+                        to: 24
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
@@ -639,6 +649,78 @@ Scope {
                         property: "animOffsetX"
                         from: 32
                         to: -260
+                        duration: 100
+                        easing.type: Easing.InCubic
+                    }
+
+                    NumberAnimation {
+                        target: win
+                        property: "animTop"
+                        from: 24
+                        to: -320
+                        duration: 100
+                        easing.type: Easing.InCubic
+                    }
+
+                    NumberAnimation {
+                        target: win
+                        property: "animOpacity"
+                        from: 1
+                        to: 0
+                        duration: 100
+                        easing.type: Easing.InCubic
+                    }
+                }
+
+                Rectangle {
+                    id: mainContainer
+                    anchors.fill: parent
+                    opacity: win.animOpacity
+                    color: theme.popupBgColor // Matching background color of other popups
+                    border.width: 1
+                    border.color: (root.previewAsset !== null || root.previewOcrText !== "") ? "#504945" : theme.accent
+                    radius: 0
+                    antialiasing: false
+                    focus: true
+                    Keys.onPressed: event => {
+                        if (root.previewAsset !== null || root.previewOcrText !== "") {
+                            if (event.key === Qt.Key_Escape || event.key === Qt.Key_Q) {
+                                root.closePreview();
+                                event.accepted = true;
+                            }
+                            return;
+                        }
+
+NumberAnimation {
+                        target: win
+                        property: "animTop"
+                        from: -320
+                        to: 32
+                        duration: 120
+                        easing.type: Easing.OutCubic
+                    }
+
+                    NumberAnimation {
+                        target: win
+                        property: "animOpacity"
+                        from: 0
+                        to: 1
+                        duration: 120
+                        easing.type: Easing.OutCubic
+                    }
+                }
+
+                // Slide-out + fade-out
+                ParallelAnimation {
+                    id: exitAnim
+
+                    onStopped: Qt.quit()
+
+                    NumberAnimation {
+                        target: win
+                        property: "animOffsetX"
+                        from: 32
+                        to: -320
                         duration: 100
                         easing.type: Easing.InCubic
                     }
