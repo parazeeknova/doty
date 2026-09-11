@@ -117,6 +117,8 @@ QtObject {
     glassState: FileView {
         path: "file:///tmp/quickshell_glass_state"
         watchChanges: true
+        blockLoading: true
+        preload: true
         onLoaded: {
             var val = glassState.text().trim();
             theme.glassEnabled = (val !== "false");
@@ -131,8 +133,13 @@ QtObject {
     property FileView layoutMode
 
     layoutMode: FileView {
+        // blockLoading makes the initial read synchronous: floatingMode is
+        // correct BEFORE popup windows/animations are created, otherwise the
+        // window spawns with stale anchors and teleports mid-animation.
         path: "file:///home/parazeeknova/.cache/hypr_layout_mode"
         watchChanges: true
+        blockLoading: true
+        preload: true
         onLoaded: {
             theme.floatingMode = (layoutMode.text().trim() === "floating");
         }
