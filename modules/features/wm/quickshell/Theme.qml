@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import "file:///home/parazeeknova/.cache/quickshell" as ThemeCache
 
@@ -128,20 +129,22 @@ QtObject {
 
     // Layout mode (written by the layoutmode Hyprland plugin): popups dock
     // top-right while floating, keep their original edges while tiling.
-    property bool floatingMode: false
+    // Primary source: QS_LAYOUT_MODE env injected by the keybind launcher —
+    // env reads are synchronous, so the value is correct at construction
+    // (FileView reads are async and land AFTER windows map; that race made
+    // popups flash with the wrong position/animation).
+    // The FileView watcher keeps long-lived processes (osd) updated live.
+    property bool floatingMode: Quickshell.env("QS_LAYOUT_MODE") === "floating"
 
     property FileView layoutMode
 
     layoutMode: FileView {
-        // blockLoading makes the initial read synchronous: floatingMode is
-        // correct BEFORE popup windows/animations are created, otherwise the
-        // window spawns with stale anchors and teleports mid-animation.
         path: "file:///home/parazeeknova/.cache/hypr_layout_mode"
         watchChanges: true
-        blockLoading: true
-        preload: true
         onLoaded: {
-            theme.floatingMode = (layoutMode.text().trim() === "floating");
+            var v = layoutMode.text().trim();
+            if (v !== "")
+                theme.floatingMode = (v === "floating");
         }
         onFileChanged: reload()
     }
