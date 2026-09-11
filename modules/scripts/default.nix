@@ -57,6 +57,7 @@ in
             "scripts/tmux-sessionizer".source = mkOutOfStoreSymlink "${scriptsDir}/tmux-sessionizer";
             "scripts/toggle_wallpaper_pause".source =
               mkOutOfStoreSymlink "${scriptsDir}/toggle_wallpaper_pause";
+            "scripts/mako_mode".source = mkOutOfStoreSymlink "${scriptsDir}/mako_mode";
           };
         };
     };

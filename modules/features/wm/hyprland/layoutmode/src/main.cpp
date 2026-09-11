@@ -316,6 +316,8 @@ void toFloating() {
     switchWaybar(true);
     refreshWaybar();
     notify("Floating layout", "Tiling arrangement saved");
+    // move mako notifications top-right, below the top waybar
+    system("/run/current-system/sw/bin/env HOME=$HOME $HOME/doty/modules/scripts/mako_mode floating 2>/dev/null");
 }
 
 // Re-tile in snapshot order (each window lands next to its focused
@@ -420,6 +422,8 @@ void toTiling() {
     switchWaybar(false);
     refreshWaybar();
     notify("Tiling layout", "Arrangement restored");
+    // restore mako notifications to their original top-left dock
+    system("/run/current-system/sw/bin/env HOME=$HOME $HOME/doty/modules/scripts/mako_mode tiling 2>/dev/null");
 }
 
 void toggle() {

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Switch mako notification position with the layout mode:
+#   floating -> top-right, below the top waybar (top margin 30)
+#   tiling   -> top-left (original), margin 4
+mode="${1:-tiling}"
+cfg="$HOME/.config/mako/config"
+[ -f "$cfg" ] || exit 0
+
+if [ "$mode" = "floating" ]; then
+  sed -i 's/^anchor=.*/anchor=top-right/; s/^margin=.*/margin=30,8,4,8/' "$cfg"
+else
+  sed -i 's/^anchor=.*/anchor=top-left/; s/^margin=.*/margin=4/' "$cfg"
+fi
+makoctl reload 2>/dev/null

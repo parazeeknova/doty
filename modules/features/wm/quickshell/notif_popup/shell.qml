@@ -42,6 +42,7 @@ Scope {
     property bool isKeyboardTriggered: Quickshell.env("QS_KEYBOARD") === "1"
 
     signal requestClose
+    signal requestOpen
 
     // Warm-open mode: process stays alive after close, reopened via IPC.
     property bool stayResident: true
@@ -210,12 +211,7 @@ Scope {
         // Warm open: the window already exists, just re-show it. Jumps
         // straight to visible (no re-parse of the whole QML tree).
         function open() {
-            win.isClosing = false;
-            win.visible = true;
-            win.animOpacity = 1;
-            win.animTop = 24;
-            win.animLeftMargin = 32;
-            root.triggerRefresh();
+            root.requestOpen();
         }
 
         target: "notif_popup"
@@ -598,6 +594,15 @@ Scope {
                 Connections {
                     function onRequestClose() {
                         win.closePopup();
+                    }
+
+                    function onRequestOpen() {
+                        win.isClosing = false;
+                        win.visible = true;
+                        win.animOpacity = 1;
+                        win.animTop = 24;
+                        win.animLeftMargin = 32;
+                        root.triggerRefresh();
                     }
 
                     target: root

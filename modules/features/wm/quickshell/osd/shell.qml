@@ -660,7 +660,7 @@ Scope {
                 implicitHeight: mainLayout.implicitHeight + 12
                 Component.onCompleted: {
                     if (root.visibleNow) {
-                        animTopMargin = 5;
+                        animTopMargin = theme.floatingMode ? 30 : 5;
                         animOpacity = 1;
                     }
                 }
@@ -685,7 +685,7 @@ Scope {
                         target: win
                         property: "animTopMargin"
                         from: -50
-                        to: 5
+                        to: theme.floatingMode ? 30 : 5
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
@@ -707,7 +707,7 @@ Scope {
                     NumberAnimation {
                         target: win
                         property: "animTopMargin"
-                        from: 5
+                        from: theme.floatingMode ? 30 : 5
                         to: -50
                         duration: 100
                         easing.type: Easing.InCubic

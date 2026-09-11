@@ -40,6 +40,7 @@ Scope {
                 property bool isClosing: false
                 property real animLeftMargin: -260
                 property real animTop: -320
+                // settles flush under the 22px top bar
                 property real animOpacity: 0
                 property bool isMenuOpen: false
                 property var activeMenu: null
@@ -146,7 +147,7 @@ NumberAnimation {
                         target: win
                         property: "animTop"
                         from: -320
-                        to: 24
+                        to: 22
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
@@ -179,7 +180,7 @@ NumberAnimation {
 NumberAnimation {
                         target: win
                         property: "animTop"
-                        from: 24
+                        from: 22
                         to: -320
                         duration: 100
                         easing.type: Easing.InCubic
@@ -424,7 +425,8 @@ NumberAnimation {
                 Rectangle {
                     id: trayBar
 
-                    anchors.bottom: parent.bottom
+                    anchors.bottom: !theme.floatingMode
+                    anchors.top: theme.floatingMode
                     anchors.left: parent.left
                     width: Math.max(34, mainLayout.implicitWidth + 16)
                     height: Math.max(34, mainLayout.implicitHeight + 16)

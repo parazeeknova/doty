@@ -25,7 +25,7 @@
     "interval": 30,
     "signal": 6,
     "on-click": "hyprctl layoutmode toggle",
-    "tooltip": true,
+    "tooltip": false,
   },
   "custom/tailscale": {
     "exec": "/home/parazeeknova/.config/waybar/scripts/get_tailscale_status",
@@ -85,7 +85,7 @@
     "on-click": "env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config sysmon_popup",
   },
   "clock#date": {
-    "format": "{:%d %m %y}",
+    "format": "{:%d/%m/%y}",
     "tooltip": false,
     "on-click": "env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config notif_popup",
   },

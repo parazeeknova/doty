@@ -690,69 +690,6 @@ Scope {
                             }
                             return;
                         }
-
-NumberAnimation {
-                        target: win
-                        property: "animTop"
-                        from: -320
-                        to: 32
-                        duration: 120
-                        easing.type: Easing.OutCubic
-                    }
-
-                    NumberAnimation {
-                        target: win
-                        property: "animOpacity"
-                        from: 0
-                        to: 1
-                        duration: 120
-                        easing.type: Easing.OutCubic
-                    }
-                }
-
-                // Slide-out + fade-out
-                ParallelAnimation {
-                    id: exitAnim
-
-                    onStopped: Qt.quit()
-
-                    NumberAnimation {
-                        target: win
-                        property: "animOffsetX"
-                        from: 32
-                        to: -320
-                        duration: 100
-                        easing.type: Easing.InCubic
-                    }
-
-                    NumberAnimation {
-                        target: win
-                        property: "animOpacity"
-                        from: 1
-                        to: 0
-                        duration: 100
-                        easing.type: Easing.InCubic
-                    }
-                }
-
-                Rectangle {
-                    id: mainContainer
-                    anchors.fill: parent
-                    opacity: win.animOpacity
-                    color: theme.popupBgColor // Matching background color of other popups
-                    border.width: 1
-                    border.color: (root.previewAsset !== null || root.previewOcrText !== "") ? "#504945" : theme.accent
-                    radius: 0
-                    antialiasing: false
-                    focus: true
-                    Keys.onPressed: event => {
-                        if (root.previewAsset !== null || root.previewOcrText !== "") {
-                            if (event.key === Qt.Key_Escape || event.key === Qt.Key_Q) {
-                                root.closePreview();
-                                event.accepted = true;
-                            }
-                            return;
-                        }
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
                             event.accepted = true;

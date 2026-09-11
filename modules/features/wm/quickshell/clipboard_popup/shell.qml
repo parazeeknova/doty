@@ -214,7 +214,7 @@ Scope {
 
         property string entryText: ""
 
-        command: ["sh", "-c", "decoded=$(echo \"$1\" | cliphist decode); echo -n \"$decoded\" | wl-copy && notify-send -t 1000 -h string:x-canonical-private-synchronous:clip-notify -a \"clipboard\" -i \"edit-copy\" \"copied to clipboard\" \"$(echo -n \"$decoded\" | head -c 50)\"", "sh", entryText]
+        command: ["sh", "-c", "case \"$1\" in *binary\ data*) id=$(echo \"$1\" | awk -F'\\t' '{print $1}' | tr -c '0-9' '_'); ext=$(echo \"$1\" | grep -o 'type [a-z]*' | head -1 | cut -d' ' -f2); ext=${ext:-png}; dir=$HOME/Pictures/Clipboard; mkdir -p \"$dir\"; file=\"$dir/clipboard_${id}.${ext}\"; echo \"$1\" | cliphist decode > \"$file\"; out=\"$file\"; ;; *) out=$(echo \"$1\" | cliphist decode); ;; esac; printf '%s' \"$out\" | wl-copy && notify-send -t 1000 -h string:x-canonical-private-synchronous:clip-notify -a \"clipboard\" -i \"edit-copy\" \"copied to clipboard\" \"$(printf '%s' \"$out\" | head -c 50)\"", "sh", entryText]
         running: false
         onExited: {
             root.requestClose();
@@ -430,11 +430,12 @@ Scope {
                     }
                 }
 
-                // Main Container (left card)
+                // Main Container (list card): left in tiling, right in floating
                 Rectangle {
                     id: mainContainer
 
-                    anchors.left: parent.left
+                    anchors.left: theme.floatingMode ? undefined : parent.left
+                    anchors.right: theme.floatingMode ? parent.right : undefined
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     width: 200
@@ -663,11 +664,12 @@ Scope {
                     }
                 }
 
-                // Preview Container (right card)
+                // Preview Container: right in tiling, left in floating
                 Rectangle {
                     id: previewContainer
 
-                    anchors.right: parent.right
+                    anchors.right: theme.floatingMode ? undefined : parent.right
+                    anchors.left: theme.floatingMode ? parent.left : undefined
                     anchors.top: parent.top
                     height: Math.min(260, previewLayout.implicitHeight + 8)
                     width: 320
