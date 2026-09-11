@@ -186,12 +186,49 @@
         enableParallelBuilding = true;
       };
 
+      hyprbars = pkgs.stdenv.mkDerivation {
+        pname = "hyprbars";
+        version = "0.56.2-pin";
+        src = "${inputs.hyprland-plugins}/hyprbars";
+
+        dontUseCmakeConfigure = true;
+
+        inherit (pkgs.hyprland) buildInputs;
+        nativeBuildInputs = pkgs.hyprland.nativeBuildInputs ++ [
+          pkgs.hyprland
+          pkgs.gcc14
+          pkgs.pkg-config
+          pkgs.pixman
+          pkgs.libdrm
+          pkgs.cairo
+          pkgs.pango
+          pkgs.lua5_4
+        ];
+
+        enableParallelBuilding = true;
+
+        buildPhase = ''
+          runHook preBuild
+          make all
+          runHook postBuild
+        '';
+
+        installPhase = ''
+          runHook preInstall
+          mkdir -p "$out/lib"
+          cp hyprbars.so "$out/lib/libhyprbars.so"
+          cp hyprbars.so "$out/lib/hyprbars.so"
+          runHook postInstall
+        '';
+      };
+
       hyprPlugins = [
         scrolloverview
         hyprglass
         dynamic_cursors
         hypr_edgehover
         hymission
+        hyprbars
         layoutmode
       ];
     in

@@ -84,6 +84,42 @@ hl.config({
 	},
 })
 
+-- Hyprbars (title bars). The layoutmode plugin flips `enabled` with the
+-- global mode: bars on while floating, off while tiling. Overlay style
+-- (not part of window geometry) so exact geometry restore keeps working.
+-- Bar color/blur follow glass mode via `hyprctl layoutmode syncbars`.
+hl.config({
+	plugin = {
+		hyprbars = {
+			enabled = false,
+			bar_height = 26,
+			bar_color = "rgba(19120cff)",
+			col = {
+				text = "rgb(ffb77b)",
+			},
+			bar_text_font = "FiraCode Nerd Font",
+			bar_text_size = 9,
+			bar_text_weight = 600,
+			bar_text_align = "left",
+			bar_title_enabled = true,
+			bar_part_of_window = false,
+			bar_blur = false,
+		},
+	},
+})
+
+-- Close button, pinned right: bare "X" text, no background. Guarded:
+-- hyprbars must be loaded already.
+if hl.plugin.hyprbars then
+	hl.plugin.hyprbars.add_button({
+		bg_color = "rgba(00000000)",
+		fg_color = "rgb(e06c5b)",
+		size = 14,
+		icon = "X",
+		action = "hyprctl dispatch 'hl.dsp.window.close()'",
+	})
+end
+
 -- Curves
 hl.curve("expressiveFastSpatial", {
 	type = "bezier",

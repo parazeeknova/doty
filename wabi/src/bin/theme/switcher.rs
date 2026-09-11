@@ -1284,6 +1284,11 @@ fn toggle_glass() {
 
     apply_glass_state();
 
+    // keep layoutmode title bars in sync (opaque vs glass) when floating
+    let _ = Command::new("hyprctl")
+        .args(["layoutmode", "syncbars"])
+        .status();
+
     let status = if new_state == "true" { "On" } else { "Off" };
     let color = if new_state == "true" { "good" } else { "bad" };
     let osdctl = home

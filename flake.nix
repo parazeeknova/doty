@@ -43,6 +43,10 @@
       url = "github:schembriaiden/helium-browser-nix-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    hyprland-plugins = {
+      url = "github:hyprwm/hyprland-plugins/7644cecdb947060682891a0db2a0cdc5c0b9e704";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     vscode-insiders = {
       url = "github:auguwu/vscode-insiders-nix";
       inputs.nixpkgs.follows = "nixpkgs";

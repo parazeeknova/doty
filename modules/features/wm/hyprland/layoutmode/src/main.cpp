@@ -59,6 +59,7 @@
 #include <hyprland/src/event/EventBus.hpp>
 #include <hyprland/src/helpers/Color.hpp>
 #include <hyprland/src/helpers/memory/Memory.hpp>
+#include <hyprland/src/config/ConfigValue.hpp>
 #undef private
 
 #include <hyprutils/math/Box.hpp>
@@ -152,6 +153,38 @@ void refreshWaybar() {
     system("pkill -RTMIN+6 waybar 2>/dev/null");
 }
 
+// Glass-aware bar theme: translucent + blurred with glass, solid without.
+// Called on every toggle and via `hyprctl layoutmode syncbars` (wired into
+// theme_switcher's glass toggle) so bars follow glass changes live.
+bool glassEnabled() {
+    const char* h = getenv("HOME");
+    std::ifstream f(std::string(h ? h : "/tmp") + "/.cache/quickshell/glass_state");
+    if (!f)
+        return true;
+    std::string s;
+    f >> s;
+    return s == "true";
+}
+
+void syncBarTheme() {
+    const bool glass = glassEnabled();
+    CConfigValue<Config::BOOL> blur("plugin:hyprbars:bar_blur");
+    if (blur.good() && blur.ptr())
+        *blur.ptr() = static_cast<Config::BOOL>(glass ? 1 : 0);
+    CConfigValue<Config::INTEGER> color("plugin:hyprbars:bar_color");
+    if (color.good() && color.ptr())
+        *color.ptr() = static_cast<Config::INTEGER>(glass ? 0xA619120C : 0xFF19120C);
+}
+
+// Title bars live only in floating mode. hyprbars reads these values
+// per-frame and repositions itself, so this applies instantly.
+void setBars(bool on) {
+    CConfigValue<Config::BOOL> h("plugin:hyprbars:enabled");
+    if (h.good() && h.ptr())
+        *h.ptr() = static_cast<Config::BOOL>(on ? 1 : 0);
+    syncBarTheme();
+}
+
 void persistMode() {
     std::ofstream f(statePath(), std::ios::trunc);
     if (f)
@@ -236,6 +269,7 @@ void toFloating() {
 
     g_floating = true;
     persistMode();
+    setBars(true);
     refreshWaybar();
     notify("Floating layout", "Tiling arrangement saved");
 }
@@ -245,6 +279,8 @@ void toFloating() {
 // widths back directly. No focus dances beyond the predecessor chain,
 // no structural tape surgery — only core-tested code paths.
 void toTiling() {
+    // bars off first so retiled windows never flash them
+    setBars(false);
     const auto rememberGeom = [](const PHLWINDOW& w) {
         const auto t = w->layoutTarget();
         if (t && t->floating())
@@ -374,6 +410,8 @@ std::string hyprctlLayoutmode(eHyprCtlOutputFormat, std::string args) {
     // "layoutmode toggle", ...), so match leniently
     if (args.find("toggle") != std::string::npos)
         toggle();
+    else if (args.find("syncbars") != std::string::npos)
+        syncBarTheme();
     if (g_floating)
         return "{\"text\":\"F\",\"class\":\"floating\",\"tooltip\":\"Floating layout — click to tile\"}\n";
     return "{\"text\":\"T\",\"class\":\"tiling\",\"tooltip\":\"Tiling layout — click to float\"}\n";
@@ -394,6 +432,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         f >> mode;
         g_floating = (mode == "floating");
     }
+    setBars(g_floating);
 
     if (!HyprlandAPI::addLuaFunction(g_handle, "layoutmode", "toggle", luaToggle)) {
         HyprlandAPI::addNotification(g_handle, "[layoutmode] failed to register lua function", CHyprColor(1.F, 0.3F, 0.3F, 1.F), 5000);

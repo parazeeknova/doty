@@ -8,7 +8,7 @@ fn get_cmd_output(cmd: &str, args: &[&str]) -> std::io::Result<String> {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!(
-        "Checking for Hyprland plugin updates (hyprland-scroll-overview, hyprglass, hypr-dynamic-cursors)..."
+        "Checking for Hyprland plugin updates (hyprland-scroll-overview, hyprglass, hypr-dynamic-cursors, hypr-edgehover, hymission, hyprland-plugins)..."
     );
 
     let token = fs::read_to_string("/run/secrets/github-token")
@@ -17,6 +17,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .or_else(|| std::env::var("GITHUB_PERSONAL_ACCESS_TOKEN").ok())
         .or_else(|| std::env::var("GITHUB_TOKEN").ok());
 
+    // NOTE: hyprland-plugins is rev-pinned in flake.nix for Hyprland 0.56.2
+    // compat, so `nix flake update` leaves it alone until the pin is lifted.
     let mut update_args = vec![
         "flake",
         "update",
@@ -25,6 +27,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "hypr-dynamic-cursors",
         "hypr-edgehover",
         "hymission",
+        "hyprland-plugins",
     ];
     let token_arg;
     if let Some(ref t) = token {
@@ -54,7 +57,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     std::process::exit(1);
                 }
 
-                let commit_msg = "chore: auto-update Hyprland plugins (hyprland-scroll-overview, hyprglass, hypr-dynamic-cursors)";
+                let commit_msg = "chore: auto-update Hyprland plugins (hyprland-scroll-overview, hyprglass, hypr-dynamic-cursors, hypr-edgehover, hymission, hyprland-plugins)";
                 let status = Command::new("git")
                     .args(["commit", "--no-gpg-sign", "-m", commit_msg])
                     .status()?;
