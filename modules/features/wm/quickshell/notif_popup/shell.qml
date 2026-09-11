@@ -590,16 +590,18 @@ Scope {
                 }
 
                 anchors {
-                    left: !theme.floatingMode
-                    top: theme.floatingMode
-                    right: theme.floatingMode
+                    left: true
+                    top: true
+                    right: true
                 }
 
-                // Center vertically on the left screen edge
+                // Center horizontally on the top edge in floating (equal
+                // left+right margins center it); original left-edge dock in
+                // tiling. Vertical slide-in from the top via animTop.
                 margins {
                     top: theme.floatingMode ? win.animTop : 0
-                    left: theme.floatingMode ? 0 : win.animLeftMargin
-                    right: theme.floatingMode ? 8 : 0
+                    left: theme.floatingMode ? (modelData.width - width) / 2 : win.animLeftMargin
+                    right: theme.floatingMode ? (modelData.width - width) / 2 : 0
                 }
 
                 // Slide-in + fade-in
