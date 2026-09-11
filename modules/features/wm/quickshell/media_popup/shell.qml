@@ -579,7 +579,7 @@ Scope {
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
                 focusable: true
                 // Set layershell requirements matching workspace_popup
-                WlrLayershell.namespace: "quickshell"
+                WlrLayershell.namespace: theme.floatingMode ? "quickshell-top" : "quickshell"
                 WlrLayershell.layer: WlrLayer.Overlay
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
                 implicitWidth: 240

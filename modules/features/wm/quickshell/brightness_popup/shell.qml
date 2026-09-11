@@ -177,6 +177,7 @@ Scope {
                 // Night Light (Auto, Off, Temp slider if not auto)
 
                 id: win
+                WlrLayershell.namespace: theme.floatingMode ? "quickshell-top" : "quickshell"
 
                 required property var modelData
                 property bool isClosing: false

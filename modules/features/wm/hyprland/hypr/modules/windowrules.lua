@@ -67,6 +67,18 @@ hl.layer_rule({
 	ignore_alpha = 0.01,
 })
 
+-- Floating-mode popups declare namespace "quickshell-top": compositor
+-- slides them from the top edge to match the QML-side animation.
+hl.layer_rule({
+	name = "quickshell-top-blur",
+	match = {
+		namespace = "^quickshell-top$",
+	},
+	animation = "slide top",
+	blur = true,
+	ignore_alpha = 0.01,
+})
+
 hl.layer_rule({
 	name = "github-graph-blur",
 	match = {

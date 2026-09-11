@@ -91,7 +91,7 @@ Scope {
                 screen: modelData
                 color: "transparent"
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
-                WlrLayershell.namespace: "quickshell"
+                WlrLayershell.namespace: theme.floatingMode ? "quickshell-top" : "quickshell"
                 WlrLayershell.layer: WlrLayer.Overlay
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
                 focusable: true

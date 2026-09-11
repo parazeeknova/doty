@@ -348,6 +348,7 @@ Scope {
         delegate: Component {
             PanelWindow {
                 id: win
+                WlrLayershell.namespace: theme.floatingMode ? "quickshell-top" : "quickshell"
 
                 required property var modelData
                 property bool isClosing: false

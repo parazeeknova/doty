@@ -202,6 +202,7 @@ Scope {
                 // Section 3: Exit (0) / Off (1) buttons
 
                 id: win
+                WlrLayershell.namespace: theme.floatingMode ? "quickshell-top" : "quickshell"
 
                 required property var modelData
                 property bool isClosing: false

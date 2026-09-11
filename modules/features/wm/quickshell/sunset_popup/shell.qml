@@ -135,7 +135,7 @@ Scope {
                 }
 
                 screen: modelData
-                WlrLayershell.namespace: "quickshell"
+                WlrLayershell.namespace: theme.floatingMode ? "quickshell-top" : "quickshell"
                 WlrLayershell.layer: WlrLayer.Overlay
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
