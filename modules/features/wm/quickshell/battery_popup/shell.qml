@@ -206,6 +206,7 @@ Scope {
                 required property var modelData
                 property bool isClosing: false
                 property real animLeftMargin: -260
+                property real animTop: -320
                 property real animOpacity: 0
                 property int activeSection: root.lastActiveSection
                 property int activeSubIndex: root.lastActiveSubIndex
@@ -295,13 +296,16 @@ Scope {
                 }
 
                 anchors {
-                    bottom: true
-                    left: true
+                    bottom: !theme.floatingMode
+                    top: theme.floatingMode
+                    right: theme.floatingMode
                 }
 
                 margins {
                     bottom: 10
-                    left: win.animLeftMargin
+                    top: theme.floatingMode ? win.animTop : 0
+                    left: theme.floatingMode ? 0 : win.animLeftMargin
+                    right: theme.floatingMode ? 8 : 0
                 }
 
                 ParallelAnimation {
@@ -312,6 +316,15 @@ Scope {
                         property: "animLeftMargin"
                         from: -260
                         to: 32
+                        duration: 120
+                        easing.type: Easing.OutCubic
+                    }
+
+NumberAnimation {
+                        target: win
+                        property: "animTop"
+                        from: -320
+                        to: 24
                         duration: 120
                         easing.type: Easing.OutCubic
                     }
@@ -336,6 +349,15 @@ Scope {
                         property: "animLeftMargin"
                         from: 32
                         to: -260
+                        duration: 100
+                        easing.type: Easing.InCubic
+                    }
+
+NumberAnimation {
+                        target: win
+                        property: "animTop"
+                        from: 24
+                        to: -320
                         duration: 100
                         easing.type: Easing.InCubic
                     }

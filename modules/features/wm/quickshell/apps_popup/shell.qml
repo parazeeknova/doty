@@ -881,12 +881,14 @@ Scope {
 
                 anchors {
                     top: true
-                    left: true
+                    left: !theme.floatingMode
+                    right: theme.floatingMode
                 }
 
                 margins {
-                    top: 4
-                    left: 32
+                    top: theme.floatingMode ? 28 : 4
+                    left: theme.floatingMode ? 0 : 32
+                    right: theme.floatingMode ? 8 : 0
                 }
 
                 ParallelAnimation {

@@ -94,12 +94,14 @@ Scope {
 
                 anchors {
                     top: true
-                    left: true
+                    left: !theme.floatingMode
+                    right: theme.floatingMode
                 }
 
                 margins {
-                    top: win.animOffsetY
-                    left: 32
+                    top: theme.floatingMode ? win.animOffsetY + 24 : win.animOffsetY
+                    left: theme.floatingMode ? 0 : 32
+                    right: theme.floatingMode ? 8 : 0
                 }
 
                 ParallelAnimation {

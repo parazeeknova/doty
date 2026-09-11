@@ -124,6 +124,21 @@ QtObject {
         onFileChanged: reload()
     }
 
+    // Layout mode (written by the layoutmode Hyprland plugin): popups dock
+    // top-right while floating, keep their original edges while tiling.
+    property bool floatingMode: false
+
+    property FileView layoutMode
+
+    layoutMode: FileView {
+        path: "file:///home/parazeeknova/.cache/hypr_layout_mode"
+        watchChanges: true
+        onLoaded: {
+            theme.floatingMode = (layoutMode.text().trim() === "floating");
+        }
+        onFileChanged: reload()
+    }
+
     property FileView colorsWatcher
 
     colorsWatcher: FileView {

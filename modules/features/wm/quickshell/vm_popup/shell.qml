@@ -189,6 +189,7 @@ Scope {
                 required property var modelData
                 property bool isClosing: false
                 property real animLeftMargin: -360
+                property real animTop: -320
                 property real animOpacity: 0
 
                 function closePopup() {
@@ -217,12 +218,14 @@ Scope {
 
                 anchors {
                     top: true
-                    left: true
+                    left: !theme.floatingMode
+                    right: theme.floatingMode
                 }
 
                 margins {
-                    top: 4
-                    left: win.animLeftMargin
+                    top: theme.floatingMode ? win.animTop : 4
+                    left: theme.floatingMode ? 0 : win.animLeftMargin
+                    right: theme.floatingMode ? 8 : 0
                 }
 
                 // Slide-in + fade-in from the left
@@ -234,6 +237,15 @@ Scope {
                         property: "animLeftMargin"
                         from: -360
                         to: 32
+                        duration: 140
+                        easing.type: Easing.OutCubic
+                    }
+
+NumberAnimation {
+                        target: win
+                        property: "animTop"
+                        from: -320
+                        to: 24
                         duration: 140
                         easing.type: Easing.OutCubic
                     }
@@ -259,6 +271,15 @@ Scope {
                         property: "animLeftMargin"
                         from: 32
                         to: -360
+                        duration: 110
+                        easing.type: Easing.InCubic
+                    }
+
+NumberAnimation {
+                        target: win
+                        property: "animTop"
+                        from: 24
+                        to: -320
                         duration: 110
                         easing.type: Easing.InCubic
                     }

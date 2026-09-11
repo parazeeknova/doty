@@ -667,12 +667,14 @@ Scope {
 
                 anchors {
                     top: true
-                    left: true
+                    left: !theme.floatingMode
+                    right: theme.floatingMode
                 }
 
                 margins {
                     top: win.animTopMargin
-                    left: 30
+                    left: theme.floatingMode ? 0 : 30
+                    right: theme.floatingMode ? 30 : 0
                 }
 
                 // Slide-in + fade-in
