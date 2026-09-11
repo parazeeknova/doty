@@ -17,7 +17,7 @@ window#waybar {
 #workspaces button {
   color: @fg_light;
   min-width: 22px;
-  padding: 0 4px;
+  padding: 0 2px;
 }
 
 #workspaces button.active {

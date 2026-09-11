@@ -1,7 +1,8 @@
 {
+  "name": "waybar-top",
   "layer": "top",
   "position": "top",
-  "height": 28,
+  "height": 20,
   "margin-top": 2,
   "margin-left": 2,
   "margin-right": 2,

@@ -95,6 +95,18 @@ hl.layer_rule({
 	ignore_alpha = 0.01,
 })
 
+-- Top variant (floating mode) slides down from the top edge instead.
+-- The top config sets name = "waybar-top", which becomes the layer namespace.
+hl.layer_rule({
+	name = "waybar-top-slide",
+	match = {
+		namespace = "^waybar-top$",
+	},
+	animation = "slide top",
+	blur = true,
+	ignore_alpha = 0.01,
+})
+
 hl.layer_rule({
 	name = "osd-blur",
 	match = {

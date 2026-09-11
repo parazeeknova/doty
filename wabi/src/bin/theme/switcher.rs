@@ -1316,23 +1316,28 @@ fn apply_glass_state() {
     };
 
     let waybar_css = home.join(".config").join("waybar").join("style.css");
+    let waybar_css_top = home.join(".config").join("waybar").join("style-top.css");
     let rofi_colors = home.join(".config").join("rofi").join("colors.rasi");
     let mako_config = home.join(".config").join("mako").join("config");
 
-    if let Ok(content) = fs::read_to_string(&waybar_css) {
-        let updated = if glass_enabled {
-            content.replace(
-                "background-color: @bg0;",
-                "background-color: alpha(@bg0, 0.75);",
-            )
-        } else {
-            content.replace(
-                "background-color: alpha(@bg0, 0.75);",
-                "background-color: @bg0;",
-            )
-        };
-        let _ = fs::write(&waybar_css, updated);
-    }
+    let toggle_waybar_glass = |path: &std::path::Path| {
+        if let Ok(content) = fs::read_to_string(path) {
+            let updated = if glass_enabled {
+                content.replace(
+                    "background-color: @bg0;",
+                    "background-color: alpha(@bg0, 0.75);",
+                )
+            } else {
+                content.replace(
+                    "background-color: alpha(@bg0, 0.75);",
+                    "background-color: @bg0;",
+                )
+            };
+            let _ = fs::write(path, updated);
+        }
+    };
+    toggle_waybar_glass(&waybar_css);
+    toggle_waybar_glass(&waybar_css_top);
 
     if let Ok(content) = fs::read_to_string(&rofi_colors) {
         let updated = toggle_hex_alpha_lines(&content, "bg0:", ";", glass_enabled);
