@@ -35,6 +35,8 @@
 #include <sstream>
 #include <string>
 #include <thread>
+#include <chrono>
+#include <sys/wait.h>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -150,7 +152,48 @@ void notify(const std::string& summary, const std::string& body) {
 
 void refreshWaybar() {
     // fire-and-forget; waybar's poll interval is the backstop
-    system("pkill -RTMIN+6 waybar 2>/dev/null");
+    system("/run/current-system/sw/bin/pkill -RTMIN+6 waybar 2>/dev/null");
+}
+
+std::string homeDir() {
+    const char* h = getenv("HOME");
+    return h ? h : "/tmp";
+}
+
+// Restart waybar on the variant matching the layout mode: top bar while
+// floating, left bar while tiling. Respects the user's waybar on/off state;
+// the variant choice is always recorded so restores pick the right one.
+void switchWaybar(bool floating) {
+    const std::string variant = floating ? "top" : "left";
+    const std::string varFile = homeDir() + "/.cache/hypr_layout_waybar";
+    {
+        std::ofstream f(varFile, std::ios::trunc);
+        if (f)
+            f << variant << "\n";
+    }
+    // Always retire the old bar: every mode toggle flips the variant, so a
+    // running bar is stale by definition (even a USR1-hidden one).
+    // A fresh bar spawns only when waybar is enabled (hidden stays hidden).
+    // Waybars ignore SIGTERM here (stuck exec children), so SIGKILL up
+    // front. Absolute paths: the compositor's PATH can't be relied on.
+    // Never spawn while any bar survives: stacking is worse than no bar.
+    system("/run/current-system/sw/bin/pkill -KILL -x waybar 2>/dev/null; /run/current-system/sw/bin/pkill -KILL -x .waybar-wrapped 2>/dev/null");
+    for (int i = 0; i < 20; ++i) {
+        int rc = system("/run/current-system/sw/bin/pgrep -x waybar >/dev/null 2>&1 || /run/current-system/sw/bin/pgrep -x .waybar-wrapped >/dev/null 2>&1");
+        if (rc == -1 || !WIFEXITED(rc) || WEXITSTATUS(rc) != 0)
+            break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    {
+        int rc = system("/run/current-system/sw/bin/pgrep -x waybar >/dev/null 2>&1 || /run/current-system/sw/bin/pgrep -x .waybar-wrapped >/dev/null 2>&1");
+        if (rc != -1 && WIFEXITED(rc) && WEXITSTATUS(rc) == 0)
+            return; // survivors: don't stack, keep old bar over none
+    }
+    const std::string cfg   = floating ? "config-top.jsonc" : "config.jsonc";
+    const std::string style = floating ? "style-top.css" : "style.css";
+    const std::string cmd = "/run/current-system/sw/bin/uwsm app -- waybar -c " + homeDir() + "/.config/waybar/" + cfg + " -s " + homeDir()
+            + "/.config/waybar/" + style + " >/dev/null 2>&1 &";
+    system(cmd.c_str());
 }
 
 // Glass-aware bar theme: translucent + blurred with glass, solid without.
@@ -270,6 +313,7 @@ void toFloating() {
     g_floating = true;
     persistMode();
     setBars(true);
+    switchWaybar(true);
     refreshWaybar();
     notify("Floating layout", "Tiling arrangement saved");
 }
@@ -373,6 +417,7 @@ void toTiling() {
     g_snap.clear();
     g_floating = false;
     persistMode();
+    switchWaybar(false);
     refreshWaybar();
     notify("Tiling layout", "Arrangement restored");
 }
@@ -433,6 +478,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         g_floating = (mode == "floating");
     }
     setBars(g_floating);
+    switchWaybar(g_floating);
 
     if (!HyprlandAPI::addLuaFunction(g_handle, "layoutmode", "toggle", luaToggle)) {
         HyprlandAPI::addNotification(g_handle, "[layoutmode] failed to register lua function", CHyprColor(1.F, 0.3F, 0.3F, 1.F), 5000);

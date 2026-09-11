@@ -519,7 +519,7 @@ hl.bind(
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/waybar/scripts/toggle_widgets"))
 
 -- Lock screen
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock -c ~/.config/hypr/hyprlock.conf"))
+hl.bind(mainMod .. " + SHIFT + L", hl.dsp.exec_cmd("hyprlock -c ~/.config/hypr/hyprlock.conf"))
 
 -- Color picker (also registers the color in the media popup history)
 hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("$HOME/.config/quickshell/media_popup/get_media_status pick-color"))

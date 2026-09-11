@@ -80,10 +80,21 @@ fn is_waybar_running() -> bool {
 }
 
 fn kill_waybar() {
-    let _ = Command::new("pkill").args(["-x", "waybar"]).status();
+    // bars ignore SIGTERM here (stuck exec children), so SIGKILL up front
     let _ = Command::new("pkill")
-        .args(["-x", ".waybar-wrapped"])
+        .args(["-KILL", "-x", "waybar"])
         .status();
+    let _ = Command::new("pkill")
+        .args(["-KILL", "-x", ".waybar-wrapped"])
+        .status();
+}
+
+fn waybar_variant() -> String {
+    // written by the layoutmode plugin: top bar in floating mode, else left
+    let home = env::var("HOME").unwrap_or_default();
+    fs::read_to_string(format!("{}/.cache/hypr_layout_waybar", home))
+        .map(|s| s.trim().to_string())
+        .unwrap_or_else(|_| "left".to_string())
 }
 
 fn apply_state(github_visible: bool, workspace_visible: bool, waybar_visible: bool) {
@@ -117,7 +128,17 @@ fn apply_state(github_visible: bool, workspace_visible: bool, waybar_visible: bo
     if waybar_visible {
         let _ = fs::write(TMPFS_WAYBAR, "true");
         if !is_waybar_running() {
-            let _ = spawn_command_robust("uwsm", &["app", "--", "waybar"]);
+            let home = env::var("HOME").unwrap_or_default();
+            let (cfg, style) = match waybar_variant().as_str() {
+                "top" => ("config-top.jsonc", "style-top.css"),
+                _ => ("config.jsonc", "style.css"),
+            };
+            let cfg_path = format!("{}/.config/waybar/{}", home, cfg);
+            let style_path = format!("{}/.config/waybar/{}", home, style);
+            let _ = spawn_command_robust(
+                "uwsm",
+                &["app", "--", "waybar", "-c", &cfg_path, "-s", &style_path],
+            );
         }
     } else {
         let _ = fs::write(TMPFS_WAYBAR, "false");

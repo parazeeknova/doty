@@ -35,6 +35,7 @@ hl.on("hyprland.start", function()
 			.. '/modules/backgrounds/gray_lien.jpg")"\''
 	)
 	hl.exec_cmd("uwsm app -- hyprsunset")
+	hl.exec_cmd("uwsm app -- hypridle")
 	hl.exec_cmd("~/.config/quickshell/brightness_popup/caffeine restore")
 	hl.exec_cmd("uwsm app -- pypr")
 	hl.exec_cmd("uwsm app -- wl-paste --type text --watch cliphist store")

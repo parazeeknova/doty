@@ -48,13 +48,37 @@ fn main() {
     let is_running = is_waybar_running();
 
     if is_running {
-        let _ = Command::new("pkill")
-            .args(["-USR1", "-x", "waybar"])
-            .status();
-        let _ = Command::new("pkill")
-            .args(["-USR1", "-x", ".waybar-wrapped"])
-            .status();
+        if new_state == "false" {
+            // hiding kills the bar (USR1 toggle only shows/hides; killing
+            // keeps things simple and layoutmode respawns the right variant)
+            let _ = Command::new("pkill")
+                .args(["-KILL", "-x", "waybar"])
+                .status();
+            let _ = Command::new("pkill")
+                .args(["-KILL", "-x", ".waybar-wrapped"])
+                .status();
+        } else {
+            // showing a hidden bar: USR1 unhides it
+            let _ = Command::new("pkill")
+                .args(["-USR1", "-x", "waybar"])
+                .status();
+            let _ = Command::new("pkill")
+                .args(["-USR1", "-x", ".waybar-wrapped"])
+                .status();
+        }
     } else if new_state == "true" {
-        let _ = Command::new("uwsm").args(["app", "--", "waybar"]).spawn();
+        // launch the variant matching the layout mode (written by layoutmode)
+        let variant = fs::read_to_string(format!("{}/.cache/hypr_layout_waybar", home))
+            .map(|s| s.trim().to_string())
+            .unwrap_or_else(|_| "left".to_string());
+        let (cfg, style) = match variant.as_str() {
+            "top" => ("config-top.jsonc", "style-top.css"),
+            _ => ("config.jsonc", "style.css"),
+        };
+        let cfg_path = format!("{}/.config/waybar/{}", home, cfg);
+        let style_path = format!("{}/.config/waybar/{}", home, style);
+        let _ = Command::new("uwsm")
+            .args(["app", "--", "waybar", "-c", &cfg_path, "-s", &style_path])
+            .spawn();
     }
 }

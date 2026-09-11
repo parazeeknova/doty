@@ -172,7 +172,7 @@
 
       layoutmode = pkgs.stdenv.mkDerivation {
         pname = "hyprland-layoutmode";
-        version = "0.2.0";
+        version = "0.2.1";
         src = ./layoutmode;
 
         nativeBuildInputs = [

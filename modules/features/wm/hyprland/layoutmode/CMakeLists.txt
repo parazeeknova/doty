@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
-project(layoutmode VERSION "0.2.0")
+project(layoutmode VERSION "0.2.1")
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
