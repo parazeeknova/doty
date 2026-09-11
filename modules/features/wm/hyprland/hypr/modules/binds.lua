@@ -397,7 +397,7 @@ hl.bind(
 hl.bind(
 	mainMod .. " + SHIFT + N",
 	hl.dsp.exec_cmd(
-		"pgrep -f '[q]uickshell --config notif_popup' >/dev/null && quickshell -c notif_popup ipc call notif_popup close || env QS_KEYBOARD=1 env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config notif_popup"
+		"pgrep -f '[q]uickshell --config notif_popup' >/dev/null && quickshell -c notif_popup ipc call notif_popup open || (env QS_KEYBOARD=1 env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config notif_popup &)"
 	)
 )
 hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd("$HOME/doty/modules/scripts/theme_switcher --toggle-glass"))

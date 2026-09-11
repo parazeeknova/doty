@@ -43,6 +43,9 @@ Scope {
 
     signal requestClose
 
+    // Warm-open mode: process stays alive after close, reopened via IPC.
+    property bool stayResident: true
+
     function getCalendarDays(offset) {
         var date = new Date();
         date.setMonth(date.getMonth() + offset);
@@ -202,6 +205,17 @@ Scope {
     IpcHandler {
         function close() {
             root.requestClose();
+        }
+
+        // Warm open: the window already exists, just re-show it. Jumps
+        // straight to visible (no re-parse of the whole QML tree).
+        function open() {
+            win.isClosing = false;
+            win.visible = true;
+            win.animOpacity = 1;
+            win.animTop = 24;
+            win.animLeftMargin = 32;
+            root.triggerRefresh();
         }
 
         target: "notif_popup"
@@ -639,7 +653,16 @@ NumberAnimation {
                 ParallelAnimation {
                     id: exitAnim
 
-                    onStopped: Qt.quit()
+                    // Stay resident: hide the window instead of quitting so
+                    // the next open skips QML re-parse (warm open).
+                    onStopped: {
+                        if (root.stayResident) {
+                            win.visible = false;
+                            isClosing = false;
+                        } else {
+                            Qt.quit();
+                        }
+                    }
 
                     NumberAnimation {
                         target: win
