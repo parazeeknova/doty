@@ -86,6 +86,16 @@ window#waybar {
   padding: 4px 0;
 }
 
+#custom-layout {
+  font-size: 0.8rem;
+  color: @fg1;
+  padding: 4px 0;
+}
+
+#custom-layout.floating {
+  color: @accent;
+}
+
 #custom-voxtype.recording {
   color: @red;
 }

@@ -138,6 +138,13 @@ hl.bind(
 
 hl.bind(mainMod .. " + J", hl.dsp.layout("promote")) -- promote window to its own column in scrolling layout
 
+-- Toggle Tiling/Floating Layout via the layoutmode plugin (exact, animated)
+hl.bind(mainMod .. " + D", function()
+	if hl.plugin.layoutmode then
+		hl.plugin.layoutmode.toggle()
+	end
+end)
+
 -- Focus with arrow keys
 hl.bind(
 	mainMod .. " + left",
@@ -262,6 +269,20 @@ hl.bind(
 		"(pgrep -x obs || pgrep -x .obs-wrapped) && hyprctl dispatch 'hl.dsp.workspace.toggle_special(\"obs\")' || obs"
 	)
 )
+-- Open Opencode Desktop (Workspace 2)
+hl.bind(
+	mainMod .. " + ALT + D",
+	hl.dsp.exec_cmd(
+		"hyprctl clients | grep -iq 'class: .*opencode' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:.*[Oo]pencode.*\" })' || uwsm app -- opencode-desktop"
+	)
+)
+-- Toggle Hermes AI Assistant (Special Workspace)
+hl.bind(
+	mainMod .. " + ALT + E",
+	hl.dsp.exec_cmd(
+		"hyprctl clients | grep -iq 'class: .*hermes' && hyprctl dispatch 'hl.dsp.workspace.toggle_special(\"hermes\")' || uwsm app -- hermes-desktop"
+	)
+)
 
 ---------------------
 ---    Old Rofi   ---
@@ -321,6 +342,8 @@ hl.bind("F9", hl.dsp.exec_cmd("voxtype record stop"), {
 ---------------------
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("pypr layout_center toggle"))
 hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("pypr toggle term"))
+-- Toggle Herdr Terminal (Top Dropdown)
+hl.bind(mainMod .. " + H", hl.dsp.exec_cmd("pypr toggle herdr"))
 
 -- Quickshell popups
 hl.bind(

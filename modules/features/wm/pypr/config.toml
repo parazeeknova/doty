@@ -9,5 +9,13 @@ position = "1% 5%"
 animation = "fromLeft"
 lazy = true
 
+[scratchpads.herdr]
+command = "kitty --class=kitty.herdr -e herdr"
+class = "kitty.herdr"
+size = "75% 60%"
+margin = 50
+animation = "fromTop"
+lazy = true
+
 [layout_center]
 margin = 60

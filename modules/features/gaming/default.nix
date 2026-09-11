@@ -8,16 +8,6 @@
       ...
     }:
     let
-      lutrisPkg = pkgs.lutris.override {
-        extraLibraries = pkgs: [ ];
-        extraPkgs = pkgs: [
-          pkgs.wineWow64Packages.stable
-          pkgs.winetricks
-          pkgs.gamescope
-          pkgs.gamemode
-          pkgs.mangohud
-        ];
-      };
       heroicPkg = pkgs.heroic.override {
         extraPkgs = pkgs: [
           pkgs.gamescope
@@ -32,6 +22,24 @@
             for f in ${pkg}/share/applications/*.desktop; do
               [ -e "$f" ] || continue
               ${pkgs.gnused}/bin/sed 's#^Exec=#Exec=nvidia-offload #' "$f" > $out/share/applications/"$(basename "$f")"
+            done
+          ''
+        );
+      # Single-instance + offload desktop entry: clicking the icon when the
+      # window already exists just focuses it (jumping to workspace 8 via the
+      # windowrule) instead of spawning a duplicate. No keybind needed.
+      singleDesktop =
+        name: pkg: classMatch:
+        lib.hiPrio (
+          pkgs.runCommand "offload-single-${name}" { } ''
+            mkdir -p $out/share/applications
+            for f in ${pkg}/share/applications/*.desktop; do
+              [ -e "$f" ] || continue
+              orig=$(${pkgs.gnugrep}/bin/grep '^Exec=' "$f" | head -n1 | ${pkgs.gnused}/bin/sed 's/^Exec=//; s/ *%[uUfF]//g')
+              ${pkgs.gnugrep}/bin/grep -v '^Exec=' "$f" > $out/share/applications/"$(basename "$f")"
+              cat >> $out/share/applications/"$(basename "$f")" <<EOF
+            Exec=sh -c "hyprctl clients 2>/dev/null | ${pkgs.gnugrep}/bin/grep -iq 'class: .*${classMatch}' && hyprctl dispatch 'focuswindow class:.*${classMatch}.*' || (nvidia-offload $orig)"
+            EOF
             done
           ''
         );
@@ -113,20 +121,16 @@
         steamcmd
         protonup-qt
         umu-launcher
-        lutrisPkg
         heroicPkg
-        bottles
         cemu
         shadps4
-        (gpuDesktop "lutris" lutrisPkg)
         (gpuDesktop "heroic" heroicPkg)
-        (gpuDesktop "bottles" pkgs.bottles)
         (gpuDesktop "cemu" pkgs.cemu)
         (gpuDesktop "shadps4" pkgs.shadps4)
-        (gpuDesktop "anime-game-launcher" pkgs.anime-game-launcher)
-        (gpuDesktop "honkers-railway-launcher" pkgs.honkers-railway-launcher)
-        (gpuDesktop "honkers-launcher" pkgs.honkers-launcher)
-        (gpuDesktop "wavey-launcher" pkgs.wavey-launcher)
+        (singleDesktop "anime-game-launcher" pkgs.anime-game-launcher "anime-game-launcher")
+        (singleDesktop "honkers-railway-launcher" pkgs.honkers-railway-launcher "honkers-railway-launcher")
+        (singleDesktop "honkers-launcher" pkgs.honkers-launcher "honkers-launcher")
+        (singleDesktop "wavey-launcher" pkgs.wavey-launcher "wavey-launcher")
         antimicrox
         wineWow64Packages.stable
         winetricks
@@ -163,20 +167,6 @@
               vram = true;
               gamemode = true;
             };
-          };
-
-          programs.lutris = {
-            enable = true;
-            extraPackages = with pkgs; [
-              mangohud
-              gamemode
-              gamescope
-              winetricks
-              umu-launcher
-            ];
-            winePackages = with pkgs; [
-              wineWow64Packages.stable
-            ];
           };
         };
     };

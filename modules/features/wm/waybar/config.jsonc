@@ -7,7 +7,7 @@
   "margin-bottom": 2,
   "spacing": 2,
   "modules-left": ["hyprland/workspaces", "hyprland/window"],
-  "modules-center": ["custom/voxtype", "clock#date"],
+  "modules-center": ["custom/voxtype", "custom/layout", "clock#date"],
   "modules-right": [
     "custom/tray_toggle",
     "custom/tailscale",
@@ -29,6 +29,15 @@
     "return-type": "json",
     "format": "{}",
     "tooltip": true
+  },
+  "custom/layout": {
+    "exec": "hyprctl layoutmode",
+    "return-type": "json",
+    "format": "{}",
+    "interval": 30,
+    "signal": 6,
+    "on-click": "hyprctl layoutmode toggle",
+    "tooltip": true,
   },
   "custom/tray_toggle": {
     "format": "{}",

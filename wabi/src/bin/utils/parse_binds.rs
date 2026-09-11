@@ -283,6 +283,8 @@ fn clean_description(desc: &str, cmd: &str) -> String {
             return "Toggle Window Overview (Expose)".to_string();
         } else if cmd.contains("pypr layout_center toggle") {
             return "Toggle Layout Center".to_string();
+        } else if cmd.contains("pypr toggle herdr") {
+            return "Toggle Herdr Terminal (Top)".to_string();
         } else if cmd.contains("pypr toggle term") {
             return "Toggle Dropdown Terminal".to_string();
         } else if cmd.contains("waybar_toggle") {
@@ -321,6 +323,8 @@ fn clean_description(desc: &str, cmd: &str) -> String {
             return "Launch Vivaldi Browser".to_string();
         } else if cmd.contains("brave") {
             return "Launch Brave Browser".to_string();
+        } else if cmd.contains("opencode") {
+            return "Open Opencode Desktop (Workspace 2)".to_string();
         } else if cmd.contains("code-insiders") {
             return "Launch VS Code Insiders".to_string();
         } else if cmd.contains("code") && cmd.contains("focus") {
@@ -331,6 +335,8 @@ fn clean_description(desc: &str, cmd: &str) -> String {
             return "Toggle GitKraken".to_string();
         } else if cmd.contains("helium") {
             return "Toggle Helium Browser".to_string();
+        } else if cmd.contains("hermes") {
+            return "Toggle Hermes AI Assistant".to_string();
         } else if cmd.contains("ghostty --class=ghostty.floating") {
             return "Launch Floating Ghostty".to_string();
         } else if cmd.contains("ghostty") {
@@ -735,6 +741,12 @@ fn parse_single_bind(
             }
         } else if description.is_empty() {
             description = "Move window".to_string();
+        }
+    } else if action_expr.contains("layoutmode") {
+        // layoutmode plugin toggle (matches before the generic layout branch)
+        cmd = "hyprctl layoutmode toggle".to_string();
+        if description.is_empty() {
+            description = "Toggle Tiling/Floating Layout".to_string();
         }
     } else if action_expr.contains("layout") {
         // Handle layout actions like swapcol

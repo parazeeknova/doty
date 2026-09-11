@@ -127,11 +127,17 @@ hl.layer_rule({
 -- Workspace assignments for specific applications using exact class names (anchored regex)
 local workspace_assignments = {
 	["1"] = { "^zen.*$", "^[Vv]ivaldi.*$" },
-	["2"] = { "^code-insiders$", "^[Ee]macs$" },
+	["2"] = { "^code-insiders$", "^[Ee]macs$", ".*[Oo]pencode.*" },
 	["3"] = { "^com\\.mitchellh\\.ghostty$", "^Code$", "^code$" },
 	["4"] = { "^[Ff]ree[Tt]ube$", "^[Gg]oogle-chrome.*$" },
 	["5 silent"] = { "^[Ss]potify$" },
 	["6"] = { "^vesktop$" },
+	["8"] = {
+		".*[Aa]nime-[Gg]ame-[Ll]auncher.*",
+		".*[Hh]onkers-[Rr]ailway-[Ll]auncher.*",
+		".*[Hh]onkers-[Ll]auncher.*",
+		".*[Ww]avey-[Ll]auncher.*",
+	},
 	["9"] = { "^virt-manager$", "^qemu.*$", "^Qemu.*$" },
 	["10"] = { "^[Pp]odman-[Dd]esktop$" },
 }
@@ -171,6 +177,37 @@ hl.window_rule({
 })
 
 hl.window_rule({
+	name = "hermes-scratchpad",
+	match = {
+		class = ".*[Hh]ermes.*",
+	},
+	workspace = "special:hermes",
+	float = true,
+	size = { 1680, 1010 },
+	center = true,
+})
+
+hl.window_rule({
+	name = "opencode-desktop-pin",
+	match = {
+		class = ".*[Oo]pencode.*",
+	},
+	workspace = "2",
+})
+
+-- AAGL launchers: always floating, centered on workspace 8 (single-instance
+-- is enforced via the desktop Exec wrapper in gaming/default.nix)
+hl.window_rule({
+	name = "aagl-launchers-float",
+	match = {
+		class = ".*([Aa]nime-[Gg]ame-[Ll]auncher|[Hh]onkers-[Rr]ailway-[Ll]auncher|[Hh]onkers-[Ll]auncher|[Ww]avey-[Ll]auncher).*",
+	},
+	float = true,
+	center = true,
+	border_size = 0,
+})
+
+hl.window_rule({
 	name = "obs-scratchpad",
 	match = {
 		class = "^(com\\.obsproject\\.Studio|obs)$",
@@ -192,6 +229,16 @@ hl.window_rule({
 	name = "pypr-term-scratchpad",
 	match = {
 		class = "^kitty\\.pypr$",
+	},
+	float = true,
+	animation = "slide",
+	border_color = colors.border_color or "rgb(a9b665)",
+})
+
+hl.window_rule({
+	name = "pypr-herdr-scratchpad",
+	match = {
+		class = "^kitty\\.herdr$",
 	},
 	float = true,
 	animation = "slide",

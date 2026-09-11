@@ -170,12 +170,29 @@
         enableParallelBuilding = true;
       };
 
+      layoutmode = pkgs.stdenv.mkDerivation {
+        pname = "hyprland-layoutmode";
+        version = "0.2.0";
+        src = ./layoutmode;
+
+        nativeBuildInputs = [
+          pkgs.cmake
+          pkgs.pkg-config
+          pkgs.hyprland
+          pkgs.gcc14
+        ];
+        buildInputs = pkgs.hyprland.buildInputs;
+
+        enableParallelBuilding = true;
+      };
+
       hyprPlugins = [
         scrolloverview
         hyprglass
         dynamic_cursors
         hypr_edgehover
         hymission
+        layoutmode
       ];
     in
     {
