@@ -173,8 +173,5 @@
 		"**/.gitea/workflows/*.yaml",
 		"**/.forgejo/workflows/*.yml",
 		"**/.forgejo/workflows/*.yaml"
-	],
-	"[nix]": {
-		"editor.defaultFormatter": "jnoortheen.nix-ide"
-	}
+	]
 }
