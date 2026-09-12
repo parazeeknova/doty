@@ -635,7 +635,7 @@ Scope {
                         easing.type: Easing.OutCubic
                     }
 
-NumberAnimation {
+                    NumberAnimation {
                         target: win
                         property: "animTop"
                         from: -320
@@ -678,7 +678,7 @@ NumberAnimation {
                         easing.type: Easing.InCubic
                     }
 
-NumberAnimation {
+                    NumberAnimation {
                         target: win
                         property: "animTop"
                         from: 24
