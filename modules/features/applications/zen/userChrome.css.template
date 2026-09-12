@@ -33,7 +33,6 @@
 .tab-background,
 .tab-stack,
 .tab-content,
-#zen-sidebar-splitter,
 #zen-workspaces-button,
 .zen-workspace-tabs-section,
 .zen-current-workspace-indicator,
@@ -43,7 +42,9 @@
 .urlbar-background,
 .content-shortcuts,
 menupopup,
+menupopup::part(content),
 panel,
+panel::part(content),
 menu,
 menuitem,
 menucaption,
@@ -109,8 +110,12 @@ zen-folder,
   --tab-selected-textcolor: var(--matugen-accent);
   --newtab-text-primary-color: var(--matugen-fg);
 
-  --arrowpanel-color: var(--matugen-accent);
-  --arrowpanel-background: var(--matugen-bg);
+  --arrowpanel-color: var(--matugen-accent) !important;
+  --arrowpanel-background: var(--matugen-bg) !important;
+  --panel-background-color: var(--matugen-bg) !important;
+  --panel-background: var(--matugen-bg) !important;
+  --panel-box-shadow: none !important;
+  --panel-box-shadow-margin: 0px !important;
   --sidebar-text-color: var(--matugen-fg);
   --toolbarbutton-icon-fill: var(--matugen-accent);
 }
@@ -159,7 +164,9 @@ toolbarbutton,
 .toolbarbutton-1,
 .toolbarbutton-icon,
 menupopup,
+menupopup::part(content),
 panel,
+panel::part(content),
 menu,
 menuitem,
 menucaption {
@@ -211,16 +218,17 @@ zen-folder[expanded] .tab-group-label-container {
 #zen-main-app-wrapper,
 #zen-browser-background,
 #zen-browser-background::after,
+#zen-browser-background::before,
 #navigator-toolbox,
 #titlebar,
-#tabbrowser-tabs[orient="vertical"],
-#zen-sidebar-splitter {
+#tabbrowser-tabs[orient="vertical"] {
   background-color: var(--matugen-bg-dark) !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 #tabbrowser-tabs[orient="vertical"] .tabbrowser-tab .tab-label,
 #tabbrowser-tabs[orient="vertical"] .tabbrowser-tab[selected] .tab-label,
-#zen-sidebar-splitter,
 #zen-workspaces-button,
 #zen-current-workspace-indicator,
 .zen-workspace-tabs-section,
@@ -328,6 +336,66 @@ toolbarbutton.bookmark-item,
   box-shadow: none !important;
   color: var(--matugen-accent) !important;
   fill: var(--matugen-accent) !important;
+}
+
+/* ============================================================
+ * 3c. SIDEBAR SPLITTER / DRAGGER
+ *     Zero out layout gap, make transparent, kill hover pill
+ *     while keeping the draggable hit area active.
+ * ============================================================ */
+#zen-sidebar-splitter,
+#sidebar-splitter,
+#sidebar-launcher-splitter,
+#ai-window-splitter,
+.sidebar-splitter {
+  width: 8px !important;
+  min-width: 8px !important;
+  max-width: 8px !important;
+  margin-inline-start: -4px !important;
+  margin-inline-end: -4px !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  opacity: 0 !important;
+  cursor: ew-resize !important;
+  z-index: 10 !important;
+  appearance: none !important;
+  -moz-appearance: none !important;
+}
+
+#zen-sidebar-splitter:hover,
+#zen-sidebar-splitter:active,
+#sidebar-splitter:hover,
+#sidebar-splitter:active,
+#sidebar-launcher-splitter:hover,
+#sidebar-launcher-splitter:active,
+#ai-window-splitter:hover,
+#ai-window-splitter:active,
+.sidebar-splitter:hover,
+.sidebar-splitter:active {
+  background: transparent !important;
+  background-color: transparent !important;
+  opacity: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+#zen-sidebar-splitter::before,
+#zen-sidebar-splitter::after,
+#sidebar-splitter::before,
+#sidebar-splitter::after,
+#sidebar-launcher-splitter::before,
+#sidebar-launcher-splitter::after,
+#ai-window-splitter::before,
+#ai-window-splitter::after,
+.sidebar-splitter::before,
+.sidebar-splitter::after {
+  display: none !important;
+  opacity: 0 !important;
+  content: none !important;
 }
 
 /* ============================================================
@@ -579,21 +647,43 @@ panel ::-moz-selection {
  * 6. PANEL POPUPS (context menus, dropdowns)
  *    No rounded corners, no shadow, subtle accent border.
  * ============================================================ */
-menupopup, panel,
+menupopup,
+panel,
 #contentAreaContextMenu,
 #PlacesToolbar menu,
 #PlacesToolbar menupopup,
 .tab-context-menu {
   --panel-border-radius: 0 !important;
+  --panel-box-shadow: none !important;
   --panel-shadow: none !important;
-  --panel-shadow-margin: 0 !important;
+  --panel-box-shadow-margin: 0px !important;
+  --panel-shadow-margin: 0px !important;
   --panel-border-color: color-mix(in srgb, var(--matugen-accent) 30%, transparent) !important;
   --panel-border-width: 1px !important;
   --panel-border-style: solid !important;
+  --panel-background-color: var(--matugen-bg) !important;
+  --panel-background: var(--matugen-bg) !important;
+  --arrowpanel-background: var(--matugen-bg) !important;
   -moz-window-shadow: none !important;
-  background-color: var(--matugen-bg) !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   color: var(--matugen-accent) !important;
   fill: var(--matugen-accent) !important;
+  max-height: 70vh !important;
+}
+
+menupopup::part(content),
+panel::part(content) {
+  border-radius: 0 !important;
+  corner-shape: unset !important;
+  border: 1px solid color-mix(in srgb, var(--matugen-accent) 30%, transparent) !important;
+  background: var(--matugen-bg) !important;
+  background-color: var(--matugen-bg) !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  max-height: 70vh !important;
 }
 
 menu, menuitem, menucaption,
@@ -672,6 +762,70 @@ menupopup menuitem[disabled="true"] {
 }
 
 /* ============================================================
+ * 6a. FORM SELECT DROPDOWNS & POPUP HEIGHT CONSTRAINTS
+ *     Constrain dropdown popups (HTML <select>, menulist) to a
+ *     fixed max-height (~12-14 items) so long lists don't spill
+ *     off the screen, and enable smooth vertical scrolling with
+ *     a slim themed scrollbar.
+ * ============================================================ */
+#ContentSelectDropdownPopup,
+#ContentSelectDropdown menupopup,
+#ContentSelectDropdown,
+menupopup.in-menulist,
+menulist > menupopup {
+  max-height: min(380px, 50vh) !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--matugen-accent) transparent !important;
+}
+
+#ContentSelectDropdownPopup::part(content),
+#ContentSelectDropdown menupopup::part(content),
+menupopup.in-menulist::part(content),
+menulist > menupopup::part(content) {
+  max-height: min(380px, 50vh) !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--matugen-accent) transparent !important;
+}
+
+#ContentSelectDropdownPopup::part(arrowscrollbox-scrollbox),
+#ContentSelectDropdown menupopup::part(arrowscrollbox-scrollbox),
+menupopup.in-menulist::part(arrowscrollbox-scrollbox),
+menulist > menupopup::part(arrowscrollbox-scrollbox),
+#ContentSelectDropdownPopup::part(scrollbox),
+menupopup.in-menulist::part(scrollbox) {
+  max-height: min(380px, 50vh) !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--matugen-accent) transparent !important;
+}
+
+#ContentSelectDropdownPopup scrollbox,
+#ContentSelectDropdown menupopup scrollbox,
+menupopup.in-menulist scrollbox,
+menulist > menupopup scrollbox,
+#ContentSelectDropdownPopup arrowscrollbox,
+menupopup.in-menulist arrowscrollbox {
+  max-height: min(380px, 50vh) !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--matugen-accent) transparent !important;
+}
+
+.contentSelectDropdown-searchbox {
+  margin: 4px !important;
+  background-color: var(--matugen-bg-dark) !important;
+  color: var(--matugen-fg) !important;
+  border: 1px solid color-mix(in srgb, var(--matugen-accent) 30%, transparent) !important;
+  border-radius: 0 !important;
+}
+
+.contentSelectDropdown-searchbox input {
+  color: var(--matugen-fg) !important;
+}
+
+
+/* ============================================================
  * 6b. APP MENU (hamburger PanelUI) - accent text/icons + hover bg
  * ============================================================ */
 #appMenu-mainView,
@@ -734,7 +888,14 @@ menupopup menuitem[disabled="true"] {
 /* ============================================================
  * 6c. DOWNLOADS POPUP
  * ============================================================ */
-#downloadsPanel,
+#downloadsPanel {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#downloadsPanel::part(content),
 #downloadsPanel .panel-view-body-unscrollable,
 #downloadsListBox,
 #downloadsFooter {
@@ -828,7 +989,7 @@ dialog .toolbarbutton-text,
   background: none !important;
 }
 
-.toolbarbutton-1,
+dialog .toolbarbutton-1,
 dialog button,
 button.dialog-button,
 button[dlgtype="accept"],
@@ -849,7 +1010,7 @@ button[default] {
   box-shadow: none !important;
 }
 
-.toolbarbutton-1:hover,
+dialog .toolbarbutton-1:hover,
 dialog button:hover,
 button.dialog-button:hover,
 button[dlgtype="accept"]:hover {
