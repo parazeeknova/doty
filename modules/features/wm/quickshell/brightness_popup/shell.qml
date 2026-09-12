@@ -297,6 +297,7 @@ Scope {
                 }
 
                 anchors {
+                    left: !theme.floatingMode
                     bottom: !theme.floatingMode
                     top: theme.floatingMode
                     right: theme.floatingMode

@@ -88,7 +88,7 @@
   "clock#date": {
     "format": "{:%d\n%m\n%y}",
     "tooltip": false,
-    "on-click": "env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config notif_popup",
+    "on-click": "quickshell -c notif_popup ipc call notif_popup open || env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config notif_popup",
   },
   "pulseaudio": {
     "rotate": 270,

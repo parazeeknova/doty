@@ -35,8 +35,6 @@
 #include <sstream>
 #include <string>
 #include <thread>
-#include <chrono>
-#include <sys/wait.h>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -62,6 +60,9 @@
 #include <hyprland/src/helpers/Color.hpp>
 #include <hyprland/src/helpers/memory/Memory.hpp>
 #include <hyprland/src/config/ConfigValue.hpp>
+#include <hyprland/src/config/ConfigManager.hpp>
+#include <hyprland/src/debug/HyprCtl.hpp>
+#include <hyprland/src/config/supplementary/executor/Executor.hpp>
 #undef private
 
 #include <hyprutils/math/Box.hpp>
@@ -98,9 +99,18 @@ bool isNative(Desktop::View::CWindow* raw) {
     return std::find(g_nativeFloating.begin(), g_nativeFloating.end(), raw) != g_nativeFloating.end();
 }
 
-std::string statePath() {
+std::string homeDir() {
     const char* h = getenv("HOME");
-    return std::string(h ? h : "/tmp") + "/.cache/hypr_layout_mode";
+    return h ? h : "/home/parazeeknova";
+}
+
+std::string statePath() {
+    return homeDir() + "/.cache/hypr_layout_mode";
+}
+
+inline void asyncExec(const std::string& cmd) {
+    if (Config::Supplementary::executor())
+        Config::Supplementary::executor()->spawnRaw(cmd);
 }
 
 Layout::Tiled::CScrollingAlgorithm* scrollingFor(const PHLWORKSPACE& ws) {
@@ -143,65 +153,11 @@ PHLWINDOW findWin(Desktop::View::CWindow* raw) {
     return nullptr;
 }
 
-void notify(const std::string& summary, const std::string& body) {
-    // default mako notifications (top-left, themed) instead of Hyprland's
-    // native overlay: static strings only, no shell interpolation risk
-    const std::string cmd = "notify-send -t 2000 -a \"Layout\" \"" + summary + "\" \"" + body + "\" 2>/dev/null";
-    system(cmd.c_str());
-}
-
-void refreshWaybar() {
-    // fire-and-forget; waybar's poll interval is the backstop
-    system("/run/current-system/sw/bin/pkill -RTMIN+6 waybar 2>/dev/null");
-}
-
-std::string homeDir() {
-    const char* h = getenv("HOME");
-    return h ? h : "/tmp";
-}
-
-// Restart waybar on the variant matching the layout mode: top bar while
-// floating, left bar while tiling. Respects the user's waybar on/off state;
-// the variant choice is always recorded so restores pick the right one.
-void switchWaybar(bool floating) {
-    const std::string variant = floating ? "top" : "left";
-    const std::string varFile = homeDir() + "/.cache/hypr_layout_waybar";
-    {
-        std::ofstream f(varFile, std::ios::trunc);
-        if (f)
-            f << variant << "\n";
-    }
-    // Always retire the old bar: every mode toggle flips the variant, so a
-    // running bar is stale by definition (even a USR1-hidden one).
-    // A fresh bar spawns only when waybar is enabled (hidden stays hidden).
-    // Waybars ignore SIGTERM here (stuck exec children), so SIGKILL up
-    // front. Absolute paths: the compositor's PATH can't be relied on.
-    // Never spawn while any bar survives: stacking is worse than no bar.
-    system("/run/current-system/sw/bin/pkill -KILL -x waybar 2>/dev/null; /run/current-system/sw/bin/pkill -KILL -x .waybar-wrapped 2>/dev/null");
-    for (int i = 0; i < 20; ++i) {
-        int rc = system("/run/current-system/sw/bin/pgrep -x waybar >/dev/null 2>&1 || /run/current-system/sw/bin/pgrep -x .waybar-wrapped >/dev/null 2>&1");
-        if (rc == -1 || !WIFEXITED(rc) || WEXITSTATUS(rc) != 0)
-            break;
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
-    {
-        int rc = system("/run/current-system/sw/bin/pgrep -x waybar >/dev/null 2>&1 || /run/current-system/sw/bin/pgrep -x .waybar-wrapped >/dev/null 2>&1");
-        if (rc != -1 && WIFEXITED(rc) && WEXITSTATUS(rc) == 0)
-            return; // survivors: don't stack, keep old bar over none
-    }
-    const std::string cfg   = floating ? "config-top.jsonc" : "config.jsonc";
-    const std::string style = floating ? "style-top.css" : "style.css";
-    const std::string cmd = "/run/current-system/sw/bin/uwsm app -- waybar -c " + homeDir() + "/.config/waybar/" + cfg + " -s " + homeDir()
-            + "/.config/waybar/" + style + " >/dev/null 2>&1 &";
-    system(cmd.c_str());
-}
-
 // Glass-aware bar theme: translucent + blurred with glass, solid without.
 // Called on every toggle and via `hyprctl layoutmode syncbars` (wired into
 // theme_switcher's glass toggle) so bars follow glass changes live.
 bool glassEnabled() {
-    const char* h = getenv("HOME");
-    std::ifstream f(std::string(h ? h : "/tmp") + "/.cache/quickshell/glass_state");
+    std::ifstream f(homeDir() + "/.cache/quickshell/glass_state");
     if (!f)
         return true;
     std::string s;
@@ -209,23 +165,50 @@ bool glassEnabled() {
     return s == "true";
 }
 
-void syncBarTheme() {
-    const bool glass = glassEnabled();
-    CConfigValue<Config::BOOL> blur("plugin:hyprbars:bar_blur");
-    if (blur.good() && blur.ptr())
-        *blur.ptr() = static_cast<Config::BOOL>(glass ? 1 : 0);
-    CConfigValue<Config::INTEGER> color("plugin:hyprbars:bar_color");
-    if (color.good() && color.ptr())
-        *color.ptr() = static_cast<Config::INTEGER>(glass ? 0xA619120C : 0xFF19120C);
+// Non-aborting config writes: CConfigValue's ctor RASSERTs when the key
+// doesn't exist (crashed the compositor at boot when hyprbars loads after
+// us). getConfigValue() returns a safe optional-style reply instead.
+template <typename T>
+void setConfigValue(const std::string& name, const T& value) {
+    if (!Config::mgr())
+        return;
+    const auto reply = Config::mgr()->getConfigValue(name);
+    if (!reply.dataptr || !reply.type)
+        return; // key not registered (plugin not loaded yet) — skip silently
+    if (*reply.type != typeid(T))
+        return;
+    *rc<T*>(*reply.dataptr) = value;
 }
 
-// Title bars live only in floating mode. hyprbars reads these values
-// per-frame and repositions itself, so this applies instantly.
+void syncBarTheme() {
+    const bool glass = glassEnabled();
+    setConfigValue<Config::BOOL>("plugin:hyprbars:bar_blur", static_cast<Config::BOOL>(glass ? 1 : 0));
+    setConfigValue<Config::INTEGER>("plugin:hyprbars:bar_color", static_cast<Config::INTEGER>(glass ? 0xA619120C : 0xFF19120C));
+}
+
+// Title bars live only in floating mode. Individual window floating and
+// fullscreen states are handled per-window by hyprbars natively.
+// In layoutmode, bars stay globally enabled in floating mode except when
+// the hymission overview is open (overview hides them so tiles aren't cluttered).
+bool overviewActive() {
+    if (!g_pHyprCtl)
+        return false;
+    const std::string reply = g_pHyprCtl->getReply("hymission-overview-state");
+    return reply.find("\"active\":true") != std::string::npos;
+}
+
+bool barsShouldBeOn() {
+    return g_floating && !overviewActive();
+}
+
 void setBars(bool on) {
-    CConfigValue<Config::BOOL> h("plugin:hyprbars:enabled");
-    if (h.good() && h.ptr())
-        *h.ptr() = static_cast<Config::BOOL>(on ? 1 : 0);
+    setConfigValue<Config::BOOL>("plugin:hyprbars:enabled", static_cast<Config::BOOL>(on ? 1 : 0));
     syncBarTheme();
+}
+
+// recompute bars from the current context (mode + fullscreen + overview)
+void refreshBars() {
+    setBars(barsShouldBeOn());
 }
 
 void persistMode() {
@@ -312,12 +295,11 @@ void toFloating() {
 
     g_floating = true;
     persistMode();
-    setBars(true);
-    switchWaybar(true);
-    refreshWaybar();
-    notify("Floating layout", "Tiling arrangement saved");
-    // move mako notifications top-right, below the top waybar
-    system("/run/current-system/sw/bin/env HOME=$HOME $HOME/doty/modules/scripts/mako_mode floating 2>/dev/null");
+    refreshBars();
+
+    // Asynchronously switch Waybar variant, update mako dock, and notify user
+    const std::string switchCmd = homeDir() + "/doty/modules/scripts/layout_mode_switch floating";
+    asyncExec(switchCmd);
 }
 
 // Re-tile in snapshot order (each window lands next to its focused
@@ -419,11 +401,10 @@ void toTiling() {
     g_snap.clear();
     g_floating = false;
     persistMode();
-    switchWaybar(false);
-    refreshWaybar();
-    notify("Tiling layout", "Arrangement restored");
-    // restore mako notifications to their original top-left dock
-    system("/run/current-system/sw/bin/env HOME=$HOME $HOME/doty/modules/scripts/mako_mode tiling 2>/dev/null");
+
+    // Asynchronously switch Waybar variant, update mako dock, and notify user
+    const std::string switchCmd = homeDir() + "/doty/modules/scripts/layout_mode_switch tiling";
+    asyncExec(switchCmd);
 }
 
 void toggle() {
@@ -434,7 +415,7 @@ void toggle() {
             toFloating();
     } catch (const std::exception& e) {
         const std::string cmd = std::string("notify-send -u critical -a \"Layout\" \"Toggle failed\" \"") + e.what() + "\" 2>/dev/null";
-        system(cmd.c_str());
+        asyncExec(cmd);
     }
 }
 
@@ -461,6 +442,8 @@ std::string hyprctlLayoutmode(eHyprCtlOutputFormat, std::string args) {
         toggle();
     else if (args.find("syncbars") != std::string::npos)
         syncBarTheme();
+    else if (args.find("syncoverview") != std::string::npos)
+        refreshBars();
     if (g_floating)
         return "{\"text\":\"F\",\"class\":\"floating\",\"tooltip\":\"Floating layout — click to tile\"}\n";
     return "{\"text\":\"T\",\"class\":\"tiling\",\"tooltip\":\"Tiling layout — click to float\"}\n";
@@ -481,12 +464,10 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         f >> mode;
         g_floating = (mode == "floating");
     }
-    setBars(g_floating);
-    switchWaybar(g_floating);
 
     if (!HyprlandAPI::addLuaFunction(g_handle, "layoutmode", "toggle", luaToggle)) {
         HyprlandAPI::addNotification(g_handle, "[layoutmode] failed to register lua function", CHyprColor(1.F, 0.3F, 0.3F, 1.F), 5000);
-        return {"layoutmode", "Global tiling/floating toggle", "parazeeknova",  "0.2.0"};
+        return {"layoutmode", "Global tiling/floating toggle", "parazeeknova",  "0.2.1"};
     }
 
     g_hyprCmd = HyprlandAPI::registerHyprCtlCommand(g_handle, SHyprCtlCommand{
@@ -500,7 +481,23 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     static const auto openListener = Event::bus()->m_events.window.open.listen([](PHLWINDOW w) { onWindowOpen(w); });
     (void)openListener;
 
-    return {"layoutmode", "Global tiling/floating toggle", "parazeeknova",  "0.2.0"};
+    static const auto closeListener = Event::bus()->m_events.window.close.listen([]() { refreshBars(); });
+    (void)closeListener;
+
+    static const auto fsListener = Event::bus()->m_events.window.fullscreen.listen([]() { refreshBars(); });
+    (void)fsListener;
+
+    static const auto wsListener = Event::bus()->m_events.workspace.active.listen([]() { refreshBars(); });
+    (void)wsListener;
+
+    static const auto winActiveListener = Event::bus()->m_events.window.active.listen([]() { refreshBars(); });
+    (void)winActiveListener;
+
+    // hyprbars may load after us; re-sync bars on every config reload
+    static const auto cfgListener = Event::bus()->m_events.config.reloaded.listen([]() { refreshBars(); });
+    (void)cfgListener;
+
+    return {"layoutmode", "Global tiling/floating toggle", "parazeeknova",  "0.2.1"};
 }
 
 APICALL EXPORT void PLUGIN_EXIT() {
@@ -508,4 +505,5 @@ APICALL EXPORT void PLUGIN_EXIT() {
         HyprlandAPI::unregisterHyprCtlCommand(g_handle, g_hyprCmd);
         g_hyprCmd.reset();
     }
+    g_handle = nullptr;
 }

@@ -70,5 +70,11 @@
 
       nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
       hardware.cpu.intel.updateMicrocode = lib.mkDefault true;
+      hardware.enableRedistributableFirmware = lib.mkDefault true;
+
+      # Intel AX201 WiFi stability: disable INI TLV debug infrastructure which causes -110 INIT ucode timeout
+      boot.extraModprobeConfig = ''
+        options iwlwifi enable_ini=0
+      '';
     };
 }

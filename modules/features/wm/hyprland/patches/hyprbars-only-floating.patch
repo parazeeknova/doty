@@ -1,0 +1,212 @@
+diff --git a/barDeco.cpp b/barDeco.cpp
+index c27653d..2965985 100644
+--- a/barDeco.cpp
++++ b/barDeco.cpp
+@@ -22,6 +22,7 @@
+ #include <hyprland/src/layout/LayoutManager.hpp>
+ #include <hyprland/src/render/OpenGL.hpp>
+ #include <hyprland/src/state/MonitorState.hpp>
++#include <hyprland/src/managers/fullscreen/FullscreenController.hpp>
+ 
+ #include "globals.hpp"
+ #include "BarPassElement.hpp"
+@@ -40,6 +41,11 @@ CHyprBar::CHyprBar(PHLWINDOW pWindow) : IHyprWindowDecoration(pWindow) {
+     const auto PMONITOR         = pWindow->m_monitor.lock();
+     PMONITOR->m_scheduledRecalc = true;
+ 
++    const bool ONLY_FLOATING   = g_pGlobalState->config.onlyFloating ? g_pGlobalState->config.onlyFloating->value() : true;
++    const bool HIDE_FULLSCREEN = g_pGlobalState->config.hideFullscreen ? g_pGlobalState->config.hideFullscreen->value() : true;
++    if (!pWindow || (ONLY_FLOATING && !pWindow->m_isFloating) || (HIDE_FULLSCREEN && Fullscreen::controller()->isFullscreen(pWindow)))
++        m_hidden = true;
++
+     // button events
+     m_pMouseButtonCallback = Event::bus()->m_events.input.mouse.button.listen([&](IPointer::SButtonEvent e, Event::SCallbackInfo& info) { onMouseButton(info, e); });
+     m_pTouchDownCallback   = Event::bus()->m_events.input.touch.down.listen([&](ITouch::SDownEvent e, Event::SCallbackInfo& info) { onTouchDown(info, e); });
+@@ -59,16 +65,20 @@ CHyprBar::~CHyprBar() {
+ }
+ 
+ SDecorationPositioningInfo CHyprBar::getPositioningInfo() {
+-    const auto                 HEIGHT     = g_pGlobalState->config.barHeight->value();
+-    const auto                 ENABLED    = g_pGlobalState->config.enabled->value();
+-    const auto                 PRECEDENCE = g_pGlobalState->config.barPrecedenceOverBorder->value();
++    const auto                 HEIGHT          = g_pGlobalState->config.barHeight->value();
++    const auto                 ENABLED         = g_pGlobalState->config.enabled->value();
++    const auto                 PRECEDENCE      = g_pGlobalState->config.barPrecedenceOverBorder->value();
++    const auto                 PWINDOW         = m_pWindow.lock();
++    const bool                 ONLY_FLOATING   = g_pGlobalState->config.onlyFloating ? g_pGlobalState->config.onlyFloating->value() : true;
++    const bool                 HIDE_FULLSCREEN = g_pGlobalState->config.hideFullscreen ? g_pGlobalState->config.hideFullscreen->value() : true;
++    const bool                 hidden          = m_hidden || !PWINDOW || (ONLY_FLOATING && !PWINDOW->m_isFloating) || (HIDE_FULLSCREEN && Fullscreen::controller()->isFullscreen(PWINDOW));
+ 
+     SDecorationPositioningInfo info;
+-    info.policy         = m_hidden ? DECORATION_POSITION_ABSOLUTE : DECORATION_POSITION_STICKY;
++    info.policy         = (hidden || !ENABLED) ? DECORATION_POSITION_ABSOLUTE : DECORATION_POSITION_STICKY;
+     info.edges          = DECORATION_EDGE_TOP;
+     info.priority       = PRECEDENCE ? 10005 : 5000;
+     info.reserved       = true;
+-    info.desiredExtents = {{0, m_hidden || !ENABLED ? 0 : HEIGHT}, {0, 0}};
++    info.desiredExtents = {{0, (int)(hidden || !ENABLED ? 0 : HEIGHT)}, {0, 0}};
+     return info;
+ }
+ 
+@@ -87,6 +97,12 @@ bool CHyprBar::inputIsValid() {
+     if (m_hidden)
+         return false;
+ 
++    const auto PWINDOW         = m_pWindow.lock();
++    const bool ONLY_FLOATING   = g_pGlobalState->config.onlyFloating ? g_pGlobalState->config.onlyFloating->value() : true;
++    const bool HIDE_FULLSCREEN = g_pGlobalState->config.hideFullscreen ? g_pGlobalState->config.hideFullscreen->value() : true;
++    if (!PWINDOW || (ONLY_FLOATING && !PWINDOW->m_isFloating) || (HIDE_FULLSCREEN && Fullscreen::controller()->isFullscreen(PWINDOW)))
++        return false;
++
+     if (g_pSeatManager->m_seatGrab && !g_pSeatManager->m_seatGrab->accepts(m_pWindow->wlSurface()->resource()))
+         return false;
+ 
+@@ -436,10 +452,18 @@ void CHyprBar::draw(PHLMONITOR pMonitor, const float& a) {
+         g_pDecorationPositioner->repositionDeco(this);
+     }
+ 
+-    if (m_hidden || !validMapped(m_pWindow) || !ENABLED)
+-        return;
++    const auto PWINDOW         = m_pWindow.lock();
++    const bool ONLY_FLOATING   = g_pGlobalState->config.onlyFloating ? g_pGlobalState->config.onlyFloating->value() : true;
++    const bool HIDE_FULLSCREEN = g_pGlobalState->config.hideFullscreen ? g_pGlobalState->config.hideFullscreen->value() : true;
++    const bool hidden          = m_hidden || !PWINDOW || (ONLY_FLOATING && !PWINDOW->m_isFloating) || (HIDE_FULLSCREEN && Fullscreen::controller()->isFullscreen(PWINDOW));
+ 
+-    const auto PWINDOW = m_pWindow.lock();
++    if (hidden != m_hidden) {
++        m_hidden = hidden;
++        g_pDecorationPositioner->repositionDeco(this);
++    }
++
++    if (hidden || !validMapped(m_pWindow) || !ENABLED)
++        return;
+ 
+     if (!PWINDOW->m_ruleApplicator->decorate().valueOrDefault())
+         return;
+@@ -605,6 +629,7 @@ void CHyprBar::onConfigReloaded() {
+     m_bTitleColorChanged = true;
+     m_pTextTex           = nullptr;
+ 
++    updateRules();
+     g_pDecorationPositioner->repositionDeco(this);
+     damageEntire();
+ }
+@@ -651,15 +676,28 @@ void CHyprBar::updateRules() {
+     m_bForcedTitleColor = std::nullopt;
+     m_hidden            = false;
+ 
+-    if (PWINDOW->m_ruleApplicator->m_otherProps.props.contains(g_pGlobalState->nobarRuleIdx))
++    const bool ONLY_FLOATING   = g_pGlobalState->config.onlyFloating ? g_pGlobalState->config.onlyFloating->value() : true;
++    const bool HIDE_FULLSCREEN = g_pGlobalState->config.hideFullscreen ? g_pGlobalState->config.hideFullscreen->value() : true;
++
++    if (!PWINDOW) {
++        m_hidden = true;
++    } else if (ONLY_FLOATING && !PWINDOW->m_isFloating) {
++        m_hidden = true;
++    } else if (HIDE_FULLSCREEN && Fullscreen::controller()->isFullscreen(PWINDOW)) {
++        m_hidden = true;
++    } else if (PWINDOW->m_ruleApplicator->m_otherProps.props.contains(g_pGlobalState->nobarRuleIdx)) {
+         m_hidden = truthy(PWINDOW->m_ruleApplicator->m_otherProps.props.at(g_pGlobalState->nobarRuleIdx)->effect);
+-    if (PWINDOW->m_ruleApplicator->m_otherProps.props.contains(g_pGlobalState->barColorRuleIdx))
++    }
++
++    if (PWINDOW && PWINDOW->m_ruleApplicator->m_otherProps.props.contains(g_pGlobalState->barColorRuleIdx))
+         m_bForcedBarColor = CHyprColor(Config::ParserUtils::parseColor(PWINDOW->m_ruleApplicator->m_otherProps.props.at(g_pGlobalState->barColorRuleIdx)->effect).value_or(0));
+-    if (PWINDOW->m_ruleApplicator->m_otherProps.props.contains(g_pGlobalState->titleColorRuleIdx))
++    if (PWINDOW && PWINDOW->m_ruleApplicator->m_otherProps.props.contains(g_pGlobalState->titleColorRuleIdx))
+         m_bForcedTitleColor = CHyprColor(Config::ParserUtils::parseColor(PWINDOW->m_ruleApplicator->m_otherProps.props.at(g_pGlobalState->titleColorRuleIdx)->effect).value_or(0));
+ 
+-    if (prevHidden != m_hidden)
++    if (prevHidden != m_hidden) {
+         g_pDecorationPositioner->repositionDeco(this);
++        damageEntire();
++    }
+     if (prevForcedTitleColor != m_bForcedTitleColor)
+         m_bTitleColorChanged = true;
+ }
+diff --git a/globals.hpp b/globals.hpp
+index 0ef19ae..a56de70 100644
+--- a/globals.hpp
++++ b/globals.hpp
+@@ -37,6 +37,7 @@ struct SGlobalState {
+         SP<Config::Values::CIntValue>        barPadding;
+         SP<Config::Values::CIntValue>        barButtonPadding;
+         SP<Config::Values::CBoolValue>       barBlur, barTitleEnabled, barPartOfWindow, barPrecedenceOverBorder, enabled, iconOnHover;
++        SP<Config::Values::CBoolValue>       onlyFloating, hideFullscreen;
+         SP<Config::Values::CStringValue>     barTextFont, barTextAlign, barButtonsAlignment, onDoubleClick;
+     } config;
+ };
+diff --git a/main.cpp b/main.cpp
+index ae9c90b..1b9e719 100644
+--- a/main.cpp
++++ b/main.cpp
+@@ -57,16 +57,29 @@ static void onConfigReloaded() {
+     }
+ }
+ 
+-static void onUpdateWindowRules(PHLWINDOW window) {
+-    const auto BARIT = std::find_if(g_pGlobalState->bars.begin(), g_pGlobalState->bars.end(), [window](const auto& bar) { return bar->getOwner() == window; });
++static void updateWindowBar(PHLWINDOW window) {
++    if (!window)
++        return;
++
++    const auto BARIT = std::find_if(g_pGlobalState->bars.begin(), g_pGlobalState->bars.end(), [window](const auto& bar) {
++        return bar && bar->getOwner() == window;
++    });
+ 
+     if (BARIT == g_pGlobalState->bars.end())
+         return;
+ 
+     (*BARIT)->updateRules();
+     window->updateWindowDecos();
+ }
+ 
++static void onUpdateWindowRules(PHLWINDOW window) {
++    updateWindowBar(window);
++}
++
++static void onWindowModeChanged(PHLWINDOW window) {
++    updateWindowBar(window);
++}
++
+ Hyprlang::CParseResult onNewButton(const char* K, const char* V) {
+     std::string                 v = V;
+     Hyprutils::String::CVarList vars(v);
+@@ -210,6 +223,8 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
+ 
+     static auto P  = Event::bus()->m_events.window.open.listen([&](PHLWINDOW w) { onNewWindow(w); });
+     static auto P3 = Event::bus()->m_events.window.updateRules.listen([&](PHLWINDOW w) { onUpdateWindowRules(w); });
++    static auto P4 = Event::bus()->m_events.window.floating.listen([&](PHLWINDOW w) { onWindowModeChanged(w); });
++    static auto P5 = Event::bus()->m_events.window.fullscreen.listen([&](PHLWINDOW w) { onWindowModeChanged(w); });
+ 
+     g_pGlobalState->config.barColor            = makeShared<Config::Values::CColorValue>("plugin:hyprbars:bar_color", "Change the bar color", 0x88333333);
+     g_pGlobalState->config.textColor           = makeShared<Config::Values::CColorValue>("plugin:hyprbars:col.text", "Change the text color", 0xffffffff);
+@@ -230,6 +245,8 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
+     g_pGlobalState->config.barPadding          = makeShared<Config::Values::CIntValue>("plugin:hyprbars:bar_padding", "Padding of the bar", 7);
+     g_pGlobalState->config.barButtonPadding    = makeShared<Config::Values::CIntValue>("plugin:hyprbars:bar_button_padding", "Padding of the bar buttons", 5);
+     g_pGlobalState->config.enabled             = makeShared<Config::Values::CBoolValue>("plugin:hyprbars:enabled", "Whether bars are enabled", true);
++    g_pGlobalState->config.onlyFloating        = makeShared<Config::Values::CBoolValue>("plugin:hyprbars:only_floating", "Whether bars are only shown on floating windows", true);
++    g_pGlobalState->config.hideFullscreen      = makeShared<Config::Values::CBoolValue>("plugin:hyprbars:hide_fullscreen", "Whether bars are hidden on fullscreen windows", true);
+     g_pGlobalState->config.iconOnHover         = makeShared<Config::Values::CBoolValue>("plugin:hyprbars:icon_on_hover", "Whether to use an icon on hover of the buttons", false);
+     g_pGlobalState->config.onDoubleClick       = makeShared<Config::Values::CStringValue>("plugin:hyprbars:on_double_click", "Action to execute on double click of the bar", "");
+ 
+@@ -249,15 +266,17 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
+     HyprlandAPI::addConfigValueV2(PHANDLE, g_pGlobalState->config.barPadding);
+     HyprlandAPI::addConfigValueV2(PHANDLE, g_pGlobalState->config.barButtonPadding);
+     HyprlandAPI::addConfigValueV2(PHANDLE, g_pGlobalState->config.enabled);
++    HyprlandAPI::addConfigValueV2(PHANDLE, g_pGlobalState->config.onlyFloating);
++    HyprlandAPI::addConfigValueV2(PHANDLE, g_pGlobalState->config.hideFullscreen);
+     HyprlandAPI::addConfigValueV2(PHANDLE, g_pGlobalState->config.iconOnHover);
+     HyprlandAPI::addConfigValueV2(PHANDLE, g_pGlobalState->config.onDoubleClick);
+ 
+     if (Config::mgr()->type() == Config::CONFIG_LEGACY)
+         HyprlandAPI::addConfigKeyword(PHANDLE, "plugin:hyprbars:hyprbars-button", onNewButton, Hyprlang::SHandlerOptions{});
+     else
+         HyprlandAPI::addLuaFunction(PHANDLE, "hyprbars", "add_button", ::newLuaButton);
+-    static auto P4 = Event::bus()->m_events.config.preReload.listen([&] { onPreConfigReload(); });
+-    static auto P5 = Event::bus()->m_events.config.reloaded.listen([&] { onConfigReloaded(); });
++    static auto P6 = Event::bus()->m_events.config.preReload.listen([&] { onPreConfigReload(); });
++    static auto P7 = Event::bus()->m_events.config.reloaded.listen([&] { onConfigReloaded(); });
+ 
+     // add deco to existing windows
+     for (auto& w : Desktop::windowState()->windows()) {

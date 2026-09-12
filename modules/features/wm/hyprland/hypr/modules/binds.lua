@@ -297,6 +297,8 @@ hl.bind(mainMod .. " + TAB", function()
 	if hl.plugin.hymission then
 		hl.plugin.hymission.toggle()
 	end
+	-- bars follow the overview state (hide while open, restore after)
+	hl.exec_cmd("sh -c 'sleep 0.35; hyprctl layoutmode syncoverview >/dev/null 2>&1'")
 end)
 hl.bind("ALT + TAB", function()
 	hl.plugin.scrolloverview.overview("toggle")

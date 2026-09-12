@@ -15,8 +15,11 @@
         };
 
         xdg.configFile = {
-          "mako/config".source =
-            config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/mako/config";
+          "mako/config" = {
+            source =
+              config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/mako/config";
+            force = true;
+          };
           "mako/config.template".source =
             config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/mako/config.template";
         };

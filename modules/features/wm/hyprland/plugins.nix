@@ -179,9 +179,12 @@
           pkgs.cmake
           pkgs.pkg-config
           pkgs.hyprland
-          pkgs.gcc14
         ];
         buildInputs = pkgs.hyprland.buildInputs;
+
+        postInstall = ''
+          ln -s "$out/lib/libhyprland-layoutmode.so" "$out/lib/liblayoutmode.so"
+        '';
 
         enableParallelBuilding = true;
       };
@@ -190,6 +193,8 @@
         pname = "hyprbars";
         version = "0.56.2-pin";
         src = "${inputs.hyprland-plugins}/hyprbars";
+
+        patches = [ ./patches/hyprbars-only-floating.patch ];
 
         dontUseCmakeConfigure = true;
 

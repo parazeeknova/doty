@@ -7,8 +7,8 @@ cfg="$HOME/.config/mako/config"
 [ -f "$cfg" ] || exit 0
 
 if [ "$mode" = "floating" ]; then
-  sed -i 's/^anchor=.*/anchor=top-right/; s/^margin=.*/margin=30,8,4,8/' "$cfg"
+  sed -i --follow-symlinks 's/^anchor=.*/anchor=top-right/; s/^margin=.*/margin=30,8,4,8/' "$cfg"
 else
-  sed -i 's/^anchor=.*/anchor=top-left/; s/^margin=.*/margin=4/' "$cfg"
+  sed -i --follow-symlinks 's/^anchor=.*/anchor=top-left/; s/^margin=.*/margin=4/' "$cfg"
 fi
 makoctl reload 2>/dev/null

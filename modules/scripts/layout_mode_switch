@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+set -u
+
+mode="${1:-}"
+if [ -z "$mode" ]; then
+    echo "Usage: $0 [floating|tiling]" >&2
+    exit 1
+fi
+
+HOME_DIR="${HOME:-/home/parazeeknova}"
+CACHE_DIR="$HOME_DIR/.cache"
+mkdir -p "$CACHE_DIR"
+
+# 1. Record mode and waybar variant
+variant="left"
+if [ "$mode" = "floating" ]; then
+    variant="top"
+fi
+
+echo "$mode" > "$CACHE_DIR/hypr_layout_mode"
+echo "$variant" > "$CACHE_DIR/hypr_layout_waybar"
+
+# 2. Update mako notification position and kill stale notif_popup
+if [ -x "$HOME_DIR/doty/modules/scripts/mako_mode" ]; then
+    "$HOME_DIR/doty/modules/scripts/mako_mode" "$mode" 2>/dev/null || true
+fi
+if pgrep -f 'quickshell --config notif_popup' >/dev/null 2>&1; then
+    pkill -KILL -f 'quickshell --config notif_popup' 2>/dev/null || true
+fi
+
+# 3. Check if Waybar is enabled by the user
+waybar_state_file="$CACHE_DIR/quickshell/waybar_state"
+waybar_enabled="true"
+if [ -f "$waybar_state_file" ]; then
+    waybar_enabled="$(cat "$waybar_state_file" 2>/dev/null | tr -d '[:space:]')"
+fi
+
+# 4. Handle Waybar switching
+if [ "$waybar_enabled" = "true" ]; then
+    # Kill old waybar
+    pkill -KILL -x waybar 2>/dev/null || true
+    pkill -KILL -x .waybar-wrapped 2>/dev/null || true
+
+    # Wait for old waybar to terminate (up to 2s)
+    for i in $(seq 1 20); do
+        if ! pgrep -x waybar >/dev/null 2>&1 && ! pgrep -x .waybar-wrapped >/dev/null 2>&1; then
+            break
+        fi
+        sleep 0.1
+    done
+
+    # Ensure no lingering processes
+    if ! pgrep -x waybar >/dev/null 2>&1 && ! pgrep -x .waybar-wrapped >/dev/null 2>&1; then
+        if [ "$mode" = "floating" ]; then
+            cfgPath="$HOME_DIR/.config/waybar/config-top.jsonc"
+            stylePath="$HOME_DIR/.config/waybar/style-top.css"
+
+            # Reset margin-top to 0
+            if [ -f "$cfgPath" ]; then
+                sed -i 's/"margin-top": *[0-9-]*,/"margin-top": 0,/' "$cfgPath"
+            fi
+
+            # Spawn waybar via uwsm
+            uwsm app -- waybar -c "$cfgPath" -s "$stylePath" >/dev/null 2>&1 &
+
+            # Hyprland 0.56.2 margin leak compensation
+            leaked=0
+            for i in $(seq 1 20); do
+                sleep 0.15
+                pos="$(hyprctl layers 2>/dev/null | grep waybar-top | grep -o 'xywh: [0-9-]* [0-9-]*' | head -1 | cut -d' ' -f3 || true)"
+                if [ -n "$pos" ]; then
+                    y="$pos"
+                    if [ "$y" -gt 6 ] 2>/dev/null; then
+                        leaked="$y"
+                        break
+                    fi
+                fi
+            done
+
+            if [ "$leaked" -gt 6 ]; then
+                margin=$((4 - leaked))
+                sed -i 's/"margin-top": *[0-9-]*,/"margin-top": '"$margin"',/' "$cfgPath"
+                pkill -KILL -x waybar 2>/dev/null || true
+                pkill -KILL -x .waybar-wrapped 2>/dev/null || true
+                sleep 0.4
+                uwsm app -- waybar -c "$cfgPath" -s "$stylePath" >/dev/null 2>&1 &
+            fi
+        else
+            cfgPath="$HOME_DIR/.config/waybar/config.jsonc"
+            stylePath="$HOME_DIR/.config/waybar/style.css"
+            uwsm app -- waybar -c "$cfgPath" -s "$stylePath" >/dev/null 2>&1 &
+        fi
+    fi
+fi
+
+# 5. Signal waybar to refresh custom modules
+pkill -RTMIN+6 waybar 2>/dev/null || true

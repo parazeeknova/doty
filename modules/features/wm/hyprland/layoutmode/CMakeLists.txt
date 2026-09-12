@@ -18,4 +18,6 @@ add_library(layoutmode SHARED src/main.cpp)
 target_include_directories(layoutmode PRIVATE ${HYPR_DEPS_INCLUDE_DIRS})
 target_link_libraries(layoutmode PRIVATE ${HYPR_DEPS_LIBRARIES})
 
+set_target_properties(layoutmode PROPERTIES OUTPUT_NAME "hyprland-layoutmode")
+
 install(TARGETS layoutmode LIBRARY DESTINATION lib)

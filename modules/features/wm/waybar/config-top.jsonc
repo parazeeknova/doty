@@ -3,7 +3,7 @@
   "layer": "top",
   "position": "top",
   "height": 20,
-  "margin-top": 2,
+  "margin-top": 0,
   "margin-left": 2,
   "margin-right": 2,
   "spacing": 4,
@@ -87,7 +87,7 @@
   "clock#date": {
     "format": "{:%d/%m/%y}",
     "tooltip": false,
-    "on-click": "env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config notif_popup",
+    "on-click": "quickshell -c notif_popup ipc call notif_popup open || env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config notif_popup",
   },
   "pulseaudio": {
     "format": "{volume} {icon}",

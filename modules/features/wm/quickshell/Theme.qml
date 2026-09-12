@@ -118,8 +118,6 @@ QtObject {
     glassState: FileView {
         path: "file:///tmp/quickshell_glass_state"
         watchChanges: true
-        blockLoading: true
-        preload: true
         onLoaded: {
             var val = glassState.text().trim();
             theme.glassEnabled = (val !== "false");
