@@ -63,6 +63,8 @@
 #include <hyprland/src/config/ConfigManager.hpp>
 #include <hyprland/src/debug/HyprCtl.hpp>
 #include <hyprland/src/config/supplementary/executor/Executor.hpp>
+#include <hyprland/src/devices/IPointer.hpp>
+#include <hyprland/src/output/Monitor.hpp>
 #undef private
 
 #include <hyprutils/math/Box.hpp>
@@ -92,8 +94,10 @@ struct SWsSnap {
 
 std::vector<SWsSnap> g_snap;
 std::unordered_map<Desktop::View::CWindow*, CBox> g_floatGeoms;
+std::unordered_map<std::string, CBox>            g_floatGeomsByClass;
 std::vector<Desktop::View::CWindow*> g_nativeFloating; // floating before us: never touch
 PHLWINDOW g_focusBefore;
+PHLWINDOW g_lastFocusedWindow;
 
 bool isNative(Desktop::View::CWindow* raw) {
     return std::find(g_nativeFloating.begin(), g_nativeFloating.end(), raw) != g_nativeFloating.end();
@@ -106,6 +110,145 @@ std::string homeDir() {
 
 std::string statePath() {
     return homeDir() + "/.cache/hypr_layout_mode";
+}
+
+std::string geomsPath() {
+    return homeDir() + "/.cache/hypr_float_geometries.json";
+}
+
+void saveGeometriesToDisk() {
+    std::ofstream f(geomsPath(), std::ios::trunc);
+    if (!f)
+        return;
+    f << "{\n";
+    bool first = true;
+    for (const auto& [cls, box] : g_floatGeomsByClass) {
+        if (cls.empty() || box.width <= 10 || box.height <= 10)
+            continue;
+        if (!first)
+            f << ",\n";
+        first = false;
+        f << "  \"" << cls << "\": {\"x\": " << static_cast<int>(box.x)
+          << ", \"y\": " << static_cast<int>(box.y)
+          << ", \"w\": " << static_cast<int>(box.width)
+          << ", \"h\": " << static_cast<int>(box.height) << "}";
+    }
+    f << "\n}\n";
+}
+
+void loadGeometriesFromDisk() {
+    std::ifstream f(geomsPath());
+    if (!f)
+        return;
+    std::string line;
+    while (std::getline(f, line)) {
+        auto q1 = line.find('"');
+        if (q1 == std::string::npos)
+            continue;
+        auto q2 = line.find('"', q1 + 1);
+        if (q2 == std::string::npos)
+            continue;
+        std::string cls = line.substr(q1 + 1, q2 - q1 - 1);
+        auto xPos = line.find("\"x\":");
+        auto yPos = line.find("\"y\":");
+        auto wPos = line.find("\"w\":");
+        auto hPos = line.find("\"h\":");
+        if (xPos != std::string::npos && yPos != std::string::npos &&
+            wPos != std::string::npos && hPos != std::string::npos) {
+            try {
+                double x = std::stod(line.substr(xPos + 4));
+                double y = std::stod(line.substr(yPos + 4));
+                double w = std::stod(line.substr(wPos + 4));
+                double h = std::stod(line.substr(hPos + 4));
+                if (w > 10 && h > 10)
+                    g_floatGeomsByClass[cls] = CBox{x, y, w, h};
+            } catch (...) {
+            }
+        }
+    }
+}
+
+CBox clampToMonitor(const CBox& box, const PHLWINDOW& w) {
+    if (box.width <= 10 || box.height <= 10)
+        return box;
+    auto mon = w ? w->m_monitor.lock() : nullptr;
+    if (!mon)
+        mon = Desktop::focusState()->monitor();
+    if (!mon)
+        return box;
+
+    CBox res = box;
+    const double monX = mon->m_position.x;
+    const double monY = mon->m_position.y;
+    const double monW = mon->m_size.x;
+    const double monH = mon->m_size.y;
+
+    res.width  = std::clamp(res.width, 150.0, monW);
+    res.height = std::clamp(res.height, 100.0, monH);
+
+    if (res.x + res.width < monX + 40 || res.x > monX + monW - 40)
+        res.x = monX + std::max(0.0, (monW - res.width) / 2.0);
+    if (res.y + res.height < monY + 40 || res.y > monY + monH - 40)
+        res.y = monY + std::max(0.0, (monH - res.height) / 2.0);
+
+    return res;
+}
+
+void saveWindowGeom(const PHLWINDOW& w) {
+    if (!w || !w->m_isMapped)
+        return;
+    const auto ws = w->m_workspace;
+    if (!ws || ws->m_isSpecialWorkspace)
+        return;
+    if (Fullscreen::controller()->isFullscreen(w))
+        return;
+    const auto t = w->layoutTarget();
+    if (!t || !t->floating())
+        return;
+    const std::string cls = w->m_class;
+    if (cls.empty())
+        return;
+    const auto box = t->position();
+    if (box.width <= 50 || box.height <= 50)
+        return;
+
+    const auto it = g_floatGeomsByClass.find(cls);
+    if (it != g_floatGeomsByClass.end()) {
+        const auto& old = it->second;
+        if (std::abs(old.x - box.x) < 1 && std::abs(old.y - box.y) < 1 &&
+            std::abs(old.width - box.width) < 1 && std::abs(old.height - box.height) < 1) {
+            g_floatGeoms[w.get()] = box;
+            return;
+        }
+    }
+
+    g_floatGeoms[w.get()] = box;
+    g_floatGeomsByClass[cls] = box;
+    saveGeometriesToDisk();
+}
+
+void applyWindowGeom(const PHLWINDOW& w) {
+    if (!w || !w->m_isMapped)
+        return;
+    const auto t = w->layoutTarget();
+    if (!t || !t->floating())
+        return;
+
+    const auto git = g_floatGeoms.find(w.get());
+    if (git != g_floatGeoms.end()) {
+        t->setPositionGlobal(clampToMonitor(git->second, w));
+        return;
+    }
+
+    const std::string cls = w->m_class;
+    if (!cls.empty()) {
+        const auto cit = g_floatGeomsByClass.find(cls);
+        if (cit != g_floatGeomsByClass.end()) {
+            const auto box = clampToMonitor(cit->second, w);
+            t->setPositionGlobal(box);
+            g_floatGeoms[w.get()] = box;
+        }
+    }
 }
 
 inline void asyncExec(const std::string& cmd) {
@@ -279,13 +422,7 @@ void toFloating() {
                 if (!w || !qualifies(w))
                     continue;
                 g_layoutManager->changeFloatingMode(w->layoutTarget());
-                // re-apply remembered floating geometry, if we have it
-                const auto git = g_floatGeoms.find(r.win);
-                if (git != g_floatGeoms.end()) {
-                    const auto t = w->layoutTarget();
-                    if (t && t->floating())
-                        t->setPositionGlobal(git->second);
-                }
+                applyWindowGeom(w);
             }
         }
     }
@@ -309,11 +446,11 @@ void toFloating() {
 void toTiling() {
     // bars off first so retiled windows never flash them
     setBars(false);
-    const auto rememberGeom = [](const PHLWINDOW& w) {
-        const auto t = w->layoutTarget();
-        if (t && t->floating())
-            g_floatGeoms[w.get()] = t->position();
-    };
+
+    for (const auto& w : Desktop::windowState()->windows()) {
+        saveWindowGeom(w);
+    }
+
     const auto focusWin = [](const PHLWINDOW& w) {
         if (w)
             Desktop::focusState()->fullWindowFocus(w, Desktop::FOCUS_REASON_OTHER);
@@ -329,7 +466,7 @@ void toTiling() {
                 auto w = findWin(r.win);
                 if (!w || !w->m_isFloating)
                     continue;
-                rememberGeom(w);
+                saveWindowGeom(w);
                 if (lastRetiled && alive(lastRetiled.get()))
                     focusWin(lastRetiled);
                 g_layoutManager->changeFloatingMode(w->layoutTarget());
@@ -351,7 +488,7 @@ void toTiling() {
             continue;
         if (isNative(w.get()))
             continue;
-        rememberGeom(w);
+        saveWindowGeom(w);
         g_layoutManager->changeFloatingMode(w->layoutTarget());
         lastRetiled = w;
     }
@@ -419,14 +556,29 @@ void toggle() {
     }
 }
 
-// Float new windows while in floating mode (rules-processed leftovers only:
-// scratchpads etc. are already floating and skipped by qualifies()).
 void onWindowOpen(PHLWINDOW w) {
-    if (!g_floating || !qualifies(w))
+    if (!w || !w->m_isMapped)
         return;
-    try {
-        g_layoutManager->changeFloatingMode(w->layoutTarget());
-    } catch (...) {
+    const auto ws = w->m_workspace;
+    if (!ws || ws->m_isSpecialWorkspace)
+        return;
+    if (Fullscreen::controller()->isFullscreen(w))
+        return;
+    if (!w->layoutTarget())
+        return;
+
+    if (g_floating) {
+        try {
+            if (!w->m_isFloating)
+                g_layoutManager->changeFloatingMode(w->layoutTarget());
+            applyWindowGeom(w);
+        } catch (...) {
+        }
+    } else if (w->m_isFloating) {
+        try {
+            applyWindowGeom(w);
+        } catch (...) {
+        }
     }
 }
 
@@ -458,6 +610,8 @@ APICALL EXPORT std::string PLUGIN_API_VERSION() {
 APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     g_handle = handle;
 
+    loadGeometriesFromDisk();
+
     std::ifstream f(statePath());
     if (f) {
         std::string mode;
@@ -481,7 +635,24 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     static const auto openListener = Event::bus()->m_events.window.open.listen([](PHLWINDOW w) { onWindowOpen(w); });
     (void)openListener;
 
-    static const auto closeListener = Event::bus()->m_events.window.close.listen([]() { refreshBars(); });
+    static const auto updateRulesListener = Event::bus()->m_events.window.updateRules.listen([](PHLWINDOW w) {
+        if (!w || !w->m_isFloating || w->m_class.empty())
+            return;
+        if (g_floatGeoms.find(w.get()) == g_floatGeoms.end())
+            applyWindowGeom(w);
+    });
+    (void)updateRulesListener;
+
+    static const auto floatingListener = Event::bus()->m_events.window.floating.listen([](PHLWINDOW w) {
+        if (w && w->m_isFloating)
+            applyWindowGeom(w);
+    });
+    (void)floatingListener;
+
+    static const auto closeListener = Event::bus()->m_events.window.close.listen([](PHLWINDOW w) {
+        saveWindowGeom(w);
+        refreshBars();
+    });
     (void)closeListener;
 
     static const auto fsListener = Event::bus()->m_events.window.fullscreen.listen([]() { refreshBars(); });
@@ -490,8 +661,22 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     static const auto wsListener = Event::bus()->m_events.workspace.active.listen([]() { refreshBars(); });
     (void)wsListener;
 
-    static const auto winActiveListener = Event::bus()->m_events.window.active.listen([]() { refreshBars(); });
+    static const auto winActiveListener = Event::bus()->m_events.window.active.listen([](PHLWINDOW w, Desktop::eFocusReason) {
+        if (g_lastFocusedWindow && alive(g_lastFocusedWindow.get()))
+            saveWindowGeom(g_lastFocusedWindow);
+        g_lastFocusedWindow = w;
+        refreshBars();
+    });
     (void)winActiveListener;
+
+    static const auto mouseButtonListener = Event::bus()->m_events.input.mouse.button.listen([](const IPointer::SButtonEvent& e, Event::SCallbackInfo&) {
+        if (e.state == 0) {
+            const auto active = Desktop::focusState()->window();
+            if (active)
+                saveWindowGeom(active);
+        }
+    });
+    (void)mouseButtonListener;
 
     // hyprbars may load after us; re-sync bars on every config reload
     static const auto cfgListener = Event::bus()->m_events.config.reloaded.listen([]() { refreshBars(); });
@@ -501,6 +686,9 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
 }
 
 APICALL EXPORT void PLUGIN_EXIT() {
+    for (const auto& w : Desktop::windowState()->windows()) {
+        saveWindowGeom(w);
+    }
     if (g_hyprCmd) {
         HyprlandAPI::unregisterHyprCtlCommand(g_handle, g_hyprCmd);
         g_hyprCmd.reset();
