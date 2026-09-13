@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+ENTRY="${1:-}"
+[ -z "$ENTRY" ] && exit 0
+
+case "$ENTRY" in
+    *"binary data"*)
+        ID=$(printf '%s\n' "$ENTRY" | awk -F'\t' '{print $1}' | tr -cd '0-9')
+        DIR="$HOME/Pictures/Clipboard"
+        mkdir -p "$DIR"
+        FILE="$DIR/clipboard_${ID}.png"
+
+        if printf '%s\n' "$ENTRY" | cliphist decode > "$FILE" 2>/dev/null; then
+            MIME=$(file -b --mime-type "$FILE" 2>/dev/null || echo "image/png")
+            wl-copy --type "$MIME" < "$FILE"
+            notify-send -t 1000 \
+                -h string:x-canonical-private-synchronous:clip-notify \
+                -a "clipboard" \
+                -i "$FILE" \
+                -- "copied to clipboard" "Image ($FILE)"
+        fi
+        ;;
+    *)
+        DECODED=$(printf '%s\n' "$ENTRY" | cliphist decode 2>/dev/null; printf x)
+        DECODED="${DECODED%x}"
+
+        if [ -n "$DECODED" ]; then
+            printf '%s' "$DECODED" | wl-copy
+            PREVIEW=$(printf '%s' "$DECODED" | head -c 50)
+            notify-send -t 1000 \
+                -h string:x-canonical-private-synchronous:clip-notify \
+                -a "clipboard" \
+                -i "edit-copy" \
+                -- "copied to clipboard" "$PREVIEW"
+        else
+            # Fallback in case cliphist decode returned empty (e.g. rotated entry)
+            RAW_TEXT=$(printf '%s' "$ENTRY" | cut -f2-)
+            if [ -n "$RAW_TEXT" ]; then
+                printf '%s' "$RAW_TEXT" | wl-copy
+                PREVIEW=$(printf '%s' "$RAW_TEXT" | head -c 50)
+                notify-send -t 1000 \
+                    -h string:x-canonical-private-synchronous:clip-notify \
+                    -a "clipboard" \
+                    -i "edit-copy" \
+                    -- "copied to clipboard" "$PREVIEW"
+            fi
+        fi
+        ;;
+esac

@@ -214,7 +214,7 @@ Scope {
 
         property string entryText: ""
 
-        command: ["sh", "-c", "case \"$1\" in *binary\ data*) id=$(echo \"$1\" | awk -F'\\t' '{print $1}' | tr -c '0-9' '_'); ext=$(echo \"$1\" | grep -o 'type [a-z]*' | head -1 | cut -d' ' -f2); ext=${ext:-png}; dir=$HOME/Pictures/Clipboard; mkdir -p \"$dir\"; file=\"$dir/clipboard_${id}.${ext}\"; echo \"$1\" | cliphist decode > \"$file\"; out=\"$file\"; ;; *) out=$(echo \"$1\" | cliphist decode); ;; esac; printf '%s' \"$out\" | wl-copy && notify-send -t 1000 -h string:x-canonical-private-synchronous:clip-notify -a \"clipboard\" -i \"edit-copy\" \"copied to clipboard\" \"$(printf '%s' \"$out\" | head -c 50)\"", "sh", entryText]
+        command: [root.homeDir + "/.config/quickshell/clipboard_popup/copy_cliphist", entryText]
         running: false
         onExited: {
             root.requestClose();
@@ -227,7 +227,7 @@ Scope {
 
         property string entryText: ""
 
-        command: ["sh", "-c", "echo \"$1\" | cliphist delete", "sh", entryText]
+        command: ["sh", "-c", "printf '%s\\n' \"$1\" | cliphist delete", "sh", entryText]
         running: false
         onExited: {
             root.refreshClipboard();
@@ -251,7 +251,7 @@ Scope {
 
         property string entryText: ""
 
-        command: ["sh", "-c", "echo \"$1\" | cliphist decode", "sh", entryText]
+        command: ["sh", "-c", "printf '%s\\n' \"$1\" | cliphist decode", "sh", entryText]
         running: false
 
         stdout: StdioCollector {
