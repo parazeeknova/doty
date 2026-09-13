@@ -58,6 +58,7 @@
         sbctl
         impala
         kexec-tools
+        nvtopPackages.full
 
         # -- Network Utils --
         nmap

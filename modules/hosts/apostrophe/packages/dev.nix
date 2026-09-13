@@ -176,10 +176,7 @@
         cloudflare-cli
         awscli2
         google-cloud-sdk
-        zed-editor-fhs
-        helix
         bruno
-        yaak
         beekeeper-studio
 
         # -- Languages --
@@ -238,13 +235,6 @@
         difftastic
         diff-so-fancy
 
-        # -- Kubernetes --
-        kubectl
-        kubernetes-helm
-        k9s
-        kubectx
-        stern
-        minikube
 
         # -- Tools --
         httpie

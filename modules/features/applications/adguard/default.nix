@@ -35,8 +35,41 @@
             protection_enabled = true;
             filtering_enabled = true;
           };
+          user_rules = [
+            "||comix.to^"
+            "||everythingmoe.com^"
+            "||anikototv.to^"
+            "||animepahe.pw^"
+            "||animepahe.org^"
+            "||animepahe.com^"
+            "||animepahe.ru^"
+            "||animepahe.si^"
+            "||fitgirl-repacks.site^"
+            "||fitgirlrepacks.co^"
+            "||dodi-repacks.site^"
+            "||dodi-repack.site^"
+            "||rule34video.com^"
+          ];
         };
       };
+
+      networking.extraHosts = ''
+        # Blocked domains (Manga, Anime, Adult, and Game Repacks)
+        0.0.0.0 comix.to www.comix.to
+        0.0.0.0 everythingmoe.com www.everythingmoe.com
+        0.0.0.0 anikototv.to www.anikototv.to
+        0.0.0.0 animepahe.pw www.animepahe.pw animepahe.org www.animepahe.org animepahe.com www.animepahe.com animepahe.ru www.animepahe.ru animepahe.si www.animepahe.si
+        0.0.0.0 fitgirl-repacks.site www.fitgirl-repacks.site fitgirlrepacks.co www.fitgirlrepacks.co
+        0.0.0.0 dodi-repacks.site www.dodi-repacks.site dodi-repack.site www.dodi-repack.site
+        0.0.0.0 rule34video.com www.rule34video.com
+        :: comix.to www.comix.to
+        :: everythingmoe.com www.everythingmoe.com
+        :: anikototv.to www.anikototv.to
+        :: animepahe.pw www.animepahe.pw animepahe.org www.animepahe.org animepahe.com www.animepahe.com animepahe.ru www.animepahe.ru animepahe.si www.animepahe.si
+        :: fitgirl-repacks.site www.fitgirl-repacks.site fitgirlrepacks.co www.fitgirlrepacks.co
+        :: dodi-repacks.site www.dodi-repacks.site dodi-repack.site www.dodi-repack.site
+        :: rule34video.com www.rule34video.com
+      '';
 
       # Update existing AdGuardHome.yaml if generated during initial failed attempt
       systemd.services.adguardhome.preStart = lib.mkAfter ''

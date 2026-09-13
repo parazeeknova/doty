@@ -23,12 +23,7 @@ hl.bind(
 		"hyprctl clients | grep -iq 'class: .*zen' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:^zen.*\" })' || uwsm app -- zen-twilight"
 	)
 )
-hl.bind(
-	mainMod .. " + ALT + B",
-	hl.dsp.exec_cmd(
-		"hyprctl clients | grep -iq 'class: .*vivaldi' && hyprctl dispatch 'hl.dsp.focus({ window = \"class:^[Vv]ivaldi.*\" })' || uwsm app -- vivaldi"
-	)
-)
+
 hl.bind(
 	mainMod .. " + CTRL + B",
 	hl.dsp.exec_cmd(

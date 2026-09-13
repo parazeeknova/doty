@@ -22,8 +22,6 @@
       environment.systemPackages = with pkgs; [
         # -- Web --
         google-chrome
-        vivaldi
-        vivaldi-ffmpeg-codecs
         inputs.helium.packages.${pkgs.stdenv.hostPlatform.system}.default
         vesktop
         telegram-desktop
@@ -174,7 +172,6 @@
         freetube
         vlc
         obs-studio
-        qbittorrent-enhanced
 
         # -- Wayland / Hyprland --
         uwsm
