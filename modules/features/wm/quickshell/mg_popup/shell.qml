@@ -39,9 +39,9 @@ Scope {
             return "--";
         return "$" + v.toFixed(2);
     }
-    function used(a) {
-        // Treat sub-cent spend as unused so rounding to $0.00 isn't shown red
-        return a.this_month > 0 && Math.round(a.this_month * 100) > 0;
+    function exhausted(a) {
+        // Red only when this month's spend has hit the monthly credit cap
+        return a.this_month >= capPer;
     }
     function monthName(m) {
         return ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m];
@@ -382,7 +382,7 @@ Scope {
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 10
                                         font.bold: true
-                                        color: root.used(modelData) ? theme.error : theme.fg
+                                        color: root.exhausted(modelData) ? theme.error : theme.fg
                                         renderType: Text.NativeRendering
                                         anchors.left: parent.left
                                         anchors.verticalCenter: parent.verticalCenter
@@ -422,14 +422,14 @@ Scope {
                                     width: parent.width
                                     height: 5
                                     spacing: 1
-                                    property bool used: root.used(modelData)
+                                    property bool exhausted: root.exhausted(modelData)
                                     property int filled: modelData.this_month < 0 ? 0 : Math.min(15, Math.round(modelData.this_month / root.capPer * 15))
                                     Repeater {
                                         model: 15
                                         delegate: Rectangle {
                                             width: (mainLayout.width - 14) / 15
                                             height: 5
-                                            color: index < barRow.filled ? (barRow.used ? theme.error : theme.accent) : theme.bg_light
+                                            color: index < barRow.filled ? (barRow.exhausted ? theme.error : theme.accent) : theme.bg_light
                                         }
                                     }
                                 }
@@ -442,7 +442,7 @@ Scope {
                                         text: root.fmt(modelData.this_month)
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
-                                        color: root.used(modelData) ? theme.error : theme.fg
+                                        color: root.exhausted(modelData) ? theme.error : theme.fg
                                         renderType: Text.NativeRendering
                                         anchors.left: parent.left
                                     }
