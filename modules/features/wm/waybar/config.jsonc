@@ -10,6 +10,7 @@
   "modules-center": ["custom/voxtype", "custom/layout", "clock#date"],
   "modules-right": [
     "custom/tray_toggle",
+    "custom/mg",
     "custom/tailscale",
     "network",
     "pulseaudio",
@@ -45,6 +46,15 @@
     "exec": "/home/parazeeknova/.config/waybar/scripts/tray_count",
     "signal": 5,
     "on-click": "quickshell -c tray_popup ipc call tray_popup close || env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config tray_popup",
+    "tooltip": false,
+  },
+  "custom/mg": {
+    "format": "{}",
+    "return-type": "json",
+    "rotate": 270,
+    "exec": "/home/parazeeknova/.config/waybar/scripts/get_mg_status",
+    "interval": 300,
+    "on-click": "quickshell -c mg_popup ipc call mg_popup close || env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config mg_popup",
     "tooltip": false,
   },
   "network": {

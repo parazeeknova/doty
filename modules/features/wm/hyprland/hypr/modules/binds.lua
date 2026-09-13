@@ -444,6 +444,12 @@ hl.bind(
 	)
 )
 hl.bind(
+	mainMod .. " + ALT + M",
+	hl.dsp.exec_cmd(
+		"pgrep -f '[q]uickshell --config mg_popup' >/dev/null && quickshell -c mg_popup ipc call mg_popup close || env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config mg_popup"
+	)
+)
+hl.bind(
 	"SUPER_L",
 	hl.dsp.exec_cmd(
 		"pgrep -f '[q]uickshell --config workspace_popup' >/dev/null && quickshell -c workspace_popup ipc call workspace_popup close || env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config workspace_popup"

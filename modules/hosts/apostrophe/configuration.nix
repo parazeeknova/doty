@@ -359,6 +359,79 @@
         group = "users";
         mode = "0400";
       };
+      # -- Merge Gateway per-account keys (mg_popup, N=1..6) --
+      sops.secrets.mg-mgmt-key-1 = {
+        path = "/run/secrets/mg-mgmt-key-1";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.mg-gateway-key-1 = {
+        path = "/run/secrets/mg-gateway-key-1";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.mg-mgmt-key-2 = {
+        path = "/run/secrets/mg-mgmt-key-2";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.mg-gateway-key-2 = {
+        path = "/run/secrets/mg-gateway-key-2";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.mg-mgmt-key-3 = {
+        path = "/run/secrets/mg-mgmt-key-3";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.mg-gateway-key-3 = {
+        path = "/run/secrets/mg-gateway-key-3";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.mg-mgmt-key-4 = {
+        path = "/run/secrets/mg-mgmt-key-4";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.mg-gateway-key-4 = {
+        path = "/run/secrets/mg-gateway-key-4";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.mg-mgmt-key-5 = {
+        path = "/run/secrets/mg-mgmt-key-5";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.mg-gateway-key-5 = {
+        path = "/run/secrets/mg-gateway-key-5";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.mg-mgmt-key-6 = {
+        path = "/run/secrets/mg-mgmt-key-6";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.mg-gateway-key-6 = {
+        path = "/run/secrets/mg-gateway-key-6";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
 
       system.stateVersion = "26.05";
     };

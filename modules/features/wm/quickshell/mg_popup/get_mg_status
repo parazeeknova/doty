@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+# get_mg_status - Merge Gateway spend per account, with 15-minute file cache.
+# Reads mgmt keys from $MG_SECRET_DIR/mg-mgmt-key-N (default /run/secrets,
+# N=1..6, skips missing), queries /v1/organization/usage for this month +
+# previous month (accounts fetched in parallel), prints JSON to stdout and
+# refreshes ~/.cache/quickshell/mg_status.json.
+# Keys never appear in the output - only spend numbers.
+# Usage: get_mg_status [--refresh to bypass the cache]
+set -u
+
+CACHE_DIR="$HOME/.cache/quickshell"
+CACHE="$CACHE_DIR/mg_status.json"
+STALE_AFTER=900
+BASE="https://api-gateway.merge.dev"
+SECRET_DIR="${MG_SECRET_DIR:-/run/secrets}"
+
+now=$(date +%s)
+if [ -f "$CACHE" ] && [ "${1:-}" != "--refresh" ]; then
+    mtime=$(stat -c %Y "$CACHE" 2>/dev/null || stat -f %m "$CACHE" 2>/dev/null || echo 0)
+    if [ $((now - mtime)) -lt $STALE_AFTER ]; then
+        cat "$CACHE"
+        exit 0
+    fi
+fi
+
+THIS_START=$(date +%Y-%m-01)
+THIS_END=$(date +%Y-%m-%d)
+PREV_START=$(date -d "$(date +%Y-%m-01) -1 month" +%Y-%m-%d)
+PREV_END=$(date -d "$(date +%Y-%m-01) -1 day" +%Y-%m-%d)
+
+# Display labels per account (safe to keep in repo - no secrets here).
+label_for() {
+    case "$1" in
+        1) printf 'work@sin***' ;;
+        2) printf 'harsh@sin***' ;;
+        3) printf 'delivo@gm***' ;;
+        4) printf 'harshsa***' ;;
+        5) printf 'uni***' ;;
+        6) printf 'yesh***' ;;
+        *) printf 'MG%s' "$1" ;;
+    esac
+}
+
+fetch_usage() {
+    # $1 = mgmt key, $2 = start, $3 = end -> "total_spend<TAB>top_model" or "ERR<TAB>"
+    curl -s -m 15 "$BASE/v1/organization/usage?start=$2&end=$3" \
+        -H "Authorization: Bearer $1" 2>/dev/null | python3 -c "
+import json, sys
+try:
+    d = json.load(sys.stdin)
+    ms = d.get('model_spend') or {}
+    top = max(ms, key=ms.get) if ms else ''
+    print('%s\t%s' % (d.get('total_spend', 'ERR'), top))
+except Exception:
+    print('ERR\t')
+" 2>/dev/null || printf 'ERR\t'
+}
+
+WORK=$(mktemp -d)
+for n in 1 2 3 4 5 6; do
+    kf="$SECRET_DIR/mg-mgmt-key-$n"
+    [ -f "$kf" ] || continue
+    (
+        key=$(cat "$kf")
+        if [ -z "$key" ]; then
+            printf '{"idx":%s,"ok":0}' "$n" >"$WORK/acc-$n"
+            exit 0
+        fi
+        IFS=$'\t' read -r this_m this_top < <(fetch_usage "$key" "$THIS_START" "$THIS_END")
+        IFS=$'\t' read -r prev_m prev_top < <(fetch_usage "$key" "$PREV_START" "$PREV_END")
+        this_m=$(python3 -c "print(float('$this_m'))" 2>/dev/null || echo "ERR")
+        prev_m=$(python3 -c "print(float('$prev_m'))" 2>/dev/null || echo "ERR")
+        if [ "$this_m" = "ERR" ] && [ "$prev_m" = "ERR" ]; then
+            printf '{"idx":%s,"ok":0}' "$n" >"$WORK/acc-$n"
+        else
+            [ "$this_m" = "ERR" ] && this_m=-1
+            [ "$prev_m" = "ERR" ] && prev_m=-1
+            top="$this_top"
+            [ -n "$top" ] || top="$prev_top"
+            printf '{"idx":%s,"ok":1,"this_month":%s,"prev_month":%s,"top_model":%s}' \
+                "$n" "$this_m" "$prev_m" \
+                "$(TOP="$top" python3 -c "import json,os; print(json.dumps(os.environ['TOP']))")" \
+                >"$WORK/acc-$n"
+        fi
+    ) &
+done
+wait
+
+json=$(LABEL1=$(label_for 1) LABEL2=$(label_for 2) LABEL3=$(label_for 3) \
+    LABEL4=$(label_for 4) LABEL5=$(label_for 5) LABEL6=$(label_for 6) \
+    python3 - "$WORK" "$now" "$THIS_START" "$THIS_END" "$PREV_START" "$PREV_END" <<'EOF'
+import json, sys, os, glob
+work, now, ts, te, ps, pe = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6]
+labels = {i: os.environ.get("LABEL%d" % i, "MG%d" % i) for i in range(1, 7)}
+accounts = []
+for f in sorted(glob.glob(work + "/acc-*")):
+    try:
+        a = json.load(open(f))
+    except Exception:
+        continue
+    n = a["idx"]
+    if a.get("ok"):
+        accounts.append({"label": labels[n], "idx": n, "this_month": a["this_month"],
+                         "prev_month": a["prev_month"], "top_model": a.get("top_model", ""),
+                         "error": ""})
+    else:
+        accounts.append({"label": labels[n], "idx": n, "this_month": -1,
+                         "prev_month": -1, "top_model": "", "error": "fetch failed"})
+print(json.dumps({"fetched_at": now, "this_start": ts, "this_end": te,
+                  "prev_start": ps, "prev_end": pe, "accounts": accounts}))
+EOF
+)
+rm -rf "$WORK"
+
+mkdir -p "$CACHE_DIR"
+printf '%s' "$json" > "$CACHE.tmp" && mv "$CACHE.tmp" "$CACHE"
+printf '%s' "$json"

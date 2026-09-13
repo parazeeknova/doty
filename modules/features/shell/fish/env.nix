@@ -73,20 +73,11 @@
           set -gx OPENAI_BASE_URL "https://api-gateway.merge.dev/v1/openai"
 
           # -- SOPS Decrypted Environment Variables --
-          if test -f /run/secrets/merge-gateway-api-key
-              set -gx MERGE_GATEWAY_API_KEY (cat /run/secrets/merge-gateway-api-key)
-              set -gx ANTHROPIC_AUTH_TOKEN (cat /run/secrets/merge-gateway-api-key)
-              set -gx LLM_API_KEY (cat /run/secrets/merge-gateway-api-key)
-              set -gx OPENAI_API_KEY (cat /run/secrets/merge-gateway-api-key)
-          end
           if test -f /run/secrets/openrouter-api-key
               set -gx OPENROUTER_API_KEY (cat /run/secrets/openrouter-api-key)
           end
           if test -f /run/secrets/context7-api-key
               set -gx CONTEXT7_API_KEY (cat /run/secrets/context7-api-key)
-          end
-          if test -f /run/secrets/modal-api-key
-              set -gx MODAL_API_KEY (cat /run/secrets/modal-api-key)
           end
           if test -f /run/secrets/github-token
               set -gx GITHUB_PERSONAL_ACCESS_TOKEN (cat /run/secrets/github-token)

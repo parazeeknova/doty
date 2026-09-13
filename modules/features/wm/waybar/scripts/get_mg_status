@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Waybar custom/mg module: reads the mg_popup cache (local file only, no network).
+CACHE="$HOME/.cache/quickshell/mg_status.json"
+if [ ! -f "$CACHE" ]; then
+    printf '{"text":"MG","tooltip":"no data yet - open MG popup"}'
+    exit 0
+fi
+python3 - "$CACHE" <<'EOF'
+import json, sys
+try:
+    d = json.load(open(sys.argv[1]))
+    accs = d.get("accounts", [])
+    this_m = sum(a.get("this_month", 0) for a in accs if a.get("this_month", -1) >= 0)
+    prev_m = sum(a.get("prev_month", 0) for a in accs if a.get("prev_month", -1) >= 0)
+    cap = 10 * len(accs)
+    lines = ["This month: $%.2f / $%d" % (this_m, cap), "Prev month: $%.2f" % prev_m]
+    for a in accs:
+        t, p = a.get("this_month", -1), a.get("prev_month", -1)
+        ts = "$%.2f" % t if t >= 0 else "--"
+        ps = "$%.2f" % p if p >= 0 else "--"
+        lines.append("%s: %s (prev %s)" % (a.get("label", "?"), ts, ps))
+    print(json.dumps({"text": "MG", "tooltip": "\n".join(lines)}))
+except Exception:
+    print(json.dumps({"text": "MG", "tooltip": "cache parse error"}))
+EOF
