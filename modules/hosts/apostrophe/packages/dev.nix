@@ -235,7 +235,6 @@
         difftastic
         diff-so-fancy
 
-
         # -- Tools --
         httpie
         tmux

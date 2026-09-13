@@ -213,7 +213,6 @@ hl.window_rule({
 	workspace = "2",
 })
 
-
 hl.window_rule({
 	name = "obs-scratchpad",
 	match = {
@@ -269,7 +268,6 @@ hl.window_rule({
 	},
 	scrolling_width = 0.7,
 })
-
 
 hl.window_rule({
 	name = "brave-starting-width",
