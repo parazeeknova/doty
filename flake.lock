@@ -303,11 +303,11 @@
     "hymission": {
       "flake": false,
       "locked": {
-        "lastModified": 1788668012,
-        "narHash": "sha256-cjId8YbxfsiA4xZE4FzdXkWgreK2ZLhTLR2l1HaBUpI=",
+        "lastModified": 1789268872,
+        "narHash": "sha256-CYhvGB/3RyHOZBgsp/TRpC5/19jw+57x2R44VAMAf0M=",
         "owner": "gfhdhytghd",
         "repo": "hymission",
-        "rev": "5bb7fa2ada11f69ef71dea889464c50903b4a896",
+        "rev": "056fb69be97b61466dca1c053494bec8dea13d7f",
         "type": "github"
       },
       "original": {
