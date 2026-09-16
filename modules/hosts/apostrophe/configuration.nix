@@ -204,9 +204,13 @@
           "wheel"
           "podman"
           "libvirtd"
+          "kvm"
+          "adbusers"
         ];
         shell = pkgs.fish;
       };
+
+      users.groups.adbusers = { };
 
       # -- Polkit & Sudo rules for systemctl --
       security.sudo.extraRules = [
@@ -232,6 +236,7 @@
 
       # -- Misc --
       nixpkgs.config.allowUnfree = true;
+      nixpkgs.config.android_sdk.accept_license = true;
       nixpkgs.config.permittedInsecurePackages = [
         "electron-40.10.5"
         "electron-39.8.10"
