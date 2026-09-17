@@ -1,0 +1,245 @@
+#!/usr/bin/env python3
+"""
+mg-key-picker - Smart Merge Gateway key selector for Pi & CLI tools.
+Selects the least-used Merge Gateway account (out of the 6 accounts with $10 limit)
+using the existing get_mg_status usage cache.
+
+Features:
+- Sub-millisecond response when cached (15-minute TTL).
+- Automatic cache refresh via get_mg_status when stale.
+- Filters out depleted accounts (spend >= $10 or errors).
+- Selects the account with the lowest spend this month.
+- Robust fallbacks to ensure Pi never fails to get a key.
+"""
+
+import os
+import sys
+import time
+import json
+import subprocess
+from pathlib import Path
+
+HOME = Path.home()
+CACHE_DIR = HOME / ".cache" / "pi"
+CACHE_FILE = CACHE_DIR / "mg_picked_key.json"
+MG_STATUS_CACHE = HOME / ".cache" / "quickshell" / "mg_status.json"
+SECRET_DIR = Path(os.environ.get("MG_SECRET_DIR", "/run/secrets"))
+FALLBACK_KEY_FILE = SECRET_DIR / "merge-gateway-api-key"
+
+GET_MG_STATUS_CANDIDATES = [
+    HOME / ".config" / "quickshell" / "mg_popup" / "get_mg_status",
+    HOME / "doty" / "modules" / "features" / "wm" / "quickshell" / "mg_popup" / "get_mg_status",
+    HOME / ".config" / "waybar" / "scripts" / "get_mg_status",
+]
+
+TTL_SECONDS = 900       # 15 minutes
+MONTHLY_LIMIT = 10.0    # $10 monthly budget per account
+
+
+def read_key_file(idx: int) -> str | None:
+    kf = SECRET_DIR / f"mg-gateway-key-{idx}"
+    if kf.exists():
+        try:
+            val = kf.read_text().strip()
+            if val:
+                return val
+        except Exception:
+            pass
+    return None
+
+
+def get_fallback_key() -> str:
+    # Try any valid gateway key 1..6
+    for idx in (4, 5, 6, 3, 2, 1):
+        k = read_key_file(idx)
+        if k:
+            return k
+    # Try global fallback
+    if FALLBACK_KEY_FILE.exists():
+        try:
+            k = FALLBACK_KEY_FILE.read_text().strip()
+            if k:
+                return k
+        except Exception:
+            pass
+    # Try env var
+    return os.environ.get("MERGE_GATEWAY_API_KEY", "")
+
+
+def load_from_cache() -> dict | None:
+    if not CACHE_FILE.exists():
+        return None
+    try:
+        data = json.loads(CACHE_FILE.read_text())
+        cached_time = data.get("timestamp", 0)
+        idx = data.get("idx")
+        key = data.get("key")
+        if time.time() - cached_time < TTL_SECONDS and key and idx:
+            # Verify the secret is still readable
+            curr_key = read_key_file(idx)
+            if curr_key:
+                return data
+    except Exception:
+        pass
+    return None
+
+
+def save_to_cache(idx: int, key: str, spend: float, label: str):
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "idx": idx,
+            "key": key,
+            "spend": spend,
+            "label": label,
+            "timestamp": time.time(),
+        }
+        tmp_file = CACHE_FILE.with_suffix(".tmp")
+        tmp_file.write_text(json.dumps(payload, indent=2))
+        tmp_file.replace(CACHE_FILE)
+    except Exception:
+        pass
+
+
+def fetch_mg_status_json(force_refresh=False) -> dict | None:
+    # Check if existing quickshell status cache is fresh enough
+    if not force_refresh and MG_STATUS_CACHE.exists():
+        try:
+            mtime = MG_STATUS_CACHE.stat().st_mtime
+            if time.time() - mtime < TTL_SECONDS:
+                return json.loads(MG_STATUS_CACHE.read_text())
+        except Exception:
+            pass
+
+    # Find get_mg_status script
+    script = None
+    for cand in GET_MG_STATUS_CANDIDATES:
+        if cand.exists() and os.access(cand, os.X_OK):
+            script = cand
+            break
+
+    if script:
+        try:
+            cmd = [str(script)]
+            if force_refresh:
+                cmd.append("--refresh")
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
+            if res.returncode == 0 and res.stdout.strip():
+                return json.loads(res.stdout)
+        except Exception:
+            pass
+
+    # Fallback to reading whatever is in MG_STATUS_CACHE
+    if MG_STATUS_CACHE.exists():
+        try:
+            return json.loads(MG_STATUS_CACHE.read_text())
+        except Exception:
+            pass
+    return None
+
+
+def select_best_account(force_refresh=False) -> tuple[int, str, float, str]:
+    """Returns (idx, key, spend, label)."""
+    status = fetch_mg_status_json(force_refresh=force_refresh)
+    accounts = status.get("accounts", []) if status else []
+
+    usable = []
+    for a in accounts:
+        idx = a.get("idx")
+        if not idx:
+            continue
+        key = read_key_file(idx)
+        if not key:
+            continue
+
+        spend = a.get("this_month", -1.0)
+        err = a.get("error", "")
+        label = a.get("label", f"MG{idx}")
+
+        if err:
+            continue
+        if spend < 0:
+            continue
+
+        usable.append({
+            "idx": idx,
+            "key": key,
+            "spend": float(spend),
+            "label": label,
+        })
+
+    if not usable:
+        # If no parsed accounts, fallback to first available key
+        fb = get_fallback_key()
+        return (0, fb, 0.0, "fallback")
+
+    # Prefer accounts under the monthly limit ($10)
+    under_limit = [x for x in usable if x["spend"] < MONTHLY_LIMIT]
+    pool = under_limit if under_limit else usable
+
+    # Sort by spend ascending (least used first)
+    pool.sort(key=lambda x: x["spend"])
+    chosen = pool[0]
+    return (chosen["idx"], chosen["key"], chosen["spend"], chosen["label"])
+
+
+def get_key(force_refresh=False) -> str:
+    if not force_refresh:
+        cached = load_from_cache()
+        if cached:
+            return cached["key"]
+
+    idx, key, spend, label = select_best_account(force_refresh=force_refresh)
+    if key:
+        save_to_cache(idx, key, spend, label)
+        return key
+
+    return get_fallback_key()
+
+
+def show_info():
+    cached = load_from_cache()
+    print("=== Merge Gateway Key Picker Status ===")
+    if cached:
+        age = int(time.time() - cached.get("timestamp", 0))
+        print(f"Cached Selection: Account {cached.get('idx')} ({cached.get('label')})")
+        print(f"Current Month Spend: ${cached.get('spend', 0.0):.2f} / ${MONTHLY_LIMIT:.2f}")
+        print(f"Cache Age: {age}s / {TTL_SECONDS}s")
+        print(f"Key Prefix: {cached.get('key', '')[:8]}...")
+    else:
+        print("No valid cached key. Next invocation will query usage.")
+
+    status = fetch_mg_status_json(force_refresh=False)
+    if status and "accounts" in status:
+        print("\nAccounts Overview:")
+        for a in status["accounts"]:
+            idx = a.get("idx")
+            spend = a.get("this_month", -1)
+            err = a.get("error", "")
+            has_key = "✔ key present" if read_key_file(idx) else "✘ no key"
+            status_tag = f"ERR ({err})" if err else (f"${spend:.2f}" if spend >= 0 else "N/A")
+            over = " [OVER $10 LIMIT]" if spend >= MONTHLY_LIMIT else ""
+            print(f"  Account {idx} ({a.get('label')}): {status_tag}{over} [{has_key}]")
+
+
+def main():
+    if len(sys.argv) > 1:
+        arg = sys.argv[1]
+        if arg in ("--info", "--status", "status", "info"):
+            show_info()
+            return
+        elif arg in ("--refresh", "-r", "refresh"):
+            key = get_key(force_refresh=True)
+            print(key)
+            return
+        elif arg in ("--help", "-h"):
+            print("Usage: mg-key-picker [--info | --refresh]")
+            print("Prints the gateway API key for the least-used Merge Gateway account.")
+            return
+
+    key = get_key(force_refresh=False)
+    print(key)
+
+
+if __name__ == "__main__":
+    main()

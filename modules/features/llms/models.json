@@ -75,6 +75,27 @@
           "contextWindow": 32768
         }
       ]
+    },
+    "merge-gateway": {
+      "baseUrl": "https://api-gateway.merge.dev/v1/openai",
+      "api": "openai-completions",
+      "apiKey": "!/home/parazeeknova/doty/modules/scripts/mg-key-picker",
+      "models": [
+        {
+          "id": "zai/glm-5.3-flash",
+          "name": "GLM 5.3 Flash (Merge Gateway)",
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 1000000
+        },
+        {
+          "id": "deepseek/deepseek-v4.1-flash",
+          "name": "DeepSeek V4.1 Flash (Merge Gateway)",
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 1000000
+        }
+      ]
     }
   }
 }

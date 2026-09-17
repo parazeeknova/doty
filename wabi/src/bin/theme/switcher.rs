@@ -844,6 +844,10 @@ fn main() {
             "modules/features/shell/claude/themes/matugen.json.template",
             "modules/features/shell/claude/themes/matugen.json",
         ),
+        (
+            "modules/features/llms/themes/matugen.json.template",
+            "modules/features/llms/themes/matugen.json",
+        ),
     ];
 
     for (tmpl, dest) in mappings {

@@ -79,6 +79,11 @@
           if test -f /run/secrets/context7-api-key
               set -gx CONTEXT7_API_KEY (cat /run/secrets/context7-api-key)
           end
+          if test -f /run/secrets/mg-gateway-key-3
+              set -gx MERGE_GATEWAY_API_KEY (cat /run/secrets/mg-gateway-key-3)
+          else if test -f /run/secrets/merge-gateway-api-key
+              set -gx MERGE_GATEWAY_API_KEY (cat /run/secrets/merge-gateway-api-key)
+          end
           if test -f /run/secrets/github-token
               set -gx GITHUB_PERSONAL_ACCESS_TOKEN (cat /run/secrets/github-token)
           end

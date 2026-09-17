@@ -39,14 +39,20 @@ in
           lcc-bin = pkgs.writeShellScriptBin "lcc" ''
             exec ${scriptsDir}/lcc "$@"
           '';
+
+          mg-key-picker-bin = pkgs.writeShellScriptBin "mg-key-picker" ''
+            exec ${scriptsDir}/mg-key-picker "$@"
+          '';
         in
         {
           home.packages = [
             ghostty-tmux
             lcc-bin
+            mg-key-picker-bin
           ];
 
           home.file = {
+            "scripts/mg-key-picker".source = mkOutOfStoreSymlink "${scriptsDir}/mg-key-picker";
             "scripts/lcc".source = mkOutOfStoreSymlink "${scriptsDir}/lcc";
             "scripts/ghostty-tmux".source = mkOutOfStoreSymlink "${scriptsDir}/ghostty_tmux";
             "scripts/kbd_aura".source = mkOutOfStoreSymlink "${scriptsDir}/kbd_aura";

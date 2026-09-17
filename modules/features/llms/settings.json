@@ -1,0 +1,41 @@
+{
+  "lastChangelogVersion": "0.85.1",
+  "theme": "matugen",
+  "defaultProvider": "merge-gateway",
+  "defaultModel": "deepseek/deepseek-v4.1-flash",
+  "defaultThinkingLevel": "high",
+  "modelThinkingLevels": {
+    "merge-gateway/deepseek/deepseek-v4.1-flash": "high",
+    "merge-gateway/zai/glm-5.3-flash": "high"
+  },
+  "enableInstallTelemetry": false,
+  "quietStartup": true,
+  "enabledModels": [
+    "llama-cpp/*",
+    "merge-gateway/**:high"
+  ],
+  "compaction": {
+    "enabled": true,
+    "reserveTokens": 16384,
+    "keepRecentTokens": 20000
+  },
+  "retry": {
+    "enabled": true,
+    "maxRetries": 3,
+    "baseDelayMs": 2000
+  },
+  "terminal": {
+    "showImages": true
+  },
+  "packages": [
+    "npm:pi-quiet-tools",
+    "npm:pi-files-widget-overlay",
+    "npm:@glevanov/tab-status",
+    "npm:lsp-pi",
+    "npm:pi-mcp-adapter",
+    "npm:pi-sub-agent",
+    "npm:@diegopetrucci/pi-code-reviewer",
+    "npm:@tmustier/pi-usage-extension"
+  ],
+  "hideThinkingBlock": false
+}

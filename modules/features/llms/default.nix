@@ -135,6 +135,18 @@
           home.file.".pi/agent/models.json".source =
             config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/models.json";
 
+          home.file.".pi/agent/settings.json".source =
+            config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/settings.json";
+
+          home.file.".pi/agent/mcp.json".source =
+            config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/mcp.json";
+
+          home.file.".pi/agent/themes/matugen.json".source =
+            config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/themes/matugen.json";
+
+          home.file.".pi/agent/extensions/minimal-header.ts".source =
+            config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/extensions/minimal-header.ts";
+
           home.file.".hermes/config.yaml".source =
             config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/hermes-config.yaml";
 
