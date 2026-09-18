@@ -19,12 +19,87 @@ try {
 }
 
 let CustomEditorBase: any;
+let createReadToolFn: any;
 try {
-  CustomEditorBase = require("@earendil-works/pi-coding-agent").CustomEditor;
+  const agent = require("@earendil-works/pi-coding-agent");
+  CustomEditorBase = agent.CustomEditor;
+  createReadToolFn = agent.createReadTool;
 } catch {
   try {
-    CustomEditorBase = require("/nix/store/m58mjsdjgk3zrwar1ckw2lb4q241l7j9-pi-coding-agent-0.85.1/lib/node_modules/pi-monorepo/dist/index.js").CustomEditor;
+    const agent = require("/nix/store/m58mjsdjgk3zrwar1ckw2lb4q241l7j9-pi-coding-agent-0.85.1/lib/node_modules/pi-monorepo/dist/index.js");
+    CustomEditorBase = agent.CustomEditor;
+    createReadToolFn = agent.createReadTool;
   } catch {}
+}
+
+let ContainerClass: any;
+let TextClass: any;
+try {
+  const tui = require("@earendil-works/pi-tui");
+  ContainerClass = tui.Container;
+  TextClass = tui.Text;
+} catch {}
+
+// Transparent stream interceptor for Merge Gateway to map "thinking": delta to "reasoning_content":
+// so Pi's built-in reasoning engine can display the thinking stream in real-time.
+if (!(globalThis as any).__mg_fetch_intercepted__) {
+  (globalThis as any).__mg_fetch_intercepted__ = true;
+  const originalFetch = globalThis.fetch;
+
+  globalThis.fetch = async function (input: any, init?: any) {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input?.url;
+    const res = await originalFetch(input, init);
+
+    if (url && url.includes("api-gateway.merge.dev") && res.body) {
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("text/event-stream")) {
+        const textDecoder = new TextDecoder();
+        const textEncoder = new TextEncoder();
+        let buffer = "";
+
+        const transform = new TransformStream({
+          transform(chunk, controller) {
+            buffer += textDecoder.decode(chunk, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
+            for (const line of lines) {
+              if (line.startsWith("data:") && line.includes("\"thinking\":")) {
+                controller.enqueue(textEncoder.encode(line.replace(/"thinking":/g, "\"reasoning_content\":") + "\n"));
+              } else {
+                controller.enqueue(textEncoder.encode(line + "\n"));
+              }
+            }
+          },
+          flush(controller) {
+            if (buffer.length > 0) {
+              if (buffer.startsWith("data:") && buffer.includes("\"thinking\":")) {
+                controller.enqueue(textEncoder.encode(buffer.replace(/"thinking":/g, "\"reasoning_content\":")));
+              } else {
+                controller.enqueue(textEncoder.encode(buffer));
+              }
+            }
+          },
+        });
+
+        const transformedBody = res.body.pipeThrough(transform);
+        return new Response(transformedBody, {
+          status: res.status,
+          statusText: res.statusText,
+          headers: res.headers,
+        });
+      } else if (contentType.includes("application/json")) {
+        const text = await res.text();
+        const replaced = text.replace(/"thinking":/g, "\"reasoning_content\":");
+        return new Response(replaced, {
+          status: res.status,
+          statusText: res.statusText,
+          headers: res.headers,
+        });
+      }
+    }
+
+    return res;
+  };
 }
 
 function formatTokens(count: number): string {
@@ -225,6 +300,103 @@ function renderStatusBarLine(ctx: any, pi: any, theme: any, width: number, extSt
 }
 
 export default function (pi: any) {
+  // Compact 1-line read tool renderer
+  if (createReadToolFn && ContainerClass && TextClass) {
+    try {
+      const originalRead = createReadToolFn(process.cwd());
+      pi.registerTool({
+        name: "read",
+        label: "read",
+        description: originalRead.description,
+        parameters: originalRead.parameters,
+        renderShell: "self",
+
+        async execute(toolCallId: string, params: any, signal: any, onUpdate: any, context: any) {
+          return (originalRead.execute as any)(toolCallId, params, signal, onUpdate, context);
+        },
+
+        renderCall(args: any, theme: any, context: any) {
+          const textComp = (context.lastComponent as any) ?? new TextClass("", 0, 0);
+          const filePath = args?.path || "";
+          const rangeParts: string[] = [];
+          if (args?.offset) rangeParts.push(`offset=${args.offset}`);
+          if (args?.limit) rangeParts.push(`limit=${args.limit}`);
+          const rangeStr = rangeParts.length > 0 ? ` [${rangeParts.join(",")}]` : "";
+
+          const state = context.state;
+          if (state?.result) {
+            if (state.isError) {
+              const err = state.result.content?.[0]?.text?.split("\n")[0] || "error";
+              textComp.setText(
+                `${theme.fg("error", "✗")} ${theme.fg("toolTitle", theme.bold("read"))} ${theme.fg("error", filePath)}${rangeStr} ${theme.fg("dim", `(${err})`)}`
+              );
+            } else {
+              const count = state.lineCount ?? 0;
+              const trunc = state.truncated ? theme.fg("warning", " [truncated]") : "";
+              textComp.setText(
+                `${theme.fg("success", "✓")} ${theme.fg("toolTitle", theme.bold("read"))} ${theme.fg("accent", filePath)}${rangeStr} ${theme.fg("dim", `(${count} lines)`)}${trunc}`
+              );
+            }
+          } else {
+            textComp.setText(
+              `${theme.fg("dim", "⠋")} ${theme.fg("toolTitle", theme.bold("read"))} ${theme.fg("accent", filePath)}${rangeStr}`
+            );
+          }
+
+          return textComp;
+        },
+
+        renderResult(result: any, { expanded, isPartial }: any, theme: any, context: any) {
+          const state = context.state;
+          const content = result?.content?.[0];
+          const isError = context.isError || (content?.type === "text" && content.text.startsWith("Error"));
+
+          let lineCount = 0;
+          if (content?.type === "text") {
+            lineCount = content.text.split("\n").length;
+          }
+
+          const details = result?.details;
+          const wasTruncated = !!details?.truncation?.truncated;
+
+          const needsInvalidate =
+            !state.result ||
+            state.lineCount !== lineCount ||
+            state.isError !== isError ||
+            state.isPartial !== isPartial;
+
+          state.result = result;
+          state.isError = isError;
+          state.lineCount = lineCount;
+          state.truncated = wasTruncated;
+          state.isPartial = isPartial;
+
+          if (needsInvalidate) {
+            context.invalidate();
+          }
+
+          if (!expanded || isPartial || isError) {
+            return new ContainerClass();
+          }
+
+          if (content?.type === "text") {
+            const lines = content.text.split("\n").slice(0, 15);
+            let preview = "";
+            for (const l of lines) {
+              preview += (preview ? "\n" : "") + theme.fg("dim", `  ${l}`);
+            }
+            if (lineCount > 15) {
+              preview += "\n" + theme.fg("muted", `  ... ${lineCount - 15} more lines`);
+            }
+            return new TextClass(preview, 0, 0);
+          }
+
+          return new ContainerClass();
+        },
+      });
+    } catch {}
+  }
+
   // Ensure essential environment variables and PATH for language servers & MCP
   try {
     const home = os.homedir();
