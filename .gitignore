@@ -46,3 +46,6 @@ voxtype_models/
 result/
 squashfs-temp
 asar-unpacked
+
+# -- Pi runtime artifacts --
+.pi/

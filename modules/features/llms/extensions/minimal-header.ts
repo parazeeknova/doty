@@ -299,6 +299,111 @@ function renderStatusBarLine(ctx: any, pi: any, theme: any, width: number, extSt
   return fullLine;
 }
 
+async function searchDuckDuckGo(query: string, limit = 5): Promise<Array<{ title: string; url: string; snippet: string }>> {
+  const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.5",
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`Search request failed with status ${res.status}`);
+  }
+  const html = await res.text();
+  const results: Array<{ title: string; url: string; snippet: string }> = [];
+
+  const titleRegex = /<h2 class="result__title">\s*<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g;
+  const snippetRegex = /<a[^>]*class="result__snippet"[^>]*>([\s\S]*?)<\/a>/g;
+
+  const titles: Array<{ title: string; url: string }> = [];
+  let m: RegExpExecArray | null;
+  while ((m = titleRegex.exec(html)) !== null) {
+    const rawHref = m[1];
+    const title = m[2]
+      .replace(/<[^>]+>/g, "")
+      .replace(/&amp;/g, "&")
+      .replace(/&#x27;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .trim();
+    let cleanUrl = rawHref;
+    if (rawHref.includes("uddg=")) {
+      const match = rawHref.match(/uddg=([^&]+)/);
+      if (match) cleanUrl = decodeURIComponent(match[1]);
+    }
+    titles.push({ title, url: cleanUrl });
+  }
+
+  const snippets: string[] = [];
+  while ((m = snippetRegex.exec(html)) !== null) {
+    const snippet = m[1]
+      .replace(/<[^>]+>/g, "")
+      .replace(/&amp;/g, "&")
+      .replace(/&#x27;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .trim();
+    snippets.push(snippet);
+  }
+
+  const maxItems = Math.max(1, Math.min(limit, 10));
+  for (let i = 0; i < Math.min(titles.length, maxItems); i++) {
+    results.push({
+      title: titles[i].title,
+      url: titles[i].url,
+      snippet: snippets[i] || "",
+    });
+  }
+
+  return results;
+}
+
+async function fetchWebPage(url: string, maxLength = 8000): Promise<string> {
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Accept": "text/html,text/plain;q=0.9,*/*;q=0.8",
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  }
+  let html = await res.text();
+  html = html.replace(/<head[\s\S]*?<\/head>/gi, "");
+  html = html.replace(/<script[\s\S]*?<\/script>/gi, "");
+  html = html.replace(/<style[\s\S]*?<\/style>/gi, "");
+  html = html.replace(/<nav[\s\S]*?<\/nav>/gi, "");
+  html = html.replace(/<footer[\s\S]*?<\/footer>/gi, "");
+
+  let text = html.replace(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/gi, "\n\n# $1\n");
+  text = text.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, "\n\n$1\n");
+  text = text.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, "\n• $1");
+  text = text.replace(/<br\s*[\/]?>/gi, "\n");
+  text = text.replace(/<[^>]+>/g, "");
+  text = text
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'")
+    .replace(/&nbsp;/g, " ");
+
+  text = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l, i, arr) => l.length > 0 || (i > 0 && arr[i - 1].length > 0))
+    .join("\n");
+
+  if (text.length > maxLength) {
+    text = text.slice(0, maxLength) + `\n\n... [truncated, ${text.length} total chars]`;
+  }
+  return text;
+}
+
 export default function (pi: any) {
   // Compact 1-line read tool renderer with batch & parallel support
   if (createReadToolFn && ContainerClass && TextClass) {
@@ -460,9 +565,224 @@ export default function (pi: any) {
     } catch {}
   }
 
+  // Zero-config Web Search Tool (DuckDuckGo HTML)
+  if (ContainerClass && TextClass) {
+    try {
+      pi.registerTool({
+        name: "web_search",
+        label: "web search",
+        description: "Search the web using DuckDuckGo. Returns titles, URLs, and snippets of top search results. Pass query string and optional limit (1-10, default 5).",
+        parameters: {
+          type: "object",
+          properties: {
+            query: { type: "string", description: "Search terms or question to look up on the web" },
+            limit: { type: "number", description: "Maximum number of search results (1-10, default 5)" },
+          },
+          required: ["query"],
+        },
+        renderShell: "self",
+
+        async execute(_toolCallId: string, params: any) {
+          const query = params?.query?.trim();
+          if (!query) {
+            return {
+              content: [{ type: "text", text: "Error: query string cannot be empty" }],
+              details: { count: 0, error: "Empty query" },
+              isError: true,
+            };
+          }
+
+          try {
+            const results = await searchDuckDuckGo(query, params.limit || 5);
+            if (results.length === 0) {
+              return {
+                content: [{ type: "text", text: `No search results found for: "${query}"` }],
+                details: { count: 0, query },
+              };
+            }
+
+            const formatted = results
+              .map((r, i) => `${i + 1}. [${r.title}](${r.url})\n   ${r.snippet}`)
+              .join("\n\n");
+
+            return {
+              content: [{ type: "text", text: formatted }],
+              details: { count: results.length, query, results },
+            };
+          } catch (err: any) {
+            return {
+              content: [{ type: "text", text: `Search error: ${err?.message || String(err)}` }],
+              details: { count: 0, error: err?.message || String(err) },
+              isError: true,
+            };
+          }
+        },
+
+        renderCall(args: any, theme: any, context: any) {
+          const textComp = (context.lastComponent as any) ?? new TextClass("", 0, 0);
+          const state = context.state;
+          const query = args?.query ? `"${args.query}"` : "...";
+
+          if (state?.result) {
+            if (state.isError) {
+              const err = state.errorMessage || "error";
+              textComp.setText(
+                `${theme.fg("error", "✗")} ${theme.fg("toolTitle", theme.bold("web_search"))} ${theme.fg("error", query)} ${theme.fg("dim", `(${err})`)}`
+              );
+            } else {
+              const count = state.count ?? 0;
+              textComp.setText(
+                `${theme.fg("success", "✓")} ${theme.fg("toolTitle", theme.bold("web_search"))} ${theme.fg("accent", query)} ${theme.fg("dim", `(${count} results)`)}`
+              );
+            }
+          } else {
+            textComp.setText(
+              `${theme.fg("dim", "⠋")} ${theme.fg("toolTitle", theme.bold("web_search"))} ${theme.fg("accent", query)}`
+            );
+          }
+
+          return textComp;
+        },
+
+        renderResult(result: any, { expanded, isPartial }: any, theme: any, context: any) {
+          const state = context.state;
+          const details = result?.details;
+          const isError = context.isError || result?.isError || false;
+          const count = details?.count ?? 0;
+          const errorMessage = details?.error;
+
+          const needsInvalidate =
+            !state.result ||
+            state.count !== count ||
+            state.isError !== isError ||
+            state.isPartial !== isPartial;
+
+          state.result = result;
+          state.count = count;
+          state.isError = isError;
+          state.errorMessage = errorMessage;
+          state.isPartial = isPartial;
+
+          if (needsInvalidate) {
+            context.invalidate();
+          }
+
+          if (!expanded || isPartial || isError) {
+            return new ContainerClass();
+          }
+
+          const results = details?.results as Array<{ title: string; url: string; snippet: string }> | undefined;
+          if (results && results.length > 0) {
+            let body = "";
+            for (const r of results.slice(0, 5)) {
+              body += (body ? "\n" : "") + theme.fg("accent", `• ${r.title}`) + "\n  " + theme.fg("dim", r.url);
+            }
+            return new TextClass(body, 0, 0);
+          }
+
+          return new ContainerClass();
+        },
+      });
+
+      // Zero-config Web Fetch Tool
+      pi.registerTool({
+        name: "web_fetch",
+        label: "web fetch",
+        description: "Fetch and extract readable plain text/markdown content from a web page URL. Automatically strips HTML boilerplate, scripts, and navigation.",
+        parameters: {
+          type: "object",
+          properties: {
+            url: { type: "string", description: "The full web page URL (http or https) to fetch" },
+            maxLength: { type: "number", description: "Maximum number of characters to return (default 8000)" },
+          },
+          required: ["url"],
+        },
+        renderShell: "self",
+
+        async execute(_toolCallId: string, params: any) {
+          const targetUrl = params?.url?.trim();
+          if (!targetUrl) {
+            return {
+              content: [{ type: "text", text: "Error: URL cannot be empty" }],
+              details: { chars: 0, error: "Empty URL" },
+              isError: true,
+            };
+          }
+
+          try {
+            const text = await fetchWebPage(targetUrl, params.maxLength || 8000);
+            return {
+              content: [{ type: "text", text }],
+              details: { chars: text.length, url: targetUrl },
+            };
+          } catch (err: any) {
+            return {
+              content: [{ type: "text", text: `Fetch error: ${err?.message || String(err)}` }],
+              details: { chars: 0, error: err?.message || String(err) },
+              isError: true,
+            };
+          }
+        },
+
+        renderCall(args: any, theme: any, context: any) {
+          const textComp = (context.lastComponent as any) ?? new TextClass("", 0, 0);
+          const state = context.state;
+          const urlStr = args?.url || "...";
+
+          if (state?.result) {
+            if (state.isError) {
+              const err = state.errorMessage || "error";
+              textComp.setText(
+                `${theme.fg("error", "✗")} ${theme.fg("toolTitle", theme.bold("web_fetch"))} ${theme.fg("error", urlStr)} ${theme.fg("dim", `(${err})`)}`
+              );
+            } else {
+              const chars = state.chars ?? 0;
+              textComp.setText(
+                `${theme.fg("success", "✓")} ${theme.fg("toolTitle", theme.bold("web_fetch"))} ${theme.fg("accent", urlStr)} ${theme.fg("dim", `(${chars} chars)`)}`
+              );
+            }
+          } else {
+            textComp.setText(
+              `${theme.fg("dim", "⠋")} ${theme.fg("toolTitle", theme.bold("web_fetch"))} ${theme.fg("accent", urlStr)}`
+            );
+          }
+
+          return textComp;
+        },
+
+        renderResult(result: any, { expanded, isPartial }: any, _theme: any, context: any) {
+          const state = context.state;
+          const details = result?.details;
+          const isError = context.isError || result?.isError || false;
+          const chars = details?.chars ?? 0;
+          const errorMessage = details?.error;
+
+          const needsInvalidate =
+            !state.result ||
+            state.chars !== chars ||
+            state.isError !== isError ||
+            state.isPartial !== isPartial;
+
+          state.result = result;
+          state.chars = chars;
+          state.isError = isError;
+          state.errorMessage = errorMessage;
+          state.isPartial = isPartial;
+
+          if (needsInvalidate) {
+            context.invalidate();
+          }
+
+          return new ContainerClass();
+        },
+      });
+    } catch {}
+  }
+
   pi.on("before_agent_start", async (event: any) => {
     const guidance = `
-## Tool Calling & Delegation Efficiency
+## Tool Calling & Web Search Guidelines
+- Web Search & Fetch: You have \`web_search\` and \`web_fetch\` available. Use \`web_search\` to search the internet (via DuckDuckGo) for real-time information, documentation, or links. Use \`web_fetch\` with any URL to extract clean readable web page content.
 - Fast Parallel Reading: When inspecting multiple files, do NOT read them one-by-one sequentially across turns. Either pass \`paths: ["file1", "file2", ...]\` to \`read\` to read them concurrently in a single call, or issue multiple parallel \`read\` tool calls in the same turn.
 - Subagents: For broad codebase reconnaissance, multi-file reviews, or large searches, delegate to the \`subagent\` tool (using \`agent: "scout"\` or parallel \`tasks: [...]\`) with isolated context.
 `;
