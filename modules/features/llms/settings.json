@@ -14,6 +14,15 @@
     "llama-cpp/*",
     "merge-gateway/**:high"
   ],
+  "defaultTools": [
+    "read",
+    "bash",
+    "edit",
+    "write",
+    "grep",
+    "find",
+    "ls"
+  ],
   "compaction": {
     "enabled": true,
     "reserveTokens": 16384,

@@ -300,30 +300,93 @@ function renderStatusBarLine(ctx: any, pi: any, theme: any, width: number, extSt
 }
 
 export default function (pi: any) {
-  // Compact 1-line read tool renderer
+  // Compact 1-line read tool renderer with batch & parallel support
   if (createReadToolFn && ContainerClass && TextClass) {
     try {
       const originalRead = createReadToolFn(process.cwd());
+      const readParams = {
+        ...originalRead.parameters,
+        properties: {
+          ...originalRead.parameters?.properties,
+          paths: {
+            type: "array",
+            items: { type: "string" },
+            description: "Optional array of file paths to read concurrently in parallel in a single call instead of one-by-one.",
+          },
+        },
+      };
+
       pi.registerTool({
         name: "read",
         label: "read",
-        description: originalRead.description,
-        parameters: originalRead.parameters,
+        description: "Read the contents of a file or multiple files in parallel. When reading multiple files, pass paths: [path1, path2, ...] to read them all concurrently in a single operation.",
+        parameters: readParams,
         renderShell: "self",
 
         async execute(toolCallId: string, params: any, signal: any, onUpdate: any, context: any) {
+          if (Array.isArray(params?.paths) && params.paths.length > 0) {
+            const cwd = context?.cwd || process.cwd();
+            const results = await Promise.all(
+              params.paths.map(async (p: string) => {
+                const abs = path.resolve(cwd, p);
+                try {
+                  const data = await fs.promises.readFile(abs, "utf-8");
+                  const lines = data.split("\n");
+                  return { path: p, ok: true, text: data, lineCount: lines.length };
+                } catch (err: any) {
+                  return { path: p, ok: false, error: err?.message || String(err) };
+                }
+              })
+            );
+
+            let totalLines = 0;
+            const textParts: string[] = [];
+            for (const r of results) {
+              if (r.ok) {
+                totalLines += r.lineCount;
+                textParts.push(`--- ${r.path} (${r.lineCount} lines) ---\n${r.text}`);
+              } else {
+                textParts.push(`--- ${r.path} (ERROR) ---\nError reading file: ${r.error}`);
+              }
+            }
+
+            return {
+              content: [{ type: "text", text: textParts.join("\n\n") }],
+              details: { paths: params.paths, lineCount: totalLines, results },
+            };
+          }
+
           return (originalRead.execute as any)(toolCallId, params, signal, onUpdate, context);
         },
 
         renderCall(args: any, theme: any, context: any) {
           const textComp = (context.lastComponent as any) ?? new TextClass("", 0, 0);
+          const state = context.state;
+
+          if (Array.isArray(args?.paths) && args.paths.length > 0) {
+            const countFiles = args.paths.length;
+            const shortNames = args.paths.slice(0, 3).map((p: string) => path.basename(p)).join(", ");
+            const displayNames = countFiles > 3 ? `${shortNames}, +${countFiles - 3} more` : shortNames;
+
+            if (state?.result) {
+              const totalLines = state.lineCount ?? 0;
+              textComp.setText(
+                `${theme.fg("success", "✓")} ${theme.fg("toolTitle", theme.bold("read"))} ${theme.fg("accent", `${countFiles} files`)} ${theme.fg("dim", `(${displayNames}) · ${totalLines} lines`)}`
+              );
+            } else {
+              textComp.setText(
+                `${theme.fg("dim", "⠋")} ${theme.fg("toolTitle", theme.bold("read"))} ${theme.fg("accent", `${countFiles} files`)} ${theme.fg("dim", `(${displayNames})`)}`
+              );
+            }
+            return textComp;
+          }
+
           const filePath = args?.path || "";
           const rangeParts: string[] = [];
           if (args?.offset) rangeParts.push(`offset=${args.offset}`);
           if (args?.limit) rangeParts.push(`limit=${args.limit}`);
           const rangeStr = rangeParts.length > 0 ? ` [${rangeParts.join(",")}]` : "";
 
-          const state = context.state;
           if (state?.result) {
             if (state.isError) {
               const err = state.result.content?.[0]?.text?.split("\n")[0] || "error";
@@ -396,6 +459,17 @@ export default function (pi: any) {
       });
     } catch {}
   }
+
+  pi.on("before_agent_start", async (event: any) => {
+    const guidance = `
+## Tool Calling & Delegation Efficiency
+- Fast Parallel Reading: When inspecting multiple files, do NOT read them one-by-one sequentially across turns. Either pass \`paths: ["file1", "file2", ...]\` to \`read\` to read them concurrently in a single call, or issue multiple parallel \`read\` tool calls in the same turn.
+- Subagents: For broad codebase reconnaissance, multi-file reviews, or large searches, delegate to the \`subagent\` tool (using \`agent: "scout"\` or parallel \`tasks: [...]\`) with isolated context.
+`;
+    return {
+      systemPrompt: `${event.systemPrompt}\n${guidance}`,
+    };
+  });
 
   // Ensure essential environment variables and PATH for language servers & MCP
   try {
