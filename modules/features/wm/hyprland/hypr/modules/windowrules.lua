@@ -260,6 +260,21 @@ hl.window_rule({
 	opacity = "1.0 override 1.0 override",
 })
 
+-- Android emulator: always float, and strip border, blur and transparency so
+-- it renders as a clean opaque surface with no compositor background behind it.
+hl.window_rule({
+	name = "android-emulator-clean",
+	match = {
+		class = "^Emulator$",
+	},
+	float = true,
+	border_size = 0,
+	rounding = 0,
+	no_blur = true,
+	no_shadow = true,
+	opacity = "1.0 override 1.0 override",
+})
+
 -- Set starting width for browsers in scrolling layout
 hl.window_rule({
 	name = "zen-starting-width",
