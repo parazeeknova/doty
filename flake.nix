@@ -76,6 +76,10 @@
     hermes-agent = {
       url = "github:NousResearch/hermes-agent";
     };
+    aagl = {
+      url = "github:ezKEa/aagl-gtk-on-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

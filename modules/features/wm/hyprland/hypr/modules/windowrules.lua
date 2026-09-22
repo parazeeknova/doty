@@ -318,3 +318,25 @@ hl.window_rule({
 	float = true,
 	size = { 300, 200 },
 })
+
+-- An Anime Game Launcher: always floating, no borders, open in workspace 5
+hl.window_rule({
+	name = "anime-game-launcher",
+	match = {
+		class = ".*[Aa]nime-[Gg]ame-[Ll]auncher.*",
+	},
+	float = true,
+	border_size = 0,
+	workspace = "5",
+})
+
+hl.window_rule({
+	name = "anime-game-launcher-title",
+	match = {
+		title = "^An Anime Game Launcher$",
+	},
+	float = true,
+	border_size = 0,
+	workspace = "5",
+})
+

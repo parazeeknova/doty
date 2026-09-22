@@ -49,24 +49,6 @@
           set -Ux WABI_GITHUB_USER "parazeeknova"
           set -Ux WABI_PRESETS_DIR "$HOME/doty/wabi/presets"
 
-          # -- Claude Code / Merge Gateway Configuration --
-          set -gx ANTHROPIC_BASE_URL "https://api-gateway.merge.dev/v1/anthropic"
-          set -gx ANTHROPIC_API_KEY ""
-          set -gx ANTHROPIC_MODEL "zai/glm-5.3-flash"
-          set -gx ANTHROPIC_CUSTOM_MODEL "zai/glm-5.3-flash"
-          set -gx ANTHROPIC_CUSTOM_MODEL_OPTION "zai/glm-5.3-flash"
-          set -gx ANTHROPIC_CUSTOM_MODEL_OPTION_NAME "zai/glm-5.3-flash"
-          set -gx CLAUDE_CODE_CUSTOM_MODEL "zai/glm-5.3-flash"
-          set -gx ANTHROPIC_DEFAULT_OPUS_MODEL "zai/glm-5.3-flash"
-          set -gx ANTHROPIC_DEFAULT_SONNET_MODEL "zai/glm-5.3-flash"
-          set -gx ANTHROPIC_DEFAULT_HAIKU_MODEL "zai/glm-5.3-flash"
-          set -gx ANTHROPIC_DEFAULT_FABLE_MODEL "zai/glm-5.3-flash"
-          set -gx CLAUDE_CODE_SUBAGENT_MODEL "zai/glm-5.3-flash"
-          set -gx CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY "1"
-          set -gx CLAUDE_CODE_EFFORT_LEVEL "max"
-          set -gx CLAUDE_CODE_MAX_CONTEXT_TOKENS "1000000"
-          set -gx CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT "1"
-
           # -- Strix Configuration --
           set -gx STRIX_LLM "openai/deepseek/deepseek-v4-flash"
           set -gx LLM_API_BASE "https://api-gateway.merge.dev/v1/openai"
@@ -78,11 +60,6 @@
           end
           if test -f /run/secrets/context7-api-key
               set -gx CONTEXT7_API_KEY (cat /run/secrets/context7-api-key)
-          end
-          if test -f /run/secrets/mg-gateway-key-3
-              set -gx MERGE_GATEWAY_API_KEY (cat /run/secrets/mg-gateway-key-3)
-          else if test -f /run/secrets/merge-gateway-api-key
-              set -gx MERGE_GATEWAY_API_KEY (cat /run/secrets/merge-gateway-api-key)
           end
           if test -f /run/secrets/github-token
               set -gx GITHUB_PERSONAL_ACCESS_TOKEN (cat /run/secrets/github-token)
