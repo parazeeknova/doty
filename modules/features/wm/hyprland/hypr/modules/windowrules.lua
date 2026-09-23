@@ -340,3 +340,41 @@ hl.window_rule({
 	workspace = "5",
 })
 
+-- Genshin Impact: always open on workspace 6 and fullscreen
+hl.window_rule({
+	name = "genshin-impact",
+	match = {
+		title = ".*Genshin Impact.*",
+	},
+	workspace = "6",
+	fullscreen = true,
+})
+
+hl.window_rule({
+	name = "genshin-impact-initial",
+	match = {
+		initial_title = ".*Genshin Impact.*",
+	},
+	workspace = "6",
+	fullscreen = true,
+})
+
+hl.window_rule({
+	name = "genshin-impact-cn",
+	match = {
+		title = ".*原神.*",
+	},
+	workspace = "6",
+	fullscreen = true,
+})
+
+hl.window_rule({
+	name = "genshin-impact-class",
+	match = {
+		class = ".*[Gg]enshin.*",
+	},
+	workspace = "6",
+	fullscreen = true,
+})
+
+

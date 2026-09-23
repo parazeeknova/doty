@@ -87,6 +87,8 @@
           "hypr/hyprsunset.conf".source = ./hypr/hyprsunset.conf;
           "hypr/modules".source =
             config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/modules";
+          "hypr/shaders".source =
+            config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/shaders";
           "hypr/sunset.state".source =
             config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/sunset.state";
           "hypr/xdph.conf".source = ./hypr/xdph.conf;
