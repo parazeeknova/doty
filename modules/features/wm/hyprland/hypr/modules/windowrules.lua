@@ -340,7 +340,6 @@ hl.window_rule({
 	workspace = "5",
 })
 
--- Genshin Impact: always open on workspace 6 and fullscreen
 hl.window_rule({
 	name = "genshin-impact",
 	match = {
@@ -376,5 +375,3 @@ hl.window_rule({
 	workspace = "6",
 	fullscreen = true,
 })
-
-

@@ -6,9 +6,12 @@ mode="${1:-tiling}"
 cfg="$HOME/.config/mako/config"
 [ -f "$cfg" ] || exit 0
 
+# Ensure outer-margin exists in config if not present
+grep -q '^outer-margin=' "$cfg" || sed -i '/^margin=/i outer-margin=0' "$cfg"
+
 if [ "$mode" = "floating" ]; then
-  sed -i --follow-symlinks 's/^anchor=.*/anchor=top-right/; s/^margin=.*/margin=30,8,4,8/' "$cfg"
+  sed -i --follow-symlinks 's/^anchor=.*/anchor=top-left/; s/^outer-margin=.*/outer-margin=28,0,0,8/; s/^margin=.*/margin=4/' "$cfg"
 else
-  sed -i --follow-symlinks 's/^anchor=.*/anchor=top-left/; s/^margin=.*/margin=4/' "$cfg"
+  sed -i --follow-symlinks 's/^anchor=.*/anchor=top-left/; s/^outer-margin=.*/outer-margin=0/; s/^margin=.*/margin=4/' "$cfg"
 fi
 makoctl reload 2>/dev/null

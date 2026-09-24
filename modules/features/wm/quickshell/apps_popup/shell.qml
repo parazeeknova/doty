@@ -41,7 +41,12 @@ Scope {
     property string rawSearchQuery: ""
     readonly property string fontName: "FiraCode Nerd Font"
 
+    // Warm-open mode: process stays alive after close, reopened via IPC.
+    property bool stayResident: true
+
     signal requestClose
+    signal requestOpen
+    signal requestToggle
     signal resetSearchInput(string text)
 
     function filterApps() {
@@ -584,6 +589,14 @@ Scope {
             root.requestClose();
         }
 
+        function open() {
+            root.requestOpen();
+        }
+
+        function toggle() {
+            root.requestToggle();
+        }
+
         target: "apps_popup"
     }
 
@@ -829,22 +842,70 @@ Scope {
                 id: win
 
                 required property var modelData
+                property bool startHidden: Quickshell.env("QS_START_HIDDEN") === "1"
+                visible: !startHidden
                 property bool isClosing: false
                 property real animOpacity: 0
                 property real animOffsetY: -20
 
                 function closePopup() {
-                    if (isClosing)
+                    if (isClosing || !win.visible)
                         return;
 
                     isClosing = true;
                     exitAnim.start();
                 }
 
+                function openPopup() {
+                    isClosing = false;
+                    win.visible = true;
+                    root.searchQuery = "";
+                    root.rawSearchQuery = "";
+                    root.activeTab = 0;
+                    root.selectedActiveWindowIndex = -1;
+                    root.filterApps();
+                    root.selectFirstApp();
+                    if (searchInput) {
+                        searchInput.text = "";
+                        searchInput.forceActiveFocus();
+                        Qt.callLater(() => {
+                            if (searchInput)
+                                searchInput.forceActiveFocus();
+                        });
+                    }
+                    if (appsList)
+                        appsList.positionViewAtIndex(0, ListView.Beginning);
+                    if (webSearchList)
+                        webSearchList.positionViewAtIndex(0, ListView.Beginning);
+                    if (fileSearchList)
+                        fileSearchList.positionViewAtIndex(0, ListView.Beginning);
+                    if (gitRepoList)
+                        gitRepoList.positionViewAtIndex(0, ListView.Beginning);
+                    if (bookmarkList)
+                        bookmarkList.positionViewAtIndex(0, ListView.Beginning);
+                    if (!getRecentsProc.running) {
+                        getRecentsProc.running = true;
+                    }
+                    if (!getAppsProc.running) {
+                        getAppsProc.running = true;
+                    }
+                    win.animOpacity = 0;
+                    win.animOffsetY = -20;
+                    introAnim.restart();
+                }
+
+                function togglePopup() {
+                    if (win.visible && !isClosing) {
+                        closePopup();
+                    } else {
+                        openPopup();
+                    }
+                }
+
                 screen: modelData
                 WlrLayershell.namespace: theme.floatingMode ? "quickshell-top" : "quickshell"
                 WlrLayershell.layer: WlrLayer.Overlay
-                WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+                WlrLayershell.keyboardFocus: win.visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
                 exclusionMode: PanelWindow.ExclusionMode.Ignore
                 focusable: true
                 color: "transparent"
@@ -867,8 +928,10 @@ Scope {
                     return Math.min(320, spacingAndStatic + Math.max(48, contentH) + bottomRow.implicitHeight);
                 }
                 Component.onCompleted: {
-                    introAnim.start();
-                    searchInput.forceActiveFocus();
+                    if (win.visible) {
+                        introAnim.start();
+                        searchInput.forceActiveFocus();
+                    }
                 }
 
                 Connections {
@@ -876,19 +939,26 @@ Scope {
                         win.closePopup();
                     }
 
+                    function onRequestOpen() {
+                        win.openPopup();
+                    }
+
+                    function onRequestToggle() {
+                        win.togglePopup();
+                    }
+
                     target: root
                 }
 
                 anchors {
                     top: true
-                    left: !theme.floatingMode
-                    right: theme.floatingMode
+                    left: true
                 }
 
                 margins {
                     top: theme.floatingMode ? 28 : 4
-                    left: theme.floatingMode ? 0 : 32
-                    right: theme.floatingMode ? 8 : 0
+                    left: theme.floatingMode ? 8 : 32
+                    right: 0
                 }
 
                 ParallelAnimation {
@@ -916,7 +986,14 @@ Scope {
                 ParallelAnimation {
                     id: exitAnim
 
-                    onStopped: Qt.quit()
+                    onStopped: {
+                        if (root.stayResident) {
+                            win.visible = false;
+                            isClosing = false;
+                        } else {
+                            Qt.quit();
+                        }
+                    }
 
                     NumberAnimation {
                         target: win
@@ -938,11 +1015,13 @@ Scope {
                 }
 
                 HyprlandFocusGrab {
-                    active: !win.isClosing
+                    active: win.visible && !win.isClosing
                     windows: [win]
                     onCleared: {
-                        console.log("apps_popup: focus grab cleared, closing popup");
-                        win.closePopup();
+                        if (win.visible && !win.isClosing) {
+                            console.log("apps_popup: focus grab cleared, closing popup");
+                            win.closePopup();
+                        }
                     }
                 }
 
@@ -1179,11 +1258,11 @@ Scope {
                                     Loader {
                                         anchors.fill: parent
                                         anchors.margins: 1
-                                        active: true
+                                        active: win.visible
 
                                         sourceComponent: ScreencopyView {
                                             captureSource: root.getToplevelForAddress(modelData.address)
-                                            live: true
+                                            live: win.visible
                                             width: 36
                                             height: 36
                                             constraintSize: Qt.size(width, height)

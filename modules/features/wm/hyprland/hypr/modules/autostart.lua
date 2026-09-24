@@ -25,6 +25,9 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd(
 		"sh -lc 'if command -v quickshell >/dev/null 2>&1; then uwsm app -- quickshell --config workspace_overview; elif command -v qs >/dev/null 2>&1; then uwsm app -- qs --config workspace_overview; fi'"
 	)
+	hl.exec_cmd(
+		"sh -lc 'if command -v quickshell >/dev/null 2>&1; then uwsm app -- env QS_START_HIDDEN=1 quickshell --config apps_popup; fi'"
+	)
 	-- Single entry point for waybar + quickshell widgets (avoids double-launch race)
 	hl.exec_cmd("~/.config/waybar/scripts/toggle_widgets restore")
 	hl.exec_cmd(

@@ -63,7 +63,7 @@ hl.bind(
 ---    Windows    ---
 ---------------------
 
-local closeWindowBind = hl.bind(mainMod .. " + Q", hl.dsp.window.close())
+local closeWindowBind = hl.bind(mainMod .. " + SHIFT + Q", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
 hl.bind(
 	mainMod .. " + C",
@@ -285,7 +285,7 @@ hl.bind(
 hl.bind(
 	mainMod .. " + SPACE",
 	hl.dsp.exec_cmd(
-		"pgrep -f '[q]uickshell --config apps_popup' >/dev/null && quickshell -c apps_popup ipc call apps_popup close || env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config apps_popup"
+		"pgrep -f '[q]uickshell --config apps_popup' >/dev/null && quickshell -c apps_popup ipc call apps_popup toggle || (env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell -d --config apps_popup)"
 	)
 )
 hl.bind(mainMod .. " + TAB", function()

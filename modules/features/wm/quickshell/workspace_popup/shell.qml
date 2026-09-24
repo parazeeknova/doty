@@ -391,7 +391,7 @@ Scope {
                 }
 
                 margins {
-                    top: 0
+                    top: theme.floatingMode ? 28 : 0
                     left: win.animOffsetX
                 }
 
