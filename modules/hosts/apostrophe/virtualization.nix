@@ -25,17 +25,6 @@
             swtpm.enable = true;
           };
         };
-
-        # Oracle VirtualBox Host (with Extension Pack)
-        virtualbox.host = {
-          enable = true;
-          enableExtensionPack = true;
-        };
-
-        # VMware Workstation Host
-        vmware.host = {
-          enable = true;
-        };
       };
 
       programs.virt-manager.enable = true;
