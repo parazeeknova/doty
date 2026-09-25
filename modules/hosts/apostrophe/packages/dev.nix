@@ -177,8 +177,6 @@
         cloudflare-cli
         awscli2
         google-cloud-sdk
-        bruno
-        beekeeper-studio
 
         # -- Languages --
         nodejs
@@ -220,8 +218,6 @@
         opencode-desktop
         vscode-fhs
         vscode-insiders
-        code-cursor-fhs
-        ghostty
         kitty
         act
         actionlint

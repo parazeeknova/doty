@@ -81,93 +81,6 @@
           }
         )
 
-        # -- Tldraw Offline --
-        (pkgs.appimageTools.wrapType2 {
-          pname = "tldraw-offline";
-          version = "1.18.0";
-          src = pkgs.fetchurl {
-            url = "https://github.com/tldraw/tldraw-offline/releases/download/v1.18.0/tldraw-offline-linux-x86_64.AppImage";
-            sha256 = "1sdk7chp099iqj31y3cwfrwxq2yqk0fnm4qg5mr24v7mrga96r2s";
-          };
-          extraInstallCommands = ''
-            mkdir -p $out/share/applications
-            cat > $out/share/applications/tldraw-offline.desktop <<EOF
-            [Desktop Entry]
-            Name=Tldraw Offline
-            Exec=tldraw-offline %U
-            Terminal=false
-            Type=Application
-            Icon=tldraw-offline
-            StartupWMClass=tldraw-offline
-            Comment=Collaborative digital whiteboard (offline)
-            Categories=Graphics;
-            EOF
-          '';
-        })
-
-        # -- Cap --
-        (pkgs.stdenv.mkDerivation rec {
-          pname = "cap";
-          version = "0.5.9";
-
-          src = pkgs.fetchurl {
-            url = "https://cdn.crabnebula.app/asset/01KZEFJYCGN6YJ32PQ7AX334RZ";
-            sha256 = "1hkc4k143ls605m395p5iqx2rbif3qi76qw608k8d75vs6cyqz70";
-          };
-
-          nativeBuildInputs = with pkgs; [
-            dpkg
-            autoPatchelfHook
-            wrapGAppsHook3
-          ];
-
-          buildInputs = with pkgs; [
-            webkitgtk_4_1
-            gtk3
-            cairo
-            gdk-pixbuf
-            glib
-            libsoup_3
-            libayatana-appindicator
-            pipewire
-            alsa-lib
-            openssl
-            libx11
-            libxkbcommon
-            libva
-            libpulseaudio
-            stdenv.cc.cc.lib
-          ];
-
-          unpackPhase = ''
-            dpkg-deb -x $src .
-          '';
-
-          installPhase = ''
-            mkdir -p $out
-            cp -r usr/* $out/
-            ln -s $out/bin/Cap $out/bin/cap
-          '';
-
-          # libappindicator-sys dlopens the tray library at runtime, so it is
-          # not a DT_NEEDED entry and autoPatchelfHook never adds it to the
-          # RPATH. Inject it into the LD_LIBRARY_PATH the gapps wrapper sets.
-          preFixup = ''
-            gappsWrapperArgs+=(
-              --prefix LD_LIBRARY_PATH : "${
-                pkgs.lib.makeLibraryPath [
-                  pkgs.libayatana-appindicator
-                  pkgs.gtk3
-                  pkgs.glib
-                  pkgs.cairo
-                  pkgs.gdk-pixbuf
-                  pkgs.pango
-                ]
-              }"
-            )
-          '';
-        })
-
         # -- Multi Media --
         freetube
         vlc
@@ -201,8 +114,6 @@
         file-roller
 
         # -- Audio / Media --
-        spotify
-        spicetify-cli
         wf-recorder
         playerctl
         imv

@@ -52,34 +52,6 @@
         "--autoConnect"
       ],
       "enabled": true
-    },
-    "firecrawl": {
-      "type": "local",
-      "command": [
-        "bunx",
-        "firecrawl-mcp"
-      ],
-      "environment": {
-        "FIRECRAWL_API_URL": "http://127.0.0.1:48002"
-      },
-      "enabled": true
-    },
-    "hindsight": {
-      "type": "remote",
-      "url": "http://127.0.0.1:48888/mcp/default",
-      "enabled": true
-    },
-    "camofox": {
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "camofox-mcp@latest"
-      ],
-      "environment": {
-        "CAMOFOX_URL": "http://127.0.0.1:49377"
-      },
-      "enabled": true
     }
   }
 }

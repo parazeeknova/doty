@@ -173,20 +173,12 @@ name = "decode_cliphist"
 path = "src/bin/utils/decode_cliphist.rs"
 
 [[bin]]
-name = "ghostty_tmux"
-path = "src/bin/utils/ghostty_tmux.rs"
-
-[[bin]]
 name = "get_voxtype_status"
 path = "src/bin/status/voxtype.rs"
 
 [[bin]]
 name = "update_verso"
 path = "src/bin/utils/update-verso.rs"
-
-[[bin]]
-name = "update_tldraw"
-path = "src/bin/utils/update-tldraw.rs"
 
 [[bin]]
 name = "update_hypr_plugins"
@@ -213,13 +205,5 @@ name = "update_bun"
 path = "src/bin/utils/update-bun.rs"
 
 [[bin]]
-name = "update_cap"
-path = "src/bin/utils/update-cap.rs"
-
-[[bin]]
 name = "update_cline"
 path = "src/bin/utils/update-cline.rs"
-
-[[bin]]
-name = "update_comfy_desktop"
-path = "src/bin/utils/update-comfy-desktop.rs"

@@ -47,9 +47,9 @@ hl.window_rule({
 })
 
 hl.window_rule({
-	name = "ghostty-floating",
+	name = "kitty-floating",
 	match = {
-		class = "ghostty.floating",
+		class = "kitty.floating",
 		title = ".+",
 	},
 	float = true,
@@ -152,9 +152,8 @@ hl.layer_rule({
 local workspace_assignments = {
 	["1"] = { "^zen.*$" },
 	["2"] = { "^code-insiders$", "^[Ee]macs$", ".*[Oo]pencode.*" },
-	["3"] = { "^com\\.mitchellh\\.ghostty$", "^Code$", "^code$" },
+	["3"] = { "^kitty$", "^Code$", "^code$" },
 	["4"] = { "^[Ff]ree[Tt]ube$", "^[Gg]oogle-chrome.*$" },
-	["5 silent"] = { "^[Ss]potify$" },
 	["6"] = { "^vesktop$" },
 	["9"] = { "^virt-manager$", "^qemu.*$", "^Qemu.*$" },
 	["10"] = { "^[Pp]odman-[Dd]esktop$" },
@@ -317,61 +316,4 @@ hl.window_rule({
 	},
 	float = true,
 	size = { 300, 200 },
-})
-
--- An Anime Game Launcher: always floating, no borders, open in workspace 5
-hl.window_rule({
-	name = "anime-game-launcher",
-	match = {
-		class = ".*[Aa]nime-[Gg]ame-[Ll]auncher.*",
-	},
-	float = true,
-	border_size = 0,
-	workspace = "5",
-})
-
-hl.window_rule({
-	name = "anime-game-launcher-title",
-	match = {
-		title = "^An Anime Game Launcher$",
-	},
-	float = true,
-	border_size = 0,
-	workspace = "5",
-})
-
-hl.window_rule({
-	name = "genshin-impact",
-	match = {
-		title = ".*Genshin Impact.*",
-	},
-	workspace = "6",
-	fullscreen = true,
-})
-
-hl.window_rule({
-	name = "genshin-impact-initial",
-	match = {
-		initial_title = ".*Genshin Impact.*",
-	},
-	workspace = "6",
-	fullscreen = true,
-})
-
-hl.window_rule({
-	name = "genshin-impact-cn",
-	match = {
-		title = ".*原神.*",
-	},
-	workspace = "6",
-	fullscreen = true,
-})
-
-hl.window_rule({
-	name = "genshin-impact-class",
-	match = {
-		class = ".*[Gg]enshin.*",
-	},
-	workspace = "6",
-	fullscreen = true,
 })

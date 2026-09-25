@@ -390,7 +390,7 @@ Scope {
                         }
                     } else if (win.activeSection === 4) {
                         if (win.activeSubIndex === 0) {
-                            Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] ghostty --title=impala -e impala")']);
+                            Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] kitty --title impala impala")']);
                             win.closePopup();
                         } else if (win.activeSubIndex === 1) {
                             Quickshell.execDetached(["nmcli", "radio", "wifi", "off"]);
@@ -1282,7 +1282,7 @@ Scope {
                                         onEntered: settingsBtn.color = theme.accent
                                         onExited: settingsBtn.color = theme.accent
                                         onClicked: {
-                                            Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] ghostty --title=impala -e impala")']);
+                                            Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] kitty --title impala impala")']);
                                             win.closePopup();
                                         }
                                     }

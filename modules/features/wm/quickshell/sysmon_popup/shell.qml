@@ -302,7 +302,7 @@ Scope {
                                     onEntered: btnBtop.color = theme.accent
                                     onExited: btnBtop.color = theme.accent
                                     onClicked: {
-                                        Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] ghostty --title=btop -e btop --force-utf")']);
+                                        Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] kitty --title btop btop --force-utf")']);
                                         win.closePopup();
                                     }
                                 }

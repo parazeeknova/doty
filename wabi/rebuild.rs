@@ -115,16 +115,13 @@ fn main() {
     println!("-> Compiling application updater tools...");
     let update_bins = [
         "update_verso",
-        "update_tldraw",
         "update_hypr_plugins",
         "update_portless",
         "update_herdr",
         "update_terminal_browser",
         "update_terminal_code",
         "update_bun",
-        "update_cap",
         "update_cline",
-        "update_comfy_desktop",
     ];
     let mut cargo_args = vec!["build", "--manifest-path", "wabi/Cargo.toml", "--release"];
     for bin in &update_bins {
@@ -139,16 +136,13 @@ fn main() {
 
     let app_updates = [
         ("Verso", "./wabi/target/release/update_verso"),
-        ("Tldraw Offline", "./wabi/target/release/update_tldraw"),
         ("Hyprland plugins", "./wabi/target/release/update_hypr_plugins"),
         ("Portless", "./wabi/target/release/update_portless"),
         ("Herdr", "./wabi/target/release/update_herdr"),
         ("Terminal Browser", "./wabi/target/release/update_terminal_browser"),
         ("Terminal Code", "./wabi/target/release/update_terminal_code"),
         ("Bun", "./wabi/target/release/update_bun"),
-        ("Cap", "./wabi/target/release/update_cap"),
         ("Cline", "./wabi/target/release/update_cline"),
-        ("ComfyUI Desktop", "./wabi/target/release/update_comfy_desktop"),
     ];
 
     let total = app_updates.len();

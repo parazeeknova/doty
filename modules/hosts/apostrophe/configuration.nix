@@ -242,7 +242,6 @@
         "electron-40.10.5"
         "electron-39.8.10"
         "electron-39.8.1"
-        "beekeeper-studio-6.0.5"
       ];
       nixpkgs.overlays = [
         inputs.vscode-insiders.overlays.default

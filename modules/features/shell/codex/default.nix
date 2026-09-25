@@ -121,26 +121,6 @@
                     "--autoConnect",
                 ]
 
-                [mcp_servers.firecrawl]
-                command = "bunx"
-                args = ["firecrawl-mcp"]
-
-                [mcp_servers.firecrawl.env]
-                FIRECRAWL_API_URL = "http://127.0.0.1:48002"
-
-                [mcp_servers.hindsight]
-                url = "http://127.0.0.1:48888/mcp/default"
-
-                [mcp_servers.camofox]
-                command = "npx"
-                args = [
-                    "-y",
-                    "camofox-mcp@latest",
-                ]
-
-                [mcp_servers.camofox.env]
-                CAMOFOX_URL = "http://127.0.0.1:49377"
-
                 [mcp_servers.node_repl]
                 args = []
                 command = "${codexPkg}/opt/codex-desktop/resources/cua_node/bin/node_repl"

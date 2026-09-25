@@ -98,31 +98,6 @@ in
                         "chrome-devtools-mcp@latest",
                         "--autoConnect"
                       ]
-                    },
-                    "firecrawl": {
-                      "type": "stdio",
-                      "command": "bunx",
-                      "args": [
-                        "firecrawl-mcp"
-                      ],
-                      "env": {
-                        "FIRECRAWL_API_URL": "http://127.0.0.1:48002"
-                      }
-                    },
-                    "hindsight": {
-                      "type": "http",
-                      "url": "http://127.0.0.1:48888/mcp/default"
-                    },
-                    "camofox": {
-                      "type": "stdio",
-                      "command": "npx",
-                      "args": [
-                        "-y",
-                        "camofox-mcp@latest"
-                      ],
-                      "env": {
-                        "CAMOFOX_URL": "http://127.0.0.1:49377"
-                      }
                     }
                   }
                 }

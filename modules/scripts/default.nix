@@ -20,22 +20,6 @@ in
         let
           inherit (config.lib.file) mkOutOfStoreSymlink;
 
-          ghostty-tmux = pkgs.writeShellScriptBin "ghostty-tmux" ''
-            SESSION_NAME="ghostty"
-
-            # Check if the session already exists
-            ${pkgs.tmux}/bin/tmux has-session -t $SESSION_NAME 2>/dev/null
-
-            if [ $? -eq 0 ]; then
-                # If the session exists, reattach to it
-                exec ${pkgs.tmux}/bin/tmux attach-session -t $SESSION_NAME
-            else
-                # If the session doesn't exist, start a new one
-                ${pkgs.tmux}/bin/tmux new-session -s $SESSION_NAME -d
-                exec ${pkgs.tmux}/bin/tmux attach-session -t $SESSION_NAME
-            fi
-          '';
-
           lcc-bin = pkgs.writeShellScriptBin "lcc" ''
             exec ${scriptsDir}/lcc "$@"
           '';
@@ -46,7 +30,6 @@ in
         in
         {
           home.packages = [
-            ghostty-tmux
             lcc-bin
             mg-key-picker-bin
           ];
@@ -54,7 +37,6 @@ in
           home.file = {
             "scripts/mg-key-picker".source = mkOutOfStoreSymlink "${scriptsDir}/mg-key-picker";
             "scripts/lcc".source = mkOutOfStoreSymlink "${scriptsDir}/lcc";
-            "scripts/ghostty-tmux".source = mkOutOfStoreSymlink "${scriptsDir}/ghostty_tmux";
             "scripts/kbd_aura".source = mkOutOfStoreSymlink "${scriptsDir}/kbd_aura";
             "scripts/presets_lister".source = mkOutOfStoreSymlink "${scriptsDir}/presets_lister";
             "scripts/set_wallpaper".source = mkOutOfStoreSymlink "${scriptsDir}/set_wallpaper";
@@ -65,7 +47,6 @@ in
               mkOutOfStoreSymlink "${scriptsDir}/toggle_wallpaper_pause";
             "scripts/mako_mode".source = mkOutOfStoreSymlink "${scriptsDir}/mako_mode";
             "scripts/layout_mode_switch".source = mkOutOfStoreSymlink "${scriptsDir}/layout_mode_switch";
-            "scripts/game_shader_daemon".source = mkOutOfStoreSymlink "${scriptsDir}/game_shader_daemon";
           };
         };
     };

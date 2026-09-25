@@ -689,10 +689,6 @@ fn main() {
             "modules/features/shell/kitty/current-theme.conf",
         ),
         (
-            "modules/features/shell/ghostty/theme.template",
-            "modules/features/shell/ghostty/themes/theme",
-        ),
-        (
             "modules/features/shell/yazi/theme.toml.template",
             "modules/features/shell/yazi/theme.toml",
         ),
@@ -1119,79 +1115,6 @@ fn main() {
     let _ = Command::new("herdr")
         .args(["server", "reload-config"])
         .status();
-
-    // Apply Spicetify theme if installed
-    let mut applied = false;
-    if Command::new("spicetify")
-        .args(["apply", "-n"])
-        .status()
-        .map(|s| s.success())
-        .unwrap_or(false)
-    {
-        applied = true;
-    } else {
-        let spicetify_path = home_dir().join(".spicetify").join("spicetify");
-        if spicetify_path.exists()
-            && Command::new(&spicetify_path)
-                .args(["apply", "-n"])
-                .status()
-                .map(|s| s.success())
-                .unwrap_or(false)
-        {
-            applied = true;
-        }
-    }
-
-    if applied {
-        // Copy spicetifyWrapper.js to the patched directory (fixes NixOS spicetify-cli package bug)
-        let wrapper_dest =
-            home_dir().join(".local/share/spotify-patched/Apps/xpui/helper/spicetifyWrapper.js");
-        let wrapper_src = doty.join("modules/features/applications/spicetify/spicetifyWrapper.js");
-        if wrapper_src.exists() {
-            if let Some(parent) = wrapper_dest.parent() {
-                let _ = std::fs::create_dir_all(parent);
-            }
-            if let Err(e) = std::fs::copy(&wrapper_src, &wrapper_dest) {
-                eprintln!("Failed to copy spicetifyWrapper.js: {}", e);
-            }
-        }
-
-        let reload_script = doty.join("modules/scripts/spotify-reload");
-        let reload_status = if reload_script.exists() {
-            Command::new(&reload_script)
-                .status()
-                .map(|s| s.success())
-                .unwrap_or(false)
-        } else {
-            false
-        };
-
-        if !reload_status {
-            let is_running = Command::new("pgrep")
-                .args(["-x", "spotify"])
-                .status()
-                .map(|s| s.success())
-                .unwrap_or(false)
-                || Command::new("pgrep")
-                    .args(["-x", ".spotify-wrappe"])
-                    .status()
-                    .map(|s| s.success())
-                    .unwrap_or(false);
-
-            if is_running {
-                let _ = Command::new("pkill").args(["-x", "spotify"]).status();
-                let _ = Command::new("pkill")
-                    .args(["-x", ".spotify-wrappe"])
-                    .status();
-                std::thread::sleep(std::time::Duration::from_millis(500));
-                let _ = Command::new("uwsm")
-                    .args(["app", "--", "spotify"])
-                    .stdout(std::process::Stdio::null())
-                    .stderr(std::process::Stdio::null())
-                    .spawn();
-            }
-        }
-    }
 
     // Rebuild bat's theme cache (non-blocking, picks up on next launch)
     let _ = Command::new("bat").arg("cache").arg("--build").spawn();

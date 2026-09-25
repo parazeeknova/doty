@@ -47,7 +47,6 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("uwsm app -- ~/.config/quickshell/battery_popup/battery_daemon")
 	hl.exec_cmd("uwsm app -- ~/.local/bin/screentime_daemon")
 	hl.exec_cmd("uwsm app -- ~/.local/bin/mtp_notify")
-	hl.exec_cmd("uwsm app -- " .. dotfiles .. "/modules/scripts/game_shader_daemon")
 	hl.exec_cmd("systemctl --user start hyprpolkitagent")
 	hl.exec_cmd(
 		"systemctl --user start ssh-agent.service && sh -c 'sleep 3 && env SSH_ASKPASS=ssh-askpass ssh-add ~/.ssh/id_ed25519 < /dev/null'"

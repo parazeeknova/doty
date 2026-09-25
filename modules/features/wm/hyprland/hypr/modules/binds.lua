@@ -2,7 +2,7 @@
 ---- Keybindings ----
 ---------------------
 local mainMod = "SUPER"
-local terminal = "uwsm app -- ghostty"
+local terminal = "uwsm app -- kitty"
 local fileManager = "uwsm app -- thunar"
 local dotfiles = os.getenv("WABI_DOTFILES_DIR") or (os.getenv("HOME") .. "/doty")
 local osdctl = os.getenv("HOME") .. "/.config/quickshell/osd/bin/osdctl"
@@ -12,8 +12,8 @@ local osdctl = os.getenv("HOME") .. "/.config/quickshell/osd/bin/osdctl"
 ---------------------
 
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + SHIFT + RETURN", hl.dsp.exec_cmd("uwsm app -- ghostty --class=ghostty.floating"))
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("uwsm app -- kitty"))
+hl.bind(mainMod .. " + SHIFT + RETURN", hl.dsp.exec_cmd("uwsm app -- kitty --class=kitty.floating"))
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 
 -- Browsers
@@ -45,13 +45,6 @@ hl.bind(
 	)
 )
 
--- Music
-hl.bind(
-	mainMod .. " + M",
-	hl.dsp.exec_cmd(
-		"hyprctl clients | grep -iq 'class: .*spotify' && hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })' || (uwsm app -- spotify && hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })')"
-	)
-)
 hl.bind(
 	mainMod .. " + Y",
 	hl.dsp.exec_cmd(

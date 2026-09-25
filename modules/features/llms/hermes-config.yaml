@@ -297,13 +297,12 @@ terminal:
   backend: local
   font_family: FiraCode Nerd Font
 web:
-  backend: firecrawl
-  search_backend: searxng
-  extract_backend: firecrawl
+  backend: duckduckgo
+  search_backend: duckduckgo
   use_gateway: false
 browser:
   use_real_profile: true
-  cloud_provider: camofox
+  cloud_provider: local
   use_gateway: false
 display:
   personality: none
@@ -331,7 +330,7 @@ wake_word:
   provider: openwakeword
   phrase: hey hermes
 memory:
-  provider: hindsight
+  provider: local
 timezone: Asia/Kolkata
 approvals:
   destructive_slash_confirm: false

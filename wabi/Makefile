@@ -59,7 +59,6 @@ install: build
 	cp --remove-destination target/release/parse_binds ../modules/features/wm/quickshell/shortcut_popup/parse_binds
 	cp --remove-destination target/release/caffeine ../modules/features/wm/quickshell/brightness_popup/caffeine
 	cp --remove-destination target/release/decode_cliphist ../modules/features/wm/quickshell/clipboard_popup/decode_cliphist
-	cp --remove-destination target/release/ghostty_tmux ../modules/scripts/ghostty_tmux
 	mkdir -p $(HOME)/.local/bin
 	cp --remove-destination target/release/screentime_daemon $(HOME)/.local/bin/screentime_daemon
 	cp --remove-destination target/release/get_screentime_status $(HOME)/.local/bin/get_screentime_status
