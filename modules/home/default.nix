@@ -31,6 +31,46 @@
 
           programs.home-manager.enable = true;
 
+          # -- MangoHud Gaming Overlay Configuration --
+          programs.mangohud = {
+            enable = true;
+            settings = {
+              fps = true;
+              frametime = 1;
+              cpu_stats = true;
+              cpu_temp = true;
+              cpu_power = true;
+              cpu_mhz = true;
+              gpu_stats = true;
+              gpu_temp = true;
+              gpu_core_clock = true;
+              gpu_mem_clock = true;
+              gpu_power = true;
+              gpu_load_change = true;
+              vram = true;
+              ram = true;
+              battery = true;
+              battery_icon = true;
+
+              legacy_layout = false;
+              horizontal = false;
+              round_corners = 8;
+              background_alpha = "0.5";
+              background_color = "020202";
+              text_color = "ffffff";
+              gpu_color = "2e9762";
+              cpu_color = "2e97cb";
+              vram_color = "ad64c1";
+              ram_color = "c26693";
+              engine_color = "eb5b5b";
+              frametime_color = "00ff00";
+
+              toggle_hud = "Shift_R+F12";
+              toggle_logging = "Shift_L+F2";
+              upload_log = "F5";
+            };
+          };
+
           # -- Systemd User Services --
           systemd.user.services.ssh-agent = {
             Unit = {

@@ -167,6 +167,7 @@
 
       environment.systemPackages = with pkgs; [
         devenv
+        devin-cli
         wrangler
         agent-browser
         herdr

@@ -206,6 +206,7 @@
           "libvirtd"
           "kvm"
           "adbusers"
+          "vboxusers"
         ];
         shell = pkgs.fish;
       };

@@ -15,7 +15,9 @@
         extraInstallCommands = ''
           mkdir -p $out/share/applications
           mkdir -p $out/share/icons/hicolor/512x512/apps
-          cp -r ${pkgs.appimageTools.extract { inherit pname version src; }}/usr/share/icons/hicolor/512x512/apps/* $out/share/icons/hicolor/512x512/apps/
+          cp -r ${
+            pkgs.appimageTools.extract { inherit pname version src; }
+          }/usr/share/icons/hicolor/512x512/apps/* $out/share/icons/hicolor/512x512/apps/
           cat > $out/share/applications/t3code.desktop <<EOF
           [Desktop Entry]
           Name=T3 Code

@@ -216,8 +216,10 @@ path = "src/bin/utils/update-bun.rs"
 name = "update_cap"
 path = "src/bin/utils/update-cap.rs"
 
+[[bin]]
+name = "update_cline"
+path = "src/bin/utils/update-cline.rs"
 
-
-
-
-
+[[bin]]
+name = "update_comfy_desktop"
+path = "src/bin/utils/update-comfy-desktop.rs"
