@@ -229,16 +229,58 @@ Scope {
 
                 ParallelAnimation {
                     id: introAnim
-                    NumberAnimation { target: win; property: "animLeftMargin"; from: -260; to: 32; duration: 120; easing.type: Easing.OutCubic }
-                    NumberAnimation { target: win; property: "animTop"; from: -320; to: 22; duration: 120; easing.type: Easing.OutCubic }
-                    NumberAnimation { target: win; property: "animOpacity"; from: 0; to: 1; duration: 120; easing.type: Easing.OutCubic }
+                    NumberAnimation {
+                        target: win
+                        property: "animLeftMargin"
+                        from: -260
+                        to: 32
+                        duration: 120
+                        easing.type: Easing.OutCubic
+                    }
+                    NumberAnimation {
+                        target: win
+                        property: "animTop"
+                        from: -320
+                        to: 22
+                        duration: 120
+                        easing.type: Easing.OutCubic
+                    }
+                    NumberAnimation {
+                        target: win
+                        property: "animOpacity"
+                        from: 0
+                        to: 1
+                        duration: 120
+                        easing.type: Easing.OutCubic
+                    }
                 }
                 ParallelAnimation {
                     id: exitAnim
                     onStopped: Qt.quit()
-                    NumberAnimation { target: win; property: "animLeftMargin"; from: 32; to: -260; duration: 100; easing.type: Easing.InCubic }
-                    NumberAnimation { target: win; property: "animTop"; from: 22; to: -320; duration: 100; easing.type: Easing.InCubic }
-                    NumberAnimation { target: win; property: "animOpacity"; from: 1; to: 0; duration: 100; easing.type: Easing.InCubic }
+                    NumberAnimation {
+                        target: win
+                        property: "animLeftMargin"
+                        from: 32
+                        to: -260
+                        duration: 100
+                        easing.type: Easing.InCubic
+                    }
+                    NumberAnimation {
+                        target: win
+                        property: "animTop"
+                        from: 22
+                        to: -320
+                        duration: 100
+                        easing.type: Easing.InCubic
+                    }
+                    NumberAnimation {
+                        target: win
+                        property: "animOpacity"
+                        from: 1
+                        to: 0
+                        duration: 100
+                        easing.type: Easing.InCubic
+                    }
                 }
 
                 HyprlandFocusGrab {
@@ -248,6 +290,7 @@ Scope {
                 }
 
                 Rectangle {
+                    id: keyHandler
                     anchors.fill: parent
                     opacity: win.animOpacity
                     color: theme.popupBgColor
@@ -256,7 +299,6 @@ Scope {
                     radius: 0
                     antialiasing: false
                     focus: true
-                    id: keyHandler
                     Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             win.closePopup();
@@ -345,7 +387,12 @@ Scope {
                             renderType: Text.NativeRendering
                         }
 
-                        Rectangle { width: parent.width; height: 1; color: theme.accent; opacity: 0.25 }
+                        Rectangle {
+                            width: parent.width
+                            height: 1
+                            color: theme.accent
+                            opacity: 0.25
+                        }
 
                         Text {
                             visible: root.loading
