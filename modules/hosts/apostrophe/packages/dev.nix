@@ -232,6 +232,7 @@
         gitkraken
         difftastic
         diff-so-fancy
+        burpsuite
 
         # -- Tools --
         httpie

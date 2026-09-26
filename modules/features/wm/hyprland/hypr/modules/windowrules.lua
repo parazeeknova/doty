@@ -152,7 +152,7 @@ hl.layer_rule({
 local workspace_assignments = {
 	["1"] = { "^zen.*$" },
 	["2"] = { "^code-insiders$", "^[Ee]macs$", ".*[Oo]pencode.*" },
-	["3"] = { "^kitty$", "^Code$", "^code$" },
+	["3"] = { "^Code$", "^code$" },
 	["4"] = { "^[Ff]ree[Tt]ube$", "^[Gg]oogle-chrome.*$" },
 	["6"] = { "^vesktop$" },
 	["9"] = { "^virt-manager$", "^qemu.*$", "^Qemu.*$" },
