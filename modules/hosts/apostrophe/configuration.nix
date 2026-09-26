@@ -179,7 +179,7 @@
           finegrained = true;
         };
         package = config.boot.kernelPackages.nvidiaPackages.stable;
-        dynamicBoost.enable = true;
+        dynamicBoost.enable = false;
 
         prime = {
           offload = {
