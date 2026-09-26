@@ -303,11 +303,11 @@
     "hymission": {
       "flake": false,
       "locked": {
-        "lastModified": 1789268872,
-        "narHash": "sha256-CYhvGB/3RyHOZBgsp/TRpC5/19jw+57x2R44VAMAf0M=",
+        "lastModified": 1789967210,
+        "narHash": "sha256-iWHVWalZXGa77f5pQ9Jb+auDdGLG4LAHhMlUMtFrYo0=",
         "owner": "gfhdhytghd",
         "repo": "hymission",
-        "rev": "056fb69be97b61466dca1c053494bec8dea13d7f",
+        "rev": "f89245e8be44c717e80accf7cfc3b92f726bda74",
         "type": "github"
       },
       "original": {
@@ -590,11 +590,11 @@
     "hyprland-scroll-overview": {
       "flake": false,
       "locked": {
-        "lastModified": 1788745613,
-        "narHash": "sha256-clDeTM5itsJPvqpbEkbWUmuPROsz2+YUnTpqsjQDMqU=",
+        "lastModified": 1789949463,
+        "narHash": "sha256-EdtVRpwYkLtqTrNBA2VbGXpt7DMyMlRm6LCDNfI/1pU=",
         "owner": "yayuuu",
         "repo": "hyprland-scroll-overview",
-        "rev": "5e96ae20ec73c320248bcf3ff68b330bc1ed4152",
+        "rev": "10eeefa0519e09992b68a1d2949781a876230f5c",
         "type": "github"
       },
       "original": {
