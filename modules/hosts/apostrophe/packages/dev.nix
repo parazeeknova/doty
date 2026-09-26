@@ -80,7 +80,8 @@
           mkdir -p $out/opt/terminal-browser $out/bin
           cp -r * $out/opt/terminal-browser/
 
-          chmod +x $out/opt/terminal-browser/bin/terminal-browser $out/opt/terminal-browser/electron/electron
+          chmod +x $out/opt/terminal-browser/bin/terminal-browser
+          find $out/opt/terminal-browser/electron -type f \( -name "electron" -o -name "pixel" \) -exec chmod +x {} +
 
           makeWrapper $out/opt/terminal-browser/bin/terminal-browser $out/bin/terminal-browser \
             --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath buildInputs}"
