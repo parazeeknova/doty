@@ -54,7 +54,9 @@
           onnxruntime-bin
           pkgs.python312Packages.tqdm
           pkgs.python312Packages.scipy
-          pkgs.python312Packages.scikit-learn
+          (pkgs.python312Packages.scikit-learn.overridePythonAttrs (_: {
+            doCheck = false;
+          }))
           pkgs.python312Packages.requests
         ];
         doCheck = false;

@@ -346,15 +346,15 @@ onboarding:
     busy_input_prompt: true
 proxy:
   enabled: false
-_config_version: 33
+_config_version: 46
 platform_toolsets:
   cli:
     - a2a
-    - bfl
     - browser
     - clarify
     - code_execution
     - computer_use
+    - connections
     - context_engine
     - cronjob
     - delegation
@@ -371,11 +371,11 @@ platform_toolsets:
     - vision
     - web
   telegram:
-    - bfl
     - browser
     - clarify
     - code_execution
     - computer_use
+    - connections
     - context_engine
     - cronjob
     - delegation
@@ -391,11 +391,11 @@ platform_toolsets:
     - vision
     - web
   whatsapp:
-    - bfl
     - browser
     - clarify
     - code_execution
     - computer_use
+    - connections
     - cronjob
     - delegation
     - file
@@ -420,11 +420,11 @@ known_plugin_toolsets:
     - spotify
 known_builtin_toolsets:
   cli:
-    - bfl
     - browser
     - clarify
     - code_execution
     - computer_use
+    - connections
     - context_engine
     - cronjob
     - delegation
@@ -448,11 +448,11 @@ known_builtin_toolsets:
     - x_search
     - yuanbao
   telegram:
-    - bfl
     - browser
     - clarify
     - code_execution
     - computer_use
+    - connections
     - context_engine
     - cronjob
     - delegation
@@ -476,11 +476,11 @@ known_builtin_toolsets:
     - x_search
     - yuanbao
   whatsapp:
-    - bfl
     - browser
     - clarify
     - code_execution
     - computer_use
+    - connections
     - context_engine
     - cronjob
     - delegation
