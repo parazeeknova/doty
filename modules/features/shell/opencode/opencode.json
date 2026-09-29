@@ -52,6 +52,14 @@
         "--autoConnect"
       ],
       "enabled": true
+    },
+    "tinyfish": {
+      "type": "remote",
+      "url": "https://agent.tinyfish.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer {env:TINYFISH_API_KEY}"
+      },
+      "enabled": true
     }
   }
 }

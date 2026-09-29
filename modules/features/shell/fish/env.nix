@@ -64,6 +64,9 @@
           if test -f /run/secrets/github-token
               set -gx GITHUB_PERSONAL_ACCESS_TOKEN (cat /run/secrets/github-token)
           end
+          if test -f /run/secrets/tinyfish-api-key
+              set -gx TINYFISH_API_KEY (cat /run/secrets/tinyfish-api-key)
+          end
         '';
       };
     };

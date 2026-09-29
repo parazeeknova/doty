@@ -81,6 +81,8 @@
           }
         )
 
+        (bottles.override { removeWarningPopup = true; })
+
         # -- Multi Media --
         freetube
         vlc

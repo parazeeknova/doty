@@ -24,6 +24,7 @@ in
             secrets.openrouter-api-key = { };
             secrets.context7-api-key = { };
             secrets.github-token = { };
+            secrets.tinyfish-api-key = { };
 
             templates."claude-settings" = {
               content = ''
@@ -67,7 +68,8 @@ in
                         "@modelcontextprotocol/server-github"
                       ],
                       "env": {
-                        "GITHUB_PERSONAL_ACCESS_TOKEN": "${config.sops.placeholder.github-token}"
+                    "GITHUB_PERSONAL_ACCESS_TOKEN": "${config.sops.placeholder.github-token}",
+                    "TINYFISH_API_KEY": "${config.sops.placeholder.tinyfish-api-key}"
                       }
                     },
                     "filesystem": {
@@ -98,6 +100,13 @@ in
                         "chrome-devtools-mcp@latest",
                         "--autoConnect"
                       ]
+                    },
+                    "tinyfish": {
+                      "type": "http",
+                      "url": "https://agent.tinyfish.ai/mcp",
+                      "headers": {
+                        "Authorization": "Bearer ${config.sops.placeholder.tinyfish-api-key}"
+                      }
                     }
                   }
                 }

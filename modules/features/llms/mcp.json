@@ -13,6 +13,13 @@
         "chrome-devtools-mcp@latest",
         "--autoConnect"
       ]
+    },
+    "tinyfish": {
+      "type": "http",
+      "url": "https://agent.tinyfish.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer ${TINYFISH_API_KEY}"
+      }
     }
   }
 }

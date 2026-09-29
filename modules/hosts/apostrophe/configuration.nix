@@ -354,6 +354,12 @@
         group = "users";
         mode = "0400";
       };
+      sops.secrets.tinyfish-api-key = {
+        path = "/run/secrets/tinyfish-api-key";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
       sops.secrets.merge-gateway-api-key = {
         path = "/run/secrets/merge-gateway-api-key";
         owner = config.users.users.parazeeknova.name;

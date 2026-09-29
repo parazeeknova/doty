@@ -1,8 +1,9 @@
 model:
-  default: deepseek/deepseek-v4.1-flash
+  default: gpt-6-luna
   provider: merge-gateway
   base_url: https://api-gateway.merge.dev/v1/openai
   key_env: HERMES_CUSTOM_MERGE_GATEWAY_API_KEY
+  api_mode: chat_completions
 providers:
   merge-gateway:
     name: Merge Gateway
@@ -305,7 +306,7 @@ browser:
   cloud_provider: local
   use_gateway: false
 display:
-  personality: none
+  personality: technical
   skin: sisyphus
   pet:
     enabled: false
@@ -545,3 +546,34 @@ mcp_servers:
 # fallback_model:
 #   provider: openrouter
 #   model: anthropic/claude-sonnet-4
+fallback_providers:
+  - provider: merge-gateway
+    model: deepseek/deepseek-v4.1-flash
+moa:
+  presets:
+    default:
+      reference_models:
+        - provider: merge-gateway
+          model: gpt-6-luna
+          enabled: true
+        - provider: merge-gateway
+          model: deepseek/deepseek-v4.1-flash
+          enabled: true
+      degraded_reference_policy: loud
+      fanout: user_turn
+      aggregator:
+        provider: nous
+        model: stealth/space-bunny-alpha
+  reference_models:
+    - provider: merge-gateway
+      model: gpt-6-luna
+      enabled: true
+    - provider: merge-gateway
+      model: deepseek/deepseek-v4.1-flash
+      enabled: true
+  aggregator:
+    provider: nous
+    model: stealth/space-bunny-alpha
+  degraded_reference_policy: loud
+  fanout: user_turn
+  enabled: true
