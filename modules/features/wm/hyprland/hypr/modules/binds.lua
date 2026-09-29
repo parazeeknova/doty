@@ -224,7 +224,8 @@ hl.bind(mainMod .. " + backslash", function()
 end)
 
 -- Special workspaces (scratchpads)
-hl.bind(mainMod .. " + A", hl.dsp.workspace.toggle_special("magic"))
+-- The magic scratchpad moved to a bare SUPER press (see the bare-modifier
+-- block at the bottom). SUPER+A is intentionally unbound.
 hl.bind(
 	mainMod .. " + SHIFT + A",
 	hl.dsp.window.move({
@@ -275,10 +276,27 @@ hl.bind(
 ---------------------
 ---    Old Rofi   ---
 ---------------------
+-- Application launcher
+hl.bind(
+	mainMod .. " + Q",
+	hl.dsp.exec_cmd(
+		"pgrep -f '[q]uickshell --config apps_popup' >/dev/null && quickshell -c apps_popup ipc call apps_popup toggle || (env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell -d --config apps_popup)"
+	)
+)
+-- Workspace picker. Took over the bare-SUPER slot, so it lives on SUPER+SPACE.
 hl.bind(
 	mainMod .. " + SPACE",
 	hl.dsp.exec_cmd(
-		"pgrep -f '[q]uickshell --config apps_popup' >/dev/null && quickshell -c apps_popup ipc call apps_popup toggle || (env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell -d --config apps_popup)"
+		"pgrep -f '[q]uickshell --config workspace_popup' >/dev/null && quickshell -c workspace_popup ipc call workspace_popup close || env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config workspace_popup"
+	)
+)
+-- Jump-to-a-recent-window list. This popup only exposes a `close` IPC call (no
+-- `toggle`), so use the close-if-running / launch-if-not pattern rather than a
+-- toggle, which would re-open an already-open popup.
+hl.bind(
+	mainMod .. " + A",
+	hl.dsp.exec_cmd(
+		"pgrep -f '[q]uickshell --config recents_popup' >/dev/null && quickshell -c recents_popup ipc call recents_popup close || env QS_KEYBOARD=1 env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config recents_popup"
 	)
 )
 hl.bind(mainMod .. " + TAB", function()
@@ -442,16 +460,15 @@ hl.bind(
 		"pgrep -f '[q]uickshell --config mg_popup' >/dev/null && quickshell -c mg_popup ipc call mg_popup close || env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config mg_popup"
 	)
 )
-hl.bind(
-	"SUPER_L",
-	hl.dsp.exec_cmd(
-		"pgrep -f '[q]uickshell --config workspace_popup' >/dev/null && quickshell -c workspace_popup ipc call workspace_popup close || env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config workspace_popup"
-	),
-	{
-		release = true,
-		ignore_mods = true,
-	}
-)
+-- Bare SUPER (press and release with no other key) toggles the magic
+-- scratchpad, the action SUPER+A used to have. The workspace picker moved to
+-- SUPER+SPACE and the app launcher to SUPER+Q. `release` fires on key-up and
+-- `ignore_mods` lets the bare modifier match without consuming combos, so
+-- SUPER+<key> still works normally.
+hl.bind("SUPER_L", hl.dsp.workspace.toggle_special("magic"), {
+	release = true,
+	ignore_mods = true,
+})
 
 ---------------------
 ---   Screenshots ---
