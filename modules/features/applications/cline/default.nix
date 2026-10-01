@@ -10,11 +10,11 @@
     let
       cline = pkgs.stdenv.mkDerivation rec {
         pname = "cline";
-        version = "3.0.65";
+        version = "3.0.67";
 
         src = pkgs.fetchurl {
           url = "https://registry.npmjs.org/@cline/cli-linux-x64/-/cli-linux-x64-${version}.tgz";
-          sha256 = "04qdj02c0vw0lfr3wmf4gvvqszh20gm4r8qdk35rzrvav76xqk5a";
+          sha256 = "1va19l47wph84ygcsqc87sk608llsinv1dwhjfqajw8aifn4x9xd";
         };
 
         nativeBuildInputs = with pkgs; [
