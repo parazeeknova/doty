@@ -10,31 +10,63 @@
     let
       cline = pkgs.stdenv.mkDerivation rec {
         pname = "cline";
-        version = "3.0.67";
+        version = "0.0.40";
 
         src = pkgs.fetchurl {
-          url = "https://registry.npmjs.org/@cline/cli-linux-x64/-/cli-linux-x64-${version}.tgz";
-          sha256 = "1va19l47wph84ygcsqc87sk608llsinv1dwhjfqajw8aifn4x9xd";
+          url = "https://github.com/cline/cline/releases/download/desktop-v${version}/Cline_${version}_amd64.deb";
+          sha256 = "1kw2igvijvnp7lbyhcv30hprjaypwhjw30g2v5774zyh6bv9xqxf";
         };
 
         nativeBuildInputs = with pkgs; [
+          dpkg
           autoPatchelfHook
-          makeWrapper
+          wrapGAppsHook3
         ];
 
         buildInputs = with pkgs; [
+          gtk3
+          webkitgtk_4_1
+          libsoup_3
+          libayatana-appindicator
+          cairo
+          gdk-pixbuf
+          glib
+          glib-networking
+          dbus
+          openssl
           stdenv.cc.cc.lib
-          glibc
         ];
 
-        dontStrip = true;
+        unpackPhase = ''
+          runHook preUnpack
+          dpkg-deb -x $src .
+          runHook postUnpack
+        '';
 
         installPhase = ''
-          mkdir -p $out/lib/cline $out/bin
-          cp -r * $out/lib/cline/
-          chmod +x $out/lib/cline/bin/cline
-          ln -s $out/lib/cline/bin/cline $out/bin/cline
+          runHook preInstall
+
+          mkdir -p $out
+          cp -r usr/* $out/
+
+          ln -s $out/bin/cline-app $out/bin/cline
+
+          runHook postInstall
         '';
+
+        preFixup = ''
+          gappsWrapperArgs+=(
+            --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ pkgs.libayatana-appindicator ]}"
+            --set CLINE_CODE_SIDECAR_BIN "$out/bin/code-sidecar"
+          )
+        '';
+
+        meta = {
+          description = "Cline Desktop - AI coding agent";
+          homepage = "https://github.com/cline/cline";
+          platforms = [ "x86_64-linux" ];
+          mainProgram = "cline-app";
+        };
       };
     in
     {

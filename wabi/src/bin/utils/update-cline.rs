@@ -10,22 +10,54 @@ fn extract_field(content: &str, start_pattern: &str, end_pattern: &str) -> Optio
 }
 
 fn get_latest_cline_version() -> Option<String> {
-    let args = [
+    let mut args = vec![
         "-s",
         "-H",
         "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
-        "https://registry.npmjs.org/@cline/cli-linux-x64/latest",
     ];
+
+    let mut token = fs::read_to_string("/run/secrets/github-token")
+        .ok()
+        .map(|s| s.trim().to_string());
+
+    if token.is_none() {
+        token = std::env::var("GITHUB_PERSONAL_ACCESS_TOKEN")
+            .ok()
+            .or_else(|| std::env::var("GITHUB_TOKEN").ok());
+    }
+
+    let auth_header;
+    if let Some(t) = token {
+        auth_header = format!("Authorization: Bearer {}", t);
+        args.push("-H");
+        args.push(&auth_header);
+    }
+
+    args.push("https://api.github.com/repos/cline/cline/releases");
 
     let output = Command::new("curl").args(args).output().ok()?;
 
     if !output.status.success() {
-        eprintln!("Failed to fetch cline info from npm registry.");
+        eprintln!("Failed to fetch Cline release info from GitHub API.");
         return None;
     }
 
-    let json = String::from_utf8_lossy(&output.stdout);
-    extract_field(&json, "\"version\":\"", "\"")
+    let releases: serde_json::Value = serde_json::from_slice(&output.stdout).ok()?;
+    let releases_arr = releases.as_array()?;
+
+    for release in releases_arr {
+        if let Some(tag_name) = release.get("tag_name").and_then(|t| t.as_str())
+            && tag_name.starts_with("desktop-")
+        {
+            let version = tag_name
+                .strip_prefix("desktop-v")
+                .or_else(|| tag_name.strip_prefix("desktop-"))
+                .unwrap_or(tag_name);
+            return Some(version.to_string());
+        }
+    }
+
+    None
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -71,8 +103,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         latest_version
     );
     let new_url = format!(
-        "https://registry.npmjs.org/@cline/cli-linux-x64/-/cli-linux-x64-{}.tgz",
-        latest_version
+        "https://github.com/cline/cline/releases/download/desktop-v{}/Cline_{}_amd64.deb",
+        latest_version, latest_version
     );
 
     let output = Command::new("nix-prefetch-url").arg(&new_url).output()?;
@@ -90,28 +122,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Fetched hash: {}", new_hash);
 
     let content = fs::read_to_string(cline_nix_path)?;
-    let start_idx = content
-        .find("pname = \"cline\";")
-        .ok_or("Cannot find cline definition in cline/default.nix")?;
-    let end_idx = content[start_idx..]
-        .find("};")
-        .ok_or("Cannot find end of cline block")?
-        + start_idx
-        + 2;
-    let old_block = &content[start_idx..end_idx];
-
-    let mut new_block = old_block.to_string();
-    new_block = new_block.replace(
+    let mut new_content = content.replace(
         &format!("version = \"{}\";", current_version),
         &format!("version = \"{}\";", latest_version),
     );
-    new_block = new_block.replace(
+    new_content = new_content.replace(
         &format!("sha256 = \"{}\";", current_hash),
         &format!("sha256 = \"{}\";", new_hash),
     );
-
-    let mut new_content = content.clone();
-    new_content.replace_range(start_idx..end_idx, &new_block);
     fs::write(cline_nix_path, new_content)?;
 
     println!(
@@ -133,7 +151,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let commit_msg = format!("chore: auto-update cline to version {}", latest_version);
         let status = Command::new("git")
-            .args(["commit", "-m", &commit_msg])
+            .args(["commit", "--no-gpg-sign", "-m", &commit_msg])
             .status()?;
         if !status.success() {
             eprintln!("Failed to run git commit.");
