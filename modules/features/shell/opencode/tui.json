@@ -1,4 +1,8 @@
 {
   "$schema": "https://opencode.ai/tui.json",
-  "theme": "matugen"
+  "theme": "matugen",
+  "plugin": [
+    "./herdr-tui-session.js",
+    "opencode-supermemory@latest"
+  ]
 }
