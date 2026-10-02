@@ -41,12 +41,12 @@ in
                   "env": {
                     "ENABLE_LSP_TOOL": "1",
                     "CLAUDE_CODE_EFFORT_LEVEL": "high",
-                    "ANTHROPIC_API_KEY": "''${config.sops.placeholder.anthropic-api-key}",
-                    "OPENROUTER_API_KEY": "''${config.sops.placeholder.openrouter-api-key}",
-                    "CONTEXT7_API_KEY": "''${config.sops.placeholder.context7-api-key}",
-                    "GITHUB_PERSONAL_ACCESS_TOKEN": "''${config.sops.placeholder.github-token}",
+                    "ANTHROPIC_API_KEY": "${config.sops.placeholder.anthropic-api-key}",
+                    "OPENROUTER_API_KEY": "${config.sops.placeholder.openrouter-api-key}",
+                    "CONTEXT7_API_KEY": "${config.sops.placeholder.context7-api-key}",
+                    "GITHUB_PERSONAL_ACCESS_TOKEN": "${config.sops.placeholder.github-token}",
                     "SUPERMEMORY_BASE_URL": "http://localhost:6767",
-                    "SUPERMEMORY_CC_API_KEY": "''${config.sops.placeholder.supermemory-api-key}"
+                    "SUPERMEMORY_CC_API_KEY": "${config.sops.placeholder.supermemory-api-key}"
                   }
                 }
               '';

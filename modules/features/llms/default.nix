@@ -159,7 +159,7 @@
           # (provider: sherpa) can import them at runtime.
           home.sessionVariables = {
             AGENT_BROWSER_EXECUTABLE_PATH = "google-chrome-stable";
-            PYTHONPATH = hermesPythonPath;
+            PYTHONPATH = "${hermesPythonPath}:/home/parazeeknova/.hermes/tools/supermemory-venv/lib/python3.14/site-packages";
           };
 
           home.file.".pi/agent/models.json".source =
@@ -229,7 +229,7 @@
               # (provider: sherpa). home.sessionVariables doesn't reach
               # systemd units, so set it here explicitly.
               EnvironmentFile = "${pkgs.writeText "hermes-gateway-pythonpath" ''
-                PYTHONPATH=${hermesPythonPath}:$HOME/.hermes/tools/supermemory-venv/lib/python3.14/site-packages
+                PYTHONPATH=${hermesPythonPath}:/home/parazeeknova/.hermes/tools/supermemory-venv/lib/python3.14/site-packages
               ''}";
               WorkingDirectory = "%h/.hermes";
               Restart = "always";

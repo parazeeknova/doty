@@ -173,9 +173,9 @@
           SUPERMEMORY_EMBEDDING_PROVIDER=gemini
           SUPERMEMORY_EMBEDDING_MODEL=gemini-embedding-2
           SUPERMEMORY_EMBEDDING_DIMENSIONS=1536
-          GEMINI_API_KEY=''${config.sops.placeholder.gemini-api-key}
+          GEMINI_API_KEY=${config.sops.placeholder.gemini-api-key}
           OPENAI_BASE_URL=http://127.0.0.1:6768/v1
-          OPENAI_API_KEY=''${config.sops.placeholder.generalcompute-api-key}
+          OPENAI_API_KEY=${config.sops.placeholder.generalcompute-api-key}
           OPENAI_MODEL=deepseek-v3.2
           GC_PROXY_PORT=6768
           GC_PRIMARY_MODEL=deepseek-v3.2
