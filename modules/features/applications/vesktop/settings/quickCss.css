@@ -4,93 +4,93 @@ body, #app-mount {
 
 :root, .theme-dark, .theme-light, .visual-refresh, .visual-refresh.theme-dark, .visual-refresh .theme-dark {
   /* Brand/Accent (blurple overrides) */
-  --brand-experiment: #dcc66e !important;
-  --brand-experiment-30a: rgba(220,198,110, 0.3) !important;
-  --brand-experiment-500: #dcc66e !important;
-  --brand-experiment-600: #d2c6a1 !important;
-  --brand-500: #dcc66e !important;
-  --brand-600: #d2c6a1 !important;
+  --brand-experiment: #f6bc70 !important;
+  --brand-experiment-30a: rgba(246,188,112, 0.3) !important;
+  --brand-experiment-500: #f6bc70 !important;
+  --brand-experiment-600: #dec2a2 !important;
+  --brand-500: #f6bc70 !important;
+  --brand-600: #dec2a2 !important;
 
   /* Primary Backgrounds (Frosted Glass Translucency) */
-  --background-primary: rgba(22,19,11, 0.45) !important;
-  --background-secondary: rgba(34,31,23, 0.6) !important;
-  --background-secondary-alt: rgba(34,31,23, 0.65) !important;
-  --background-tertiary: rgba(34,31,23, 0.75) !important;
-  --background-floating: rgba(34,31,23, 0.85) !important;
-  --background-accent: rgba(75,71,57, 0.45) !important;
-  --background-message-hover: rgba(75,71,57, 0.07) !important;
+  --background-primary: rgba(24,18,11, 0.45) !important;
+  --background-secondary: rgba(37,31,23, 0.6) !important;
+  --background-secondary-alt: rgba(37,31,23, 0.65) !important;
+  --background-tertiary: rgba(37,31,23, 0.75) !important;
+  --background-floating: rgba(37,31,23, 0.85) !important;
+  --background-accent: rgba(79,69,57, 0.45) !important;
+  --background-message-hover: rgba(79,69,57, 0.07) !important;
   
   /* Additional Background Mappings from Catppuccin */
-  --background-surface-highest: rgba(75,71,57, 0.5) !important;
-  --background-surface-higher: rgba(75,71,57, 0.4) !important;
-  --background-surface-high: rgba(22,19,11, 0.45) !important;
-  --background-base-lowest: rgba(34,31,23, 0.75) !important;
-  --background-base-lower: rgba(34,31,23, 0.6) !important;
-  --background-base-low: rgba(22,19,11, 0.45) !important;
-  --bg-surface-raised: rgba(34,31,23, 0.6) !important;
-  --home-background: rgba(22,19,11, 0.45) !important;
-  --chat-background: rgba(22,19,11, 0.45) !important;
-  --chat-background-default: rgba(22,19,11, 0.45) !important;
-  --chat-border: rgba(34,31,23, 0.3) !important;
-  --chat-text-muted: #cdc6b4 !important;
+  --background-surface-highest: rgba(79,69,57, 0.5) !important;
+  --background-surface-higher: rgba(79,69,57, 0.4) !important;
+  --background-surface-high: rgba(24,18,11, 0.45) !important;
+  --background-base-lowest: rgba(37,31,23, 0.75) !important;
+  --background-base-lower: rgba(37,31,23, 0.6) !important;
+  --background-base-low: rgba(24,18,11, 0.45) !important;
+  --bg-surface-raised: rgba(37,31,23, 0.6) !important;
+  --home-background: rgba(24,18,11, 0.45) !important;
+  --chat-background: rgba(24,18,11, 0.45) !important;
+  --chat-background-default: rgba(24,18,11, 0.45) !important;
+  --chat-border: rgba(37,31,23, 0.3) !important;
+  --chat-text-muted: #d3c4b4 !important;
 
   /* Text and Interactive States */
-  --text-normal: #e9e2d4 !important;
-  --text-muted: #cdc6b4 !important;
-  --text-link: #dcc66e !important;
-  --text-positive: #dcc66e !important;
+  --text-normal: #ede0d4 !important;
+  --text-muted: #d3c4b4 !important;
+  --text-link: #f6bc70 !important;
+  --text-positive: #f6bc70 !important;
   --text-danger: #ffb4ab !important;
-  --text-default: #e9e2d4 !important;
-  --text-strong: #e9e2d4 !important;
-  --text-subtle: #cdc6b4 !important;
+  --text-default: #ede0d4 !important;
+  --text-strong: #ede0d4 !important;
+  --text-subtle: #d3c4b4 !important;
 
-  --interactive-normal: #cdc6b4 !important;
-  --interactive-hover: #e9e2d4 !important;
-  --interactive-active: #dcc66e !important;
-  --interactive-muted: rgba(205,198,180, 0.5) !important;
+  --interactive-normal: #d3c4b4 !important;
+  --interactive-hover: #ede0d4 !important;
+  --interactive-active: #f6bc70 !important;
+  --interactive-muted: rgba(211,196,180, 0.5) !important;
   
-  --interactive-icon-default: #cdc6b4 !important;
-  --interactive-icon-hover: #e9e2d4 !important;
-  --interactive-icon-active: #dcc66e !important;
-  --interactive-text-default: #cdc6b4 !important;
-  --interactive-text-hover: #e9e2d4 !important;
-  --interactive-text-active: #dcc66e !important;
+  --interactive-icon-default: #d3c4b4 !important;
+  --interactive-icon-hover: #ede0d4 !important;
+  --interactive-icon-active: #f6bc70 !important;
+  --interactive-text-default: #d3c4b4 !important;
+  --interactive-text-hover: #ede0d4 !important;
+  --interactive-text-active: #f6bc70 !important;
 
   /* Interactive Backgrounds */
-  --background-modifier-hover: rgba(75,71,57, 0.12) !important;
-  --background-modifier-active: rgba(75,71,57, 0.22) !important;
-  --background-modifier-selected: rgba(220,198,110, 0.12) !important;
-  --background-modifier-accent: rgba(220,198,110, 0.25) !important;
+  --background-modifier-hover: rgba(79,69,57, 0.12) !important;
+  --background-modifier-active: rgba(79,69,57, 0.22) !important;
+  --background-modifier-selected: rgba(246,188,112, 0.12) !important;
+  --background-modifier-accent: rgba(246,188,112, 0.25) !important;
   
-  --interactive-background-hover: rgba(75,71,57, 0.12) !important;
-  --interactive-background-selected: rgba(220,198,110, 0.12) !important;
-  --interactive-background-active: rgba(220,198,110, 0.22) !important;
+  --interactive-background-hover: rgba(79,69,57, 0.12) !important;
+  --interactive-background-selected: rgba(246,188,112, 0.12) !important;
+  --interactive-background-active: rgba(246,188,112, 0.22) !important;
 
   /* Card and Input Backgrounds */
-  --channeltextarea-background: rgba(75,71,57, 0.4) !important;
-  --activity-card-background: rgba(34,31,23, 0.5) !important;
-  --deprecated-card-bg: rgba(34,31,23, 0.5) !important;
-  --deprecated-quickbinder-border: rgba(75,71,57, 0.5) !important;
-  --card-background-default: rgba(75,71,57, 0.4) !important;
+  --channeltextarea-background: rgba(79,69,57, 0.4) !important;
+  --activity-card-background: rgba(37,31,23, 0.5) !important;
+  --deprecated-card-bg: rgba(37,31,23, 0.5) !important;
+  --deprecated-quickbinder-border: rgba(79,69,57, 0.5) !important;
+  --card-background-default: rgba(79,69,57, 0.4) !important;
 
   /* Scrollbars */
-  --scrollbar-thin-thumb: rgba(220,198,110, 0.5) !important;
+  --scrollbar-thin-thumb: rgba(246,188,112, 0.5) !important;
   --scrollbar-thin-track: transparent !important;
-  --scrollbar-auto-thumb: rgba(220,198,110, 0.5) !important;
+  --scrollbar-auto-thumb: rgba(246,188,112, 0.5) !important;
   --scrollbar-auto-track: transparent !important;
-  --scrollbar-auto-scrollbar-color-thumb: rgba(220,198,110, 0.5) !important;
+  --scrollbar-auto-scrollbar-color-thumb: rgba(246,188,112, 0.5) !important;
   --scrollbar-auto-scrollbar-color-track: transparent !important;
   
   /* Status Colors */
-  --status-positive: #dcc66e !important;
-  --status-warning: #d2c6a1 !important;
+  --status-positive: #f6bc70 !important;
+  --status-warning: #dec2a2 !important;
   --status-danger: #ffb4ab !important;
 
   /* Borders and Dividers */
-  --border-subtle: rgba(220,198,110, 0.15) !important;
-  --border-muted: rgba(220,198,110, 0.1) !important;
-  --border-strong: rgba(220,198,110, 0.25) !important;
-  --border-normal: rgba(220,198,110, 0.2) !important;
-  --divider-subtle: rgba(220,198,110, 0.15) !important;
-  --divider-strong: rgba(220,198,110, 0.25) !important;
+  --border-subtle: rgba(246,188,112, 0.15) !important;
+  --border-muted: rgba(246,188,112, 0.1) !important;
+  --border-strong: rgba(246,188,112, 0.25) !important;
+  --border-normal: rgba(246,188,112, 0.2) !important;
+  --divider-subtle: rgba(246,188,112, 0.15) !important;
+  --divider-strong: rgba(246,188,112, 0.25) !important;
 }

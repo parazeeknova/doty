@@ -51,6 +51,13 @@
         # Upstream hyprglass v0.9.0 replaced damageSurface hook with a per-surface commit listener,
         # so damageSurface hook conflict with scrolloverview is resolved without patching.
 
+        postPatch = ''
+          # Ensure non-executable stack so dlopen succeeds under modern NX / security enforcement
+          sed -i 's/LDFLAGS = -shared/LDFLAGS = -shared -Wl,-z,noexecstack/' Makefile
+          sed -i 's/\$(CC) -shared -fPIC/\$(CC) -shared -fPIC -Wl,-z,noexecstack/' Makefile
+          echo '.section .note.GNU-stack,"",@progbits' >> src/ItemHelperBlob.S
+        '';
+
         dontUseCmakeConfigure = true;
 
         inherit (pkgs.hyprland) buildInputs;
