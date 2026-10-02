@@ -215,7 +215,6 @@
         cachix
 
         # -- Apps --
-        opencode
         opencode-desktop
         vscode-fhs
         vscode-insiders

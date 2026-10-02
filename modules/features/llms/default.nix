@@ -133,7 +133,6 @@
         pi-coding-agent
         tailscale
         codex
-        claude-code
         yt-dlp
         cudatoolkit
         llama-cpp-cuda

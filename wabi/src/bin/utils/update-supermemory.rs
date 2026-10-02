@@ -9,7 +9,7 @@ fn extract_field(content: &str, start_pattern: &str, end_pattern: &str) -> Optio
     Some(content[val_start..val_start + end_idx].to_string())
 }
 
-fn get_latest_cline_version() -> Option<String> {
+fn get_latest_supermemory_version() -> Option<String> {
     let mut args = vec![
         "-s",
         "-H",
@@ -33,27 +33,25 @@ fn get_latest_cline_version() -> Option<String> {
         args.push(&auth_header);
     }
 
-    args.push("https://api.github.com/repos/cline/cline/releases");
+    args.push("https://api.github.com/repos/supermemoryai/supermemory/releases");
 
     let output = Command::new("curl").args(args).output().ok()?;
 
     if !output.status.success() {
-        eprintln!("Failed to fetch Cline release info from GitHub API.");
+        eprintln!("Failed to fetch supermemory release info from GitHub API.");
         return None;
     }
 
-    let releases: serde_json::Value = serde_json::from_slice(&output.stdout).ok()?;
+    let json_str = String::from_utf8_lossy(&output.stdout);
+    let releases: serde_json::Value = serde_json::from_str(&json_str).ok()?;
     let releases_arr = releases.as_array()?;
 
-    for release in releases_arr {
-        if let Some(tag_name) = release.get("tag_name").and_then(|t| t.as_str())
-            && tag_name.starts_with("desktop-")
+    for rel in releases_arr {
+        if let Some(tag) = rel.get("tag_name").and_then(|t| t.as_str())
+            && let Some(ver) = tag.strip_prefix("server-v")
+            && !ver.contains("-rc")
         {
-            let version = tag_name
-                .strip_prefix("desktop-v")
-                .or_else(|| tag_name.strip_prefix("desktop-"))
-                .unwrap_or(tag_name);
-            return Some(version.to_string());
+            return Some(ver.to_string());
         }
     }
 
@@ -61,40 +59,47 @@ fn get_latest_cline_version() -> Option<String> {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("Checking for Cline updates...");
+    println!("Checking for Supermemory server updates...");
 
-    let cline_nix_path = Path::new("modules/features/applications/cline/default.nix");
-    if !cline_nix_path.exists() {
-        eprintln!("Error: {:?} not found.", cline_nix_path);
+    let supermemory_nix_path = Path::new("modules/features/llms/supermemory.nix");
+    if !supermemory_nix_path.exists() {
+        eprintln!("Error: {:?} not found.", supermemory_nix_path);
         std::process::exit(1);
     }
 
-    let content = fs::read_to_string(cline_nix_path)?;
+    let content = fs::read_to_string(supermemory_nix_path)?;
 
+    // Locate supermemory-server block
     let start_idx = content
-        .find("pname = \"cline\";")
-        .ok_or("Cannot find cline definition in cline/default.nix")?;
-    let cline_block = &content[start_idx..];
+        .find("pname = \"supermemory-server\";")
+        .ok_or("Cannot find supermemory-server definition in supermemory.nix")?;
+    let block = &content[start_idx..];
 
-    let current_version = extract_field(cline_block, "version = \"", "\";")
-        .ok_or("Cannot find current cline version")?;
-    let current_hash =
-        extract_field(cline_block, "sha256 = \"", "\";").ok_or("Cannot find current cline hash")?;
+    let current_version = extract_field(block, "version = \"", "\";")
+        .ok_or("Cannot find current supermemory-server version")?;
+    let current_hash = extract_field(block, "sha256 = \"", "\";")
+        .ok_or("Cannot find current supermemory-server hash")?;
 
-    println!("Current local cline version: {}", current_version);
+    println!(
+        "Current local supermemory-server version: {}",
+        current_version
+    );
 
-    let latest_version = match get_latest_cline_version() {
+    let latest_version = match get_latest_supermemory_version() {
         Some(v) => v,
         None => {
-            eprintln!("Warning: Could not check for Cline updates. Skipping update check.");
+            eprintln!("Warning: Could not check for supermemory updates. Skipping update check.");
             return Ok(());
         }
     };
 
-    println!("Latest online cline version: {}", latest_version);
+    println!(
+        "Latest online supermemory-server version: {}",
+        latest_version
+    );
 
     if latest_version == current_version {
-        println!("Cline is already up to date!");
+        println!("Supermemory server is already up to date!");
         return Ok(());
     }
 
@@ -103,8 +108,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         latest_version
     );
     let new_url = format!(
-        "https://github.com/cline/cline/releases/download/desktop-v{}/Cline_{}_amd64.deb",
-        latest_version, latest_version
+        "https://github.com/supermemoryai/supermemory/releases/download/server-v{}/supermemory-server-linux-x64",
+        latest_version
     );
 
     let output = Command::new("nix-prefetch-url").arg(&new_url).output()?;
@@ -121,19 +126,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     println!("Fetched hash: {}", new_hash);
 
-    let content = fs::read_to_string(cline_nix_path)?;
-    let mut new_content = content.replace(
+    let end_idx = content[start_idx..]
+        .find("};")
+        .ok_or("Cannot find end of supermemory-server block")?
+        + start_idx
+        + 2;
+    let old_block = &content[start_idx..end_idx];
+
+    let mut new_block = old_block.to_string();
+    new_block = new_block.replace(
         &format!("version = \"{}\";", current_version),
         &format!("version = \"{}\";", latest_version),
     );
-    new_content = new_content.replace(
+    new_block = new_block.replace(
         &format!("sha256 = \"{}\";", current_hash),
         &format!("sha256 = \"{}\";", new_hash),
     );
-    fs::write(cline_nix_path, new_content)?;
+
+    let mut new_content = content.clone();
+    new_content.replace_range(start_idx..end_idx, &new_block);
+    fs::write(supermemory_nix_path, new_content)?;
 
     println!(
-        "Successfully updated cline/default.nix to cline version {} with hash {}",
+        "Successfully updated supermemory.nix to supermemory-server version {} with hash {}",
         latest_version, new_hash
     );
 
@@ -142,16 +157,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if should_commit {
         println!("Staging and committing changes to Git...");
         let status = Command::new("git")
-            .args(["add", "modules/features/applications/cline/default.nix"])
+            .args(["add", "modules/features/llms/supermemory.nix"])
             .status()?;
         if !status.success() {
             eprintln!("Failed to run git add.");
             std::process::exit(1);
         }
 
-        let commit_msg = format!("chore: auto-update cline to version {}", latest_version);
+        let commit_msg = format!(
+            "chore: auto-update supermemory-server to version {}",
+            latest_version
+        );
         let status = Command::new("git")
-            .args(["commit", "--no-gpg-sign", "-m", &commit_msg])
+            .args(["commit", "-m", &commit_msg])
             .status()?;
         if !status.success() {
             eprintln!("Failed to run git commit.");
@@ -160,7 +178,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Committed: {}", commit_msg);
     }
 
-    println!("Cline update complete!");
+    println!("Supermemory update complete!");
 
     Ok(())
 }

@@ -205,8 +205,8 @@ name = "update_bun"
 path = "src/bin/utils/update-bun.rs"
 
 [[bin]]
-name = "update_cline"
-path = "src/bin/utils/update-cline.rs"
+name = "update_supermemory"
+path = "src/bin/utils/update-supermemory.rs"
 
 [[bin]]
 name = "sd_gen"

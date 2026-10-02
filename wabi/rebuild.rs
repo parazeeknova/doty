@@ -121,7 +121,7 @@ fn main() {
         "update_terminal_browser",
         "update_terminal_code",
         "update_bun",
-        "update_cline",
+        "update_supermemory",
     ];
     let mut cargo_args = vec!["build", "--manifest-path", "wabi/Cargo.toml", "--release"];
     for bin in &update_bins {
@@ -142,7 +142,7 @@ fn main() {
         ("Terminal Browser", "./wabi/target/release/update_terminal_browser"),
         ("Terminal Code", "./wabi/target/release/update_terminal_code"),
         ("Bun", "./wabi/target/release/update_bun"),
-        ("Cline", "./wabi/target/release/update_cline"),
+        ("Supermemory", "./wabi/target/release/update_supermemory"),
     ];
 
     let total = app_updates.len();

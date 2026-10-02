@@ -366,6 +366,24 @@
         group = "users";
         mode = "0400";
       };
+      sops.secrets.generalcompute-api-key = {
+        path = "/run/secrets/generalcompute-api-key";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.gemini-api-key = {
+        path = "/run/secrets/gemini-api-key";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
+      sops.secrets.supermemory-api-key = {
+        path = "/run/secrets/supermemory-api-key";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
       # -- Merge Gateway per-account keys (mg_popup, N=1..6) --
       sops.secrets.mg-mgmt-key-1 = {
         path = "/run/secrets/mg-mgmt-key-1";

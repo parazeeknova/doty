@@ -61,5 +61,18 @@
       },
       "enabled": true
     }
-  }
+  },
+  "plugin": [
+    "opencode-supermemory@latest"
+  ],
+  "plugins": [
+    "opencode-supermemory"
+  ],
+  "permissions": [
+    {
+      "action": "supermemory_recall",
+      "resource": "*",
+      "effect": "allow"
+    }
+  ]
 }
