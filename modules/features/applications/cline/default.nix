@@ -10,11 +10,11 @@
     let
       cline = pkgs.stdenv.mkDerivation rec {
         pname = "cline";
-        version = "0.0.40";
+        version = "0.0.41";
 
         src = pkgs.fetchurl {
           url = "https://github.com/cline/cline/releases/download/desktop-v${version}/Cline_${version}_amd64.deb";
-          sha256 = "1kw2igvijvnp7lbyhcv30hprjaypwhjw30g2v5774zyh6bv9xqxf";
+          sha256 = "1y7pf62m53vgk2nbdjwfmbz4ic9pj5bkmz3c8ici48749az06vzy";
         };
 
         nativeBuildInputs = with pkgs; [
