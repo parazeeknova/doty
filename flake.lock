@@ -383,11 +383,11 @@
     "hyprglass": {
       "flake": false,
       "locked": {
-        "lastModified": 1788473433,
-        "narHash": "sha256-yUU0gKu1CXqpUQBtyb3IWNBYZ1bCAm99mfTUV7ceJyg=",
+        "lastModified": 1790883131,
+        "narHash": "sha256-3MzsLE0dZZ7dAlhsGGKNNJ/ZpIr2gc3RUue3K7nVZM4=",
         "owner": "hyprnux",
         "repo": "hyprglass",
-        "rev": "725383e86a2a79457a81cdbc2ceb33c07363bd8d",
+        "rev": "b14733f81f6868f6bbbac7c2e2c47a8f665756eb",
         "type": "github"
       },
       "original": {
