@@ -546,6 +546,7 @@ mcp_servers:
 # fallback_model:
 #   provider: openrouter
 #   model: anthropic/claude-sonnet-4
+    enabled: false
 fallback_providers:
   - provider: merge-gateway
     model: deepseek/deepseek-v4.1-flash
@@ -577,3 +578,7 @@ moa:
   degraded_reference_policy: loud
   fanout: user_turn
   enabled: true
+telemetry:
+  shared_metrics:
+    enabled: false
+    send: false
