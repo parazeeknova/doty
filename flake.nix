@@ -13,7 +13,7 @@
     };
 
     hyprglass = {
-      url = "github:hyprnux/hyprglass";
+      url = "github:hyprnux/hyprglass/hyprland-0.56";
       flake = false;
     };
 

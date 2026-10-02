@@ -90,6 +90,7 @@
           bundle="$out/share/hermes-desktop/dist/electron-main.mjs"
           chmod u+w "$out/share/hermes-desktop/dist" "$bundle"
           sed -i 's/if (!\(IS_WINDOWS[0-9]*\) && IS_WSL) {/if (!\1) {/' "$bundle"
+          sed -i 's/if (platform === "wslg")/if (platform === "wslg" || platform === "linux")/' "$bundle"
           sed -i '/function nativeOverlayWidth/,/return OVERLAY_FALLBACK_WIDTH;/{s/  if (isMac) {/  if (!isWindows) {/}' "$bundle"
         '';
       });

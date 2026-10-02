@@ -48,8 +48,8 @@
         version = "0.1";
         src = inputs.hyprglass;
 
-        # Omit damageSurface hook in hyprglass so scrolloverview can hook damageSurface exclusively
-        patches = [ ./patches/hyprglass-scrolloverview-compat.patch ];
+        # Upstream hyprglass v0.9.0 replaced damageSurface hook with a per-surface commit listener,
+        # so damageSurface hook conflict with scrolloverview is resolved without patching.
 
         dontUseCmakeConfigure = true;
 
