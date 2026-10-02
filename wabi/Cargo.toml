@@ -209,5 +209,9 @@ name = "update_supermemory"
 path = "src/bin/utils/update-supermemory.rs"
 
 [[bin]]
+name = "update_cua"
+path = "src/bin/utils/update-cua.rs"
+
+[[bin]]
 name = "sd_gen"
 path = "src/bin/utils/sd_gen.rs"

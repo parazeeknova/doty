@@ -95,6 +95,12 @@
         pkgs.python312Packages.pyyaml
       ];
 
+      # Supermemory's SDK is kept in an isolated writable venv because Hermes
+      # is installed from a read-only Nix store and its PM lock is absent.
+      # Add the SDK site-packages after Hermes' existing Python extensions.
+      supermemoryPythonPath = "/home/parazeeknova/.hermes/tools/supermemory-venv/lib/python3.14/site-packages";
+      hermesPythonPath = "${wakePythonPath}:${supermemoryPythonPath}";
+
       # Hermes Desktop is built with Electron's Window Controls Overlay on
       # plain Linux, which paints native min/max/close buttons in the
       # top-right. On Hyprland those are redundant (the WM provides its own
@@ -153,7 +159,7 @@
           # (provider: sherpa) can import them at runtime.
           home.sessionVariables = {
             AGENT_BROWSER_EXECUTABLE_PATH = "google-chrome-stable";
-            PYTHONPATH = wakePythonPath;
+            PYTHONPATH = hermesPythonPath;
           };
 
           home.file.".pi/agent/models.json".source =
@@ -223,7 +229,7 @@
               # (provider: sherpa). home.sessionVariables doesn't reach
               # systemd units, so set it here explicitly.
               EnvironmentFile = "${pkgs.writeText "hermes-gateway-pythonpath" ''
-                PYTHONPATH=${wakePythonPath}
+                PYTHONPATH=${hermesPythonPath}:$HOME/.hermes/tools/supermemory-venv/lib/python3.14/site-packages
               ''}";
               WorkingDirectory = "%h/.hermes";
               Restart = "always";

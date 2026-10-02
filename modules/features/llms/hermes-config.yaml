@@ -332,7 +332,7 @@ wake_word:
   provider: openwakeword
   phrase: hey hermes
 memory:
-  provider: local
+  provider: supermemory
 timezone: Asia/Kolkata
 approvals:
   destructive_slash_confirm: false
