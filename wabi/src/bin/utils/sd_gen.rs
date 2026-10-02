@@ -484,7 +484,7 @@ fn parse_cli_args() -> Result<CliArgs, String> {
 
 fn print_help() {
     println!(
-        r#"🎨 sd_gen - High performance Stable Diffusion & Qwen-Image 2.1 CLI
+        r#"sd_gen - High performance Stable Diffusion & Qwen-Image 2.1 CLI
 
 USAGE:
     sd_gen [COMMAND] [OPTIONS]
@@ -538,14 +538,14 @@ fn emit_event(json_mode: bool, event: &ProgressEvent) {
                     "Warm Start"
                 };
                 println!(
-                    "🎨 Starting image generation with {} [{}]",
+                    "[sd_gen] Starting image generation with {} [{}]",
                     model, start_type
                 );
                 println!("   Prompt: \"{}\"", prompt);
             }
             ProgressEvent::Loading { model, elapsed_ms } => {
                 print!(
-                    "\r⏳ Loading model {}... ({:.1}s)",
+                    "\r[sd_gen] Loading model {}... ({:.1}s)",
                     model,
                     *elapsed_ms as f64 / 1000.0
                 );
@@ -557,7 +557,7 @@ fn emit_event(json_mode: bool, event: &ProgressEvent) {
             } => {
                 let status = if *is_cold { "Cold Load" } else { "Warm Load" };
                 println!(
-                    "\n⚡ Model loaded in {:.2}s [{}]",
+                    "\n[sd_gen] Model loaded in {:.2}s [{}]",
                     *load_ms as f64 / 1000.0,
                     status
                 );
@@ -572,7 +572,7 @@ fn emit_event(json_mode: bool, event: &ProgressEvent) {
                 let filled = (percent * bar_len as u32 / 100) as usize;
                 let bar: String = "█".repeat(filled) + &"░".repeat(bar_len - filled);
                 print!(
-                    "\r🎨 [{}] {}/{} steps ({}%) - {:.1}s",
+                    "\r[{}] {}/{} steps ({}%) - {:.1}s",
                     bar,
                     step,
                     total_steps,
@@ -596,7 +596,7 @@ fn emit_event(json_mode: bool, event: &ProgressEvent) {
                 } else {
                     "Warm Start"
                 };
-                println!("\n✨ Generation Complete! [{}]", start_tag);
+                println!("\nGeneration Complete! [{}]", start_tag);
                 println!("   Output: {}", output_path);
                 println!("   Resolution: {}x{}, Steps: {}", width, height, steps);
                 println!(
@@ -607,7 +607,7 @@ fn emit_event(json_mode: bool, event: &ProgressEvent) {
                 );
             }
             ProgressEvent::Error { error } => {
-                eprintln!("\n❌ Error: {}", error);
+                eprintln!("\nError: {}", error);
             }
         }
     }
@@ -976,7 +976,7 @@ fn execute_generation(args: CliArgs) -> Result<(), String> {
             width,
             height
         );
-        send_desktop_notification("🎨 Image Generated", &msg, Some(&output_str));
+        send_desktop_notification("Image Generated", &msg, Some(&output_str));
     }
 
     Ok(())
@@ -1026,7 +1026,7 @@ fn command_list(json: bool) {
             println!("{}", s);
         }
     } else {
-        println!("🔍 Discovered Diffusion Models ({} total):", models.len());
+        println!("Discovered Diffusion Models ({} total):", models.len());
         if models.is_empty() {
             println!("   No models found in ~/Models or ~/Downloads.");
             println!(
@@ -1082,7 +1082,7 @@ fn command_status(json: bool) {
                     "Warm Start"
                 };
 
-                println!("📊 sd_gen Status:");
+                println!("sd_gen Status:");
                 println!("   Last Model:      {}", st.last_model);
                 println!("   Last Output:     {}", st.last_output);
                 println!("   Age:             {} minutes ago", age_min);
@@ -1099,7 +1099,7 @@ fn command_status(json: bool) {
                 );
             }
             None => {
-                println!("📊 sd_gen Status: No previous runs recorded.");
+                println!("sd_gen Status: No previous runs recorded.");
             }
         }
     }

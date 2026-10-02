@@ -874,19 +874,30 @@ export default function (pi: any) {
                 const ev = JSON.parse(trimmed);
                 if (ev.event === "start") {
                   modelName = ev.model || modelName;
-                  const coldCand = ev.is_cold_candidate ? "Cold" : "Warm";
-                  ui?.setStatus?.("image-gen", `🎨 ${shortenModel(modelName)} [${coldCand} Start...]`);
+                  const coldCand = ev.is_cold_candidate ? "cold" : "warm";
+                  ui?.setStatus?.("image-gen", `sd:${shortenModel(modelName).toLowerCase()} [${coldCand} start...]`);
                 } else if (ev.event === "loading") {
-                  ui?.setStatus?.("image-gen", `🎨 ${shortenModel(modelName)} [Loading: ${(ev.elapsed_ms / 1000).toFixed(1)}s]`);
-                } else if (ev.event === "loaded") {
-                  const coldStr = ev.is_cold ? "Cold" : "Warm";
-                  ui?.setStatus?.("image-gen", `🎨 ${shortenModel(modelName)} [Loaded: ${coldStr} (${(ev.load_ms / 1000).toFixed(1)}s)]`);
-                } else if (ev.event === "step") {
-                  ui?.setStatus?.("image-gen", `🎨 ${shortenModel(modelName)} [${ev.step}/${ev.total_steps} (${ev.percent}%) | ${(ev.elapsed_ms / 1000).toFixed(1)}s]`);
+                  ui?.setStatus?.("image-gen", `sd:${shortenModel(modelName).toLowerCase()} [loading: ${(ev.elapsed_ms / 1000).toFixed(1)}s]`);
                   onUpdate?.({
                     content: [{
                       type: "text",
-                      text: `🎨 Generating with ${modelName}...\nStep ${ev.step}/${ev.total_steps} (${ev.percent}%) • ${(ev.elapsed_ms / 1000).toFixed(1)}s elapsed`,
+                      text: `Loading model ${modelName}... (${(ev.elapsed_ms / 1000).toFixed(1)}s)`,
+                    }],
+                    details: {
+                      model: modelName,
+                      status: "loading",
+                      elapsed_ms: ev.elapsed_ms,
+                    },
+                  });
+                } else if (ev.event === "loaded") {
+                  const coldStr = ev.is_cold ? "cold" : "warm";
+                  ui?.setStatus?.("image-gen", `sd:${shortenModel(modelName).toLowerCase()} [loaded: ${coldStr} (${(ev.load_ms / 1000).toFixed(1)}s)]`);
+                } else if (ev.event === "step") {
+                  ui?.setStatus?.("image-gen", `sd:${shortenModel(modelName).toLowerCase()} [${ev.step}/${ev.total_steps} (${ev.percent}%) | ${(ev.elapsed_ms / 1000).toFixed(1)}s]`);
+                  onUpdate?.({
+                    content: [{
+                      type: "text",
+                      text: `Generating with ${modelName}...\nStep ${ev.step}/${ev.total_steps} (${ev.percent}%) • ${(ev.elapsed_ms / 1000).toFixed(1)}s elapsed`,
                     }],
                     details: {
                       model: modelName,
@@ -899,8 +910,8 @@ export default function (pi: any) {
                   });
                 } else if (ev.event === "complete") {
                   resultData = ev;
-                  const coldTag = ev.is_cold_start ? "Cold" : "Warm";
-                  ui?.setStatus?.("image-gen", `🎨 ${shortenModel(modelName)} [${coldTag}: ${(ev.total_duration_ms / 1000).toFixed(1)}s | ${ev.width}x${ev.height}]`);
+                  const coldTag = ev.is_cold_start ? "cold" : "warm";
+                  ui?.setStatus?.("image-gen", `sd:${shortenModel(modelName).toLowerCase()} [${coldTag}: ${(ev.total_duration_ms / 1000).toFixed(1)}s | ${ev.width}x${ev.height}]`);
                 } else if (ev.event === "error") {
                   errorMessage = ev.error;
                 }
@@ -920,7 +931,7 @@ export default function (pi: any) {
                 const sampleSec = (resultData.sample_duration_ms / 1000).toFixed(2);
 
                 const responseText = [
-                  `🎨 Generated image: ${resultData.output_path}`,
+                  `Generated image: ${resultData.output_path}`,
                   `• Model: ${resultData.model}`,
                   `• Resolution: ${resultData.width}x${resultData.height}`,
                   `• Steps: ${resultData.steps}, CFG: ${resultData.cfg}, Seed: ${resultData.seed}`,
@@ -933,7 +944,7 @@ export default function (pi: any) {
                 });
               } else {
                 const finalErr = errorMessage || stderrBuf.trim() || `sd_gen exited with code ${code}`;
-                ui?.setStatus?.("image-gen", "🎨 Error");
+                ui?.setStatus?.("image-gen", "sd:error");
                 resolve({
                   content: [{ type: "text", text: `Image generation failed: ${finalErr}` }],
                   details: { error: finalErr },
@@ -943,7 +954,7 @@ export default function (pi: any) {
             });
 
             proc.on("error", (err) => {
-              ui?.setStatus?.("image-gen", "🎨 Error");
+              ui?.setStatus?.("image-gen", "sd:error");
               resolve({
                 content: [{ type: "text", text: `Failed to execute sd_gen: ${err.message}` }],
                 details: { error: err.message },
@@ -960,7 +971,7 @@ export default function (pi: any) {
             ? `"${args.prompt.slice(0, 42)}${args.prompt.length > 42 ? "..." : ""}"`
             : "...";
 
-          if (state?.result) {
+          if (state?.result && !state?.isPartial) {
             if (state.isError) {
               const err = state.errorMessage || "error";
               textComp.setText(
@@ -979,7 +990,7 @@ export default function (pi: any) {
           } else {
             const stepInfo = state?.stepInfo || "";
             textComp.setText(
-              `${theme.fg("dim", "⠋")} ${theme.fg("toolTitle", theme.bold("generate_image"))} ${theme.fg("accent", prompt)} ${theme.fg("dim", stepInfo)}`
+              `${theme.fg("dim", "⠋")} ${theme.fg("toolTitle", theme.bold("generate_image"))} ${theme.fg("accent", prompt)}${stepInfo ? " " + theme.fg("dim", stepInfo) : ""}`
             );
           }
 
@@ -991,31 +1002,56 @@ export default function (pi: any) {
           const details = result?.details;
           const isError = context.isError || result?.isError || false;
 
+          let stepInfo = "";
+          if (isPartial && details) {
+            if (details.status === "loading") {
+              stepInfo = `[loading weights ${(details.elapsed_ms / 1000).toFixed(1)}s]`;
+            } else if (details.step) {
+              stepInfo = `[${details.step}/${details.total_steps} (${details.percent}%) · ${(details.elapsed_ms / 1000).toFixed(1)}s]`;
+            }
+          }
+
           const needsInvalidate =
             !state.result ||
             state.isError !== isError ||
             state.isPartial !== isPartial ||
+            state.stepInfo !== stepInfo ||
             state.output !== details?.output_path;
 
           state.result = result;
           state.isError = isError;
           state.isPartial = isPartial;
+          state.stepInfo = stepInfo;
           state.output = details?.output_path;
 
           if (needsInvalidate) {
             context.invalidate();
           }
 
-          if (!expanded || isPartial || isError) {
+          if (isPartial) {
+            const step = details?.step ?? 0;
+            const total = details?.total_steps ?? 25;
+            const pct = details?.percent ?? 0;
+            const elapsed = details?.elapsed_ms ? `${(details.elapsed_ms / 1000).toFixed(1)}s` : "";
+            if (details?.status === "loading") {
+              return new TextClass(theme.fg("dim", `  loading model weights... ${elapsed}`), 0, 0);
+            }
+            const barLen = 22;
+            const filled = Math.min(barLen, Math.floor((pct * barLen) / 100));
+            const bar = "=".repeat(filled) + (filled < barLen ? ">" : "") + " ".repeat(Math.max(0, barLen - filled - (filled < barLen ? 1 : 0)));
+            return new TextClass(theme.fg("accent", `  sampling: [${bar}] ${step}/${total} (${pct}%) ${elapsed}`), 0, 0);
+          }
+
+          if (!expanded || isError) {
             return new ContainerClass();
           }
 
           if (details?.output_path) {
             const lines = [
-              theme.fg("accent", "🖼️  Generated Image: ") + theme.fg("text", details.output_path),
-              theme.fg("dim", `   Model: ${details.model || "Local Diffusion"}`),
-              theme.fg("dim", `   Resolution: ${details.width}x${details.height} · Steps: ${details.steps} · CFG: ${details.cfg}`),
-              theme.fg("dim", `   Timings: Total ${(details.total_duration_ms / 1000).toFixed(2)}s [${details.is_cold_start ? "Cold Start" : "Warm Start"} (Load: ${(details.load_duration_ms / 1000).toFixed(2)}s, Sampling: ${(details.sample_duration_ms / 1000).toFixed(2)}s)]`),
+              theme.fg("accent", "  Output: ") + theme.fg("text", details.output_path),
+              theme.fg("dim", `  Model: ${details.model || "Local Diffusion"}`),
+              theme.fg("dim", `  Resolution: ${details.width}x${details.height} · Steps: ${details.steps} · CFG: ${details.cfg}`),
+              theme.fg("dim", `  Timings: Total ${(details.total_duration_ms / 1000).toFixed(2)}s [${details.is_cold_start ? "Cold Start" : "Warm Start"} (Load: ${(details.load_duration_ms / 1000).toFixed(2)}s, Sampling: ${(details.sample_duration_ms / 1000).toFixed(2)}s)]`),
             ];
             return new TextClass(lines.join("\n"), 0, 0);
           }
@@ -1056,8 +1092,9 @@ export default function (pi: any) {
             return;
           }
 
-          ctx.ui?.setStatus?.("image-gen", "🎨 Starting generation...");
-          ctx.ui?.notify?.(`🎨 Generating image: "${query}"`);
+          ctx.ui?.setStatus?.("image-gen", "sd:starting...");
+          ctx.ui?.setWorkingMessage?.(`[image] starting generation...`);
+          ctx.ui?.notify?.(`Generating image: "${query}"`);
 
           try {
             const proc = child_process.spawn(sdBin, ["generate", "--json", "-p", query, "--notify"], {
@@ -1071,13 +1108,18 @@ export default function (pi: any) {
               try {
                 const ev = JSON.parse(l.trim());
                 if (ev.event === "loading") {
-                  ctx.ui?.setStatus?.("image-gen", `🎨 Loading: ${(ev.elapsed_ms / 1000).toFixed(1)}s`);
+                  ctx.ui?.setStatus?.("image-gen", `sd:loading [${(ev.elapsed_ms / 1000).toFixed(1)}s]`);
+                  ctx.ui?.setWorkingMessage?.(`[image] loading model weights (${(ev.elapsed_ms / 1000).toFixed(1)}s)...`);
                 } else if (ev.event === "step") {
-                  ctx.ui?.setStatus?.("image-gen", `🎨 ${ev.step}/${ev.total_steps} (${ev.percent}%) | ${(ev.elapsed_ms / 1000).toFixed(1)}s`);
+                  const barLen = 15;
+                  const filled = Math.min(barLen, Math.floor((ev.percent * barLen) / 100));
+                  const bar = "=".repeat(filled) + (filled < barLen ? ">" : "") + " ".repeat(Math.max(0, barLen - filled - (filled < barLen ? 1 : 0)));
+                  ctx.ui?.setStatus?.("image-gen", `sd:sampling [${ev.step}/${ev.total_steps} (${ev.percent}%) | ${(ev.elapsed_ms / 1000).toFixed(1)}s]`);
+                  ctx.ui?.setWorkingMessage?.(`[image] [${bar}] ${ev.step}/${ev.total_steps} (${ev.percent}%) · ${(ev.elapsed_ms / 1000).toFixed(1)}s`);
                 } else if (ev.event === "complete") {
                   finalRes = ev;
-                  const coldTag = ev.is_cold_start ? "Cold" : "Warm";
-                  ctx.ui?.setStatus?.("image-gen", `🎨 [${coldTag}: ${(ev.total_duration_ms / 1000).toFixed(1)}s | ${ev.width}x${ev.height}]`);
+                  const coldTag = ev.is_cold_start ? "cold" : "warm";
+                  ctx.ui?.setStatus?.("image-gen", `sd:[${coldTag}: ${(ev.total_duration_ms / 1000).toFixed(1)}s | ${ev.width}x${ev.height}]`);
                 }
               } catch {}
             });
@@ -1090,11 +1132,14 @@ export default function (pi: any) {
               proc.on("error", reject);
             });
 
+            ctx.ui?.setWorkingMessage?.(null);
+
             if (finalRes) {
-              ctx.ui?.notify?.(`✨ Image saved to: ${finalRes.output_path} (${(finalRes.total_duration_ms / 1000).toFixed(1)}s)`);
+              ctx.ui?.notify?.(`Image saved to: ${finalRes.output_path} (${(finalRes.total_duration_ms / 1000).toFixed(1)}s)`);
             }
           } catch (err: any) {
-            ctx.ui?.setStatus?.("image-gen", "🎨 Error");
+            ctx.ui?.setWorkingMessage?.(null);
+            ctx.ui?.setStatus?.("image-gen", "sd:error");
             ctx.ui?.notify?.(`Image generation failed: ${err?.message || String(err)}`);
           }
         },
@@ -1161,9 +1206,9 @@ export default function (pi: any) {
         const modelShort = shortenModel(raw.last_model);
         const startType = raw.is_cold ? "Cold" : "Warm";
         const timing = raw.last_total_ms ? ` (${(raw.last_total_ms / 1000).toFixed(1)}s)` : "";
-        ctx.ui?.setStatus?.("image-gen", `🎨 ${modelShort} [Ready | ${startType}${timing}]`);
+        ctx.ui?.setStatus?.("image-gen", `sd:${modelShort.toLowerCase()} [ready | ${startType.toLowerCase()}${timing}]`);
       } else {
-        ctx.ui?.setStatus?.("image-gen", "🎨 Qwen2.1 [Ready]");
+        ctx.ui?.setStatus?.("image-gen", "sd:qwen2.1 [ready]");
       }
     } catch {}
 

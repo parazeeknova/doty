@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.85.1",
+  "lastChangelogVersion": "0.99.2",
   "theme": "matugen",
   "defaultProvider": "merge-gateway",
   "defaultModel": "deepseek/deepseek-v4.1-flash",
@@ -41,7 +41,6 @@
     "npm:pi-files-widget-overlay",
     "npm:@glevanov/tab-status",
     "npm:lsp-pi",
-    "npm:pi-mcp-adapter",
     "npm:pi-sub-agent",
     "npm:@diegopetrucci/pi-code-reviewer",
     "npm:@tmustier/pi-usage-extension"
