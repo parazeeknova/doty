@@ -230,6 +230,8 @@
               # systemd units, so set it here explicitly.
               EnvironmentFile = "${pkgs.writeText "hermes-gateway-pythonpath" ''
                 PYTHONPATH=${hermesPythonPath}:/home/parazeeknova/.hermes/tools/supermemory-venv/lib/python3.14/site-packages
+                CUA_DRIVER_RS_ENABLE_WAYLAND=1
+                HERMES_CUA_DRIVER_CMD=/run/current-system/sw/bin/cua-driver
               ''}";
               WorkingDirectory = "%h/.hermes";
               Restart = "always";

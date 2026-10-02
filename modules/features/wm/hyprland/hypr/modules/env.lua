@@ -27,3 +27,8 @@ hl.env("QT_QPA_PLATFORMTHEME", "qt5ct")
 -- hl.env("GBM_BACKEND", "nvidia-drm")
 -- hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
 -- hl.env("LIBVA_DRIVER_NAME", "nvidia")
+
+-- CUA / Hermes Wayland Driver
+hl.env("CUA_DRIVER_RS_ENABLE_WAYLAND", "1")
+hl.env("HERMES_CUA_DRIVER_CMD", "/run/current-system/sw/bin/cua-driver")
+

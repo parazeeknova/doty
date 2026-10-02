@@ -78,6 +78,10 @@
               set -gx SUPERMEMORY_API_KEY (cat $HOME/.supermemory/api-key)
               set -gx SUPERMEMORY_CC_API_KEY (cat $HOME/.supermemory/api-key)
           end
+
+          # -- CUA / Hermes Computer Use --
+          set -gx CUA_DRIVER_RS_ENABLE_WAYLAND "1"
+          set -gx HERMES_CUA_DRIVER_CMD "/run/current-system/sw/bin/cua-driver"
         '';
       };
     };

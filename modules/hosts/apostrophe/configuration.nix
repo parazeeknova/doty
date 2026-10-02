@@ -124,6 +124,7 @@
       # -- Services --
       services.cloudflare-warp.enable = true;
       services.gnome.gnome-keyring.enable = true;
+      services.gnome.at-spi2-core.enable = true;
       services.blueman.enable = true;
       services.upower.enable = true;
       services.tumbler.enable = true;

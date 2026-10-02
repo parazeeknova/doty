@@ -74,5 +74,10 @@
         cua
         cua-driver
       ];
+
+      environment.sessionVariables = {
+        CUA_DRIVER_RS_ENABLE_WAYLAND = "1";
+        HERMES_CUA_DRIVER_CMD = "${cua-driver}/bin/cua-driver";
+      };
     };
 }
