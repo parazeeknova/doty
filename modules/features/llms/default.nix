@@ -150,6 +150,17 @@
         codex-desktop
       ];
 
+      sops.templates."hermes-profile-env" = {
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+        path = "/run/secrets/hermes-profile.env";
+        content = ''
+          SUPERMEMORY_API_KEY=''${config.sops.placeholder.supermemory-api-key}
+          TINYFISH_API_KEY=''${config.sops.placeholder.tinyfish-api-key}
+        '';
+      };
+
       home-manager.users.parazeeknova =
         { config, ... }:
         {
@@ -182,6 +193,94 @@
 
           home.file.".hermes/SOUL.md".source =
             config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/hermes-SOUL.md";
+
+          # -- Hermes Root Declarative Files --
+          home.file.".hermes/profile.yaml" = {
+            source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/hermes-profile.yaml";
+            force = true;
+          };
+
+          home.file.".hermes/supermemory.json" = {
+            text = builtins.toJSON {
+              base_url = "http://localhost:6767";
+            };
+            force = true;
+          };
+
+          # -- Hermes dev profile --
+          home.file.".hermes/profiles/dev/config.yaml" = {
+            source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/profiles/dev/config.yaml";
+            force = true;
+          };
+          home.file.".hermes/profiles/dev/SOUL.md" = {
+            source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/profiles/dev/SOUL.md";
+            force = true;
+          };
+          home.file.".hermes/profiles/dev/profile.yaml" = {
+            source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/profiles/dev/profile.yaml";
+            force = true;
+          };
+          home.file.".hermes/profiles/dev/supermemory.json" = {
+            text = builtins.toJSON {
+              base_url = "http://localhost:6767";
+              container_tag = "hermes-dev";
+            };
+            force = true;
+          };
+          home.file.".hermes/profiles/dev/.env" = {
+            source = config.lib.file.mkOutOfStoreSymlink "/run/secrets/hermes-profile.env";
+            force = true;
+          };
+
+          # -- Hermes job profile --
+          home.file.".hermes/profiles/job/config.yaml" = {
+            source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/profiles/job/config.yaml";
+            force = true;
+          };
+          home.file.".hermes/profiles/job/SOUL.md" = {
+            source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/profiles/job/SOUL.md";
+            force = true;
+          };
+          home.file.".hermes/profiles/job/profile.yaml" = {
+            source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/profiles/job/profile.yaml";
+            force = true;
+          };
+          home.file.".hermes/profiles/job/supermemory.json" = {
+            text = builtins.toJSON {
+              base_url = "http://localhost:6767";
+              container_tag = "hermes-job";
+            };
+            force = true;
+          };
+          home.file.".hermes/profiles/job/.env" = {
+            source = config.lib.file.mkOutOfStoreSymlink "/run/secrets/hermes-profile.env";
+            force = true;
+          };
+
+          # -- Hermes uni profile --
+          home.file.".hermes/profiles/uni/config.yaml" = {
+            source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/profiles/uni/config.yaml";
+            force = true;
+          };
+          home.file.".hermes/profiles/uni/SOUL.md" = {
+            source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/profiles/uni/SOUL.md";
+            force = true;
+          };
+          home.file.".hermes/profiles/uni/profile.yaml" = {
+            source = config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/llms/profiles/uni/profile.yaml";
+            force = true;
+          };
+          home.file.".hermes/profiles/uni/supermemory.json" = {
+            text = builtins.toJSON {
+              base_url = "http://localhost:6767";
+              container_tag = "hermes-uni";
+            };
+            force = true;
+          };
+          home.file.".hermes/profiles/uni/.env" = {
+            source = config.lib.file.mkOutOfStoreSymlink "/run/secrets/hermes-profile.env";
+            force = true;
+          };
 
           xdg.dataFile."applications/hermes.desktop" = {
             # The Hermes desktop app rewrites its own .desktop entry on every

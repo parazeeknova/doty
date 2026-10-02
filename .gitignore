@@ -49,3 +49,8 @@ asar-unpacked
 
 # -- Pi runtime artifacts --
 .pi/
+
+# -- Hermes secrets and tokens --
+*google_client_secret*.json
+*google_token*.json
+*.env
