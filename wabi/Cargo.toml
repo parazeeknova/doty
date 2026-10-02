@@ -207,3 +207,7 @@ path = "src/bin/utils/update-bun.rs"
 [[bin]]
 name = "update_cline"
 path = "src/bin/utils/update-cline.rs"
+
+[[bin]]
+name = "sd_gen"
+path = "src/bin/utils/sd_gen.rs"

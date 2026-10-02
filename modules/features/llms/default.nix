@@ -9,6 +9,27 @@
     }:
     let
       llama-cpp-cuda = pkgs.llama-cpp.override { cudaSupport = true; };
+      stable-diffusion-cpp-cuda =
+        (pkgs.stable-diffusion-cpp.override {
+          cudaSupport = true;
+        }).overrideAttrs
+          (old: {
+            version = "unstable-2026-09-24";
+            src = pkgs.fetchgit {
+              url = "https://github.com/leejet/stable-diffusion.cpp.git";
+              rev = "3f8527a46c54ecf4cb4ed6003da8e8982283c73c";
+              sha256 = "sha256-AMWPF0nPpU92MuTHQo9QUJQm5IvVLPEPDOR/Wrgziq4=";
+              fetchSubmodules = true;
+            };
+            cmakeFlags =
+              (lib.filter (flag: !lib.hasPrefix "-DCMAKE_CUDA_ARCHITECTURES" flag) old.cmakeFlags)
+              ++ [
+                "-DCMAKE_CUDA_ARCHITECTURES=86"
+              ];
+            postInstall = (old.postInstall or "") + ''
+              ln -s $out/bin/sd-cli $out/bin/sd || true
+            '';
+          });
       hermes-desktop = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.desktop;
       hermes-cli = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
@@ -116,6 +137,7 @@
         yt-dlp
         cudatoolkit
         llama-cpp-cuda
+        stable-diffusion-cpp-cuda
         hermes-desktop-patched
         hermes-cli
         opus

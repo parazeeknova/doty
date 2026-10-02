@@ -27,16 +27,27 @@ in
           mg-key-picker-bin = pkgs.writeShellScriptBin "mg-key-picker" ''
             exec ${scriptsDir}/mg-key-picker "$@"
           '';
+
+          sd-gen-bin = pkgs.writeShellScriptBin "sd_gen" ''
+            exec ${scriptsDir}/sd_gen "$@"
+          '';
+
+          sd-gen-dash-bin = pkgs.writeShellScriptBin "sd-gen" ''
+            exec ${scriptsDir}/sd_gen "$@"
+          '';
         in
         {
           home.packages = [
             lcc-bin
             mg-key-picker-bin
+            sd-gen-bin
+            sd-gen-dash-bin
           ];
 
           home.file = {
             "scripts/mg-key-picker".source = mkOutOfStoreSymlink "${scriptsDir}/mg-key-picker";
             "scripts/lcc".source = mkOutOfStoreSymlink "${scriptsDir}/lcc";
+            "scripts/sd_gen".source = mkOutOfStoreSymlink "${scriptsDir}/sd_gen";
             "scripts/kbd_aura".source = mkOutOfStoreSymlink "${scriptsDir}/kbd_aura";
             "scripts/presets_lister".source = mkOutOfStoreSymlink "${scriptsDir}/presets_lister";
             "scripts/set_wallpaper".source = mkOutOfStoreSymlink "${scriptsDir}/set_wallpaper";

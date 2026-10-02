@@ -2,6 +2,9 @@ import child_process from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import readline from "node:readline";
+
+let activeUi: any = null;
 
 let visibleWidth: (s: string) => number;
 let truncateToWidth: (s: string, w: number, ellipsis?: string) => string;
@@ -404,6 +407,29 @@ async function fetchWebPage(url: string, maxLength = 8000): Promise<string> {
   return text;
 }
 
+function findSdGenBin(): string {
+  const home = os.homedir();
+  const cands = [
+    path.join(home, ".local", "bin", "sd_gen"),
+    path.join(home, "doty", "modules", "scripts", "sd_gen"),
+    "/run/current-system/sw/bin/sd_gen",
+  ];
+  for (const c of cands) {
+    if (fs.existsSync(c)) return c;
+  }
+  return "sd_gen";
+}
+
+function shortenModel(name?: string): string {
+  if (!name) return "SD";
+  const lower = name.toLowerCase();
+  if (lower.includes("qwen")) return "Qwen2.1";
+  if (lower.includes("flux")) return "Flux";
+  if (lower.includes("sdxl") || lower.includes("xl")) return "SDXL";
+  if (lower.includes("sd15") || lower.includes("1.5")) return "SD1.5";
+  return name.replace(/\(.*?\)/g, "").trim().split(/[-_ ]/)[0] || "SD";
+}
+
 export default function (pi: any) {
   // Compact 1-line read tool renderer with batch & parallel support
   if (createReadToolFn && ContainerClass && TextClass) {
@@ -776,6 +802,303 @@ export default function (pi: any) {
           return new ContainerClass();
         },
       });
+
+      // Local Stable Diffusion / Qwen-Image 2.1 Generation Tool
+      pi.registerTool({
+        name: "generate_image",
+        label: "generate image",
+        description: "Generate images locally using GPU-accelerated Stable Diffusion / Qwen-Image 2.1 inference with CUDA. Supports custom prompts, negative prompts, dimensions, steps, CFG scale, and model selection. Returns output image file path and performance metrics.",
+        parameters: {
+          type: "object",
+          properties: {
+            prompt: { type: "string", description: "Text prompt describing the desired image" },
+            negative_prompt: { type: "string", description: "Optional negative prompt describing things to exclude or avoid" },
+            model: { type: "string", description: "Optional model name or substring match (e.g. 'qwen', 'sdxl', 'flux'). Defaults to auto-selected model." },
+            width: { type: "number", description: "Image width in pixels (default 1024, or 512 for SD1.5)" },
+            height: { type: "number", description: "Image height in pixels (default 1024, or 512 for SD1.5)" },
+            steps: { type: "number", description: "Sampling steps (default 25 for Qwen, 20 for Flux)" },
+            cfg: { type: "number", description: "Classifier-Free Guidance scale (default 6.0 for Qwen, 7.0 for SDXL)" },
+            sampler: { type: "string", description: "Sampling method (euler, euler_a, dpm++2m, etc. default: euler)" },
+            seed: { type: "number", description: "Random seed (-1 for random)" },
+          },
+          required: ["prompt"],
+        },
+        renderShell: "self",
+
+        async execute(toolCallId: string, params: any, signal: any, onUpdate: any, context: any) {
+          const prompt = params?.prompt?.trim();
+          if (!prompt) {
+            return {
+              content: [{ type: "text", text: "Error: Prompt cannot be empty" }],
+              details: { error: "Empty prompt" },
+              isError: true,
+            };
+          }
+
+          const sdBin = findSdGenBin();
+          const args = ["generate", "--json", "-p", prompt, "--notify"];
+
+          if (params.negative_prompt) args.push("-n", params.negative_prompt);
+          if (params.model) args.push("-m", params.model);
+          if (params.width) args.push("-W", String(params.width));
+          if (params.height) args.push("-H", String(params.height));
+          if (params.steps) args.push("--steps", String(params.steps));
+          if (params.cfg) args.push("--cfg", String(params.cfg));
+          if (params.sampler) args.push("--sampler", params.sampler);
+          if (params.seed !== undefined && params.seed !== null) args.push("-s", String(params.seed));
+
+          const ui = context?.ui || activeUi;
+          let modelName = params.model || "Qwen-Image 2.1";
+          let resultData: any = null;
+          let errorMessage: string | null = null;
+
+          return new Promise((resolve) => {
+            const proc = child_process.spawn(sdBin, args, {
+              stdio: ["ignore", "pipe", "pipe"],
+            });
+
+            if (signal) {
+              const onAbort = () => {
+                try {
+                  proc.kill("SIGTERM");
+                } catch {}
+              };
+              signal.addEventListener("abort", onAbort, { once: true });
+            }
+
+            const rlOut = readline.createInterface({ input: proc.stdout });
+            rlOut.on("line", (line) => {
+              const trimmed = line.trim();
+              if (!trimmed.startsWith("{")) return;
+              try {
+                const ev = JSON.parse(trimmed);
+                if (ev.event === "start") {
+                  modelName = ev.model || modelName;
+                  const coldCand = ev.is_cold_candidate ? "Cold" : "Warm";
+                  ui?.setStatus?.("image-gen", `🎨 ${shortenModel(modelName)} [${coldCand} Start...]`);
+                } else if (ev.event === "loading") {
+                  ui?.setStatus?.("image-gen", `🎨 ${shortenModel(modelName)} [Loading: ${(ev.elapsed_ms / 1000).toFixed(1)}s]`);
+                } else if (ev.event === "loaded") {
+                  const coldStr = ev.is_cold ? "Cold" : "Warm";
+                  ui?.setStatus?.("image-gen", `🎨 ${shortenModel(modelName)} [Loaded: ${coldStr} (${(ev.load_ms / 1000).toFixed(1)}s)]`);
+                } else if (ev.event === "step") {
+                  ui?.setStatus?.("image-gen", `🎨 ${shortenModel(modelName)} [${ev.step}/${ev.total_steps} (${ev.percent}%) | ${(ev.elapsed_ms / 1000).toFixed(1)}s]`);
+                  onUpdate?.({
+                    content: [{
+                      type: "text",
+                      text: `🎨 Generating with ${modelName}...\nStep ${ev.step}/${ev.total_steps} (${ev.percent}%) • ${(ev.elapsed_ms / 1000).toFixed(1)}s elapsed`,
+                    }],
+                    details: {
+                      model: modelName,
+                      step: ev.step,
+                      total_steps: ev.total_steps,
+                      percent: ev.percent,
+                      elapsed_ms: ev.elapsed_ms,
+                      status: "sampling",
+                    },
+                  });
+                } else if (ev.event === "complete") {
+                  resultData = ev;
+                  const coldTag = ev.is_cold_start ? "Cold" : "Warm";
+                  ui?.setStatus?.("image-gen", `🎨 ${shortenModel(modelName)} [${coldTag}: ${(ev.total_duration_ms / 1000).toFixed(1)}s | ${ev.width}x${ev.height}]`);
+                } else if (ev.event === "error") {
+                  errorMessage = ev.error;
+                }
+              } catch {}
+            });
+
+            let stderrBuf = "";
+            proc.stderr.on("data", (chunk) => {
+              stderrBuf += chunk.toString();
+            });
+
+            proc.on("close", (code) => {
+              if (code === 0 && resultData) {
+                const coldLabel = resultData.is_cold_start ? "Cold start" : "Warm start";
+                const totalSec = (resultData.total_duration_ms / 1000).toFixed(2);
+                const loadSec = (resultData.load_duration_ms / 1000).toFixed(2);
+                const sampleSec = (resultData.sample_duration_ms / 1000).toFixed(2);
+
+                const responseText = [
+                  `🎨 Generated image: ${resultData.output_path}`,
+                  `• Model: ${resultData.model}`,
+                  `• Resolution: ${resultData.width}x${resultData.height}`,
+                  `• Steps: ${resultData.steps}, CFG: ${resultData.cfg}, Seed: ${resultData.seed}`,
+                  `• Performance: ${totalSec}s total [${coldLabel} (Model Load: ${loadSec}s, Sampling: ${sampleSec}s)]`,
+                ].join("\n");
+
+                resolve({
+                  content: [{ type: "text", text: responseText }],
+                  details: resultData,
+                });
+              } else {
+                const finalErr = errorMessage || stderrBuf.trim() || `sd_gen exited with code ${code}`;
+                ui?.setStatus?.("image-gen", "🎨 Error");
+                resolve({
+                  content: [{ type: "text", text: `Image generation failed: ${finalErr}` }],
+                  details: { error: finalErr },
+                  isError: true,
+                });
+              }
+            });
+
+            proc.on("error", (err) => {
+              ui?.setStatus?.("image-gen", "🎨 Error");
+              resolve({
+                content: [{ type: "text", text: `Failed to execute sd_gen: ${err.message}` }],
+                details: { error: err.message },
+                isError: true,
+              });
+            });
+          });
+        },
+
+        renderCall(args: any, theme: any, context: any) {
+          const textComp = (context.lastComponent as any) ?? new TextClass("", 0, 0);
+          const state = context.state;
+          const prompt = args?.prompt
+            ? `"${args.prompt.slice(0, 42)}${args.prompt.length > 42 ? "..." : ""}"`
+            : "...";
+
+          if (state?.result) {
+            if (state.isError) {
+              const err = state.errorMessage || "error";
+              textComp.setText(
+                `${theme.fg("error", "✗")} ${theme.fg("toolTitle", theme.bold("generate_image"))} ${theme.fg("error", prompt)} ${theme.fg("dim", `(${err})`)}`
+              );
+            } else {
+              const details = state.result.details || {};
+              const totalSec = details.total_duration_ms ? (details.total_duration_ms / 1000).toFixed(1) + "s" : "";
+              const coldStr = details.is_cold_start !== undefined ? (details.is_cold_start ? "cold" : "warm") : "";
+              const res = details.width && details.height ? `${details.width}x${details.height}` : "";
+              const tag = [totalSec, coldStr, res].filter(Boolean).join(" · ");
+              textComp.setText(
+                `${theme.fg("success", "✓")} ${theme.fg("toolTitle", theme.bold("generate_image"))} ${theme.fg("accent", prompt)} ${theme.fg("dim", `(${tag})`)}`
+              );
+            }
+          } else {
+            const stepInfo = state?.stepInfo || "";
+            textComp.setText(
+              `${theme.fg("dim", "⠋")} ${theme.fg("toolTitle", theme.bold("generate_image"))} ${theme.fg("accent", prompt)} ${theme.fg("dim", stepInfo)}`
+            );
+          }
+
+          return textComp;
+        },
+
+        renderResult(result: any, { expanded, isPartial }: any, theme: any, context: any) {
+          const state = context.state;
+          const details = result?.details;
+          const isError = context.isError || result?.isError || false;
+
+          const needsInvalidate =
+            !state.result ||
+            state.isError !== isError ||
+            state.isPartial !== isPartial ||
+            state.output !== details?.output_path;
+
+          state.result = result;
+          state.isError = isError;
+          state.isPartial = isPartial;
+          state.output = details?.output_path;
+
+          if (needsInvalidate) {
+            context.invalidate();
+          }
+
+          if (!expanded || isPartial || isError) {
+            return new ContainerClass();
+          }
+
+          if (details?.output_path) {
+            const lines = [
+              theme.fg("accent", "🖼️  Generated Image: ") + theme.fg("text", details.output_path),
+              theme.fg("dim", `   Model: ${details.model || "Local Diffusion"}`),
+              theme.fg("dim", `   Resolution: ${details.width}x${details.height} · Steps: ${details.steps} · CFG: ${details.cfg}`),
+              theme.fg("dim", `   Timings: Total ${(details.total_duration_ms / 1000).toFixed(2)}s [${details.is_cold_start ? "Cold Start" : "Warm Start"} (Load: ${(details.load_duration_ms / 1000).toFixed(2)}s, Sampling: ${(details.sample_duration_ms / 1000).toFixed(2)}s)]`),
+            ];
+            return new TextClass(lines.join("\n"), 0, 0);
+          }
+
+          return new ContainerClass();
+        },
+      });
+
+      // User slash command: /image <prompt> | /image list | /image status
+      pi.registerCommand("image", {
+        description: "Generate an image locally with Stable Diffusion / Qwen-Image 2.1 (/image <prompt> | /image list | /image status)",
+        handler: async (args: string, ctx: any) => {
+          const query = (args || "").trim();
+          const sdBin = findSdGenBin();
+
+          if (!query || query === "help") {
+            ctx.ui?.notify?.("Usage: /image <prompt> | /image list | /image status");
+            return;
+          }
+
+          if (query === "list") {
+            try {
+              const out = child_process.execFileSync(sdBin, ["list"], { encoding: "utf-8" });
+              ctx.ui?.notify?.(out.trim());
+            } catch (e: any) {
+              ctx.ui?.notify?.(`Error listing models: ${e?.message || String(e)}`);
+            }
+            return;
+          }
+
+          if (query === "status") {
+            try {
+              const out = child_process.execFileSync(sdBin, ["status"], { encoding: "utf-8" });
+              ctx.ui?.notify?.(out.trim());
+            } catch (e: any) {
+              ctx.ui?.notify?.(`Error reading status: ${e?.message || String(e)}`);
+            }
+            return;
+          }
+
+          ctx.ui?.setStatus?.("image-gen", "🎨 Starting generation...");
+          ctx.ui?.notify?.(`🎨 Generating image: "${query}"`);
+
+          try {
+            const proc = child_process.spawn(sdBin, ["generate", "--json", "-p", query, "--notify"], {
+              stdio: ["ignore", "pipe", "pipe"],
+            });
+
+            const rl = readline.createInterface({ input: proc.stdout });
+            let finalRes: any = null;
+
+            rl.on("line", (l) => {
+              try {
+                const ev = JSON.parse(l.trim());
+                if (ev.event === "loading") {
+                  ctx.ui?.setStatus?.("image-gen", `🎨 Loading: ${(ev.elapsed_ms / 1000).toFixed(1)}s`);
+                } else if (ev.event === "step") {
+                  ctx.ui?.setStatus?.("image-gen", `🎨 ${ev.step}/${ev.total_steps} (${ev.percent}%) | ${(ev.elapsed_ms / 1000).toFixed(1)}s`);
+                } else if (ev.event === "complete") {
+                  finalRes = ev;
+                  const coldTag = ev.is_cold_start ? "Cold" : "Warm";
+                  ctx.ui?.setStatus?.("image-gen", `🎨 [${coldTag}: ${(ev.total_duration_ms / 1000).toFixed(1)}s | ${ev.width}x${ev.height}]`);
+                }
+              } catch {}
+            });
+
+            await new Promise<void>((resolve, reject) => {
+              proc.on("close", (code) => {
+                if (code === 0) resolve();
+                else reject(new Error(`sd_gen failed with exit code ${code}`));
+              });
+              proc.on("error", reject);
+            });
+
+            if (finalRes) {
+              ctx.ui?.notify?.(`✨ Image saved to: ${finalRes.output_path} (${(finalRes.total_duration_ms / 1000).toFixed(1)}s)`);
+            }
+          } catch (err: any) {
+            ctx.ui?.setStatus?.("image-gen", "🎨 Error");
+            ctx.ui?.notify?.(`Image generation failed: ${err?.message || String(err)}`);
+          }
+        },
+      });
     } catch {}
   }
 
@@ -783,6 +1106,7 @@ export default function (pi: any) {
     const guidance = `
 ## Tool Calling & Web Search Guidelines
 - Web Search & Fetch: You have \`web_search\` and \`web_fetch\` available. Use \`web_search\` to search the internet (via DuckDuckGo) for real-time information, documentation, or links. Use \`web_fetch\` with any URL to extract clean readable web page content.
+- Image Generation: You have \`generate_image\` available to create images locally using GPU-accelerated Stable Diffusion / Qwen-Image 2.1 inference with NVIDIA CUDA. When the user requests an image, illustration, logo, wallpaper, or visual concept, invoke \`generate_image\` with their prompt.
 - Fast Parallel Reading: When inspecting multiple files, do NOT read them one-by-one sequentially across turns. Either pass \`paths: ["file1", "file2", ...]\` to \`read\` to read them concurrently in a single call, or issue multiple parallel \`read\` tool calls in the same turn.
 - Subagents: For broad codebase reconnaissance, multi-file reviews, or large searches, delegate to the \`subagent\` tool (using \`agent: "scout"\` or parallel \`tasks: [...]\`) with isolated context.
 `;
@@ -826,6 +1150,22 @@ export default function (pi: any) {
     if (ctx?.mode !== "tui") {
       return;
     }
+
+    activeUi = ctx.ui;
+
+    // Initialize image generation status on status bar
+    try {
+      const statePath = path.join(os.homedir(), ".cache", "sd_gen", "state.json");
+      if (fs.existsSync(statePath)) {
+        const raw = JSON.parse(fs.readFileSync(statePath, "utf-8"));
+        const modelShort = shortenModel(raw.last_model);
+        const startType = raw.is_cold ? "Cold" : "Warm";
+        const timing = raw.last_total_ms ? ` (${(raw.last_total_ms / 1000).toFixed(1)}s)` : "";
+        ctx.ui?.setStatus?.("image-gen", `🎨 ${modelShort} [Ready | ${startType}${timing}]`);
+      } else {
+        ctx.ui?.setStatus?.("image-gen", "🎨 Qwen2.1 [Ready]");
+      }
+    } catch {}
 
     // Ensure default thinking level is set to "high" for reasoning models
     try {

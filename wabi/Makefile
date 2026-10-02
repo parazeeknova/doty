@@ -66,6 +66,8 @@ install: build
 	cp --remove-destination target/release/mtp_notify $(HOME)/.local/bin/mtp_notify
 	cp --remove-destination target/release/mail_notifier $(HOME)/.local/bin/mail_notifier
 	cp --remove-destination target/release/update_verso $(HOME)/.local/bin/update_verso
+	cp --remove-destination target/release/sd_gen ../modules/scripts/sd_gen
+	cp --remove-destination target/release/sd_gen $(HOME)/.local/bin/sd_gen
 
 
 
