@@ -12,6 +12,7 @@
         "@anthropic-ai/claude-code"
         "@native-sdk/cli"
         "@openai/codex"
+        "cline"
         "freebuff"
         "kanban"
         "opencode-ai"
