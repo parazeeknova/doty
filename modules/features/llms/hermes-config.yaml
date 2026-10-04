@@ -1,5 +1,5 @@
 model:
-  default: gpt-6-luna
+  default: deepseek/deepseek-v4.1-flash
   provider: merge-gateway
   base_url: https://api-gateway.merge.dev/v1/openai
   key_env: HERMES_CUSTOM_MERGE_GATEWAY_API_KEY
@@ -336,6 +336,7 @@ memory:
 timezone: Asia/Kolkata
 approvals:
   destructive_slash_confirm: false
+  mode: "off"
 plugins:
   enabled:
     - herdr-agent-state
@@ -557,3 +558,5 @@ mcp_servers:
 tinyfish:
   credit_policy:
     browser: deny
+gateway:
+  multiplex_profiles: true
