@@ -71,6 +71,13 @@
           # -- Supermemory --
           set -gx SUPERMEMORY_BASE_URL "http://localhost:6767"
           set -gx SUPERMEMORY_API_URL "http://localhost:6767"
+          if test -f /run/secrets/supermemory-codex-api-key
+              set -gx SUPERMEMORY_CODEX_API_KEY (cat /run/secrets/supermemory-codex-api-key)
+          else if test -f /run/secrets/supermemory-api-key
+              set -gx SUPERMEMORY_CODEX_API_KEY (cat /run/secrets/supermemory-api-key)
+          else if test -f $HOME/.supermemory/api-key
+              set -gx SUPERMEMORY_CODEX_API_KEY (cat $HOME/.supermemory/api-key)
+          end
           if test -f /run/secrets/supermemory-api-key
               set -gx SUPERMEMORY_API_KEY (cat /run/secrets/supermemory-api-key)
               set -gx SUPERMEMORY_CC_API_KEY (cat /run/secrets/supermemory-api-key)

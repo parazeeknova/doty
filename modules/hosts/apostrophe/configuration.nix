@@ -385,6 +385,12 @@
         group = "users";
         mode = "0400";
       };
+      sops.secrets.supermemory-codex-api-key = {
+        path = "/run/secrets/supermemory-codex-api-key";
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+      };
       # -- Merge Gateway per-account keys (mg_popup, N=1..6) --
       sops.secrets.mg-mgmt-key-1 = {
         path = "/run/secrets/mg-mgmt-key-1";

@@ -24,6 +24,7 @@ in
           xdg.configFile = {
             "opencode/opencode.json".source = mkOutOfStoreSymlink "${opencodeDir}/opencode.json";
             "opencode/tui.json".source = mkOutOfStoreSymlink "${opencodeDir}/tui.json";
+            "opencode/supermemory-plugin.js".source = mkOutOfStoreSymlink "${opencodeDir}/supermemory-plugin.js";
             "opencode/themes".source = mkOutOfStoreSymlink "${opencodeDir}/themes";
             "opencode/AGENTS.md".source = mkOutOfStoreSymlink "${opencodeDir}/AGENTS.md";
           };

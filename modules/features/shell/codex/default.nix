@@ -20,6 +20,7 @@
             secrets.merge-gateway-api-key = { };
             secrets.context7-api-key = { };
             secrets.github-token = { };
+            secrets.supermemory-codex-api-key = { };
 
             templates."codex-config" = {
               content = ''
@@ -232,6 +233,8 @@
                 OPENROUTER_API_KEY = "${config.sops.placeholder.openrouter-api-key}"
                 CONTEXT7_API_KEY = "${config.sops.placeholder.context7-api-key}"
                 GITHUB_PERSONAL_ACCESS_TOKEN = "${config.sops.placeholder.github-token}"
+                SUPERMEMORY_BASE_URL = "http://localhost:6767"
+                SUPERMEMORY_CODEX_API_KEY = "${config.sops.placeholder.supermemory-codex-api-key}"
               '';
               path = "${config.home.homeDirectory}/.codex/config.toml";
             };

@@ -158,6 +158,7 @@
         # -- Documents --
         zathura
         zathuraPkgs.zathura_pdf_mupdf
+        onlyoffice-desktopeditors
       ];
     };
 }
