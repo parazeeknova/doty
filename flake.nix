@@ -76,6 +76,10 @@
     hermes-agent = {
       url = "github:NousResearch/hermes-agent";
     };
+    deepseek-harness = {
+      url = "github:deepseek-ai/deepseek-harness";
+      flake = false;
+    };
   };
 
   outputs =

@@ -198,6 +198,7 @@
         biome
         turbo
         lefthook
+        bubblewrap
 
         # -- Build Tools --
         (lib.lowPrio gcc)
