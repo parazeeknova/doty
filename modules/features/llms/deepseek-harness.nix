@@ -98,6 +98,23 @@
 
       dshWeb = pkgs.writeShellScriptBin "dsh-web" ''
         set -euo pipefail
+
+        if [ "$#" -eq 0 ]; then
+          # If the systemd background service is running, open the authenticated URL in browser
+          if systemctl --user is-active --quiet deepseek-harness 2>/dev/null; then
+            echo "DeepSeek Harness background service is active on port ${defaultPort}."
+            url=$(journalctl --user -u deepseek-harness -n 100 --no-pager 2>/dev/null | grep -o 'http://127.0.0.1:[0-9]*/?token=[^ ]*' | tail -n 1 || true)
+            if [ -n "$url" ]; then
+              echo "Opening: $url"
+              ${pkgs.xdg-utils}/bin/xdg-open "$url" 2>/dev/null || true
+            else
+              echo "Opening: http://127.0.0.1:${defaultPort}"
+              ${pkgs.xdg-utils}/bin/xdg-open "http://127.0.0.1:${defaultPort}" 2>/dev/null || true
+            fi
+            exit 0
+          fi
+        fi
+
         exec ${dshBin}/bin/dsh web "$@"
       '';
     in
@@ -110,6 +127,35 @@
       home-manager.users.parazeeknova =
         { config, ... }:
         {
+          # Background service: autostart DeepSeek Harness Web in the background on system start
+          systemd.user.services.deepseek-harness = {
+            Unit = {
+              Description = "DeepSeek Harness Web Server";
+              After = [ "network-online.target" ];
+              Wants = [ "network-online.target" ];
+            };
+
+            Service = {
+              Type = "simple";
+              ExecStart = "${dshBin}/bin/dsh web --no-open --port ${defaultPort}";
+              Environment = [
+                "PATH=${lib.makeBinPath [ pkgs.nodejs pkgs.pnpm pkgs.coreutils pkgs.bash ]}:/run/current-system/sw/bin"
+                "HOME=%h"
+                "DSH_PORT=${defaultPort}"
+              ];
+              WorkingDirectory = "%h";
+              Restart = "always";
+              RestartSec = 5;
+              StandardOutput = "journal";
+              StandardError = "journal";
+              TimeoutStopSec = 30;
+            };
+
+            Install = {
+              WantedBy = [ "default.target" ];
+            };
+          };
+
           # Pre-bootstrap ~/.local/share/dsh on home-manager activation
           home.activation.bootstrapDeepseekHarness = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
             DSH_SHARE_DIR="$HOME/.local/share/dsh"
