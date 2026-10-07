@@ -72,9 +72,12 @@
       hardware.cpu.intel.updateMicrocode = lib.mkDefault true;
       hardware.enableRedistributableFirmware = lib.mkDefault true;
 
-      # Intel AX201 WiFi stability: disable INI TLV debug infrastructure which causes -110 INIT ucode timeout
+      # Intel AX201 WiFi stability: maximum reliability, disable power saving & sleep states
       boot.extraModprobeConfig = ''
         options iwlwifi enable_ini=0
+        options iwlwifi power_save=0
+        options iwlmvm power_scheme=1
+        options iwlwifi uapsd_disable=1
       '';
     };
 }

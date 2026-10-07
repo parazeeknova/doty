@@ -82,7 +82,11 @@
 
       # -- Networking --
       networking.hostName = "apostrophe";
-      networking.networkmanager.enable = true;
+      networking.networkmanager = {
+        enable = true;
+        wifi.powersave = false;
+        wifi.scanRandMacAddress = false;
+      };
 
       # -- Locale --
       time.timeZone = "Asia/Kolkata";
