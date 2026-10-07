@@ -165,7 +165,6 @@ in
             };
             ".dsh/mcp/supermemory/run.sh" = {
               source = mkOutOfStoreSymlink "${dshDir}/run-supermemory-mcp.sh";
-              executable = true;
               force = true;
             };
             ".dsh/mcp/supermemory/openapi.json" = {
