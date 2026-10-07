@@ -156,8 +156,8 @@
         mode = "0400";
         path = "/run/secrets/hermes-profile.env";
         content = ''
-          SUPERMEMORY_API_KEY=''${config.sops.placeholder.supermemory-api-key}
-          TINYFISH_API_KEY=''${config.sops.placeholder.tinyfish-api-key}
+          SUPERMEMORY_API_KEY=${config.sops.placeholder.supermemory-api-key}
+          TINYFISH_API_KEY=${config.sops.placeholder.tinyfish-api-key}
         '';
       };
 
