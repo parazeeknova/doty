@@ -41,6 +41,14 @@
         "chrome-devtools-mcp@latest",
         "--autoConnect"
       ]
+    },
+    "supermemory": {
+      "command": "/home/parazeeknova/.dsh/mcp/supermemory/run.sh",
+      "args": [],
+      "env": {
+        "SUPERMEMORY_API_KEY": "{env:SUPERMEMORY_API_KEY}",
+        "SUPERMEMORY_BASE_URL": "http://localhost:6767"
+      }
     }
   }
 }

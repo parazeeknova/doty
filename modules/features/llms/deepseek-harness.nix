@@ -1,4 +1,9 @@
 { self, inputs, ... }:
+
+let
+  repo = "/home/parazeeknova/doty";
+  dshDir = "${repo}/modules/features/llms/deepseek-harness";
+in
 {
   flake.nixosModules.parazeeknovaDeepseekHarness =
     {
@@ -23,33 +28,42 @@
       # intercepts `require('node-addon-require-builtin')` and transparently falls back to
       # Node's native `require('internal/...')`, resolving the issue completely.
       preloadShim = pkgs.writeText "dsh-require-builtin-shim.cjs" ''
-        const Module = require('module');
+        const Module = require('node:module');
         const origRequire = Module.prototype.require;
         Module.prototype.require = function(id) {
-          const res = origRequire.apply(this, arguments);
-          if (typeof id === 'string' && (id === 'node-addon-require-builtin' || id.includes('node-addon-require-builtin'))) {
-            if (res && res.requireBuiltin && !res.__patched) {
-              const orig = res.requireBuiltin;
-              const patched = function(mid) {
-                try {
-                  return orig(mid);
-                } catch (e) {
-                  return origRequire.call(this, mid);
-                }
-              };
-              res.requireBuiltin = patched;
-              if (res.default) {
-                res.default.requireBuiltin = patched;
+          if (id === 'node-addon-require-builtin' || (typeof id === 'string' && id.includes('node-addon-require-builtin'))) {
+            const builtinLoader = (mid) => {
+              try {
+                return origRequire.call(this, mid);
+              } catch (e) {
+                return Module.createRequire(__filename)(mid);
               }
-              res.__patched = true;
-            }
+            };
+            return {
+              requireBuiltin: builtinLoader,
+              isAllowedInternalId: () => true,
+              getBindingInfo: () => ({ status: 'ok' }),
+              default: {
+                requireBuiltin: builtinLoader,
+                isAllowedInternalId: () => true,
+                getBindingInfo: () => ({ status: 'ok' })
+              }
+            };
           }
-          return res;
+          return origRequire.apply(this, arguments);
         };
       '';
 
       dshBin = pkgs.writeShellScriptBin "dsh" ''
         set -euo pipefail
+
+        # Load dsh secrets environment if available
+        if [ -f /run/secrets/dsh.env ]; then
+          set -a
+          # shellcheck disable=SC1091
+          . /run/secrets/dsh.env
+          set +a
+        fi
 
         DSH_PORT="''${DSH_PORT:-${defaultPort}}"
         DSH_SHARE_DIR="''${DSH_SHARE_DIR:-$HOME/.local/share/dsh}"
@@ -124,22 +138,68 @@
         dshWeb
       ];
 
+      sops.templates."dsh.env" = {
+        owner = config.users.users.parazeeknova.name;
+        group = "users";
+        mode = "0400";
+        path = "/run/secrets/dsh.env";
+        content = ''
+          MERGE_GATEWAY_API_KEY=${config.sops.placeholder.merge-gateway-api-key}
+          TINYFISH_API_KEY=${config.sops.placeholder.tinyfish-api-key}
+          SUPERMEMORY_API_KEY=${config.sops.placeholder.supermemory-api-key}
+          SUPERMEMORY_BASE_URL=http://localhost:6767
+        '';
+      };
+
       home-manager.users.parazeeknova =
         { config, ... }:
+        let
+          inherit (config.lib.file) mkOutOfStoreSymlink;
+        in
         {
+          # Declarative configuration symlinks for DeepSeek Harness
+          home.file = {
+            ".dsh/profiles/web/cordis.patch.yml" = {
+              source = mkOutOfStoreSymlink "${dshDir}/cordis.patch.yml";
+              force = true;
+            };
+            ".dsh/mcp/supermemory/run.sh" = {
+              source = mkOutOfStoreSymlink "${dshDir}/run-supermemory-mcp.sh";
+              executable = true;
+              force = true;
+            };
+            ".dsh/mcp/supermemory/openapi.json" = {
+              source = mkOutOfStoreSymlink "${dshDir}/openapi.json";
+              force = true;
+            };
+          };
+
           # Background service: autostart DeepSeek Harness Web in the background on system start
           systemd.user.services.deepseek-harness = {
             Unit = {
               Description = "DeepSeek Harness Web Server";
-              After = [ "network-online.target" ];
+              After = [
+                "network-online.target"
+                "supermemory-server.service"
+              ];
               Wants = [ "network-online.target" ];
             };
 
             Service = {
               Type = "simple";
               ExecStart = "${dshBin}/bin/dsh web --no-open --port ${defaultPort}";
+              EnvironmentFile = [
+                "-/run/secrets/dsh.env"
+              ];
               Environment = [
-                "PATH=${lib.makeBinPath [ pkgs.nodejs pkgs.pnpm pkgs.coreutils pkgs.bash ]}:/run/current-system/sw/bin"
+                "PATH=${
+                  lib.makeBinPath [
+                    pkgs.nodejs
+                    pkgs.pnpm
+                    pkgs.coreutils
+                    pkgs.bash
+                  ]
+                }:/run/current-system/sw/bin"
                 "HOME=%h"
                 "DSH_PORT=${defaultPort}"
               ];
@@ -157,22 +217,24 @@
           };
 
           # Pre-bootstrap ~/.local/share/dsh on home-manager activation
-          home.activation.bootstrapDeepseekHarness = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-            DSH_SHARE_DIR="$HOME/.local/share/dsh"
-            DSH_ENTRY="$DSH_SHARE_DIR/node_modules/@deepseek-ai/dsh/lib/bin.js"
-            if [ ! -f "$DSH_ENTRY" ]; then
-              $DRY_RUN_CMD mkdir -p "$DSH_SHARE_DIR"
-              (
-                cd "$DSH_SHARE_DIR"
-                if [ ! -f "package.json" ]; then
-                  ${pkgs.pnpm}/bin/pnpm init >/dev/null 2>&1 || true
+          home.activation.bootstrapDeepseekHarness =
+            inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ]
+              ''
+                DSH_SHARE_DIR="$HOME/.local/share/dsh"
+                DSH_ENTRY="$DSH_SHARE_DIR/node_modules/@deepseek-ai/dsh/lib/bin.js"
+                if [ ! -f "$DSH_ENTRY" ]; then
+                  $DRY_RUN_CMD mkdir -p "$DSH_SHARE_DIR"
+                  (
+                    cd "$DSH_SHARE_DIR"
+                    if [ ! -f "package.json" ]; then
+                      ${pkgs.pnpm}/bin/pnpm init >/dev/null 2>&1 || true
+                    fi
+                    $DRY_RUN_CMD ${pkgs.pnpm}/bin/pnpm add --prefer-offline @deepseek-ai/dsh || {
+                      echo "Warning: DeepSeek Harness initial installation encountered a warning."
+                    }
+                  )
                 fi
-                $DRY_RUN_CMD ${pkgs.pnpm}/bin/pnpm add --prefer-offline @deepseek-ai/dsh || {
-                  echo "Warning: DeepSeek Harness initial installation encountered a warning."
-                }
-              )
-            fi
-          '';
+              '';
 
           xdg.dataFile."applications/deepseek-harness.desktop".text = ''
             [Desktop Entry]

@@ -1,0 +1,96 @@
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
+- id: ui-settings-general
+  name: "@deepseek-ai/dsh-client-ui-settings-general"
+  config:
+    welcomeNoticeVersion: 2026-09-28.1
+- id: ui-theme
+  name: "@deepseek-ai/dsh-client-ui-theme"
+  config:
+    preference: dark
+    fontSize: 12
+- id: permission
+  name: "@deepseek-ai/dsh-permission-presets"
+  config:
+    presets:
+      read-only:
+        sandbox: read-only
+        approval: ask
+      workspace-write:
+        sandbox: workspace-write
+        approval: ask
+      danger-full-access:
+        sandbox: danger-full-access
+        approval: never
+    defaultPreset: danger-full-access
+- id: llm-pi-ai
+  name: "@deepseek-ai/dsh-llm-pi-ai"
+  config:
+    providers:
+      merge-gateway:
+        displayName: Merge Gateway
+        apiKeyEnv: MERGE_GATEWAY_API_KEY
+        api: openai-completions
+        baseURL: https://api-gateway.merge.dev/v1/openai
+        # Default reasoning effort for this route.
+        reasoning: high
+        models:
+          - id: deepseek/deepseek-v4.1-flash
+            name: deepseek/deepseek-v4.1-flash
+            # pi-ai ships no catalog entry for "merge-gateway", so the
+            # installed-catalog fallback would report reasoning: false and the
+            # model would never be asked to think. Declaring the levels the
+            # model actually supports turns the capability on.
+            #   off: null -> supported, sends no reasoning parameter
+            reasoningEfforts:
+              off: null
+              low: low
+              high: high
+              max: max
+- id: agent-default-model
+  name: "@deepseek-ai/dsh-agent-default-model"
+  config:
+    provider: merge-gateway
+    model: deepseek/deepseek-v4.1-flash
+# New plugin rows must be added through `insert:` — a bare entry with an id
+# that no bundle declared is warned and skipped ("entry not found"). Patches
+# above this line only override ids that already exist in a bundle.
+- insert:
+    # TinyFish Web Agent MCP: search, fetch_content, monitors, browser automation.
+    # Tools appear as mcp__tinyfish__search, mcp__tinyfish__fetch_content, etc.
+    # The bearer token is read from the harness process env at load time, so the
+    # key never lives in this file.
+    - id: mcp-tinyfish
+      name: "@deepseek-ai/dsh-mcp-client"
+      config:
+        serverName: tinyfish
+        transport: streamable-http
+        url: https://agent.tinyfish.ai/mcp
+        headers:
+          Authorization: !!js '`Bearer ${process.env.TINYFISH_API_KEY || ""}`'
+    # Local supermemory (localhost:6767) exposed as memory tools.
+    #
+    # The self-hosted supermemory binary serves only a REST API — it has no MCP
+    # endpoint (/mcp and /sse both 404, and its own welcome page says so). So
+    # this runs a stdio MCP bridge over its OpenAPI spec instead. Tools appear
+    # as mcp__memory__pst-v4-search, mcp__memory__pst-v4-memories, etc.
+    #
+    # `env` is required, not optional: stdio children get a scrubbed environment
+    # where any name matching KEY|PASSWORD|SECRET|TOKEN is dropped, and
+    # SUPERMEMORY_API_KEY matches. Passing it here re-adds it explicitly.
+    - id: mcp-supermemory
+      name: "@deepseek-ai/dsh-mcp-client"
+      config:
+        serverName: memory
+        transport: stdio
+        command: /home/parazeeknova/.dsh/mcp/supermemory/run.sh
+        args: []
+        env:
+          SUPERMEMORY_API_KEY: !!js (process.env.SUPERMEMORY_API_KEY || "")
+          SUPERMEMORY_BASE_URL: http://localhost:6767
+        # Search/embedding calls can be slow on first query; the default is 60s.
+        toolCallTimeoutMs: 180000
+        # stdio negotiation spawns a probe process first, so allow a longer
+        # startup window than the streamable-http default.
+        failOnStartupError: false
