@@ -373,8 +373,8 @@
         group = "users";
         mode = "0400";
       };
-      sops.secrets.gemini-api-key = {
-        path = "/run/secrets/gemini-api-key";
+      sops.secrets.voyage-api-key = {
+        path = "/run/secrets/voyage-api-key";
         owner = config.users.users.parazeeknova.name;
         group = "users";
         mode = "0400";
