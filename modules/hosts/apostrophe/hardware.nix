@@ -72,12 +72,24 @@
       hardware.cpu.intel.updateMicrocode = lib.mkDefault true;
       hardware.enableRedistributableFirmware = lib.mkDefault true;
 
-      # Intel AX201 WiFi stability: maximum reliability, disable power saving & sleep states
+      # Intel AX201 WiFi stability: maximum reliability, disable power saving, sleep states & buggy 11ax HE aggregation
       boot.extraModprobeConfig = ''
         options iwlwifi enable_ini=0
         options iwlwifi power_save=0
         options iwlmvm power_scheme=1
         options iwlwifi uapsd_disable=1
+        options iwlwifi disable_11ax=1
+        options iwlwifi 11n_disable=8
+        options iwlwifi amsdu_size=4
       '';
+
+      # Keep Intel AX201 WiFi CNVi PCIe controller fully powered (prevent runtime suspend / D3 / L1.2)
+      services.udev.extraRules = ''
+        ACTION=="add|change", SUBSYSTEM=="pci", ATTR{vendor}=="0x8086", ATTR{device}=="0x51f0", ATTR{power/control}="on"
+      '';
+
+      systemd.tmpfiles.rules = [
+        "w /sys/bus/pci/devices/0000:00:14.3/power/control - - - - on"
+      ];
     };
 }
