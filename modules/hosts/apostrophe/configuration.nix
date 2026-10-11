@@ -254,12 +254,21 @@
           });
           pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
             (pfinal: pprev: {
+              anyio = pprev.anyio.overridePythonAttrs (_: {
+                doCheck = false;
+              });
+              narwhals = pprev.narwhals.overridePythonAttrs (_: {
+                doCheck = false;
+              });
               inline-snapshot = pprev.inline-snapshot.overridePythonAttrs (_: {
                 doCheck = false;
               });
               sse-starlette = pprev.sse-starlette.overridePythonAttrs (_: {
                 doCheck = false;
                 dependencies = (pprev.dependencies or [ ]) ++ [ pfinal.starlette ];
+              });
+              fsspec = pprev.fsspec.overridePythonAttrs (_: {
+                doCheck = false;
               });
             })
           ];

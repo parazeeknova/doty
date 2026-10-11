@@ -31,4 +31,3 @@ hl.env("QT_QPA_PLATFORMTHEME", "qt5ct")
 -- CUA / Hermes Wayland Driver
 hl.env("CUA_DRIVER_RS_ENABLE_WAYLAND", "1")
 hl.env("HERMES_CUA_DRIVER_CMD", "/run/current-system/sw/bin/cua-driver")
-
