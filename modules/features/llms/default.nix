@@ -33,73 +33,11 @@
       hermes-desktop = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.desktop;
       hermes-cli = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
-      onnxruntime-bin = pkgs.python312Packages.buildPythonPackage {
-        pname = "onnxruntime";
-        version = "1.29.0";
-        format = "wheel";
-        src = pkgs.fetchurl {
-          url = "https://files.pythonhosted.org/packages/96/eb/e6968f5e41aac3125f2ff5708855f09cb0b70d85ed3115b625b0b58305ba/onnxruntime-1.29.0-cp312-cp312-manylinux_2_28_x86_64.whl";
-          sha256 = "2b80d8c7ec2cc7438e4da3760b88c24568cba72c9ace96d668800a6c79419acb";
-        };
-        nativeBuildInputs = [ pkgs.autoPatchelfHook ];
-        buildInputs = [
-          pkgs.stdenv.cc.cc.lib
-          pkgs.zlib
-        ];
-        propagatedBuildInputs = with pkgs.python312Packages; [
-          numpy
-          protobuf
-          coloredlogs
-          flatbuffers
-          packaging
-          sympy
-        ];
-        doCheck = false;
-        pythonImportsCheck = [ "onnxruntime" ];
-      };
-
-      openwakeword = pkgs.python312Packages.buildPythonPackage {
-        pname = "openwakeword";
-        version = "0.6.0";
-        src = pkgs.fetchFromGitHub {
-          owner = "dscripka";
-          repo = "openWakeWord";
-          rev = "v0.6.0";
-          hash = "sha256-QsXV9REAHdP0Y0fVZuU+Gt9+gcPMB60bc3DOMDYuaDM=";
-        };
-        format = "setuptools";
-        postPatch = ''
-          sed -i "/tflite-runtime/d" setup.py
-        '';
-        propagatedBuildInputs = [
-          onnxruntime-bin
-          pkgs.python312Packages.tqdm
-          pkgs.python312Packages.scipy
-          (pkgs.python312Packages.scikit-learn.overridePythonAttrs (_: {
-            doCheck = false;
-          }))
-          pkgs.python312Packages.requests
-        ];
-        doCheck = false;
-        pythonImportsCheck = [ "openwakeword" ];
-      };
-
-      # Wake word ("Hey Hermes"): OpenWakeWord & Sherpa providers.
-      # The extraPythonPackages override on the flake package doesn't reach the
-      # runtime PYTHONPATH, so we add openwakeword, sherpa-onnx, sentencepiece
-      # site-packages directly via home.sessionVariables (content-addressed store paths).
-      wakePythonPath = pkgs.lib.makeSearchPath pkgs.python312.sitePackages [
-        openwakeword
-        pkgs.python312Packages.sherpa-onnx
-        pkgs.python312Packages.sentencepiece
-        pkgs.python312Packages.pyyaml
-      ];
-
       # Supermemory's SDK is kept in an isolated writable venv because Hermes
       # is installed from a read-only Nix store and its PM lock is absent.
       # Add the SDK site-packages after Hermes' existing Python extensions.
       supermemoryPythonPath = "/home/parazeeknova/.hermes/tools/supermemory-venv/lib/python3.14/site-packages";
-      hermesPythonPath = "${wakePythonPath}:${supermemoryPythonPath}";
+      hermesPythonPath = supermemoryPythonPath;
 
       # Hermes Desktop is built with Electron's Window Controls Overlay on
       # plain Linux, which paints native min/max/close buttons in the
@@ -166,11 +104,9 @@
         {
           # agent-browser downloads its own Chrome (which breaks on NixOS -
           # missing libglib etc). Point it at the system Chrome instead.
-          # PYTHONPATH adds sherpa-onnx + sentencepiece so hermes' wake word
-          # (provider: sherpa) can import them at runtime.
           home.sessionVariables = {
             AGENT_BROWSER_EXECUTABLE_PATH = "google-chrome-stable";
-            PYTHONPATH = "${hermesPythonPath}:/home/parazeeknova/.hermes/tools/supermemory-venv/lib/python3.14/site-packages";
+            PYTHONPATH = hermesPythonPath;
           };
 
           home.file.".pi/agent/models.json".source =
@@ -324,11 +260,8 @@
               # with status 203/EXEC.
               ExecStart = "/run/current-system/sw/bin/hermes gateway run";
               Environment = "HERMES_HOME=%h/.hermes";
-              # sherpa-onnx + sentencepiece for the wake word
-              # (provider: sherpa). home.sessionVariables doesn't reach
-              # systemd units, so set it here explicitly.
               EnvironmentFile = "${pkgs.writeText "hermes-gateway-pythonpath" ''
-                PYTHONPATH=${hermesPythonPath}:/home/parazeeknova/.hermes/tools/supermemory-venv/lib/python3.14/site-packages
+                PYTHONPATH=${hermesPythonPath}
                 CUA_DRIVER_RS_ENABLE_WAYLAND=1
                 HERMES_CUA_DRIVER_CMD=/run/current-system/sw/bin/cua-driver
               ''}";

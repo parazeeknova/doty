@@ -20,7 +20,6 @@ install: build
 	-pkill -f wallpaper_thumb_watcher 2>/dev/null || true
 	-pkill -f screentime_daemon 2>/dev/null || true
 	-pkill -f mtp_notify 2>/dev/null || true
-	-pkill -f get_voxtype_status 2>/dev/null || true
 	-pkill -f mail_notifier 2>/dev/null || true
 	@sleep 0.5
 	mkdir -p ../modules/features/wm/quickshell/battery_popup ../modules/features/wm/quickshell/volume_popup ../modules/features/wm/quickshell/osd/bin ../modules/features/wm/quickshell/network_popup ../modules/features/wm/quickshell/clipboard_popup ../modules/features/wm/quickshell/bluetooth_popup ../modules/features/wm/quickshell/brightness_popup ../modules/features/wm/quickshell/notif_popup ../modules/features/wm/quickshell/sysmon_popup ../modules/features/wm/quickshell/podman_popup ../modules/features/wm/quickshell/media_popup ../modules/features/wm/quickshell/vm_popup ../modules/features/wm/quickshell/ports_popup ../modules/features/wm/quickshell/sunset_popup ../modules/features/wm/quickshell/apps_popup ../modules/features/wm/quickshell/recents_popup ../modules/features/wm/quickshell/wallpaper_switcher ../modules/features/wm/quickshell/github_graph ../modules/features/wm/shortcut_popup ../modules/features/wm/volume_popup ../modules/features/wm/waybar/scripts ../modules/features/wm/theming/scripts ../modules/scripts
@@ -47,7 +46,6 @@ install: build
 	cp --remove-destination target/release/toggle_widgets ../modules/features/wm/waybar/scripts/toggle_widgets
 	cp --remove-destination target/release/wabi_power ../modules/features/wm/waybar/scripts/wabi_power
 	cp --remove-destination target/release/tray_count ../modules/features/wm/waybar/scripts/tray_count
-	cp --remove-destination target/release/get_voxtype_status ../modules/features/wm/waybar/scripts/get_voxtype_status
 	cp --remove-destination target/release/get_tailscale_status ../modules/features/wm/waybar/scripts/get_tailscale_status
 	cp --remove-destination target/release/wallpaper_thumb_watcher ../modules/features/wm/quickshell/wallpaper_switcher/wallpaper_thumb_watcher
 	cp --remove-destination target/release/get_github_graph ../modules/features/wm/quickshell/github_graph/get_github_graph

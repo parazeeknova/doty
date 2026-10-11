@@ -335,17 +335,6 @@ hl.bind(
 )
 
 ---------------------
----    Voxtype    ---
----------------------
-hl.bind("F9", hl.dsp.exec_cmd("voxtype record start"), {
-	ignore_mods = true,
-})
-hl.bind("F9", hl.dsp.exec_cmd("voxtype record stop"), {
-	release = true,
-	ignore_mods = true,
-})
-
----------------------
 ---   Pyprland    ---
 ---------------------
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("pypr layout_center toggle"))

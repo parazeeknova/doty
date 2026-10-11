@@ -10,7 +10,6 @@
     {
       imports = [
         self.nixosModules.apostropheHardware
-        self.nixosModules.apostropheDisko
         self.nixosModules.apostropheVirtualization
         inputs.home-manager.nixosModules.home-manager
         inputs.sops-nix.nixosModules.sops
@@ -252,26 +251,6 @@
               sed -i 's/#define BORDER_RADIUS 8/#define BORDER_RADIUS 0/g' thunar/thunar-util.c
             '';
           });
-          pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
-            (pfinal: pprev: {
-              anyio = pprev.anyio.overridePythonAttrs (_: {
-                doCheck = false;
-              });
-              narwhals = pprev.narwhals.overridePythonAttrs (_: {
-                doCheck = false;
-              });
-              inline-snapshot = pprev.inline-snapshot.overridePythonAttrs (_: {
-                doCheck = false;
-              });
-              sse-starlette = pprev.sse-starlette.overridePythonAttrs (_: {
-                doCheck = false;
-                dependencies = (pprev.dependencies or [ ]) ++ [ pfinal.starlette ];
-              });
-              fsspec = pprev.fsspec.overridePythonAttrs (_: {
-                doCheck = false;
-              });
-            })
-          ];
         })
       ];
       programs.nix-ld = {

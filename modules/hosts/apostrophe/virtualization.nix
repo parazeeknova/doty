@@ -44,7 +44,6 @@
       environment.systemPackages = with pkgs; [
         dive
         podman-tui
-        podman-desktop
         podman-compose
         distrobox
         libvirt

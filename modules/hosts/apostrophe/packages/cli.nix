@@ -10,9 +10,6 @@
     {
 
       environment.systemPackages = with pkgs; [
-        # -- JFR --
-        adguardian
-
         # -- Editors --
         vim
         neovim

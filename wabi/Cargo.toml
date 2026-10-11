@@ -173,10 +173,6 @@ name = "decode_cliphist"
 path = "src/bin/utils/decode_cliphist.rs"
 
 [[bin]]
-name = "get_voxtype_status"
-path = "src/bin/status/voxtype.rs"
-
-[[bin]]
 name = "update_verso"
 path = "src/bin/utils/update-verso.rs"
 

@@ -330,9 +330,7 @@ stt:
 voice:
   auto_tts: false
 wake_word:
-  enabled: true
-  provider: openwakeword
-  phrase: hey hermes
+  enabled: false
 memory:
   provider: supermemory
 timezone: Asia/Kolkata

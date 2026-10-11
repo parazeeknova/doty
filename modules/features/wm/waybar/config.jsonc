@@ -7,7 +7,7 @@
   "margin-bottom": 2,
   "spacing": 2,
   "modules-left": ["hyprland/workspaces", "hyprland/window"],
-  "modules-center": ["custom/voxtype", "custom/layout", "clock#date"],
+  "modules-center": ["custom/layout", "clock#date"],
   "modules-right": [
     "custom/tray_toggle",
     "custom/mg",
@@ -23,12 +23,6 @@
     "return-type": "json",
     "interval": 5,
     "on-click": "env QS_LAYOUT_MODE=$(cat ~/.cache/hypr_layout_mode 2>/dev/null) quickshell --config network_popup",
-    "tooltip": true
-  },
-  "custom/voxtype": {
-    "exec": "/home/parazeeknova/.config/waybar/scripts/get_voxtype_status",
-    "return-type": "json",
-    "format": "{}",
     "tooltip": true
   },
   "custom/layout": {

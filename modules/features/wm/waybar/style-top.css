@@ -81,26 +81,6 @@ window#waybar {
   padding: 0 2px;
 }
 
-#custom-voxtype {
-  font-size: 0.9rem;
-  padding: 0 4px;
-}
-
-#custom-voxtype.recording {
-  color: @red;
-}
-
-#custom-voxtype.transcribing {
-  color: @yellow;
-}
-
-#custom-voxtype.idle {
-  color: @fg1;
-}
-
-#custom-voxtype.stopped {
-  color: @grey1;
-}
 
 #custom-layout {
   font-size: 0.8rem;

@@ -227,7 +227,6 @@
         inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-cli
 
         # -- Dev Tools --
-        jupyter
         github-cli
         lazygit
         gitkraken
