@@ -163,6 +163,18 @@
           sha256 = "063fh4iwnadqwx9g5wrp1afhkx2dgiw0cp7hhwzz0xcpv0l0awry";
         };
       });
+      t3code = pkgs.symlinkJoin {
+        name = "t3code-${pkgs.t3code.version}";
+        paths = [ pkgs.t3code ];
+        nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
+        postBuild = ''
+          for bin in $out/bin/*; do
+            wrapProgram "$bin" \
+              --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib ]}"
+          done
+          ln -s $out/bin/t3code-desktop $out/bin/t3code
+        '';
+      };
     in
     {
 
