@@ -315,15 +315,16 @@
     "hypr-dynamic-cursors": {
       "flake": false,
       "locked": {
-        "lastModified": 1791235474,
-        "narHash": "sha256-PSt/SRtemvsoGYNFJ7YLiXGxT8EJe3AhmGwt5Vt79aA=",
+        "lastModified": 1786008049,
+        "narHash": "sha256-BQjuQplkQFA30/7evDxmEAvr2ArIG09JffEBQhuzo80=",
         "owner": "VirtCode",
         "repo": "hypr-dynamic-cursors",
-        "rev": "2a8d0b735328d874a78ca93b2f201649f712a74a",
+        "rev": "5a224284872208b5324759d535d65061043725de",
         "type": "github"
       },
       "original": {
         "owner": "VirtCode",
+        "ref": "v0.56.2",
         "repo": "hypr-dynamic-cursors",
         "type": "github"
       }
