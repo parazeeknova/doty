@@ -314,6 +314,8 @@ display:
     slug: makisekurisu
     scale: 0.55
   message_reactions: true
+  in_app_tips: false
+  in_app_tours: false
 dashboard:
   theme: mono
   font: jetbrains-mono

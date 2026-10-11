@@ -199,6 +199,7 @@
         turbo
         lefthook
         bubblewrap
+        t3code
 
         # -- Build Tools --
         (lib.lowPrio gcc)
