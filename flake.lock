@@ -319,11 +319,11 @@
     "hymission": {
       "flake": false,
       "locked": {
-        "lastModified": 1789967210,
-        "narHash": "sha256-iWHVWalZXGa77f5pQ9Jb+auDdGLG4LAHhMlUMtFrYo0=",
+        "lastModified": 1791623913,
+        "narHash": "sha256-kAfWbzrhTE8J2Tp6FokPo2j6s5CGmy7BWckDPnuyz+Q=",
         "owner": "gfhdhytghd",
         "repo": "hymission",
-        "rev": "f89245e8be44c717e80accf7cfc3b92f726bda74",
+        "rev": "8ed6de1fe02c21e4e537e4db166f5c50b15377b0",
         "type": "github"
       },
       "original": {
@@ -335,11 +335,11 @@
     "hypr-dynamic-cursors": {
       "flake": false,
       "locked": {
-        "lastModified": 1788508268,
-        "narHash": "sha256-v+7e4T412K3Hi/qb+v7sZh2/2k1jFB9AY4AusVXr58I=",
+        "lastModified": 1791235474,
+        "narHash": "sha256-PSt/SRtemvsoGYNFJ7YLiXGxT8EJe3AhmGwt5Vt79aA=",
         "owner": "VirtCode",
         "repo": "hypr-dynamic-cursors",
-        "rev": "b9739b1db4a48616d66af29239ab0fe2756d28f6",
+        "rev": "2a8d0b735328d874a78ca93b2f201649f712a74a",
         "type": "github"
       },
       "original": {
@@ -399,11 +399,11 @@
     "hyprglass": {
       "flake": false,
       "locked": {
-        "lastModified": 1790881647,
-        "narHash": "sha256-3wYQrSxxoSU9CJS8nxGqMCLX4XxQ/n5N0G8KXSP3nMc=",
+        "lastModified": 1791547422,
+        "narHash": "sha256-60nDpYUgPXue7iSWHb05goz95j0cNmBYAyhlpviu7K4=",
         "owner": "hyprnux",
         "repo": "hyprglass",
-        "rev": "0ec4118fa7f6ddda73a90a52066c8a9b2fbf844d",
+        "rev": "84c1a5ab217101a317d4edaab7fba2efcc1bf346",
         "type": "github"
       },
       "original": {
@@ -607,11 +607,11 @@
     "hyprland-scroll-overview": {
       "flake": false,
       "locked": {
-        "lastModified": 1789949463,
-        "narHash": "sha256-EdtVRpwYkLtqTrNBA2VbGXpt7DMyMlRm6LCDNfI/1pU=",
+        "lastModified": 1791678954,
+        "narHash": "sha256-TXr37VVVFd6OlWj3FSE631y4w84aXHD9demAvi9uqcI=",
         "owner": "yayuuu",
         "repo": "hyprland-scroll-overview",
-        "rev": "10eeefa0519e09992b68a1d2949781a876230f5c",
+        "rev": "7ff22457dc016239eff1b19c3ea57de93404b5c9",
         "type": "github"
       },
       "original": {
