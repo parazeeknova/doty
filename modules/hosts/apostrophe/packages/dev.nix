@@ -10,11 +10,11 @@
     let
       herdr = pkgs.stdenv.mkDerivation rec {
         pname = "herdr";
-        version = "0.9.3";
+        version = "0.9.4";
 
         src = pkgs.fetchurl {
           url = "https://github.com/herdrdev/herdr/releases/download/v${version}/herdr-linux-x86_64";
-          sha256 = "19yvyj3l0gqrisknzx3cy3313nfgl7g5chrlhic4iyn2y5jxra0q";
+          sha256 = "08svcwvyklkaj564z5y79dvyh94dyi3kndsz8nh0xvdhxzxh8cs9";
         };
 
         dontUnpack = true;
