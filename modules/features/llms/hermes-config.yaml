@@ -542,6 +542,7 @@ telemetry:
   shared_metrics:
     enabled: false
     send: false
+    offer_version: 2
 mcp_servers:
   tinyfish:
     url: https://agent.tinyfish.ai/mcp

@@ -74,10 +74,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
     };
-    deepseek-harness = {
-      url = "github:deepseek-ai/deepseek-harness";
-      flake = false;
-    };
   };
 
   outputs =

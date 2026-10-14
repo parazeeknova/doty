@@ -79,22 +79,6 @@
         "type": "github"
       }
     },
-    "deepseek-harness": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1791538292,
-        "narHash": "sha256-MxxwtEPBG8SK6Rw5CqGalnJ5FWAygzVxklCQab5mpbU=",
-        "owner": "deepseek-ai",
-        "repo": "deepseek-harness",
-        "rev": "d743267388641bc76f17c45ce8b4c231aed1d32c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "deepseek-ai",
-        "repo": "deepseek-harness",
-        "type": "github"
-      }
-    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -954,7 +938,6 @@
       "inputs": {
         "antigravity-nix": "antigravity-nix",
         "codex-desktop-linux": "codex-desktop-linux",
-        "deepseek-harness": "deepseek-harness",
         "flake-parts": "flake-parts",
         "helium": "helium",
         "hermes-agent": "hermes-agent",

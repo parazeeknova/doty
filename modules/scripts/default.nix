@@ -20,10 +20,6 @@ in
         let
           inherit (config.lib.file) mkOutOfStoreSymlink;
 
-          lcc-bin = pkgs.writeShellScriptBin "lcc" ''
-            exec ${scriptsDir}/lcc "$@"
-          '';
-
           mg-key-picker-bin = pkgs.writeShellScriptBin "mg-key-picker" ''
             exec ${scriptsDir}/mg-key-picker "$@"
           '';
@@ -38,7 +34,6 @@ in
         in
         {
           home.packages = [
-            lcc-bin
             mg-key-picker-bin
             sd-gen-bin
             sd-gen-dash-bin
@@ -46,7 +41,6 @@ in
 
           home.file = {
             "scripts/mg-key-picker".source = mkOutOfStoreSymlink "${scriptsDir}/mg-key-picker";
-            "scripts/lcc".source = mkOutOfStoreSymlink "${scriptsDir}/lcc";
             "scripts/sd_gen".source = mkOutOfStoreSymlink "${scriptsDir}/sd_gen";
             "scripts/kbd_aura".source = mkOutOfStoreSymlink "${scriptsDir}/kbd_aura";
             "scripts/presets_lister".source = mkOutOfStoreSymlink "${scriptsDir}/presets_lister";
