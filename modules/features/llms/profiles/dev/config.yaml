@@ -292,7 +292,7 @@ providers:
       '@alias/default': {}
       default_routing: {}
     key_env: HERMES_CUSTOM_MERGE_GATEWAY_API_KEY
-_config_version: 49
+_config_version: 50
 plugins:
   enabled:
     - web-tinyfish
@@ -319,3 +319,8 @@ tinyfish:
     browser: deny
 memory:
   provider: supermemory
+telemetry:
+  shared_metrics:
+    enabled: false
+    send: false
+    offer_version: 2

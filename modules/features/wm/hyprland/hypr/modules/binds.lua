@@ -269,7 +269,7 @@ hl.bind(
 hl.bind(
 	mainMod .. " + ALT + E",
 	hl.dsp.exec_cmd(
-		"hyprctl clients | grep -iq 'class: .*hermes' && hyprctl dispatch 'hl.dsp.workspace.toggle_special(\"hermes\")' || uwsm app -- hermes-desktop"
+		"hyprctl clients | grep -iq 'class: .*hermes' && hyprctl dispatch togglespecialworkspace hermes || uwsm app -- hermes-desktop"
 	)
 )
 

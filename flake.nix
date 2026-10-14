@@ -71,6 +71,8 @@
     };
     hermes-agent = {
       url = "github:NousResearch/hermes-agent";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
     };
     deepseek-harness = {
       url = "github:deepseek-ai/deepseek-harness";
