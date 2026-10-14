@@ -10,11 +10,11 @@
     let
       portless = pkgs.stdenv.mkDerivation rec {
         pname = "portless";
-        version = "0.15.7";
+        version = "0.15.8";
 
         src = pkgs.fetchurl {
           url = "https://registry.npmjs.org/portless/-/portless-${version}.tgz";
-          sha256 = "1z58r5bgjs3f5cvnivrlg9w9q6pk74nilvsf68f1jy33azvwf5w2";
+          sha256 = "0hzlq29a027671gpl0ijl11i62md68221wlk9aq5g7hxgmbzhrf1";
         };
 
         nativeBuildInputs = [ pkgs.makeWrapper ];
