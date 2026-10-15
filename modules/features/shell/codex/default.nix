@@ -20,6 +20,7 @@
             secrets.merge-gateway-api-key = { };
             secrets.context7-api-key = { };
             secrets.github-token = { };
+            secrets.tinyfish-api-key = { };
             secrets.supermemory-codex-api-key = { };
 
             templates."codex-config" = {
@@ -145,6 +146,12 @@
                 [mcp_servers.tldraw]
                 url = "https://tldraw-mcp-app.tldraw.workers.dev/mcp"
 
+                [mcp_servers.tinyfish]
+                url = "https://agent.tinyfish.ai/mcp"
+
+                [mcp_servers.tinyfish.http_headers]
+                Authorization = "Bearer ${config.sops.placeholder.tinyfish-api-key}"
+
                 [hooks.state."/home/parazeeknova/.codex/hooks.json:session_start:0:0"]
                 trusted_hash = "sha256:65c200b17729361a95bcd97e8460bcb29e6995c0b58aa60e8f7301a63a52898e"
 
@@ -233,6 +240,7 @@
                 OPENROUTER_API_KEY = "${config.sops.placeholder.openrouter-api-key}"
                 CONTEXT7_API_KEY = "${config.sops.placeholder.context7-api-key}"
                 GITHUB_PERSONAL_ACCESS_TOKEN = "${config.sops.placeholder.github-token}"
+                TINYFISH_API_KEY = "${config.sops.placeholder.tinyfish-api-key}"
                 SUPERMEMORY_BASE_URL = "http://localhost:6767"
                 SUPERMEMORY_CODEX_API_KEY = "${config.sops.placeholder.supermemory-codex-api-key}"
               '';

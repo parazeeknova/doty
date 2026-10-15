@@ -90,7 +90,10 @@
           "hypr/sunset.state".source =
             config.lib.file.mkOutOfStoreSymlink "/home/parazeeknova/doty/modules/features/wm/hyprland/hypr/sunset.state";
           "hypr/xdph.conf".source = ./hypr/xdph.conf;
-          "uwsm/env".source = "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
+          "uwsm/env".text = ''
+            . "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh"
+            eval "$(/home/parazeeknova/doty/modules/scripts/load_secrets 2>/dev/null || true)"
+          '';
         };
 
         # -- Quickshell Config --

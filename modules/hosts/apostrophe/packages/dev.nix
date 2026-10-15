@@ -163,17 +163,60 @@
           sha256 = "063fh4iwnadqwx9g5wrp1afhkx2dgiw0cp7hhwzz0xcpv0l0awry";
         };
       });
-      t3code = pkgs.symlinkJoin {
-        name = "t3code-${pkgs.t3code.version}";
-        paths = [ pkgs.t3code ];
-        nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
-        postBuild = ''
-          for bin in $out/bin/*; do
-            wrapProgram "$bin" \
-              --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib ]}"
-          done
-          ln -s $out/bin/t3code-desktop $out/bin/t3code
-        '';
+      t3code = pkgs.appimageTools.wrapType2 rec {
+        pname = "t3code";
+        version = "0.0.46-nightly.20261015.3145";
+
+        src = pkgs.fetchurl {
+          url = "https://github.com/pingdotgg/t3code/releases/download/v${version}/T3-Code-${version}-x86_64.AppImage";
+          sha256 = "08wjpb38zvfvpj2p5l9y1z0nyj862fdia8c9b8q32pzjkm446s2b";
+        };
+
+        extraPkgs = pkgs: with pkgs; [
+          stdenv.cc.cc.lib
+        ];
+
+        extraInstallCommands =
+          let
+            extracted = pkgs.appimageTools.extract { inherit pname version src; };
+          in
+          ''
+            mv $out/bin/t3code $out/bin/.t3code-unwrapped
+            cat << 'WRAPPER' > $out/bin/t3code
+            #!/usr/bin/env bash
+            if [ -r /run/secrets/openrouter-api-key ]; then export OPENROUTER_API_KEY="$(cat /run/secrets/openrouter-api-key)"; fi
+            if [ -r /run/secrets/context7-api-key ]; then export CONTEXT7_API_KEY="$(cat /run/secrets/context7-api-key)"; fi
+            if [ -r /run/secrets/github-token ]; then export GITHUB_PERSONAL_ACCESS_TOKEN="$(cat /run/secrets/github-token)"; fi
+            if [ -r /run/secrets/tinyfish-api-key ]; then export TINYFISH_API_KEY="$(cat /run/secrets/tinyfish-api-key)"; fi
+            if [ -r /run/secrets/merge-gateway-api-key ]; then export MERGE_GATEWAY_API_KEY="$(cat /run/secrets/merge-gateway-api-key)"; fi
+            if [ -r /run/secrets/anthropic-api-key ]; then export ANTHROPIC_API_KEY="$(cat /run/secrets/anthropic-api-key)"; fi
+            if [ -r /run/secrets/supermemory-codex-api-key ]; then
+              export SUPERMEMORY_CODEX_API_KEY="$(cat /run/secrets/supermemory-codex-api-key)"
+            elif [ -r /run/secrets/supermemory-api-key ]; then
+              export SUPERMEMORY_CODEX_API_KEY="$(cat /run/secrets/supermemory-api-key)"
+            fi
+            if [ -r /run/secrets/supermemory-api-key ]; then
+              export SUPERMEMORY_API_KEY="$(cat /run/secrets/supermemory-api-key)"
+              export SUPERMEMORY_CC_API_KEY="$(cat /run/secrets/supermemory-api-key)"
+            fi
+            export SUPERMEMORY_BASE_URL="http://localhost:6767"
+            export SUPERMEMORY_API_URL="http://localhost:6767"
+            export STRIX_LLM="openai/deepseek/deepseek-v4-flash"
+            export LLM_API_BASE="https://api-gateway.merge.dev/v1/openai"
+            export OPENAI_BASE_URL="https://api-gateway.merge.dev/v1/openai"
+            exec "$(dirname "$0")/.t3code-unwrapped" "$@"
+            WRAPPER
+            chmod +x $out/bin/t3code
+
+            ln -s t3code $out/bin/t3code-desktop
+            ln -s t3code $out/bin/t3
+
+            mkdir -p $out/share/applications $out/share/icons
+            cp -r ${extracted}/usr/share/icons $out/share/
+            cp ${extracted}/t3code.desktop $out/share/applications/
+            substituteInPlace $out/share/applications/t3code.desktop \
+              --replace-fail "Exec=AppRun" "Exec=t3code"
+          '';
       };
     in
     {
@@ -235,7 +278,6 @@
         kitty
         act
         actionlint
-        inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
         inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-cli
 
         # -- Dev Tools --

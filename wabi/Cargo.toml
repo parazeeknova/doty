@@ -172,9 +172,6 @@ path = "src/bin/utils/mtp_notify.rs"
 name = "decode_cliphist"
 path = "src/bin/utils/decode_cliphist.rs"
 
-[[bin]]
-name = "update_verso"
-path = "src/bin/utils/update-verso.rs"
 
 [[bin]]
 name = "update_hypr_plugins"
@@ -209,5 +206,13 @@ name = "update_cua"
 path = "src/bin/utils/update-cua.rs"
 
 [[bin]]
+name = "update_t3code"
+path = "src/bin/utils/update-t3code.rs"
+
+[[bin]]
 name = "sd_gen"
 path = "src/bin/utils/sd_gen.rs"
+
+[[bin]]
+name = "load_secrets"
+path = "src/bin/utils/load_secrets.rs"

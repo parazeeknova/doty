@@ -52,6 +52,7 @@ in
               mkOutOfStoreSymlink "${scriptsDir}/toggle_wallpaper_pause";
             "scripts/mako_mode".source = mkOutOfStoreSymlink "${scriptsDir}/mako_mode";
             "scripts/layout_mode_switch".source = mkOutOfStoreSymlink "${scriptsDir}/layout_mode_switch";
+            "scripts/load_secrets".source = mkOutOfStoreSymlink "${scriptsDir}/load_secrets";
           };
         };
     };

@@ -27,59 +27,6 @@
         telegram-desktop
         phototonic
 
-        # -- Verso --
-        (
-          let
-            verso-extracted = pkgs.appimageTools.extract {
-              pname = "verso";
-              version = "0.7.45";
-              src = pkgs.fetchurl {
-                url = "https://github.com/parazeeknova/amemorymachine/releases/download/v0.7.45/Verso-0.7.45-x86_64.AppImage";
-                sha256 = "02779kb9gsl4sy8rwmz6fi3f18drc1gmn19zkldvn4w9szr0wif6";
-              };
-              postExtract = ''
-                # Extract the embedded Electrobun tarball into a temp directory
-                mkdir temp_extract
-                tar_zst=$(find $out -name "*.tar.zst")
-                if [ -n "$tar_zst" ]; then
-                  chmod +w -R $out
-                  ${pkgs.zstd}/bin/zstd -d -c "$tar_zst" | ${pkgs.gnutar}/bin/tar -xf - -C temp_extract
-                  cp -r temp_extract/Verso/* $out/usr/bin/
-                  rm -rf temp_extract
-                  ln -s bin/launcher $out/usr/bin/Verso
-                else
-                  echo "Error: no .tar.zst archive found inside the AppImage!"
-                  exit 1
-                fi
-              '';
-            };
-          in
-          pkgs.appimageTools.wrapAppImage {
-            pname = "verso";
-            version = "0.7.45";
-            src = verso-extracted;
-            extraPkgs =
-              pkgs: with pkgs; [
-                webkitgtk_4_1
-                libsoup_3
-                libayatana-appindicator
-              ];
-            extraInstallCommands = ''
-              mkdir -p $out/share/applications
-              cat > $out/share/applications/verso.desktop <<EOF
-              [Desktop Entry]
-              Name=Verso
-              Exec=verso %U
-              Terminal=false
-              Type=Application
-              Icon=verso
-              StartupWMClass=Verso
-              Comment=Verso Application
-              Categories=Network;
-              EOF
-            '';
-          }
-        )
 
         (bottles.override { removeWarningPopup = true; })
 

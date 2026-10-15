@@ -114,7 +114,6 @@ fn main() {
 
     println!("-> Compiling application updater tools...");
     let update_bins = [
-        "update_verso",
         "update_hypr_plugins",
         "update_portless",
         "update_herdr",
@@ -123,6 +122,7 @@ fn main() {
         "update_bun",
         "update_supermemory",
         "update_cua",
+        "update_t3code",
     ];
     let mut cargo_args = vec!["build", "--manifest-path", "wabi/Cargo.toml", "--release"];
     for bin in &update_bins {
@@ -136,7 +136,6 @@ fn main() {
     }
 
     let app_updates = [
-        ("Verso", "./wabi/target/release/update_verso"),
         ("Hyprland plugins", "./wabi/target/release/update_hypr_plugins"),
         ("Portless", "./wabi/target/release/update_portless"),
         ("Herdr", "./wabi/target/release/update_herdr"),
@@ -145,6 +144,7 @@ fn main() {
         ("Bun", "./wabi/target/release/update_bun"),
         ("Supermemory", "./wabi/target/release/update_supermemory"),
         ("Cua", "./wabi/target/release/update_cua"),
+        ("T3 Code", "./wabi/target/release/update_t3code"),
     ];
 
     let total = app_updates.len();
