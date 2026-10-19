@@ -152,6 +152,16 @@
                 [mcp_servers.tinyfish.http_headers]
                 Authorization = "Bearer ${config.sops.placeholder.tinyfish-api-key}"
 
+                [mcp_servers.rea]
+                command = "npx"
+                args = [
+                    "-y",
+                    "rea-agents@6.7.0",
+                    "mcp",
+                ]
+                startup_timeout_sec = 30
+                tool_timeout_sec = 450
+
                 [hooks.state."/home/parazeeknova/.codex/hooks.json:session_start:0:0"]
                 trusted_hash = "sha256:65c200b17729361a95bcd97e8460bcb29e6995c0b58aa60e8f7301a63a52898e"
 

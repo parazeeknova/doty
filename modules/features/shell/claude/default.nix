@@ -111,6 +111,18 @@ in
                       "headers": {
                         "Authorization": "Bearer ${config.sops.placeholder.tinyfish-api-key}"
                       }
+                    },
+                    "rea": {
+                      "type": "stdio",
+                      "command": "npx",
+                      "args": [
+                        "-y",
+                        "rea-agents@6.7.0",
+                        "mcp"
+                      ],
+                      "env": {
+                        "REA_MCP_INPUT_SCHEMA_PROFILE": "compact"
+                      }
                     }
                   }
                 }
