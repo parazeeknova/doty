@@ -1,6 +1,52 @@
-use std::fs;
-use std::path::Path;
+use std::fs::{self, OpenOptions};
+use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::thread;
+use std::time::{Duration, Instant};
+
+struct FileLock {
+    path: PathBuf,
+}
+
+impl FileLock {
+    fn acquire(name: &str) -> Self {
+        let lock_path = std::env::temp_dir().join(format!("doty-{}.lock", name));
+        let start = Instant::now();
+        loop {
+            match OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&lock_path)
+            {
+                Ok(_) => return FileLock { path: lock_path },
+                Err(_) => {
+                    if let Ok(meta) = fs::metadata(&lock_path)
+                        && let Ok(elapsed) = meta
+                            .modified()
+                            .and_then(|m| m.elapsed().map_err(std::io::Error::other))
+                        && elapsed.as_secs() > 300
+                    {
+                        let _ = fs::remove_file(&lock_path);
+                    }
+                    if start.elapsed().as_secs() > 180 {
+                        eprintln!(
+                            "Warning: Timed out waiting for file lock {:?}, proceeding anyway.",
+                            lock_path
+                        );
+                        return FileLock { path: lock_path };
+                    }
+                    thread::sleep(Duration::from_millis(100));
+                }
+            }
+        }
+    }
+}
+
+impl Drop for FileLock {
+    fn drop(&mut self) {
+        let _ = fs::remove_file(&self.path);
+    }
+}
 
 fn extract_field(content: &str, start_pattern: &str, end_pattern: &str) -> Option<String> {
     let start_idx = content.find(start_pattern)?;
@@ -9,12 +55,62 @@ fn extract_field(content: &str, start_pattern: &str, end_pattern: &str) -> Optio
     Some(content[val_start..val_start + end_idx].to_string())
 }
 
-fn get_latest_supermemory_version() -> Option<String> {
-    let mut args = vec![
+fn curl_with_retry(args: &[&str]) -> Option<String> {
+    let mut full_args = vec![
         "-s",
+        "--retry",
+        "3",
+        "--retry-delay",
+        "1",
+        "--retry-connrefused",
+        "--connect-timeout",
+        "10",
+        "--max-time",
+        "30",
         "-H",
         "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
     ];
+    full_args.extend_from_slice(args);
+    let output = Command::new("curl").args(&full_args).output().ok()?;
+    if output.status.success() {
+        Some(String::from_utf8_lossy(&output.stdout).to_string())
+    } else {
+        None
+    }
+}
+
+fn nix_prefetch_url_with_retry(url: &str, retries: u32) -> Result<String, String> {
+    let mut last_err = String::new();
+    for attempt in 1..=retries {
+        let output = Command::new("nix-prefetch-url")
+            .arg(url)
+            .output()
+            .map_err(|e| format!("Failed to execute nix-prefetch-url: {}", e))?;
+
+        if output.status.success() {
+            let hash = String::from_utf8_lossy(&output.stdout).trim().to_string();
+            if !hash.is_empty() {
+                return Ok(hash);
+            }
+        }
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        last_err = if !stderr.trim().is_empty() {
+            stderr.trim().to_string()
+        } else {
+            "Empty hash returned".to_string()
+        };
+        if attempt < retries {
+            thread::sleep(Duration::from_secs(2));
+        }
+    }
+    Err(format!(
+        "nix-prefetch-url failed after {} attempts: {}",
+        retries, last_err
+    ))
+}
+
+fn get_latest_supermemory_version() -> Option<String> {
+    let mut args = Vec::new();
 
     let mut token = fs::read_to_string("/run/secrets/github-token")
         .ok()
@@ -35,15 +131,8 @@ fn get_latest_supermemory_version() -> Option<String> {
 
     args.push("https://api.github.com/repos/supermemoryai/supermemory/releases");
 
-    let output = Command::new("curl").args(args).output().ok()?;
-
-    if !output.status.success() {
-        eprintln!("Failed to fetch supermemory release info from GitHub API.");
-        return None;
-    }
-
-    let json_str = String::from_utf8_lossy(&output.stdout);
-    let releases: serde_json::Value = serde_json::from_str(&json_str).ok()?;
+    let stdout = curl_with_retry(&args)?;
+    let releases: serde_json::Value = serde_json::from_str(&stdout).ok()?;
     let releases_arr = releases.as_array()?;
 
     for rel in releases_arr {
@@ -59,7 +148,7 @@ fn get_latest_supermemory_version() -> Option<String> {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("Checking for Supermemory server updates...");
+    println!("Checking for supermemory updates...");
 
     let supermemory_nix_path = Path::new("modules/features/llms/supermemory.nix");
     if !supermemory_nix_path.exists() {
@@ -112,26 +201,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         latest_version
     );
 
-    let output = Command::new("nix-prefetch-url").arg(&new_url).output()?;
-
-    if !output.status.success() {
-        eprintln!("Failed to get hash from nix-prefetch-url.");
-        std::process::exit(1);
-    }
-
-    let new_hash = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    if new_hash.is_empty() {
-        eprintln!("nix-prefetch-url returned an empty hash.");
-        std::process::exit(1);
-    }
+    let new_hash = nix_prefetch_url_with_retry(&new_url, 3)?;
     println!("Fetched hash: {}", new_hash);
 
-    let end_idx = content[start_idx..]
+    let _lock = FileLock::acquire("updater");
+
+    let fresh_content = fs::read_to_string(supermemory_nix_path)?;
+    let start_idx = fresh_content
+        .find("pname = \"supermemory-server\";")
+        .ok_or("Cannot find supermemory-server definition in supermemory.nix")?;
+    let end_idx = fresh_content[start_idx..]
         .find("};")
         .ok_or("Cannot find end of supermemory-server block")?
         + start_idx
         + 2;
-    let old_block = &content[start_idx..end_idx];
+    let old_block = &fresh_content[start_idx..end_idx];
 
     let mut new_block = old_block.to_string();
     new_block = new_block.replace(
@@ -143,7 +227,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &format!("sha256 = \"{}\";", new_hash),
     );
 
-    let mut new_content = content.clone();
+    let mut new_content = fresh_content.clone();
     new_content.replace_range(start_idx..end_idx, &new_block);
     fs::write(supermemory_nix_path, new_content)?;
 
@@ -169,7 +253,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             latest_version
         );
         let status = Command::new("git")
-            .args(["commit", "-m", &commit_msg])
+            .args(["commit", "--no-gpg-sign", "-m", &commit_msg])
             .status()?;
         if !status.success() {
             eprintln!("Failed to run git commit.");
@@ -178,7 +262,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Committed: {}", commit_msg);
     }
 
-    println!("Supermemory update complete!");
+    println!("Supermemory server update complete!");
 
     Ok(())
 }

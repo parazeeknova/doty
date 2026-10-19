@@ -1,5 +1,52 @@
-use std::fs;
+use std::fs::{self, OpenOptions};
+use std::path::PathBuf;
 use std::process::Command;
+use std::thread;
+use std::time::{Duration, Instant};
+
+struct FileLock {
+    path: PathBuf,
+}
+
+impl FileLock {
+    fn acquire(name: &str) -> Self {
+        let lock_path = std::env::temp_dir().join(format!("doty-{}.lock", name));
+        let start = Instant::now();
+        loop {
+            match OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&lock_path)
+            {
+                Ok(_) => return FileLock { path: lock_path },
+                Err(_) => {
+                    if let Ok(meta) = fs::metadata(&lock_path)
+                        && let Ok(elapsed) = meta
+                            .modified()
+                            .and_then(|m| m.elapsed().map_err(std::io::Error::other))
+                        && elapsed.as_secs() > 300
+                    {
+                        let _ = fs::remove_file(&lock_path);
+                    }
+                    if start.elapsed().as_secs() > 180 {
+                        eprintln!(
+                            "Warning: Timed out waiting for file lock {:?}, proceeding anyway.",
+                            lock_path
+                        );
+                        return FileLock { path: lock_path };
+                    }
+                    thread::sleep(Duration::from_millis(100));
+                }
+            }
+        }
+    }
+}
+
+impl Drop for FileLock {
+    fn drop(&mut self) {
+        let _ = fs::remove_file(&self.path);
+    }
+}
 
 fn get_cmd_output(cmd: &str, args: &[&str]) -> std::io::Result<String> {
     let output = Command::new(cmd).args(args).output()?;
@@ -37,8 +84,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         update_args.push(&token_arg);
     }
 
-    let status = Command::new("nix").args(&update_args).status()?;
-    if !status.success() {
+    let mut success = false;
+    for attempt in 1..=3 {
+        let status = Command::new("nix").args(&update_args).status()?;
+        if status.success() {
+            success = true;
+            break;
+        }
+        if attempt < 3 {
+            thread::sleep(Duration::from_secs(2));
+        }
+    }
+
+    if !success {
         eprintln!("Warning: Failed to run nix flake update for Hyprland plugins.");
         return Ok(());
     }
@@ -50,6 +108,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let args: Vec<String> = std::env::args().collect();
             let should_commit = args.contains(&"--commit".to_string());
             if should_commit {
+                let _lock = FileLock::acquire("updater");
+
                 println!("Staging and committing Hyprland plugin updates...");
                 let status = Command::new("git").args(["add", "flake.lock"]).status()?;
                 if !status.success() {

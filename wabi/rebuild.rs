@@ -1,4 +1,8 @@
+use std::collections::HashSet;
+use std::io::{IsTerminal, Write};
 use std::process::{Command, ExitStatus};
+use std::thread;
+use std::time::{Duration, Instant};
 
 fn print_header(title: &str) {
     println!("\x1b[34m=== {} ===\x1b[0m", title);
@@ -61,16 +65,129 @@ fn run_cmd_silent_in_dir(cmd: &str, args: &[&str], dir: &str) -> bool {
 }
 
 fn run_cmd(cmd: &str, args: &[&str]) -> std::io::Result<ExitStatus> {
-    Command::new(cmd)
-        .args(args)
-        .status()
+    Command::new(cmd).args(args).status()
 }
 
 fn get_cmd_output(cmd: &str, args: &[&str]) -> std::io::Result<String> {
-    let output = Command::new(cmd)
-        .args(args)
-        .output()?;
+    let output = Command::new(cmd).args(args).output()?;
     Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
+}
+
+#[derive(Clone, Debug)]
+enum AppStatus {
+    UpToDate(String),
+    Updated(String),
+    Warning(String),
+    Failed(String),
+}
+
+struct AppUpdateResult {
+    name: &'static str,
+    status: AppStatus,
+    duration: Duration,
+    retries: usize,
+}
+
+fn parse_app_output(stdout: &str) -> AppStatus {
+    let mut version = None;
+    let mut updated_msg = None;
+    let mut is_up_to_date = false;
+
+    for line in stdout.lines() {
+        let trim = line.trim();
+        if trim.starts_with("Current local ") && trim.contains(" version: ") {
+            if let Some(v) = trim.split(": ").nth(1) {
+                version = Some(v.trim().to_string());
+            }
+        }
+        if trim.contains("already up to date") || trim.contains("is up to date") {
+            is_up_to_date = true;
+        }
+        if trim.contains("Successfully updated")
+            || trim.contains("Committed:")
+            || trim.contains("updates detected")
+        {
+            updated_msg = Some(trim.to_string());
+        }
+    }
+
+    if let Some(msg) = updated_msg {
+        AppStatus::Updated(msg)
+    } else if is_up_to_date {
+        if let Some(v) = version {
+            AppStatus::UpToDate(format!("v{}", v))
+        } else {
+            AppStatus::UpToDate("up to date".to_string())
+        }
+    } else {
+        AppStatus::UpToDate("up to date".to_string())
+    }
+}
+
+fn extract_error_msg(stderr: &str, stdout: &str) -> String {
+    let raw = if !stderr.trim().is_empty() {
+        stderr
+    } else if !stdout.trim().is_empty() {
+        stdout
+    } else {
+        "Failed or skipped"
+    };
+
+    for line in raw.lines() {
+        let t = line.trim();
+        if !t.is_empty() && !t.starts_with("Checking for ") {
+            return t.to_string();
+        }
+    }
+    "Failed or skipped".to_string()
+}
+
+fn run_updater_with_retry(name: &'static str, bin: &'static str, max_retries: usize) -> AppUpdateResult {
+    let start = Instant::now();
+    let mut attempts = 0;
+    loop {
+        attempts += 1;
+        let output = Command::new(bin).arg("--commit").output();
+        match output {
+            Ok(out) if out.status.success() => {
+                let stdout = String::from_utf8_lossy(&out.stdout);
+                let status = parse_app_output(&stdout);
+                return AppUpdateResult {
+                    name,
+                    status,
+                    duration: start.elapsed(),
+                    retries: attempts - 1,
+                };
+            }
+            Ok(out) => {
+                let stderr = String::from_utf8_lossy(&out.stderr);
+                let stdout = String::from_utf8_lossy(&out.stdout);
+                let err_msg = extract_error_msg(&stderr, &stdout);
+                if attempts <= max_retries {
+                    thread::sleep(Duration::from_millis(1500 * attempts as u64));
+                    continue;
+                }
+                return AppUpdateResult {
+                    name,
+                    status: AppStatus::Warning(err_msg),
+                    duration: start.elapsed(),
+                    retries: attempts - 1,
+                };
+            }
+            Err(e) => {
+                if attempts <= max_retries {
+                    thread::sleep(Duration::from_millis(1500 * attempts as u64));
+                    continue;
+                }
+                return AppUpdateResult {
+                    name,
+                    status: AppStatus::Failed(format!("Execution failed: {}", e)),
+                    duration: start.elapsed(),
+                    retries: attempts - 1,
+                };
+            }
+        }
+    }
 }
 
 fn main() {
@@ -86,11 +203,12 @@ fn main() {
     match get_cmd_output("git", &["status", "--porcelain"]) {
         Ok(status) => {
             // Filter out untracked rebuild binary, rebuild.rs, and gitignores to keep things clean.
-            let lines: Vec<&str> = status.lines()
+            let lines: Vec<&str> = status
+                .lines()
                 .filter(|line| {
                     let trim_line = line.trim();
-                    !trim_line.is_empty() 
-                        && !trim_line.ends_with("rebuild") 
+                    !trim_line.is_empty()
+                        && !trim_line.ends_with("rebuild")
                         && !trim_line.ends_with("rebuild.rs")
                         && !trim_line.ends_with(".gitignore")
                 })
@@ -131,6 +249,17 @@ fn main() {
     }
     if run_cmd_silent("cargo", &cargo_args) {
         print_success("Updater tools ready.");
+    } else if run_cmd_silent(
+        "nix-shell",
+        &[
+            "-p",
+            "pkg-config",
+            "openssl",
+            "--run",
+            &format!("cargo {}", cargo_args.join(" ")),
+        ],
+    ) {
+        print_success("Updater tools ready.");
     } else {
         print_warning("Failed to build updater tools; attempting to proceed with existing binaries.");
     }
@@ -147,50 +276,112 @@ fn main() {
         ("T3 Code", "./wabi/target/release/update_t3code"),
     ];
 
+    println!("-> Checking 9 applications in parallel...");
+
+    let (tx, rx) = std::sync::mpsc::channel();
     let total = app_updates.len();
-    for (i, (name, bin)) in app_updates.iter().enumerate() {
-        println!("-> [{}/{}] Checking {}...", i + 1, total, name);
-        let output = Command::new(bin).arg("--commit").output();
-        match output {
-            Ok(out) if out.status.success() => {
-                let stdout = String::from_utf8_lossy(&out.stdout);
-                let mut found_summary = false;
-                for line in stdout.lines() {
-                    let trim = line.trim();
-                    if trim.contains("already up to date") {
-                        print_success(&format!("   ✓ {} is up to date.", name));
-                        found_summary = true;
-                        break;
-                    } else if trim.contains("Successfully updated")
-                        || trim.contains("Committed:")
-                        || trim.contains("updates detected")
-                    {
-                        print_success(&format!("   ✓ {}", trim));
-                        found_summary = true;
+    let mut in_flight: HashSet<&'static str> = app_updates.iter().map(|(n, _)| *n).collect();
+
+    for (name, bin) in app_updates {
+        let thread_tx = tx.clone();
+        thread::spawn(move || {
+            let res = run_updater_with_retry(name, bin, 2);
+            let _ = thread_tx.send(res);
+        });
+    }
+    drop(tx);
+
+    let start_all = Instant::now();
+    let mut completed = 0;
+    let mut updated_count = 0;
+    let mut up_to_date_count = 0;
+    let mut warn_count = 0;
+
+    let is_tty = std::io::stdout().is_terminal();
+
+    while completed < total {
+        match rx.recv_timeout(Duration::from_millis(250)) {
+            Ok(res) => {
+                completed += 1;
+                in_flight.remove(res.name);
+
+                if is_tty {
+                    print!("\r\x1b[K");
+                }
+
+                let retry_str = if res.retries > 0 {
+                    format!(" \x1b[90m({} retries)\x1b[0m", res.retries)
+                } else {
+                    String::new()
+                };
+
+                let dur_str = format!("{:.1}s", res.duration.as_secs_f64());
+
+                match &res.status {
+                    AppStatus::UpToDate(ver) => {
+                        up_to_date_count += 1;
+                        println!(
+                            "  \x1b[32m✓\x1b[0m {:<18} \x1b[90m{:<12} ({})\x1b[0m{}",
+                            res.name, ver, dur_str, retry_str
+                        );
+                    }
+                    AppStatus::Updated(msg) => {
+                        updated_count += 1;
+                        println!(
+                            "  \x1b[36m↑\x1b[0m {:<18} \x1b[32m{}\x1b[0m \x1b[90m({})\x1b[0m{}",
+                            res.name, msg, dur_str, retry_str
+                        );
+                    }
+                    AppStatus::Warning(msg) => {
+                        warn_count += 1;
+                        println!(
+                            "  \x1b[33m⚠\x1b[0m {:<18} \x1b[33m{}\x1b[0m \x1b[90m({})\x1b[0m{}",
+                            res.name, msg, dur_str, retry_str
+                        );
+                    }
+                    AppStatus::Failed(msg) => {
+                        warn_count += 1;
+                        println!(
+                            "  \x1b[31m✗\x1b[0m {:<18} \x1b[31m{}\x1b[0m \x1b[90m({})\x1b[0m{}",
+                            res.name, msg, dur_str, retry_str
+                        );
                     }
                 }
-                if !found_summary {
-                    print_success(&format!("   ✓ {} check completed.", name));
+            }
+            Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
+                if is_tty && completed < total {
+                    let running: Vec<&str> = in_flight.iter().copied().collect();
+                    print!(
+                        "\r\x1b[K  \x1b[34m⠋\x1b[0m [{}/{}] Checking: {}...",
+                        completed,
+                        total,
+                        running.join(", ")
+                    );
+                    let _ = std::io::stdout().flush();
                 }
             }
-            Ok(out) => {
-                let stderr = String::from_utf8_lossy(&out.stderr);
-                let stdout = String::from_utf8_lossy(&out.stdout);
-                let err_line = if !stderr.trim().is_empty() {
-                    stderr.lines().next().unwrap_or("Failed").trim()
-                } else if !stdout.trim().is_empty() {
-                    stdout.lines().next().unwrap_or("Failed").trim()
-                } else {
-                    "Failed or skipped"
-                };
-                print_warning(&format!("   ⚠ {} check failed or skipped: {}", name, err_line));
-            }
-            Err(e) => {
-                print_warning(&format!("   ⚠ Could not execute {} ({}): {}", name, bin, e));
-            }
+            Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => break,
         }
     }
-    print_success("Standalone applications check completed.");
+
+    if is_tty {
+        print!("\r\x1b[K");
+        let _ = std::io::stdout().flush();
+    }
+
+    let elapsed = start_all.elapsed();
+    let time_str = format!("{:.1}s", elapsed.as_secs_f64());
+    if warn_count == 0 {
+        print_success(&format!(
+            "Standalone applications check completed in {} ({} up to date, {} updated).",
+            time_str, up_to_date_count, updated_count
+        ));
+    } else {
+        print_warning(&format!(
+            "Standalone applications check completed in {} ({} up to date, {} updated, {} warnings/skips).",
+            time_str, up_to_date_count, updated_count, warn_count
+        ));
+    }
 
     // Step 2: Update Nix Flake inputs
     print_step("Updating Nix flake inputs...");
@@ -208,7 +399,8 @@ fn main() {
             Ok(status) if !status.trim().is_empty() => {
                 print_warning("flake.lock has changed. Committing...");
                 if run_cmd_silent("git", &["add", "flake.lock"])
-                    && run_cmd_silent("git", &["commit", "--no-gpg-sign", "-m", "chore: update flake.lock"]) {
+                    && run_cmd_silent("git", &["commit", "--no-gpg-sign", "-m", "chore: update flake.lock"])
+                {
                     print_success("flake.lock committed successfully.");
                 } else {
                     print_error("Failed to commit flake.lock changes.");
@@ -226,7 +418,7 @@ fn main() {
 
     // Step 3: Lint, format, and build wabi
     print_step("Linting, formatting, and building wabi...");
-    
+
     println!("-> wabi: cargo clippy --all-targets -- -D warnings");
     if run_cmd_silent_in_dir("cargo", &["clippy", "--all-targets", "--", "-D", "warnings"], "wabi") {
         print_success("wabi clippy passed.");
@@ -257,11 +449,16 @@ fn main() {
 
     // Step 4: Format QML, Nix, and Lua files
     print_step("Formatting and linting QML / Nix / Lua files...");
-    
+
     println!("-> Formatting QML files...");
     if run_cmd_silent(
         "nix-shell",
-        &["-p", "qt6.qtdeclarative", "--run", "find modules/features/wm/quickshell -type f -name '*.qml' -exec qmlformat -i {} +"]
+        &[
+            "-p",
+            "qt6.qtdeclarative",
+            "--run",
+            "find modules/features/wm/quickshell -type f -name '*.qml' -exec qmlformat -i {} +",
+        ],
     ) {
         print_success("QML files formatted.");
     } else {
@@ -272,14 +469,18 @@ fn main() {
     println!("-> Linting QML files...");
     // We capture qmllint output and only treat non-zero exits as structural errors
     let qml_lint_output = Command::new("nix-shell")
-        .args(&["-p", "qt6.qtdeclarative", "--run", "find modules/features/wm/quickshell -type f -name '*.qml' -exec qmllint {} +"])
+        .args(&[
+            "-p",
+            "qt6.qtdeclarative",
+            "--run",
+            "find modules/features/wm/quickshell -type f -name '*.qml' -exec qmllint {} +",
+        ])
         .output();
     match qml_lint_output {
         Ok(output) if output.status.success() => {
             print_success("QML lint passed.");
         }
         Ok(output) => {
-            // It returned non-zero (meaning there were syntax errors)
             print_error("QML lint found syntax errors:");
             eprintln!("{}", String::from_utf8_lossy(&output.stderr));
             std::process::exit(1);
@@ -291,7 +492,12 @@ fn main() {
     }
 
     println!("-> Formatting Nix files...");
-    let nix_files_output = get_cmd_output("find", &[".", "-name", "*.nix", "-not", "-path", "./.git/*", "-not", "-path", "./wabi/*"]);
+    let nix_files_output = get_cmd_output(
+        "find",
+        &[
+            ".", "-name", "*.nix", "-not", "-path", "./.git/*", "-not", "-path", "./wabi/*",
+        ],
+    );
     if let Ok(files) = nix_files_output {
         let file_list: Vec<&str> = files.lines().filter(|s| !s.is_empty()).collect();
         if !file_list.is_empty() {
@@ -317,7 +523,12 @@ fn main() {
     println!("-> Formatting Lua files...");
     if run_cmd_silent(
         "nix-shell",
-        &["-p", "stylua", "--run", "find modules/features/wm/hyprland/hypr -type f -name '*.lua' -exec stylua {} +"]
+        &[
+            "-p",
+            "stylua",
+            "--run",
+            "find modules/features/wm/hyprland/hypr -type f -name '*.lua' -exec stylua {} +",
+        ],
     ) {
         print_success("Lua files formatted.");
     } else {
@@ -328,7 +539,12 @@ fn main() {
     println!("-> Checking Lua formatting...");
     if run_cmd_silent(
         "nix-shell",
-        &["-p", "stylua", "--run", "find modules/features/wm/hyprland/hypr -type f -name '*.lua' -exec stylua --check {} +"]
+        &[
+            "-p",
+            "stylua",
+            "--run",
+            "find modules/features/wm/hyprland/hypr -type f -name '*.lua' -exec stylua --check {} +",
+        ],
     ) {
         print_success("Lua formatting check passed.");
     } else {
@@ -358,11 +574,12 @@ fn main() {
     print_step("Checking for auto-formatting changes...");
     match get_cmd_output("git", &["status", "--porcelain"]) {
         Ok(status) => {
-            let lines: Vec<&str> = status.lines()
+            let lines: Vec<&str> = status
+                .lines()
                 .filter(|line| {
                     let trim_line = line.trim();
-                    !trim_line.is_empty() 
-                        && !trim_line.ends_with("rebuild") 
+                    !trim_line.is_empty()
+                        && !trim_line.ends_with("rebuild")
                         && !trim_line.ends_with("rebuild.rs")
                         && !trim_line.ends_with(".gitignore")
                 })
@@ -370,8 +587,17 @@ fn main() {
 
             if !lines.is_empty() {
                 print_warning("Formatting changed some files. Committing formatting updates...");
-                if run_cmd_silent("git", &["add", "-A"]) 
-                    && run_cmd_silent("git", &["commit", "--no-gpg-sign", "-m", "style: auto-format Nix, QML, and Lua files"]) {
+                if run_cmd_silent("git", &["add", "-A"])
+                    && run_cmd_silent(
+                        "git",
+                        &[
+                            "commit",
+                            "--no-gpg-sign",
+                            "-m",
+                            "style: auto-format Nix, QML, and Lua files",
+                        ],
+                    )
+                {
                     print_success("Formatting changes committed successfully.");
                 } else {
                     print_error("Failed to commit formatting changes.");
@@ -389,21 +615,34 @@ fn main() {
 
     // Step 7: Nix Garbage Collection & Generation Cleanup
     print_step("Deleting old system generations (keeping last 12)...");
-    match run_cmd("sudo", &["nix-env", "-p", "/nix/var/nix/profiles/system", "--delete-generations", "+12"]) {
+    match run_cmd(
+        "sudo",
+        &[
+            "nix-env",
+            "-p",
+            "/nix/var/nix/profiles/system",
+            "--delete-generations",
+            "+12",
+        ],
+    ) {
         Ok(status) if status.success() => print_success("Old system generations deleted."),
         _ => print_warning("Failed to delete old system generations."),
     }
 
     print_step("Collecting Nix garbage...");
     match run_cmd("sudo", &["nix-collect-garbage"]) {
-        Ok(status) if status.success() => print_success("Garbage collection completed successfully."),
+        Ok(status) if status.success() => {
+            print_success("Garbage collection completed successfully.")
+        }
         _ => print_warning("Garbage collection failed or skipped."),
     }
 
     // Step 8: System Rebuild
     print_step("Rebuilding NixOS configuration...");
     match run_cmd("sudo", &["nixos-rebuild", "switch", "--flake", ".#apostrophe"]) {
-        Ok(status) if status.success() => print_success("\n=== Rebuild Pipeline Completed Successfully ==="),
+        Ok(status) if status.success() => {
+            print_success("\n=== Rebuild Pipeline Completed Successfully ===")
+        }
         _ => {
             print_error("NixOS rebuild switch failed.");
             std::process::exit(1);

@@ -12,7 +12,10 @@ fn get_secrets() -> HashMap<&'static str, String> {
         ("CONTEXT7_API_KEY", "/run/secrets/context7-api-key"),
         ("GITHUB_PERSONAL_ACCESS_TOKEN", "/run/secrets/github-token"),
         ("TINYFISH_API_KEY", "/run/secrets/tinyfish-api-key"),
-        ("MERGE_GATEWAY_API_KEY", "/run/secrets/merge-gateway-api-key"),
+        (
+            "MERGE_GATEWAY_API_KEY",
+            "/run/secrets/merge-gateway-api-key",
+        ),
         ("ANTHROPIC_API_KEY", "/run/secrets/anthropic-api-key"),
         ("MODAL_API_KEY", "/run/secrets/modal-api-key"),
         ("GEMINI_API_KEY", "/run/secrets/gemini-api-key"),
@@ -49,8 +52,14 @@ fn get_secrets() -> HashMap<&'static str, String> {
     map.insert("SUPERMEMORY_BASE_URL", "http://localhost:6767".to_string());
     map.insert("SUPERMEMORY_API_URL", "http://localhost:6767".to_string());
     map.insert("STRIX_LLM", "openai/deepseek/deepseek-v4-flash".to_string());
-    map.insert("LLM_API_BASE", "https://api-gateway.merge.dev/v1/openai".to_string());
-    map.insert("OPENAI_BASE_URL", "https://api-gateway.merge.dev/v1/openai".to_string());
+    map.insert(
+        "LLM_API_BASE",
+        "https://api-gateway.merge.dev/v1/openai".to_string(),
+    );
+    map.insert(
+        "OPENAI_BASE_URL",
+        "https://api-gateway.merge.dev/v1/openai".to_string(),
+    );
 
     map
 }
@@ -63,7 +72,10 @@ fn import_to_systemd(secrets: &HashMap<&str, String>) {
     }
     match cmd.status() {
         Ok(status) if status.success() => {
-            eprintln!("Successfully imported {} secrets to systemd --user", secrets.len());
+            eprintln!(
+                "Successfully imported {} secrets to systemd --user",
+                secrets.len()
+            );
         }
         Ok(status) => {
             eprintln!("systemctl exited with status: {status}");
@@ -130,10 +142,16 @@ fn main() {
             println!("load_secrets - Secrets and environment loader for Wabi / Doty");
             println!();
             println!("Usage:");
-            println!("  load_secrets                    Print POSIX shell export statements (eval $(load_secrets))");
-            println!("  load_secrets --import-systemd   Import all decrypted secrets into systemctl --user");
+            println!(
+                "  load_secrets                    Print POSIX shell export statements (eval $(load_secrets))"
+            );
+            println!(
+                "  load_secrets --import-systemd   Import all decrypted secrets into systemctl --user"
+            );
             println!("  load_secrets --fish             Print fish shell set -gx statements");
-            println!("  load_secrets exec <cmd> [args]  Execute a command directly with all secrets in env");
+            println!(
+                "  load_secrets exec <cmd> [args]  Execute a command directly with all secrets in env"
+            );
         }
         _ => {
             // If unknown option or command, execute it directly if not starting with '-'
