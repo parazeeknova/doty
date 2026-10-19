@@ -10,11 +10,11 @@
     let
       supermemory-server = pkgs.stdenv.mkDerivation rec {
         pname = "supermemory-server";
-        version = "0.0.8";
+        version = "0.0.9";
 
         src = pkgs.fetchurl {
           url = "https://github.com/supermemoryai/supermemory/releases/download/server-v${version}/supermemory-server-linux-x64";
-          sha256 = "1wq6amxsglcbrdza4hj368l43bv5mkxvm8fqp45yi6qps0rj9ww7";
+          sha256 = "113r33aqfvxqdpsxchcv2r3y9g5azjyfqyqnkpgcc95hyb5px66p";
         };
 
         dontUnpack = true;
