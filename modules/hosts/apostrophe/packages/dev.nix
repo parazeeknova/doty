@@ -89,11 +89,11 @@
       };
       terminal-code = pkgs.stdenv.mkDerivation rec {
         pname = "terminal-code";
-        version = "0.4.2";
+        version = "0.4.3";
 
         src = pkgs.fetchurl {
           url = "https://github.com/zenbu-labs/terminal-code/releases/download/v${version}/tode-linux-x64.tar.gz";
-          sha256 = "09fbaahq9haw8rcfxp7123630f0n13d79cdk9zp835v43k1yiam8";
+          sha256 = "0l806jf3xhsw4wbaqnf42i9r264nlydz45j5p113ng5q3hr142rf";
         };
 
         nativeBuildInputs = with pkgs; [
