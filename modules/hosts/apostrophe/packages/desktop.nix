@@ -27,7 +27,6 @@
         telegram-desktop
         phototonic
 
-
         (bottles.override { removeWarningPopup = true; })
 
         # -- Multi Media --

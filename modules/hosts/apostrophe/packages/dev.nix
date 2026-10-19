@@ -172,9 +172,10 @@
           sha256 = "08wjpb38zvfvpj2p5l9y1z0nyj862fdia8c9b8q32pzjkm446s2b";
         };
 
-        extraPkgs = pkgs: with pkgs; [
-          stdenv.cc.cc.lib
-        ];
+        extraPkgs =
+          pkgs: with pkgs; [
+            stdenv.cc.cc.lib
+          ];
 
         extraInstallCommands =
           let
