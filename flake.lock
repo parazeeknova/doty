@@ -266,11 +266,11 @@
     "hymission": {
       "flake": false,
       "locked": {
-        "lastModified": 1791912191,
-        "narHash": "sha256-sab4R5jacUb0zbonpm8ox8DdhDtXrk3gYE9DKtvuhz8=",
+        "lastModified": 1792227538,
+        "narHash": "sha256-qwwUkB8Wf4DMMYy5Z/Rnf/NWb0kVxqlyl5tapjy94lU=",
         "owner": "gfhdhytghd",
         "repo": "hymission",
-        "rev": "e5b94dcf481259bc0ae1e30d323290e1f28a2b53",
+        "rev": "f1394d72e1a203f2a3faf6711e1d62714b466de8",
         "type": "github"
       },
       "original": {
@@ -299,11 +299,11 @@
     "hypr-edgehover": {
       "flake": false,
       "locked": {
-        "lastModified": 1784557802,
-        "narHash": "sha256-4yDKWc4fFKxsEk9T9SLhiX3nCWzxG3P1VjznemKu440=",
+        "lastModified": 1792090841,
+        "narHash": "sha256-rfRq2L+mbxFsBgoZ1LrnNGab2VJgVaAk4GHvjtuLqbw=",
         "owner": "gfhdhytghd",
         "repo": "hypr-edgehover",
-        "rev": "77b5e1445361b3a1f7b6f03bb4bee15e91229c94",
+        "rev": "1b41eb054e1d7690648b0c293b0bf4ff4a1d87e3",
         "type": "github"
       },
       "original": {
@@ -347,11 +347,11 @@
     "hyprglass": {
       "flake": false,
       "locked": {
-        "lastModified": 1791547422,
-        "narHash": "sha256-60nDpYUgPXue7iSWHb05goz95j0cNmBYAyhlpviu7K4=",
+        "lastModified": 1792426841,
+        "narHash": "sha256-SOdn2s/oxf5v2VYHVmQvfvRIyyV9kFNvEBpQXkLCb+s=",
         "owner": "hyprnux",
         "repo": "hyprglass",
-        "rev": "84c1a5ab217101a317d4edaab7fba2efcc1bf346",
+        "rev": "7fc328064c63d9fbaaac8d8204eadf85dcdeae19",
         "type": "github"
       },
       "original": {
