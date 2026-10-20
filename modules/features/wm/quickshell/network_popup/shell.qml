@@ -14,6 +14,7 @@ Scope {
     property bool connected: false
     property string activeSsid: ""
     property int activeSignal: 0
+    property string wifiDevice: "wlo1"
     property bool warpConnected: false
     property bool tailscaleConnected: false
     property string tailscaleIp: ""
@@ -29,6 +30,7 @@ Scope {
     property var vpns: []
     property bool detailsExpanded: false
     property string expandedNetworkSsid: "" // Tracks which scanned network is expanded for actions
+    property bool isScanning: false
     property int lastActiveSection: 0
     property int lastActiveSubIndex: 0
     property bool isKeyboardTriggered: Quickshell.env("QS_KEYBOARD") === "1"
@@ -36,13 +38,16 @@ Scope {
     signal requestClose
 
     function getNetworkSectionItemsCount() {
-        // Connect, Forget, Auto buttons
-
         var count = 0;
         for (var i = 0; i < root.networks.length; i++) {
             count++; // the header row
-            if (root.expandedNetworkSsid === root.networks[i].ssid)
-                count += 3;
+            if (root.expandedNetworkSsid === root.networks[i].ssid) {
+                if (root.networks[i].saved)
+                    count += 3;
+                else
+                    // Connect, Forget, Auto
+                    count += 1; // Connect
+            }
         }
         return count;
     }
@@ -67,22 +72,24 @@ Scope {
                     };
 
                 current++;
-                if (current === subIndex)
-                    return {
-                        "type": "forget",
-                        "netIndex": i,
-                        "netData": root.networks[i]
-                    };
+                if (root.networks[i].saved) {
+                    if (current === subIndex)
+                        return {
+                            "type": "forget",
+                            "netIndex": i,
+                            "netData": root.networks[i]
+                        };
 
-                current++;
-                if (current === subIndex)
-                    return {
-                        "type": "auto",
-                        "netIndex": i,
-                        "netData": root.networks[i]
-                    };
+                    current++;
+                    if (current === subIndex)
+                        return {
+                            "type": "auto",
+                            "netIndex": i,
+                            "netData": root.networks[i]
+                        };
 
-                current++;
+                    current++;
+                }
             }
         }
         return null;
@@ -102,6 +109,14 @@ Scope {
     function triggerRefresh() {
         refreshTimer.restart();
         focusStateFile.reload();
+    }
+
+    function triggerScan() {
+        if (updateStatusProc.running)
+            return;
+        root.isScanning = true;
+        updateStatusProc.running = false;
+        updateStatusProc.running = true;
     }
 
     Component.onCompleted: {
@@ -154,6 +169,7 @@ Scope {
                 root.connected = data.connected ?? false;
                 root.activeSsid = data.active_ssid || "";
                 root.activeSignal = data.active_signal || 0;
+                root.wifiDevice = data.wifi_device || "wlo1";
                 root.warpConnected = data.warp_connected || false;
                 root.tailscaleConnected = data.tailscale_connected || false;
                 root.tailscaleIp = data.tailscale_ip || "";
@@ -201,6 +217,7 @@ Scope {
                     root.connected = data.connected;
                     root.activeSsid = data.active_ssid || "";
                     root.activeSignal = data.active_signal || 0;
+                    root.wifiDevice = data.wifi_device || "wlo1";
                     root.warpConnected = data.warp_connected || false;
                     root.tailscaleConnected = data.tailscale_connected || false;
                     root.tailscaleIp = data.tailscale_ip || "";
@@ -227,6 +244,44 @@ Scope {
 
         command: [root.homeDir + "/.config/quickshell/network_popup/get_network_status", "--rescan"]
         running: false
+
+        onRunningChanged: {
+            if (running) {
+                root.isScanning = true;
+            } else {
+                root.isScanning = false;
+            }
+        }
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    var data = JSON.parse(this.text);
+                    root.wifiEnabled = data.wifi_enabled;
+                    root.airplaneMode = data.airplane_mode;
+                    root.connected = data.connected;
+                    root.activeSsid = data.active_ssid || "";
+                    root.activeSignal = data.active_signal || 0;
+                    root.wifiDevice = data.wifi_device || "wlo1";
+                    root.warpConnected = data.warp_connected || false;
+                    root.tailscaleConnected = data.tailscale_connected || false;
+                    root.tailscaleIp = data.tailscale_ip || "";
+                    root.details = data.details || ({
+                            "ip_address": "",
+                            "gateway": "",
+                            "dns": "",
+                            "subnet": "",
+                            "security": "",
+                            "bssid": ""
+                        });
+                    root.networks = data.networks || [];
+                    root.vpns = data.vpns || [];
+                } catch (e) {
+                    console.log("Failed to parse network scan status: " + e);
+                }
+                root.isScanning = false;
+            }
+        }
     }
 
     // Timer to wait and refresh status after actions
@@ -251,7 +306,7 @@ Scope {
         running: true
         triggeredOnStart: true
         onTriggered: {
-            if (!checkStatusProc.running)
+            if (!checkStatusProc.running && !updateStatusProc.running)
                 checkStatusProc.running = true;
         }
     }
@@ -263,10 +318,10 @@ Scope {
         interval: 15000
         repeat: true
         running: true
-        triggeredOnStart: true
+        triggeredOnStart: false
         onTriggered: {
             if (!updateStatusProc.running)
-                updateStatusProc.running = true;
+                root.triggerScan();
         }
     }
 
@@ -288,6 +343,22 @@ Scope {
                 property bool isLoaded: false
                 property bool showFocusHighlight: root.isKeyboardTriggered
                 property string focusHighlightColor: showFocusHighlight ? "#30d5c4a1" : "transparent"
+
+                property bool isRestartingWifi: false
+                property bool isDnsFlushed: false
+                property bool isResettingNet: false
+
+                Timer {
+                    id: feedbackTimer
+
+                    interval: 1500
+                    repeat: false
+                    onTriggered: {
+                        win.isRestartingWifi = false;
+                        win.isDnsFlushed = false;
+                        win.isResettingNet = false;
+                    }
+                }
 
                 function navigateSubIndex(dir) {
                     var maxItems = 0;
@@ -359,7 +430,7 @@ Scope {
                                     root.expandedNetworkSsid = item.netData.ssid;
                             } else if (item.type === "connect") {
                                 if (item.netData.active) {
-                                    Quickshell.execDetached(["nmcli", "device", "disconnect", "wlan0"]);
+                                    Quickshell.execDetached(["nmcli", "device", "disconnect", root.wifiDevice || "wlo1"]);
                                 } else {
                                     var script = "SSID=\"$1\"; SECURITY=\"$2\"; if nmcli connection show id \"$SSID\" >/dev/null 2>&1; then nmcli device wifi connect \"$SSID\"; else if [ \"$SECURITY\" != \"--\" ] && [ -n \"$SECURITY\" ]; then pass=$(rofi -dmenu -password -p \"Password for $SSID\"); [ -n \"$pass\" ] && nmcli device wifi connect \"$SSID\" password \"$pass\"; else nmcli device wifi connect \"$SSID\"; fi; fi";
                                     Quickshell.execDetached(["sh", "-c", script, "sh", item.netData.ssid, item.netData.security]);
@@ -371,9 +442,12 @@ Scope {
                                 root.expandedNetworkSsid = "";
                                 root.triggerRefresh();
                             } else if (item.type === "auto") {
-                                var val = item.netData.autoconnect ? "no" : "yes";
-                                Quickshell.execDetached(["nmcli", "connection", "modify", item.netData.ssid, "connection.autoconnect", val]);
-                                root.triggerRefresh();
+                                if (item.netData.saved) {
+                                    var nextVal = !item.netData.autoconnect;
+                                    item.netData.autoconnect = nextVal;
+                                    Quickshell.execDetached(["nmcli", "connection", "modify", item.netData.ssid, "connection.autoconnect", nextVal ? "yes" : "no"]);
+                                    root.triggerRefresh();
+                                }
                             }
                         }
                     } else if (win.activeSection === 4) {
@@ -381,13 +455,19 @@ Scope {
                             Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] kitty --title impala impala")']);
                             win.closePopup();
                         } else if (win.activeSubIndex === 1) {
+                            win.isRestartingWifi = true;
+                            feedbackTimer.restart();
                             Quickshell.execDetached(["nmcli", "radio", "wifi", "off"]);
                             Quickshell.execDetached(["sh", "-c", "sleep 0.5 && nmcli radio wifi on"]);
                             root.triggerRefresh();
                         } else if (win.activeSubIndex === 2) {
+                            win.isDnsFlushed = true;
+                            feedbackTimer.restart();
                             Quickshell.execDetached(["sh", "-c", "sudo resolvectl flush-caches 2>/dev/null || true; notify-send -u low -i network-wireless -a 'Network' 'DNS Flushed' 'System DNS caches cleared.'"]);
                             root.triggerRefresh();
                         } else if (win.activeSubIndex === 3) {
+                            win.isResettingNet = true;
+                            feedbackTimer.restart();
                             Quickshell.execDetached(["sh", "-c", "sudo ip route flush cache 2>/dev/null || true; nmcli networking off && sleep 0.5 && nmcli networking on; notify-send -u low -i network-wireless -a 'Network' 'Network Offloaded' 'IP route cache & network stack reset.'"]);
                             root.triggerRefresh();
                         }
@@ -557,8 +637,6 @@ Scope {
                     }
 
                     Column {
-                        // --- SECTION 3: CONNECTION DETAILS COLLAPSIBLE ---
-
                         id: mainLayout
 
                         anchors.top: parent.top
@@ -622,8 +700,8 @@ Scope {
                             Text {
                                 id: wifiToggleText
 
-                                text: "Wi-Fi: " + (root.wifiEnabled ? "On" : "Off")
-                                color: theme.accent
+                                text: "󰤨 Wi-Fi: " + (root.wifiEnabled ? "On" : "Off")
+                                color: (wifiToggleMouse.containsMouse || (win.activeSection === 0 && win.activeSubIndex === 0)) ? theme.accent : (root.wifiEnabled ? theme.accent : theme.fg_light)
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -631,15 +709,17 @@ Scope {
 
                                 Rectangle {
                                     anchors.fill: parent
+                                    anchors.margins: -2
                                     color: (win.activeSection === 0 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
                                     radius: 0
                                 }
 
                                 MouseArea {
+                                    id: wifiToggleMouse
+
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: wifiToggleText.color = theme.accent
-                                    onExited: wifiToggleText.color = theme.accent
+                                    cursorShape: Qt.PointingHandCursor
                                     onClicked: {
                                         if (root.wifiEnabled)
                                             Quickshell.execDetached(["nmcli", "radio", "wifi", "off"]);
@@ -654,8 +734,8 @@ Scope {
                             Text {
                                 id: airplaneToggleText
 
-                                text: "Airplane: " + (root.airplaneMode ? "On" : "Off")
-                                color: theme.accent
+                                text: "󰀝 Airplane: " + (root.airplaneMode ? "On" : "Off")
+                                color: (airplaneToggleMouse.containsMouse || (win.activeSection === 0 && win.activeSubIndex === 1)) ? theme.accent : (root.airplaneMode ? theme.accent : theme.fg_light)
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -663,15 +743,17 @@ Scope {
 
                                 Rectangle {
                                     anchors.fill: parent
+                                    anchors.margins: -2
                                     color: (win.activeSection === 0 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
                                     radius: 0
                                 }
 
                                 MouseArea {
+                                    id: airplaneToggleMouse
+
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    onEntered: airplaneToggleText.color = theme.accent
-                                    onExited: airplaneToggleText.color = theme.accent
+                                    cursorShape: Qt.PointingHandCursor
                                     onClicked: {
                                         if (root.airplaneMode)
                                             Quickshell.execDetached(["rfkill", "unblock", "all"]);
@@ -690,27 +772,45 @@ Scope {
                             opacity: 0.15
                         }
 
+                        // --- SECTION 3: CONNECTION DETAILS COLLAPSIBLE ---
                         Column {
                             width: parent.width
                             spacing: 4
 
                             Rectangle {
                                 width: parent.width
-                                height: 14
+                                height: 16
                                 color: (win.activeSection === 1 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
                                 radius: 0
 
-                                Text {
-                                    text: "Details " + (root.detailsExpanded ? "󰅀" : "󰅂")
-                                    color: theme.accent
-                                    font.family: "FiraCode Nerd Font"
-                                    font.pixelSize: 9
-                                    font.bold: true
-                                    renderType: Text.NativeRendering
+                                Row {
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 4
+
+                                    Text {
+                                        text: root.detailsExpanded ? "󰅁" : "󰅂"
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 9
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        renderType: Text.NativeRendering
+                                    }
+
+                                    Text {
+                                        text: "Details"
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 9
+                                        font.bold: true
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        renderType: Text.NativeRendering
+                                    }
                                 }
 
                                 MouseArea {
                                     anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
                                     onClicked: {
                                         root.detailsExpanded = !root.detailsExpanded;
                                     }
@@ -785,7 +885,7 @@ Scope {
                         // --- SECTION 4: VPN SECTION ---
                         Column {
                             width: parent.width
-                            spacing: 3
+                            spacing: 4
 
                             Text {
                                 text: "VPN"
@@ -819,16 +919,17 @@ Scope {
                                     anchors.right: parent.right
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: root.warpConnected ? "disconnect" : "connect"
-                                    color: theme.accent
+                                    color: (warpMouse.containsMouse || (win.activeSection === 2 && win.activeSubIndex === 0)) ? theme.accent : theme.fg_light
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
 
                                     MouseArea {
+                                        id: warpMouse
+
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: warpToggleBtn.color = theme.accent
-                                        onExited: warpToggleBtn.color = theme.accent
+                                        cursorShape: Qt.PointingHandCursor
                                         onClicked: {
                                             if (root.warpConnected)
                                                 Quickshell.execDetached(["warp-cli", "disconnect"]);
@@ -864,6 +965,7 @@ Scope {
                                         text: "  IP: " + root.tailscaleIp
                                         visible: root.tailscaleConnected
                                         color: theme.accent
+                                        opacity: 0.7
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 8
                                         renderType: Text.NativeRendering
@@ -876,16 +978,17 @@ Scope {
                                     anchors.right: parent.right
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: root.tailscaleConnected ? "disconnect" : "connect"
-                                    color: theme.accent
+                                    color: (tsMouse.containsMouse || (win.activeSection === 2 && win.activeSubIndex === 1)) ? theme.accent : theme.fg_light
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
 
                                     MouseArea {
+                                        id: tsMouse
+
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: tailscaleToggleBtn.color = theme.accent
-                                        onExited: tailscaleToggleBtn.color = theme.accent
+                                        cursorShape: Qt.PointingHandCursor
                                         onClicked: {
                                             if (root.tailscaleConnected)
                                                 Quickshell.execDetached(["sudo", "tailscale", "down"]);
@@ -929,16 +1032,17 @@ Scope {
                                             anchors.right: parent.right
                                             anchors.verticalCenter: parent.verticalCenter
                                             text: modelData.active ? "disconnect" : "connect"
-                                            color: theme.accent
+                                            color: (vpnMouse.containsMouse || (win.activeSection === 2 && win.activeSubIndex === (index + 2))) ? theme.accent : theme.fg_light
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             renderType: Text.NativeRendering
 
                                             MouseArea {
+                                                id: vpnMouse
+
                                                 anchors.fill: parent
                                                 hoverEnabled: true
-                                                onEntered: vpnActionBtn.color = theme.accent
-                                                onExited: vpnActionBtn.color = theme.accent
+                                                cursorShape: Qt.PointingHandCursor
                                                 onClicked: {
                                                     if (modelData.active)
                                                         Quickshell.execDetached(["nmcli", "connection", "down", modelData.name]);
@@ -966,15 +1070,46 @@ Scope {
                         // --- SECTION 5: SCANNED NETWORK LIST ---
                         Column {
                             width: parent.width
-                            spacing: 3
+                            spacing: 4
 
-                            Text {
-                                text: "WiFi Networks"
-                                color: theme.accent
-                                font.family: "FiraCode Nerd Font"
-                                font.pixelSize: 9
-                                font.bold: true
-                                renderType: Text.NativeRendering
+                            // Header with WiFi Networks label and Rescan text button
+                            Item {
+                                width: parent.width
+                                height: 16
+
+                                Text {
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "WiFi Networks"
+                                    color: theme.accent
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 9
+                                    font.bold: true
+                                    renderType: Text.NativeRendering
+                                }
+
+                                Text {
+                                    id: scanBtn
+
+                                    anchors.right: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: root.isScanning ? "󰑐 searching..." : "󰑐 refresh"
+                                    color: (scanMouse.containsMouse || root.isScanning) ? theme.accent : theme.fg_light
+                                    font.family: "FiraCode Nerd Font"
+                                    font.pixelSize: 8
+                                    renderType: Text.NativeRendering
+
+                                    MouseArea {
+                                        id: scanMouse
+
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            root.triggerScan();
+                                        }
+                                    }
+                                }
                             }
 
                             Column {
@@ -997,7 +1132,7 @@ Scope {
                                                 if (win.activeSection === 3 && item && item.type === "header" && item.netIndex === index)
                                                     return win.focusHighlightColor;
 
-                                                return "transparent";
+                                                return rowMouse.containsMouse ? Qt.rgba(theme.accent.r, theme.accent.g, theme.accent.b, 0.1) : "transparent";
                                             }
                                             radius: 0
 
@@ -1040,7 +1175,11 @@ Scope {
                                             }
 
                                             MouseArea {
+                                                id: rowMouse
+
                                                 anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
                                                 onClicked: {
                                                     if (root.expandedNetworkSsid === modelData.ssid)
                                                         root.expandedNetworkSsid = "";
@@ -1057,38 +1196,41 @@ Scope {
                                             visible: root.expandedNetworkSsid === modelData.ssid
 
                                             Row {
-                                                spacing: 10
+                                                spacing: 12
                                                 anchors.horizontalCenter: parent.horizontalCenter
 
+                                                // Connect / Disconnect button
                                                 Text {
                                                     id: connActionBtn
 
+                                                    property bool itemConnectFocused: {
+                                                        var item = root.getNetworkItemAtSubIndex(win.activeSubIndex);
+                                                        return item && item.type === "connect" && item.netIndex === index;
+                                                    }
+
                                                     text: modelData.active ? "Disconnect" : "Connect"
-                                                    color: theme.accent
+                                                    color: (connMouse.containsMouse || connActionBtn.itemConnectFocused) ? theme.accent : theme.fg_light
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
+                                                    font.bold: modelData.active
                                                     renderType: Text.NativeRendering
 
                                                     Rectangle {
                                                         anchors.fill: parent
-                                                        color: {
-                                                            var item = root.getNetworkItemAtSubIndex(win.activeSubIndex);
-                                                            if (win.activeSection === 3 && item && item.type === "connect" && item.netIndex === index)
-                                                                return win.focusHighlightColor;
-
-                                                            return "transparent";
-                                                        }
+                                                        anchors.margins: -2
+                                                        color: connActionBtn.itemConnectFocused ? win.focusHighlightColor : "transparent"
                                                         radius: 0
                                                     }
 
                                                     MouseArea {
+                                                        id: connMouse
+
                                                         anchors.fill: parent
                                                         hoverEnabled: true
-                                                        onEntered: connActionBtn.color = theme.accent
-                                                        onExited: connActionBtn.color = theme.accent
+                                                        cursorShape: Qt.PointingHandCursor
                                                         onClicked: {
                                                             if (modelData.active) {
-                                                                Quickshell.execDetached(["nmcli", "device", "disconnect", "wlan0"]);
+                                                                Quickshell.execDetached(["nmcli", "device", "disconnect", root.wifiDevice || "wlo1"]);
                                                             } else {
                                                                 var script = "SSID=\"$1\"; SECURITY=\"$2\"; " + "if nmcli connection show id \"$SSID\" >/dev/null 2>&1; then " + "  nmcli device wifi connect \"$SSID\"; " + "else " + "  if [ \"$SECURITY\" != \"--\" ] && [ -n \"$SECURITY\" ]; then " + "    pass=$(rofi -dmenu -password -p \"Password for $SSID\"); " + "    [ -n \"$pass\" ] && nmcli device wifi connect \"$SSID\" password \"$pass\"; " + "  else " + "    nmcli device wifi connect \"$SSID\"; " + "  fi; " + "fi";
                                                                 Quickshell.execDetached(["sh", "-c", script, "sh", modelData.ssid, modelData.security]);
@@ -1099,32 +1241,35 @@ Scope {
                                                     }
                                                 }
 
+                                                // Forget button (only for saved networks)
                                                 Text {
                                                     id: forgetActionBtn
 
+                                                    property bool itemForgetFocused: {
+                                                        var item = root.getNetworkItemAtSubIndex(win.activeSubIndex);
+                                                        return item && item.type === "forget" && item.netIndex === index;
+                                                    }
+
+                                                    visible: modelData.saved
                                                     text: "Forget"
-                                                    color: theme.accent
+                                                    color: (forgetMouse.containsMouse || forgetActionBtn.itemForgetFocused) ? (forgetMouse.containsMouse ? theme.error : theme.accent) : theme.fg_light
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
 
                                                     Rectangle {
                                                         anchors.fill: parent
-                                                        color: {
-                                                            var item = root.getNetworkItemAtSubIndex(win.activeSubIndex);
-                                                            if (win.activeSection === 3 && item && item.type === "forget" && item.netIndex === index)
-                                                                return win.focusHighlightColor;
-
-                                                            return "transparent";
-                                                        }
+                                                        anchors.margins: -2
+                                                        color: forgetActionBtn.itemForgetFocused ? win.focusHighlightColor : "transparent"
                                                         radius: 0
                                                     }
 
                                                     MouseArea {
+                                                        id: forgetMouse
+
                                                         anchors.fill: parent
                                                         hoverEnabled: true
-                                                        onEntered: forgetActionBtn.color = theme.accent
-                                                        onExited: forgetActionBtn.color = theme.accent
+                                                        cursorShape: Qt.PointingHandCursor
                                                         onClicked: {
                                                             Quickshell.execDetached(["nmcli", "connection", "delete", modelData.ssid]);
                                                             root.expandedNetworkSsid = "";
@@ -1133,35 +1278,40 @@ Scope {
                                                     }
                                                 }
 
+                                                // Auto button (only for saved networks)
                                                 Text {
                                                     id: autoActionBtn
 
+                                                    property bool itemAutoFocused: {
+                                                        var item = root.getNetworkItemAtSubIndex(win.activeSubIndex);
+                                                        return item && item.type === "auto" && item.netIndex === index;
+                                                    }
+
+                                                    visible: modelData.saved
                                                     text: "Auto: " + (modelData.autoconnect ? "On" : "Off")
-                                                    color: theme.accent
+                                                    color: (autoMouse.containsMouse || autoActionBtn.itemAutoFocused) ? theme.accent : (modelData.autoconnect ? theme.accent : theme.fg_light)
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
+                                                    font.bold: modelData.autoconnect
                                                     renderType: Text.NativeRendering
 
                                                     Rectangle {
                                                         anchors.fill: parent
-                                                        color: {
-                                                            var item = root.getNetworkItemAtSubIndex(win.activeSubIndex);
-                                                            if (win.activeSection === 3 && item && item.type === "auto" && item.netIndex === index)
-                                                                return win.focusHighlightColor;
-
-                                                            return "transparent";
-                                                        }
+                                                        anchors.margins: -2
+                                                        color: autoActionBtn.itemAutoFocused ? win.focusHighlightColor : "transparent"
                                                         radius: 0
                                                     }
 
                                                     MouseArea {
+                                                        id: autoMouse
+
                                                         anchors.fill: parent
                                                         hoverEnabled: true
-                                                        onEntered: autoActionBtn.color = theme.accent
-                                                        onExited: autoActionBtn.color = theme.accent
+                                                        cursorShape: Qt.PointingHandCursor
                                                         onClicked: {
-                                                            var val = modelData.autoconnect ? "no" : "yes";
-                                                            Quickshell.execDetached(["nmcli", "connection", "modify", modelData.ssid, "connection.autoconnect", val]);
+                                                            var nextVal = !modelData.autoconnect;
+                                                            modelData.autoconnect = nextVal;
+                                                            Quickshell.execDetached(["nmcli", "connection", "modify", modelData.ssid, "connection.autoconnect", nextVal ? "yes" : "no"]);
                                                             root.triggerRefresh();
                                                         }
                                                     }
@@ -1171,7 +1321,7 @@ Scope {
                                             // Additional details for scanned network
                                             Text {
                                                 anchors.horizontalCenter: parent.horizontalCenter
-                                                text: "Security: " + modelData.security + " | Rate: " + modelData.rate
+                                                text: "Security: " + modelData.security + " | Rate: " + modelData.rate + (modelData.saved ? " | Saved" : "")
                                                 color: theme.accent
                                                 opacity: 0.6
                                                 font.family: "FiraCode Nerd Font"
@@ -1181,6 +1331,17 @@ Scope {
                                         }
                                     }
                                 }
+                            }
+
+                            // Empty state indicator
+                            Text {
+                                visible: root.networks.length === 0
+                                text: root.isScanning ? "  󰑐 Searching for networks..." : "  No networks found (click refresh)"
+                                color: theme.accent
+                                opacity: root.isScanning ? 0.8 : 0.5
+                                font.family: "FiraCode Nerd Font"
+                                font.pixelSize: 8
+                                renderType: Text.NativeRendering
                             }
                         }
 
@@ -1193,27 +1354,29 @@ Scope {
                                 spacing: 20
                                 anchors.horizontalCenter: parent.horizontalCenter
 
-                                // Network Settings
+                                // Button 0: Settings
                                 Text {
                                     id: settingsBtn
 
-                                    text: "Settings"
-                                    color: theme.accent
+                                    text: "󰒓 Settings"
+                                    color: (settingsMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 0)) ? theme.accent : theme.fg_light
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
                                     renderType: Text.NativeRendering
 
                                     Rectangle {
                                         anchors.fill: parent
+                                        anchors.margins: -2
                                         color: (win.activeSection === 4 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
                                         radius: 0
                                     }
 
                                     MouseArea {
+                                        id: settingsMouse
+
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: settingsBtn.color = theme.accent
-                                        onExited: settingsBtn.color = theme.accent
+                                        cursorShape: Qt.PointingHandCursor
                                         onClicked: {
                                             Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] kitty --title impala impala")']);
                                             win.closePopup();
@@ -1221,28 +1384,32 @@ Scope {
                                     }
                                 }
 
-                                // Restart WiFi
+                                // Button 1: Restart Wi-Fi
                                 Text {
                                     id: restartBtn
 
-                                    text: "Restart Wi-Fi"
-                                    color: theme.accent
+                                    text: win.isRestartingWifi ? "󰑐 Restarting..." : "󰑐 Restart Wi-Fi"
+                                    color: (restartMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 1) || win.isRestartingWifi) ? theme.accent : theme.fg_light
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
                                     renderType: Text.NativeRendering
 
                                     Rectangle {
                                         anchors.fill: parent
+                                        anchors.margins: -2
                                         color: (win.activeSection === 4 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
                                         radius: 0
                                     }
 
                                     MouseArea {
+                                        id: restartMouse
+
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: restartBtn.color = theme.accent
-                                        onExited: restartBtn.color = theme.accent
+                                        cursorShape: Qt.PointingHandCursor
                                         onClicked: {
+                                            win.isRestartingWifi = true;
+                                            feedbackTimer.restart();
                                             Quickshell.execDetached(["nmcli", "radio", "wifi", "off"]);
                                             Quickshell.execDetached(["sh", "-c", "sleep 0.5 && nmcli radio wifi on"]);
                                             root.triggerRefresh();
@@ -1255,56 +1422,64 @@ Scope {
                                 spacing: 20
                                 anchors.horizontalCenter: parent.horizontalCenter
 
-                                // Flush DNS
+                                // Button 2: Flush DNS
                                 Text {
                                     id: flushDnsBtn
 
-                                    text: "Flush DNS"
-                                    color: theme.accent
+                                    text: win.isDnsFlushed ? "󰄬 Flushed!" : "󰃢 Flush DNS"
+                                    color: (flushMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 2) || win.isDnsFlushed) ? theme.accent : theme.fg_light
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
                                     renderType: Text.NativeRendering
 
                                     Rectangle {
                                         anchors.fill: parent
+                                        anchors.margins: -2
                                         color: (win.activeSection === 4 && win.activeSubIndex === 2) ? win.focusHighlightColor : "transparent"
                                         radius: 0
                                     }
 
                                     MouseArea {
+                                        id: flushMouse
+
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: flushDnsBtn.color = theme.accent
-                                        onExited: flushDnsBtn.color = theme.accent
+                                        cursorShape: Qt.PointingHandCursor
                                         onClicked: {
+                                            win.isDnsFlushed = true;
+                                            feedbackTimer.restart();
                                             Quickshell.execDetached(["sh", "-c", "sudo resolvectl flush-caches 2>/dev/null || true; notify-send -u low -i network-wireless -a 'Network' 'DNS Flushed' 'System DNS caches cleared.'"]);
                                             root.triggerRefresh();
                                         }
                                     }
                                 }
 
-                                // Offload / Reset Network
+                                // Button 3: Offload / Reset Network
                                 Text {
                                     id: offloadBtn
 
-                                    text: "Offload Network"
-                                    color: theme.accent
+                                    text: win.isResettingNet ? "󰑐 Resetting..." : "󰌘 Offload Network"
+                                    color: (offloadMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 3) || win.isResettingNet) ? theme.accent : theme.fg_light
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 9
                                     renderType: Text.NativeRendering
 
                                     Rectangle {
                                         anchors.fill: parent
+                                        anchors.margins: -2
                                         color: (win.activeSection === 4 && win.activeSubIndex === 3) ? win.focusHighlightColor : "transparent"
                                         radius: 0
                                     }
 
                                     MouseArea {
+                                        id: offloadMouse
+
                                         anchors.fill: parent
                                         hoverEnabled: true
-                                        onEntered: offloadBtn.color = theme.accent
-                                        onExited: offloadBtn.color = theme.accent
+                                        cursorShape: Qt.PointingHandCursor
                                         onClicked: {
+                                            win.isResettingNet = true;
+                                            feedbackTimer.restart();
                                             Quickshell.execDetached(["sh", "-c", "sudo ip route flush cache 2>/dev/null || true; nmcli networking off && sleep 0.5 && nmcli networking on; notify-send -u low -i network-wireless -a 'Network' 'Network Offloaded' 'IP route cache & network stack reset.'"]);
                                             root.triggerRefresh();
                                         }

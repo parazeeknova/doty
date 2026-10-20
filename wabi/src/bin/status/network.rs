@@ -10,6 +10,7 @@ struct WifiNetwork {
     rate: String,
     security: String,
     active: bool,
+    saved: bool,
     autoconnect: bool,
 }
 
@@ -39,6 +40,7 @@ struct NetworkStatus {
     active_ssid: String,
     active_signal: i32,
     active_speed: String,
+    wifi_device: String,
     warp_connected: bool,
     tailscale_connected: bool,
     tailscale_ip: String,
@@ -89,13 +91,13 @@ fn is_airplane_mode() -> bool {
     }
 }
 
-fn wifi_autoconnect_by_ssid() -> HashMap<String, bool> {
+fn wifi_saved_connections() -> HashMap<String, bool> {
     let out = run_cmd(
         "nmcli",
         &[
             "-t",
             "-f",
-            "NAME,TYPE,802-11-wireless.ssid,connection.autoconnect",
+            "NAME,TYPE,AUTOCONNECT",
             "connection",
             "show",
         ],
@@ -105,13 +107,9 @@ fn wifi_autoconnect_by_ssid() -> HashMap<String, bool> {
 
     for line in out.lines() {
         let parts = split_nmcli_t_line(line);
-        if parts.len() >= 4 && parts[1] == "802-11-wireless" {
-            let ssid = if parts[2].is_empty() {
-                parts[0].clone()
-            } else {
-                parts[2].clone()
-            };
-            map.insert(ssid, parts[3].eq_ignore_ascii_case("yes"));
+        if parts.len() >= 3 && parts[1] == "802-11-wireless" {
+            let name = parts[0].clone();
+            map.insert(name, parts[2].eq_ignore_ascii_case("yes"));
         }
     }
 
@@ -142,7 +140,7 @@ fn main() {
 
     let mut networks: Vec<WifiNetwork> = Vec::new();
     let mut vpns: Vec<VpnConnection> = Vec::new();
-    let autoconnect_by_ssid = wifi_autoconnect_by_ssid();
+    let saved_connections = wifi_saved_connections();
 
     // 1. Get scanned wifi networks
     if wifi_enabled {
@@ -187,15 +185,11 @@ fn main() {
                     details.security = security.clone();
                     details.bssid = bssid.clone();
 
-                    // Get real negotiated bitrate from iw instead of PHY link rate
-                    let iw_out = wifi_device
-                        .as_deref()
-                        .and_then(|dev| run_cmd("iw", &["dev", dev, "link"]))
-                        .unwrap_or_default();
-                    let mut rx_rate = String::new();
                     let mut tx_rate = String::new();
-                    for iw_line in iw_out.lines() {
-                        let trimmed = iw_line.trim();
+                    let mut rx_rate = String::new();
+                    let link_info = run_cmd("iw", &["dev", "wlo1", "link"]).unwrap_or_default();
+                    for l in link_info.lines() {
+                        let trimmed = l.trim();
                         if trimmed.starts_with("rx bitrate:") {
                             rx_rate = trimmed
                                 .trim_start_matches("rx bitrate:")
@@ -225,7 +219,10 @@ fn main() {
                 if !seen_ssids.contains(&ssid) {
                     seen_ssids.insert(ssid.clone());
 
-                    let autoconnect = autoconnect_by_ssid.get(&ssid).copied().unwrap_or(false);
+                    let (saved, autoconnect) = match saved_connections.get(&ssid) {
+                        Some(&auto) => (true, auto),
+                        None => (false, false),
+                    };
 
                     networks.push(WifiNetwork {
                         ssid,
@@ -234,6 +231,7 @@ fn main() {
                         rate,
                         security,
                         active,
+                        saved,
                         autoconnect,
                     });
                 }
@@ -258,44 +256,55 @@ fn main() {
             if parts.len() == 2 {
                 let key = parts[0].trim();
                 let val = parts[1].trim().to_string();
-                if key.contains("IP4.ADDRESS") {
-                    // format: 192.168.1.10/24
-                    let addr_parts: Vec<&str> = val.split('/').collect();
-                    details.ip_address = addr_parts[0].to_string();
-                    if addr_parts.len() >= 2 {
-                        // Calculate subnet mask from CIDR prefix
-                        if let Ok(prefix) = addr_parts[1].parse::<u32>()
-                            && let Some(mask) = cidr_to_netmask(prefix)
-                        {
-                            details.subnet = mask;
+
+                match key {
+                    "IP4.ADDRESS[1]" => {
+                        let ip_parts: Vec<&str> = val.split('/').collect();
+                        if !ip_parts.is_empty() {
+                            details.ip_address = ip_parts[0].to_string();
+                            if ip_parts.len() > 1 {
+                                if let Ok(cidr) = ip_parts[1].parse::<u32>() {
+                                    if let Some(mask) = cidr_to_netmask(cidr) {
+                                        details.subnet = mask;
+                                    }
+                                }
+                            }
                         }
                     }
-                } else if key.contains("IP4.GATEWAY") {
-                    details.gateway = val;
-                } else if key.contains("IP4.DNS") {
-                    if details.dns.is_empty() {
-                        details.dns = val;
-                    } else {
-                        details.dns = format!("{}, {}", details.dns, val);
+                    "IP4.GATEWAY" => details.gateway = val,
+                    "IP4.DNS[1]" => {
+                        if details.dns.is_empty() {
+                            details.dns = val;
+                        } else {
+                            details.dns = format!("{}, {}", details.dns, val);
+                        }
                     }
+                    "IP4.DNS[2]" => {
+                        if !details.dns.is_empty() {
+                            details.dns = format!("{}, {}", details.dns, val);
+                        }
+                    }
+                    _ => {}
                 }
             }
         }
     }
 
-    // 3. Get NM VPN / Wireguard / tunnel connections
-    let vpn_out = run_cmd(
+    // 3. Get active VPN connections
+    let conns_out = run_cmd(
         "nmcli",
-        &["-t", "-f", "name,type,device,active", "connection", "show"],
+        &["-t", "-f", "NAME,TYPE,DEVICE,STATE", "connection", "show"],
     )
     .unwrap_or_default();
-    for line in vpn_out.lines() {
+
+    for line in conns_out.lines() {
         let parts = split_nmcli_t_line(line);
         if parts.len() >= 4 {
             let name = parts[0].clone();
-            let conn_type = parts[1].clone();
+            let conn_type = parts[1].to_lowercase();
             let device = parts[2].clone();
-            let active = parts[3].to_lowercase().contains("yes");
+            let state = parts[3].to_lowercase();
+            let active = state.contains("activated");
 
             // Filter for VPN / Wireguard / tun connections (excluding bridge, loopback, wifi, ethernet)
             let is_vpn = conn_type.contains("vpn")
@@ -344,6 +353,7 @@ fn main() {
         active_ssid,
         active_signal,
         active_speed,
+        wifi_device: wifi_device.unwrap_or_default(),
         warp_connected,
         tailscale_connected,
         tailscale_ip,
