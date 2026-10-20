@@ -29,6 +29,7 @@ Scope {
     property var networks: []
     property var vpns: []
     property bool detailsExpanded: false
+    property bool moreExpanded: false
     property string expandedNetworkSsid: "" // Tracks which scanned network is expanded for actions
     property bool isScanning: false
     property int lastActiveSection: 0
@@ -44,8 +45,8 @@ Scope {
             if (root.expandedNetworkSsid === root.networks[i].ssid) {
                 if (root.networks[i].saved)
                     count += 3;
-                else
                     // Connect, Forget, Auto
+                else
                     count += 1; // Connect
             }
         }
@@ -371,7 +372,7 @@ Scope {
                     else if (win.activeSection === 3)
                         maxItems = root.getNetworkSectionItemsCount();
                     else if (win.activeSection === 4)
-                        maxItems = 4;
+                        maxItems = root.moreExpanded ? 5 : 1;
                     if (maxItems > 0)
                         win.activeSubIndex = (win.activeSubIndex + dir + maxItems) % maxItems;
                     else
@@ -452,20 +453,22 @@ Scope {
                         }
                     } else if (win.activeSection === 4) {
                         if (win.activeSubIndex === 0) {
+                            root.moreExpanded = !root.moreExpanded;
+                        } else if (win.activeSubIndex === 1) {
                             Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] kitty --title impala impala")']);
                             win.closePopup();
-                        } else if (win.activeSubIndex === 1) {
+                        } else if (win.activeSubIndex === 2) {
                             win.isRestartingWifi = true;
                             feedbackTimer.restart();
                             Quickshell.execDetached(["nmcli", "radio", "wifi", "off"]);
                             Quickshell.execDetached(["sh", "-c", "sleep 0.5 && nmcli radio wifi on"]);
                             root.triggerRefresh();
-                        } else if (win.activeSubIndex === 2) {
+                        } else if (win.activeSubIndex === 3) {
                             win.isDnsFlushed = true;
                             feedbackTimer.restart();
                             Quickshell.execDetached(["sh", "-c", "sudo resolvectl flush-caches 2>/dev/null || true; notify-send -u low -i network-wireless -a 'Network' 'DNS Flushed' 'System DNS caches cleared.'"]);
                             root.triggerRefresh();
-                        } else if (win.activeSubIndex === 3) {
+                        } else if (win.activeSubIndex === 4) {
                             win.isResettingNet = true;
                             feedbackTimer.restart();
                             Quickshell.execDetached(["sh", "-c", "sudo ip route flush cache 2>/dev/null || true; nmcli networking off && sleep 0.5 && nmcli networking on; notify-send -u low -i network-wireless -a 'Network' 'Network Offloaded' 'IP route cache & network stack reset.'"]);
@@ -1345,143 +1348,189 @@ Scope {
                             }
                         }
 
-                        // --- SECTION 6: FOOTER ACTIONS ---
+                        // --- SECTION 6: FOOTER ACTIONS (MORE) ---
                         Column {
                             width: parent.width
                             spacing: 4
 
-                            Row {
-                                spacing: 20
-                                anchors.horizontalCenter: parent.horizontalCenter
+                            Rectangle {
+                                width: parent.width
+                                height: 16
+                                color: (win.activeSection === 4 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
+                                radius: 0
 
-                                // Button 0: Settings
-                                Text {
-                                    id: settingsBtn
+                                Row {
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 4
 
-                                    text: "󰒓 Settings"
-                                    color: (settingsMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 0)) ? theme.accent : theme.fg_light
-                                    font.family: "FiraCode Nerd Font"
-                                    font.pixelSize: 9
-                                    renderType: Text.NativeRendering
-
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        anchors.margins: -2
-                                        color: (win.activeSection === 4 && win.activeSubIndex === 0) ? win.focusHighlightColor : "transparent"
-                                        radius: 0
+                                    Text {
+                                        text: root.moreExpanded ? "󰅁" : "󰅂"
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 9
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        renderType: Text.NativeRendering
                                     }
 
-                                    MouseArea {
-                                        id: settingsMouse
-
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] kitty --title impala impala")']);
-                                            win.closePopup();
-                                        }
+                                    Text {
+                                        text: "More"
+                                        color: theme.accent
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 9
+                                        font.bold: true
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        renderType: Text.NativeRendering
                                     }
                                 }
 
-                                // Button 1: Restart Wi-Fi
-                                Text {
-                                    id: restartBtn
-
-                                    text: win.isRestartingWifi ? "󰑐 Restarting..." : "󰑐 Restart Wi-Fi"
-                                    color: (restartMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 1) || win.isRestartingWifi) ? theme.accent : theme.fg_light
-                                    font.family: "FiraCode Nerd Font"
-                                    font.pixelSize: 9
-                                    renderType: Text.NativeRendering
-
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        anchors.margins: -2
-                                        color: (win.activeSection === 4 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
-                                        radius: 0
-                                    }
-
-                                    MouseArea {
-                                        id: restartMouse
-
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            win.isRestartingWifi = true;
-                                            feedbackTimer.restart();
-                                            Quickshell.execDetached(["nmcli", "radio", "wifi", "off"]);
-                                            Quickshell.execDetached(["sh", "-c", "sleep 0.5 && nmcli radio wifi on"]);
-                                            root.triggerRefresh();
-                                        }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        root.moreExpanded = !root.moreExpanded;
                                     }
                                 }
                             }
 
-                            Row {
-                                spacing: 20
-                                anchors.horizontalCenter: parent.horizontalCenter
+                            Column {
+                                width: parent.width
+                                spacing: 4
+                                visible: root.moreExpanded
 
-                                // Button 2: Flush DNS
-                                Text {
-                                    id: flushDnsBtn
+                                Row {
+                                    spacing: 20
+                                    anchors.horizontalCenter: parent.horizontalCenter
 
-                                    text: win.isDnsFlushed ? "󰄬 Flushed!" : "󰃢 Flush DNS"
-                                    color: (flushMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 2) || win.isDnsFlushed) ? theme.accent : theme.fg_light
-                                    font.family: "FiraCode Nerd Font"
-                                    font.pixelSize: 9
-                                    renderType: Text.NativeRendering
+                                    // Button 0: Settings
+                                    Text {
+                                        id: settingsBtn
 
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        anchors.margins: -2
-                                        color: (win.activeSection === 4 && win.activeSubIndex === 2) ? win.focusHighlightColor : "transparent"
-                                        radius: 0
+                                        text: "󰒓 Settings"
+                                        color: (settingsMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 1)) ? theme.accent : theme.fg_light
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 9
+                                        renderType: Text.NativeRendering
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            anchors.margins: -2
+                                            color: (win.activeSection === 4 && win.activeSubIndex === 1) ? win.focusHighlightColor : "transparent"
+                                            radius: 0
+                                        }
+
+                                        MouseArea {
+                                            id: settingsMouse
+
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.exec_cmd("[float;size 55% 65%;center] kitty --title impala impala")']);
+                                                win.closePopup();
+                                            }
+                                        }
                                     }
 
-                                    MouseArea {
-                                        id: flushMouse
+                                    // Button 1: Restart Wi-Fi
+                                    Text {
+                                        id: restartBtn
 
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            win.isDnsFlushed = true;
-                                            feedbackTimer.restart();
-                                            Quickshell.execDetached(["sh", "-c", "sudo resolvectl flush-caches 2>/dev/null || true; notify-send -u low -i network-wireless -a 'Network' 'DNS Flushed' 'System DNS caches cleared.'"]);
-                                            root.triggerRefresh();
+                                        text: win.isRestartingWifi ? "󰑐 Restarting..." : "󰑐 Restart Wi-Fi"
+                                        color: (restartMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 2) || win.isRestartingWifi) ? theme.accent : theme.fg_light
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 9
+                                        renderType: Text.NativeRendering
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            anchors.margins: -2
+                                            color: (win.activeSection === 4 && win.activeSubIndex === 2) ? win.focusHighlightColor : "transparent"
+                                            radius: 0
+                                        }
+
+                                        MouseArea {
+                                            id: restartMouse
+
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                win.isRestartingWifi = true;
+                                                feedbackTimer.restart();
+                                                Quickshell.execDetached(["nmcli", "radio", "wifi", "off"]);
+                                                Quickshell.execDetached(["sh", "-c", "sleep 0.5 && nmcli radio wifi on"]);
+                                                root.triggerRefresh();
+                                            }
                                         }
                                     }
                                 }
 
-                                // Button 3: Offload / Reset Network
-                                Text {
-                                    id: offloadBtn
+                                Row {
+                                    spacing: 20
+                                    anchors.horizontalCenter: parent.horizontalCenter
 
-                                    text: win.isResettingNet ? "󰑐 Resetting..." : "󰌘 Offload Network"
-                                    color: (offloadMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 3) || win.isResettingNet) ? theme.accent : theme.fg_light
-                                    font.family: "FiraCode Nerd Font"
-                                    font.pixelSize: 9
-                                    renderType: Text.NativeRendering
+                                    // Button 2: Flush DNS
+                                    Text {
+                                        id: flushDnsBtn
 
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        anchors.margins: -2
-                                        color: (win.activeSection === 4 && win.activeSubIndex === 3) ? win.focusHighlightColor : "transparent"
-                                        radius: 0
+                                        text: win.isDnsFlushed ? "󰄬 Flushed!" : "󰃢 Flush DNS"
+                                        color: (flushMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 3) || win.isDnsFlushed) ? theme.accent : theme.fg_light
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 9
+                                        renderType: Text.NativeRendering
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            anchors.margins: -2
+                                            color: (win.activeSection === 4 && win.activeSubIndex === 3) ? win.focusHighlightColor : "transparent"
+                                            radius: 0
+                                        }
+
+                                        MouseArea {
+                                            id: flushMouse
+
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                win.isDnsFlushed = true;
+                                                feedbackTimer.restart();
+                                                Quickshell.execDetached(["sh", "-c", "sudo resolvectl flush-caches 2>/dev/null || true; notify-send -u low -i network-wireless -a 'Network' 'DNS Flushed' 'System DNS caches cleared.'"]);
+                                                root.triggerRefresh();
+                                            }
+                                        }
                                     }
 
-                                    MouseArea {
-                                        id: offloadMouse
+                                    // Button 3: Offload / Reset Network
+                                    Text {
+                                        id: offloadBtn
 
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            win.isResettingNet = true;
-                                            feedbackTimer.restart();
-                                            Quickshell.execDetached(["sh", "-c", "sudo ip route flush cache 2>/dev/null || true; nmcli networking off && sleep 0.5 && nmcli networking on; notify-send -u low -i network-wireless -a 'Network' 'Network Offloaded' 'IP route cache & network stack reset.'"]);
-                                            root.triggerRefresh();
+                                        text: win.isResettingNet ? "󰑐 Resetting..." : "󰌘 Offload Network"
+                                        color: (offloadMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 4) || win.isResettingNet) ? theme.accent : theme.fg_light
+                                        font.family: "FiraCode Nerd Font"
+                                        font.pixelSize: 9
+                                        renderType: Text.NativeRendering
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            anchors.margins: -2
+                                            color: (win.activeSection === 4 && win.activeSubIndex === 4) ? win.focusHighlightColor : "transparent"
+                                            radius: 0
+                                        }
+
+                                        MouseArea {
+                                            id: offloadMouse
+
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                win.isResettingNet = true;
+                                                feedbackTimer.restart();
+                                                Quickshell.execDetached(["sh", "-c", "sudo ip route flush cache 2>/dev/null || true; nmcli networking off && sleep 0.5 && nmcli networking on; notify-send -u low -i network-wireless -a 'Network' 'Network Offloaded' 'IP route cache & network stack reset.'"]);
+                                                root.triggerRefresh();
+                                            }
                                         }
                                     }
                                 }
