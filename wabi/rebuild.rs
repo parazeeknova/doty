@@ -1,8 +1,56 @@
 use std::collections::HashSet;
+use std::fs::OpenOptions;
 use std::io::{IsTerminal, Write};
+use std::path::PathBuf;
 use std::process::{Command, ExitStatus};
 use std::thread;
 use std::time::{Duration, Instant};
+
+struct FileLock {
+    path: PathBuf,
+}
+
+impl FileLock {
+    fn acquire(name: &str) -> Self {
+        let lock_path = std::env::temp_dir().join(format!("doty-{}.lock", name));
+        let start = Instant::now();
+        loop {
+            match OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&lock_path)
+            {
+                Ok(_) => return FileLock { path: lock_path },
+                Err(_) => {
+                    if let Ok(meta) = std::fs::metadata(&lock_path) {
+                        if let Ok(elapsed) = meta
+                            .modified()
+                            .and_then(|m| m.elapsed().map_err(std::io::Error::other))
+                        {
+                            if elapsed.as_secs() > 300 {
+                                let _ = std::fs::remove_file(&lock_path);
+                            }
+                        }
+                    }
+                    if start.elapsed().as_secs() > 180 {
+                        eprintln!(
+                            "Warning: Timed out waiting for file lock {:?}, proceeding anyway.",
+                            lock_path
+                        );
+                        return FileLock { path: lock_path };
+                    }
+                    thread::sleep(Duration::from_millis(100));
+                }
+            }
+        }
+    }
+}
+
+impl Drop for FileLock {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_file(&self.path);
+    }
+}
 
 fn print_header(title: &str) {
     println!("\x1b[34m=== {} ===\x1b[0m", title);
@@ -190,6 +238,86 @@ fn run_updater_with_retry(name: &'static str, bin: &'static str, max_retries: us
     }
 }
 
+fn update_flake_inputs(token: Option<&str>) -> AppUpdateResult {
+    let start = Instant::now();
+    let mut update_args = vec!["flake", "update"];
+    let token_arg;
+    if let Some(t) = token {
+        token_arg = format!("github.com={}", t);
+        update_args.push("--option");
+        update_args.push("access-tokens");
+        update_args.push(&token_arg);
+    }
+
+    let output = Command::new("nix").args(&update_args).output();
+    match output {
+        Ok(out) if out.status.success() => {
+            let status_res = Command::new("git")
+                .args(["status", "--porcelain", "flake.lock"])
+                .output();
+            match status_res {
+                Ok(s_out) => {
+                    let s_str = String::from_utf8_lossy(&s_out.stdout);
+                    if !s_str.trim().is_empty() {
+                        let _lock = FileLock::acquire("updater");
+                        let add_res = Command::new("git").args(["add", "flake.lock"]).status();
+                        let commit_res = Command::new("git")
+                            .args(["commit", "--no-gpg-sign", "-m", "chore: update flake.lock"])
+                            .status();
+                        if add_res.map(|s| s.success()).unwrap_or(false)
+                            && commit_res.map(|s| s.success()).unwrap_or(false)
+                        {
+                            AppUpdateResult {
+                                name: "Flake inputs",
+                                status: AppStatus::Updated("Committed: chore: update flake.lock".to_string()),
+                                duration: start.elapsed(),
+                                retries: 0,
+                            }
+                        } else {
+                            AppUpdateResult {
+                                name: "Flake inputs",
+                                status: AppStatus::Failed("Failed to commit flake.lock changes".to_string()),
+                                duration: start.elapsed(),
+                                retries: 0,
+                            }
+                        }
+                    } else {
+                        AppUpdateResult {
+                            name: "Flake inputs",
+                            status: AppStatus::UpToDate("up to date".to_string()),
+                            duration: start.elapsed(),
+                            retries: 0,
+                        }
+                    }
+                }
+                Err(e) => AppUpdateResult {
+                    name: "Flake inputs",
+                    status: AppStatus::Failed(format!("git status failed: {}", e)),
+                    duration: start.elapsed(),
+                    retries: 0,
+                },
+            }
+        }
+        Ok(out) => {
+            let stderr = String::from_utf8_lossy(&out.stderr);
+            let stdout = String::from_utf8_lossy(&out.stdout);
+            let err_msg = extract_error_msg(&stderr, &stdout);
+            AppUpdateResult {
+                name: "Flake inputs",
+                status: AppStatus::Failed(format!("nix flake update failed: {}", err_msg)),
+                duration: start.elapsed(),
+                retries: 0,
+            }
+        }
+        Err(e) => AppUpdateResult {
+            name: "Flake inputs",
+            status: AppStatus::Failed(format!("Failed to execute nix flake update: {}", e)),
+            duration: start.elapsed(),
+            retries: 0,
+        },
+    }
+}
+
 fn main() {
     print_header("Starting Rust-powered Rebuild Pipeline");
 
@@ -227,8 +355,20 @@ fn main() {
         }
     }
 
-    // Step 1: Check and update standalone applications
-    print_step("Checking and updating standalone applications...");
+    // Step 1: Check and update standalone applications & Nix flake inputs in parallel
+    print_step("Checking and updating standalone applications and Nix flake inputs in parallel...");
+
+    let (tx, rx) = std::sync::mpsc::channel();
+    let mut in_flight: HashSet<&'static str> = HashSet::new();
+
+    // Spawn flake update thread immediately so it runs concurrently with building & running updaters
+    let token_clone = token.clone();
+    let flake_tx = tx.clone();
+    in_flight.insert("Flake inputs");
+    thread::spawn(move || {
+        let res = update_flake_inputs(token_clone.as_deref());
+        let _ = flake_tx.send(res);
+    });
 
     println!("-> Compiling application updater tools...");
     let update_bins = [
@@ -278,11 +418,8 @@ fn main() {
 
     println!("-> Checking 9 applications in parallel...");
 
-    let (tx, rx) = std::sync::mpsc::channel();
-    let total = app_updates.len();
-    let mut in_flight: HashSet<&'static str> = app_updates.iter().map(|(n, _)| *n).collect();
-
     for (name, bin) in app_updates {
+        in_flight.insert(name);
         let thread_tx = tx.clone();
         thread::spawn(move || {
             let res = run_updater_with_retry(name, bin, 2);
@@ -291,11 +428,13 @@ fn main() {
     }
     drop(tx);
 
+    let total = in_flight.len();
     let start_all = Instant::now();
     let mut completed = 0;
     let mut updated_count = 0;
     let mut up_to_date_count = 0;
     let mut warn_count = 0;
+    let mut flake_failed_msg = None;
 
     let is_tty = std::io::stdout().is_terminal();
 
@@ -316,6 +455,12 @@ fn main() {
                 };
 
                 let dur_str = format!("{:.1}s", res.duration.as_secs_f64());
+
+                if res.name == "Flake inputs" {
+                    if let AppStatus::Failed(ref msg) = res.status {
+                        flake_failed_msg = Some(msg.clone());
+                    }
+                }
 
                 match &res.status {
                     AppStatus::UpToDate(ver) => {
@@ -373,50 +518,22 @@ fn main() {
     let time_str = format!("{:.1}s", elapsed.as_secs_f64());
     if warn_count == 0 {
         print_success(&format!(
-            "Standalone applications check completed in {} ({} up to date, {} updated).",
+            "Package and flake inputs check completed in {} ({} up to date, {} updated).",
             time_str, up_to_date_count, updated_count
         ));
     } else {
         print_warning(&format!(
-            "Standalone applications check completed in {} ({} up to date, {} updated, {} warnings/skips).",
+            "Package and flake inputs check completed in {} ({} up to date, {} updated, {} warnings/skips).",
             time_str, up_to_date_count, updated_count, warn_count
         ));
     }
 
-    // Step 2: Update Nix Flake inputs
-    print_step("Updating Nix flake inputs...");
-    let mut update_args = vec!["flake", "update"];
-    let token_arg;
-    if let Some(ref t) = token {
-        token_arg = format!("github.com={}", t);
-        update_args.push("--option");
-        update_args.push("access-tokens");
-        update_args.push(&token_arg);
-    }
-    if run_cmd("nix", &update_args).map(|s| s.success()).unwrap_or(false) {
-        print_success("Flake inputs updated successfully.");
-        match get_cmd_output("git", &["status", "--porcelain", "flake.lock"]) {
-            Ok(status) if !status.trim().is_empty() => {
-                print_warning("flake.lock has changed. Committing...");
-                if run_cmd_silent("git", &["add", "flake.lock"])
-                    && run_cmd_silent("git", &["commit", "--no-gpg-sign", "-m", "chore: update flake.lock"])
-                {
-                    print_success("flake.lock committed successfully.");
-                } else {
-                    print_error("Failed to commit flake.lock changes.");
-                    std::process::exit(1);
-                }
-            }
-            _ => {
-                print_success("flake.lock is already up to date.");
-            }
-        }
-    } else {
-        print_error("nix flake update failed.");
+    if let Some(err) = flake_failed_msg {
+        print_error(&format!("Nix flake update failed: {}", err));
         std::process::exit(1);
     }
 
-    // Step 3: Lint, format, and build wabi
+    // Step 2: Lint, format, and build wabi
     print_step("Linting, formatting, and building wabi...");
 
     println!("-> wabi: cargo clippy --all-targets -- -D warnings");
@@ -447,112 +564,124 @@ fn main() {
         std::process::exit(1);
     }
 
-    // Step 4: Format QML, Nix, and Lua files
-    print_step("Formatting and linting QML / Nix / Lua files...");
+    // Step 3: Format and lint QML, Nix, and Lua files in parallel
+    print_step("Formatting and linting QML / Nix / Lua files in parallel...");
 
-    println!("-> Formatting QML files...");
-    if run_cmd_silent(
-        "nix-shell",
-        &[
-            "-p",
-            "qt6.qtdeclarative",
-            "--run",
-            "find modules/features/wm/quickshell -type f -name '*.qml' -exec qmlformat -i {} +",
-        ],
-    ) {
-        print_success("QML files formatted.");
-    } else {
-        print_error("QML formatting failed.");
-        std::process::exit(1);
-    }
+    let (fmt_tx, fmt_rx) = std::sync::mpsc::channel();
 
-    println!("-> Linting QML files...");
-    // We capture qmllint output and only treat non-zero exits as structural errors
-    let qml_lint_output = Command::new("nix-shell")
-        .args(&[
-            "-p",
-            "qt6.qtdeclarative",
-            "--run",
-            "find modules/features/wm/quickshell -type f -name '*.qml' -exec qmllint {} +",
-        ])
-        .output();
-    match qml_lint_output {
-        Ok(output) if output.status.success() => {
-            print_success("QML lint passed.");
+    // Thread 1: QML format & lint
+    let tx_qml = fmt_tx.clone();
+    thread::spawn(move || {
+        let ok_fmt = run_cmd_silent(
+            "nix-shell",
+            &[
+                "-p",
+                "qt6.qtdeclarative",
+                "--run",
+                "find modules/features/wm/quickshell -type f -name '*.qml' -exec qmlformat -i {} +",
+            ],
+        );
+        if !ok_fmt {
+            let _ = tx_qml.send((false, "QML formatting failed."));
+            return;
         }
-        Ok(output) => {
-            print_error("QML lint found syntax errors:");
-            eprintln!("{}", String::from_utf8_lossy(&output.stderr));
-            std::process::exit(1);
-        }
-        Err(e) => {
-            print_error(&format!("Failed to run qmllint: {}", e));
-            std::process::exit(1);
-        }
-    }
-
-    println!("-> Formatting Nix files...");
-    let nix_files_output = get_cmd_output(
-        "find",
-        &[
-            ".", "-name", "*.nix", "-not", "-path", "./.git/*", "-not", "-path", "./wabi/*",
-        ],
-    );
-    if let Ok(files) = nix_files_output {
-        let file_list: Vec<&str> = files.lines().filter(|s| !s.is_empty()).collect();
-        if !file_list.is_empty() {
-            if run_cmd_silent("nixfmt", &file_list) {
-                print_success("Nix files formatted.");
-            } else {
-                print_error("nixfmt formatting failed.");
-                std::process::exit(1);
+        let qml_lint = Command::new("nix-shell")
+            .args(&[
+                "-p",
+                "qt6.qtdeclarative",
+                "--run",
+                "find modules/features/wm/quickshell -type f -name '*.qml' -exec qmllint {} +",
+            ])
+            .output();
+        match qml_lint {
+            Ok(output) if output.status.success() => {
+                let _ = tx_qml.send((true, "QML format & lint passed."));
             }
-
-            println!("-> Checking Nix formatting...");
-            let mut check_args = vec!["-c"];
-            check_args.extend(file_list);
-            if run_cmd_silent("nixfmt", &check_args) {
-                print_success("Nix formatting check passed.");
-            } else {
-                print_error("nixfmt formatting check failed.");
-                std::process::exit(1);
+            Ok(output) => {
+                eprintln!("{}", String::from_utf8_lossy(&output.stderr));
+                let _ = tx_qml.send((false, "QML lint found syntax errors."));
+            }
+            Err(e) => {
+                eprintln!("Failed to run qmllint: {}", e);
+                let _ = tx_qml.send((false, "Failed to run qmllint."));
             }
         }
-    }
+    });
 
-    println!("-> Formatting Lua files...");
-    if run_cmd_silent(
-        "nix-shell",
-        &[
-            "-p",
-            "stylua",
-            "--run",
-            "find modules/features/wm/hyprland/hypr -type f -name '*.lua' -exec stylua {} +",
-        ],
-    ) {
-        print_success("Lua files formatted.");
-    } else {
-        print_error("Lua formatting failed.");
+    // Thread 2: Nix format & check
+    let tx_nix = fmt_tx.clone();
+    thread::spawn(move || {
+        let nix_files_output = get_cmd_output(
+            "find",
+            &[
+                ".", "-name", "*.nix", "-not", "-path", "./.git/*", "-not", "-path", "./wabi/*",
+            ],
+        );
+        if let Ok(files) = nix_files_output {
+            let file_list: Vec<&str> = files.lines().filter(|s| !s.is_empty()).collect();
+            if !file_list.is_empty() {
+                if !run_cmd_silent("nixfmt", &file_list) {
+                    let _ = tx_nix.send((false, "nixfmt formatting failed."));
+                    return;
+                }
+                let mut check_args = vec!["-c"];
+                check_args.extend(file_list);
+                if !run_cmd_silent("nixfmt", &check_args) {
+                    let _ = tx_nix.send((false, "nixfmt formatting check failed."));
+                    return;
+                }
+            }
+        }
+        let _ = tx_nix.send((true, "Nix format check passed."));
+    });
+
+    // Thread 3: Lua format & check
+    let tx_lua = fmt_tx.clone();
+    thread::spawn(move || {
+        let ok_fmt = run_cmd_silent(
+            "nix-shell",
+            &[
+                "-p",
+                "stylua",
+                "--run",
+                "find modules/features/wm/hyprland/hypr -type f -name '*.lua' -exec stylua {} +",
+            ],
+        );
+        if !ok_fmt {
+            let _ = tx_lua.send((false, "Lua formatting failed."));
+            return;
+        }
+        let ok_check = run_cmd_silent(
+            "nix-shell",
+            &[
+                "-p",
+                "stylua",
+                "--run",
+                "find modules/features/wm/hyprland/hypr -type f -name '*.lua' -exec stylua --check {} +",
+            ],
+        );
+        if !ok_check {
+            let _ = tx_lua.send((false, "Lua formatting check failed."));
+            return;
+        }
+        let _ = tx_lua.send((true, "Lua format check passed."));
+    });
+    drop(fmt_tx);
+
+    let mut any_fmt_failed = false;
+    for (success, msg) in fmt_rx {
+        if success {
+            print_success(&format!("✓ {}", msg));
+        } else {
+            print_error(msg);
+            any_fmt_failed = true;
+        }
+    }
+    if any_fmt_failed {
         std::process::exit(1);
     }
 
-    println!("-> Checking Lua formatting...");
-    if run_cmd_silent(
-        "nix-shell",
-        &[
-            "-p",
-            "stylua",
-            "--run",
-            "find modules/features/wm/hyprland/hypr -type f -name '*.lua' -exec stylua --check {} +",
-        ],
-    ) {
-        print_success("Lua formatting check passed.");
-    } else {
-        print_error("Lua formatting check failed.");
-        std::process::exit(1);
-    }
-
-    // Step 5: Nix flake check
+    // Step 4: Nix flake check
     print_step("Running nix flake check...");
     let mut check_args = vec!["flake", "check"];
     check_args.push("--impure");
@@ -570,7 +699,7 @@ fn main() {
         std::process::exit(1);
     }
 
-    // Step 6: Git clean check & commit formatting changes if any
+    // Step 5: Git clean check & commit formatting changes if any
     print_step("Checking for auto-formatting changes...");
     match get_cmd_output("git", &["status", "--porcelain"]) {
         Ok(status) => {
@@ -613,7 +742,7 @@ fn main() {
         }
     }
 
-    // Step 7: Nix Garbage Collection & Generation Cleanup
+    // Step 6: Nix Garbage Collection & Generation Cleanup
     print_step("Deleting old system generations (keeping last 12)...");
     match run_cmd(
         "sudo",
@@ -637,7 +766,7 @@ fn main() {
         _ => print_warning("Garbage collection failed or skipped."),
     }
 
-    // Step 8: System Rebuild
+    // Step 7: System Rebuild
     print_step("Rebuilding NixOS configuration...");
     match run_cmd("sudo", &["nixos-rebuild", "switch", "--flake", ".#apostrophe"]) {
         Ok(status) if status.success() => {
