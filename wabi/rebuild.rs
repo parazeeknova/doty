@@ -240,7 +240,21 @@ fn run_updater_with_retry(name: &'static str, bin: &'static str, max_retries: us
 
 fn update_flake_inputs(token: Option<&str>) -> AppUpdateResult {
     let start = Instant::now();
-    let mut update_args = vec!["flake", "update"];
+    let mut update_args = vec![
+        "flake",
+        "update",
+        "hyprland-scroll-overview",
+        "hyprglass",
+        "hypr-dynamic-cursors",
+        "hypr-edgehover",
+        "hymission",
+        "zen-browser",
+        "helium",
+        "vscode-insiders",
+        "antigravity-nix",
+        "codex-desktop-linux",
+        "sops-nix",
+    ];
     let token_arg;
     if let Some(t) = token {
         token_arg = format!("github.com={}", t);
