@@ -58,6 +58,7 @@ fn extract_field(content: &str, start_pattern: &str, end_pattern: &str) -> Optio
 fn curl_with_retry(args: &[&str]) -> Option<String> {
     let mut full_args = vec![
         "-s",
+        "-L",
         "--retry",
         "3",
         "--retry-delay",
@@ -129,7 +130,7 @@ fn get_latest_cua_versions() -> (Option<String>, Option<String>) {
         args.push(&auth_header);
     }
 
-    args.push("https://api.github.com/repos/trycua/cua/releases");
+    args.push("https://api.github.com/repos/trycua/cua/releases?per_page=5");
 
     let stdout = match curl_with_retry(&args) {
         Some(s) => s,

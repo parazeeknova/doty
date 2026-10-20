@@ -58,6 +58,7 @@ fn extract_field(content: &str, start_pattern: &str, end_pattern: &str) -> Optio
 fn curl_with_retry(args: &[&str]) -> Option<String> {
     let mut full_args = vec![
         "-s",
+        "-L",
         "--retry",
         "3",
         "--retry-delay",
@@ -109,6 +110,30 @@ fn nix_prefetch_url_with_retry(url: &str, retries: u32) -> Result<String, String
     ))
 }
 
+fn get_t3code_hash(version: &str) -> Result<String, String> {
+    let yml_url = format!(
+        "https://github.com/pingdotgg/t3code/releases/download/v{}/nightly-linux.yml",
+        version
+    );
+    if let Some(content) = curl_with_retry(&[&yml_url]) {
+        for line in content.lines() {
+            let trim = line.trim();
+            if let Some(rest) = trim.strip_prefix("sha512:") {
+                let h = rest.trim();
+                if !h.is_empty() {
+                    return Ok(format!("sha512-{}", h));
+                }
+            }
+        }
+    }
+
+    let new_url = format!(
+        "https://github.com/pingdotgg/t3code/releases/download/v{}/T3-Code-{}-x86_64.AppImage",
+        version, version
+    );
+    nix_prefetch_url_with_retry(&new_url, 3)
+}
+
 fn get_latest_t3code_nightly_version() -> Option<String> {
     let mut args = Vec::new();
 
@@ -129,7 +154,7 @@ fn get_latest_t3code_nightly_version() -> Option<String> {
         args.push(&auth_header);
     }
 
-    args.push("https://api.github.com/repos/pingdotgg/t3code/releases?per_page=30");
+    args.push("https://api.github.com/repos/pingdotgg/t3code/releases?per_page=10");
 
     let stdout = curl_with_retry(&args)?;
     let releases: serde_json::Value = serde_json::from_str(&stdout).ok()?;
@@ -166,8 +191,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let current_version = extract_field(t3code_block, "version = \"", "\";")
         .ok_or("Cannot find current t3code version")?;
-    let current_hash = extract_field(t3code_block, "sha256 = \"", "\";")
-        .ok_or("Cannot find current t3code hash")?;
+    let (hash_key, current_hash) = if let Some(h) = extract_field(t3code_block, "hash = \"", "\";")
+    {
+        ("hash", h)
+    } else if let Some(h) = extract_field(t3code_block, "sha256 = \"", "\";") {
+        ("sha256", h)
+    } else {
+        return Err("Cannot find current t3code hash".into());
+    };
 
     println!("Current local T3 Code version: {}", current_version);
 
@@ -190,12 +221,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "New version {} available! Fetching new hash...",
         latest_version
     );
-    let new_url = format!(
-        "https://github.com/pingdotgg/t3code/releases/download/v{}/T3-Code-{}-x86_64.AppImage",
-        latest_version, latest_version
-    );
 
-    let new_hash = nix_prefetch_url_with_retry(&new_url, 3)?;
+    let new_hash = get_t3code_hash(&latest_version)?;
     println!("Fetched hash: {}", new_hash);
 
     let _lock = FileLock::acquire("updater");
@@ -221,10 +248,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &format!("version = \"{}\";", current_version),
         &format!("version = \"{}\";", latest_version),
     );
-    new_block = new_block.replace(
-        &format!("sha256 = \"{}\";", current_hash),
-        &format!("sha256 = \"{}\";", new_hash),
-    );
+    let target_hash_line = format!("{} = \"{}\";", hash_key, current_hash);
+    let new_hash_line = if new_hash.starts_with("sha512-") || new_hash.starts_with("sha256-") {
+        format!("hash = \"{}\";", new_hash)
+    } else {
+        format!("sha256 = \"{}\";", new_hash)
+    };
+    new_block = new_block.replace(&target_hash_line, &new_hash_line);
 
     let mut new_content = fresh_content.clone();
     new_content.replace_range(start_idx..end_idx, &new_block);

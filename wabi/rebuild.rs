@@ -249,6 +249,7 @@ fn update_flake_inputs(token: Option<&str>) -> AppUpdateResult {
         update_args.push(&token_arg);
     }
 
+    let _flake_lock = FileLock::acquire("flake_update");
     let output = Command::new("nix").args(&update_args).output();
     match output {
         Ok(out) if out.status.success() => {
@@ -392,13 +393,73 @@ fn update_rea() -> AppUpdateResult {
     }
 }
 
+fn updaters_need_build() -> bool {
+    let update_bins = [
+        "update_hypr_plugins",
+        "update_portless",
+        "update_herdr",
+        "update_terminal_browser",
+        "update_terminal_code",
+        "update_bun",
+        "update_supermemory",
+        "update_cua",
+        "update_t3code",
+    ];
+    let mut oldest_bin_mtime = None;
+    for bin in &update_bins {
+        let p = PathBuf::from("wabi/target/release").join(bin);
+        match std::fs::metadata(&p) {
+            Ok(m) => {
+                if let Ok(t) = m.modified() {
+                    oldest_bin_mtime =
+                        Some(oldest_bin_mtime.map_or(t, |prev: std::time::SystemTime| prev.min(t)));
+                } else {
+                    return true;
+                }
+            }
+            Err(_) => return true,
+        }
+    }
+    let bin_mtime = match oldest_bin_mtime {
+        Some(t) => t,
+        None => return true,
+    };
+
+    if let Ok(cargo_meta) = std::fs::metadata("wabi/Cargo.toml") {
+        if let Ok(m) = cargo_meta.modified() {
+            if m > bin_mtime {
+                return true;
+            }
+        }
+    }
+    if let Ok(entries) = std::fs::read_dir("wabi/src/bin/utils") {
+        for entry in entries.flatten() {
+            if let Ok(meta) = entry.metadata() {
+                if let Ok(m) = meta.modified() {
+                    if m > bin_mtime {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    false
+}
+
 fn main() {
     print_header("Starting Rust-powered Rebuild Pipeline");
+
+    let args: Vec<String> = std::env::args().collect();
+    let force_update = args
+        .iter()
+        .any(|a| a == "--update" || a == "-u" || a == "--check" || a == "-c");
 
     // Read GitHub token if available to prevent API rate limiting on nix commands
     let token = std::fs::read_to_string("/run/secrets/github-token")
         .ok()
-        .map(|s| s.trim().to_string());
+        .map(|s| s.trim().to_string())
+        .or_else(|| std::env::var("GITHUB_PERSONAL_ACCESS_TOKEN").ok())
+        .or_else(|| std::env::var("GITHUB_TOKEN").ok());
 
     // Step 0: Check Git Working Directory status
     print_step("Checking Git working tree status...");
@@ -432,187 +493,233 @@ fn main() {
     // Step 1: Check and update standalone applications & Nix flake inputs in parallel
     print_step("Checking and updating applications, REA, and Nix flake inputs in parallel...");
 
-    let (tx, rx) = std::sync::mpsc::channel();
-    let mut in_flight: HashSet<&'static str> = HashSet::new();
+    let cache_path = std::env::temp_dir().join("doty-step1-cache.txt");
+    let mut used_cache = false;
 
-    // Spawn flake update thread immediately so it runs concurrently with building & running updaters
-    let token_clone = token.clone();
-    let flake_tx = tx.clone();
-    in_flight.insert("Flake inputs");
-    thread::spawn(move || {
-        let res = update_flake_inputs(token_clone.as_deref());
-        let _ = flake_tx.send(res);
-    });
-
-    // Spawn REA update thread in parallel
-    let rea_tx = tx.clone();
-    in_flight.insert("REA");
-    thread::spawn(move || {
-        let res = update_rea();
-        let _ = rea_tx.send(res);
-    });
-
-    println!("-> Compiling application updater tools...");
-    let update_bins = [
-        "update_hypr_plugins",
-        "update_portless",
-        "update_herdr",
-        "update_terminal_browser",
-        "update_terminal_code",
-        "update_bun",
-        "update_supermemory",
-        "update_cua",
-        "update_t3code",
-    ];
-    let mut cargo_args = vec!["build", "--manifest-path", "wabi/Cargo.toml", "--release"];
-    for bin in &update_bins {
-        cargo_args.push("--bin");
-        cargo_args.push(bin);
-    }
-    if run_cmd_silent("cargo", &cargo_args) {
-        print_success("Updater tools ready.");
-    } else if run_cmd_silent(
-        "nix-shell",
-        &[
-            "-p",
-            "pkg-config",
-            "openssl",
-            "--run",
-            &format!("cargo {}", cargo_args.join(" ")),
-        ],
-    ) {
-        print_success("Updater tools ready.");
-    } else {
-        print_warning("Failed to build updater tools; attempting to proceed with existing binaries.");
-    }
-
-    let app_updates = [
-        ("Hyprland plugins", "./wabi/target/release/update_hypr_plugins"),
-        ("Portless", "./wabi/target/release/update_portless"),
-        ("Herdr", "./wabi/target/release/update_herdr"),
-        ("Terminal Browser", "./wabi/target/release/update_terminal_browser"),
-        ("Terminal Code", "./wabi/target/release/update_terminal_code"),
-        ("Bun", "./wabi/target/release/update_bun"),
-        ("Supermemory", "./wabi/target/release/update_supermemory"),
-        ("Cua", "./wabi/target/release/update_cua"),
-        ("T3 Code", "./wabi/target/release/update_t3code"),
-    ];
-
-    println!("-> Checking 9 applications in parallel...");
-
-    for (name, bin) in app_updates {
-        in_flight.insert(name);
-        let thread_tx = tx.clone();
-        thread::spawn(move || {
-            let res = run_updater_with_retry(name, bin, 2);
-            let _ = thread_tx.send(res);
-        });
-    }
-    drop(tx);
-
-    let total = in_flight.len();
-    let start_all = Instant::now();
-    let mut completed = 0;
-    let mut updated_count = 0;
-    let mut up_to_date_count = 0;
-    let mut warn_count = 0;
-    let mut flake_failed_msg = None;
-
-    let is_tty = std::io::stdout().is_terminal();
-
-    while completed < total {
-        match rx.recv_timeout(Duration::from_millis(250)) {
-            Ok(res) => {
-                completed += 1;
-                in_flight.remove(res.name);
-
-                if is_tty {
-                    print!("\r\x1b[K");
-                }
-
-                let retry_str = if res.retries > 0 {
-                    format!(" \x1b[90m({} retries)\x1b[0m", res.retries)
-                } else {
-                    String::new()
-                };
-
-                let dur_str = format!("{:.1}s", res.duration.as_secs_f64());
-
-                if res.name == "Flake inputs" {
-                    if let AppStatus::Failed(ref msg) = res.status {
-                        flake_failed_msg = Some(msg.clone());
-                    }
-                }
-
-                match &res.status {
-                    AppStatus::UpToDate(ver) => {
-                        up_to_date_count += 1;
-                        println!(
-                            "  \x1b[32m✓\x1b[0m {:<18} \x1b[90m{:<12} ({})\x1b[0m{}",
-                            res.name, ver, dur_str, retry_str
-                        );
-                    }
-                    AppStatus::Updated(msg) => {
-                        updated_count += 1;
-                        println!(
-                            "  \x1b[36m↑\x1b[0m {:<18} \x1b[32m{}\x1b[0m \x1b[90m({})\x1b[0m{}",
-                            res.name, msg, dur_str, retry_str
-                        );
-                    }
-                    AppStatus::Warning(msg) => {
-                        warn_count += 1;
-                        println!(
-                            "  \x1b[33m⚠\x1b[0m {:<18} \x1b[33m{}\x1b[0m \x1b[90m({})\x1b[0m{}",
-                            res.name, msg, dur_str, retry_str
-                        );
-                    }
-                    AppStatus::Failed(msg) => {
-                        warn_count += 1;
-                        println!(
-                            "  \x1b[31m✗\x1b[0m {:<18} \x1b[31m{}\x1b[0m \x1b[90m({})\x1b[0m{}",
-                            res.name, msg, dur_str, retry_str
-                        );
+    if !force_update && cache_path.exists() {
+        if let Ok(meta) = std::fs::metadata(&cache_path) {
+            if let Ok(elapsed) = meta
+                .modified()
+                .and_then(|m| m.elapsed().map_err(std::io::Error::other))
+            {
+                if elapsed.as_secs() < 3600 {
+                    if let Ok(content) = std::fs::read_to_string(&cache_path) {
+                        let lines: Vec<&str> = content.lines().filter(|l| !l.is_empty()).collect();
+                        if !lines.is_empty() {
+                            for line in &lines {
+                                println!("{}", line);
+                            }
+                            let mins = elapsed.as_secs() / 60;
+                            print_success(&format!(
+                                "Package and flake inputs check completed in 0.0s (all up to date, checked {}m ago; pass -u to refresh).",
+                                mins
+                            ));
+                            used_cache = true;
+                        }
                     }
                 }
             }
-            Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
-                if is_tty && completed < total {
-                    let running: Vec<&str> = in_flight.iter().copied().collect();
-                    print!(
-                        "\r\x1b[K  \x1b[34m⠋\x1b[0m [{}/{}] Checking: {}...",
-                        completed,
-                        total,
-                        running.join(", ")
-                    );
-                    let _ = std::io::stdout().flush();
-                }
-            }
-            Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => break,
         }
     }
 
-    if is_tty {
-        print!("\r\x1b[K");
-        let _ = std::io::stdout().flush();
-    }
+    if !used_cache {
+        let (tx, rx) = std::sync::mpsc::channel();
+        let mut in_flight: HashSet<&'static str> = HashSet::new();
+        let mut cached_lines: Vec<String> = Vec::new();
 
-    let elapsed = start_all.elapsed();
-    let time_str = format!("{:.1}s", elapsed.as_secs_f64());
-    if warn_count == 0 {
-        print_success(&format!(
-            "Package and flake inputs check completed in {} ({} up to date, {} updated).",
-            time_str, up_to_date_count, updated_count
-        ));
-    } else {
-        print_warning(&format!(
-            "Package and flake inputs check completed in {} ({} up to date, {} updated, {} warnings/skips).",
-            time_str, up_to_date_count, updated_count, warn_count
-        ));
-    }
+        // Spawn flake update thread immediately so it runs concurrently with building & running updaters
+        let token_clone = token.clone();
+        let flake_tx = tx.clone();
+        in_flight.insert("Flake inputs");
+        thread::spawn(move || {
+            let res = update_flake_inputs(token_clone.as_deref());
+            let _ = flake_tx.send(res);
+        });
 
-    if let Some(err) = flake_failed_msg {
-        print_error(&format!("Nix flake update failed: {}", err));
-        std::process::exit(1);
+        // Spawn REA update thread in parallel
+        let rea_tx = tx.clone();
+        in_flight.insert("REA");
+        thread::spawn(move || {
+            let res = update_rea();
+            let _ = rea_tx.send(res);
+        });
+
+        println!("-> Compiling application updater tools...");
+        if !updaters_need_build() {
+            print_success("Updater tools ready (up to date).");
+        } else {
+            let update_bins = [
+                "update_hypr_plugins",
+                "update_portless",
+                "update_herdr",
+                "update_terminal_browser",
+                "update_terminal_code",
+                "update_bun",
+                "update_supermemory",
+                "update_cua",
+                "update_t3code",
+            ];
+            let mut cargo_args = vec!["build", "--manifest-path", "wabi/Cargo.toml", "--release"];
+            for bin in &update_bins {
+                cargo_args.push("--bin");
+                cargo_args.push(bin);
+            }
+            if run_cmd_silent("cargo", &cargo_args) {
+                print_success("Updater tools ready.");
+            } else if run_cmd_silent(
+                "nix-shell",
+                &[
+                    "-p",
+                    "pkg-config",
+                    "openssl",
+                    "--run",
+                    &format!("cargo {}", cargo_args.join(" ")),
+                ],
+            ) {
+                print_success("Updater tools ready.");
+            } else {
+                print_warning(
+                    "Failed to build updater tools; attempting to proceed with existing binaries.",
+                );
+            }
+        }
+
+        let app_updates = [
+            ("Hyprland plugins", "./wabi/target/release/update_hypr_plugins"),
+            ("Portless", "./wabi/target/release/update_portless"),
+            ("Herdr", "./wabi/target/release/update_herdr"),
+            ("Terminal Browser", "./wabi/target/release/update_terminal_browser"),
+            ("Terminal Code", "./wabi/target/release/update_terminal_code"),
+            ("Bun", "./wabi/target/release/update_bun"),
+            ("Supermemory", "./wabi/target/release/update_supermemory"),
+            ("Cua", "./wabi/target/release/update_cua"),
+            ("T3 Code", "./wabi/target/release/update_t3code"),
+        ];
+
+        println!("-> Checking 9 applications in parallel...");
+
+        for (name, bin) in app_updates {
+            in_flight.insert(name);
+            let thread_tx = tx.clone();
+            thread::spawn(move || {
+                let res = run_updater_with_retry(name, bin, 2);
+                let _ = thread_tx.send(res);
+            });
+        }
+        drop(tx);
+
+        let total = in_flight.len();
+        let start_all = Instant::now();
+        let mut completed = 0;
+        let mut updated_count = 0;
+        let mut up_to_date_count = 0;
+        let mut warn_count = 0;
+        let mut flake_failed_msg = None;
+
+        let is_tty = std::io::stdout().is_terminal();
+
+        while completed < total {
+            match rx.recv_timeout(Duration::from_millis(250)) {
+                Ok(res) => {
+                    completed += 1;
+                    in_flight.remove(res.name);
+
+                    if is_tty {
+                        print!("\r\x1b[K");
+                    }
+
+                    let retry_str = if res.retries > 0 {
+                        format!(" \x1b[90m({} retries)\x1b[0m", res.retries)
+                    } else {
+                        String::new()
+                    };
+
+                    let dur_str = format!("{:.1}s", res.duration.as_secs_f64());
+
+                    if res.name == "Flake inputs" {
+                        if let AppStatus::Failed(ref msg) = res.status {
+                            flake_failed_msg = Some(msg.clone());
+                        }
+                    }
+
+                    match &res.status {
+                        AppStatus::UpToDate(ver) => {
+                            up_to_date_count += 1;
+                            println!(
+                                "  \x1b[32m✓\x1b[0m {:<18} \x1b[90m{:<12} ({})\x1b[0m{}",
+                                res.name, ver, dur_str, retry_str
+                            );
+                            cached_lines.push(format!(
+                                "  \x1b[32m✓\x1b[0m {:<18} \x1b[90m{:<12} (cached)\x1b[0m",
+                                res.name, ver
+                            ));
+                        }
+                        AppStatus::Updated(msg) => {
+                            updated_count += 1;
+                            println!(
+                                "  \x1b[36m↑\x1b[0m {:<18} \x1b[32m{}\x1b[0m \x1b[90m({})\x1b[0m{}",
+                                res.name, msg, dur_str, retry_str
+                            );
+                        }
+                        AppStatus::Warning(msg) => {
+                            warn_count += 1;
+                            println!(
+                                "  \x1b[33m⚠\x1b[0m {:<18} \x1b[33m{}\x1b[0m \x1b[90m({})\x1b[0m{}",
+                                res.name, msg, dur_str, retry_str
+                            );
+                        }
+                        AppStatus::Failed(msg) => {
+                            warn_count += 1;
+                            println!(
+                                "  \x1b[31m✗\x1b[0m {:<18} \x1b[31m{}\x1b[0m \x1b[90m({})\x1b[0m{}",
+                                res.name, msg, dur_str, retry_str
+                            );
+                        }
+                    }
+                }
+                Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
+                    if is_tty && completed < total {
+                        let running: Vec<&str> = in_flight.iter().copied().collect();
+                        print!(
+                            "\r\x1b[K  \x1b[34m⠋\x1b[0m [{}/{}] Checking: {}...",
+                            completed,
+                            total,
+                            running.join(", ")
+                        );
+                        let _ = std::io::stdout().flush();
+                    }
+                }
+                Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => break,
+            }
+        }
+
+        if is_tty {
+            print!("\r\x1b[K");
+            let _ = std::io::stdout().flush();
+        }
+
+        let elapsed = start_all.elapsed();
+        let time_str = format!("{:.1}s", elapsed.as_secs_f64());
+        if warn_count == 0 {
+            print_success(&format!(
+                "Package and flake inputs check completed in {} ({} up to date, {} updated).",
+                time_str, up_to_date_count, updated_count
+            ));
+            if flake_failed_msg.is_none() && updated_count == 0 {
+                let _ = std::fs::write(&cache_path, cached_lines.join("\n"));
+            }
+        } else {
+            print_warning(&format!(
+                "Package and flake inputs check completed in {} ({} up to date, {} updated, {} warnings/skips).",
+                time_str, up_to_date_count, updated_count, warn_count
+            ));
+            let _ = std::fs::remove_file(&cache_path);
+        }
+
+        if let Some(err) = flake_failed_msg {
+            print_error(&format!("Nix flake update failed: {}", err));
+            std::process::exit(1);
+        }
     }
 
     // Step 2: Lint, format, and build wabi

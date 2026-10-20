@@ -58,6 +58,7 @@ fn extract_field(content: &str, start_pattern: &str, end_pattern: &str) -> Optio
 fn curl_with_retry(args: &[&str]) -> Option<String> {
     let mut full_args = vec![
         "-s",
+        "-L",
         "--retry",
         "3",
         "--retry-delay",

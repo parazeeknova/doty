@@ -94,13 +94,7 @@ fn is_airplane_mode() -> bool {
 fn wifi_saved_connections() -> HashMap<String, bool> {
     let out = run_cmd(
         "nmcli",
-        &[
-            "-t",
-            "-f",
-            "NAME,TYPE,AUTOCONNECT",
-            "connection",
-            "show",
-        ],
+        &["-t", "-f", "NAME,TYPE,AUTOCONNECT", "connection", "show"],
     )
     .unwrap_or_default();
     let mut map = HashMap::new();
@@ -249,10 +243,18 @@ fn main() {
 
         // Fallback: if not connected according to wifi scan, check device status
         if !connected {
-            let dev_out = run_cmd("nmcli", &["-t", "-f", "DEVICE,TYPE,STATE,CONNECTION", "dev"]).unwrap_or_default();
+            let dev_out = run_cmd(
+                "nmcli",
+                &["-t", "-f", "DEVICE,TYPE,STATE,CONNECTION", "dev"],
+            )
+            .unwrap_or_default();
             for line in dev_out.lines() {
                 let parts = split_nmcli_t_line(line);
-                if parts.len() >= 4 && parts[1] == "wifi" && parts[2].starts_with("connected") && !parts[3].is_empty() {
+                if parts.len() >= 4
+                    && parts[1] == "wifi"
+                    && parts[2].starts_with("connected")
+                    && !parts[3].is_empty()
+                {
                     connected = true;
                     if active_ssid.is_empty() {
                         active_ssid = parts[3].clone();
@@ -312,12 +314,11 @@ fn main() {
                         let ip_parts: Vec<&str> = val.split('/').collect();
                         if !ip_parts.is_empty() {
                             details.ip_address = ip_parts[0].to_string();
-                            if ip_parts.len() > 1 {
-                                if let Ok(cidr) = ip_parts[1].parse::<u32>() {
-                                    if let Some(mask) = cidr_to_netmask(cidr) {
-                                        details.subnet = mask;
-                                    }
-                                }
+                            if ip_parts.len() > 1
+                                && let Ok(cidr) = ip_parts[1].parse::<u32>()
+                                && let Some(mask) = cidr_to_netmask(cidr)
+                            {
+                                details.subnet = mask;
                             }
                         }
                     }
@@ -329,10 +330,8 @@ fn main() {
                             details.dns = format!("{}, {}", details.dns, val);
                         }
                     }
-                    "IP4.DNS[2]" => {
-                        if !details.dns.is_empty() {
-                            details.dns = format!("{}, {}", details.dns, val);
-                        }
+                    "IP4.DNS[2]" if !details.dns.is_empty() => {
+                        details.dns = format!("{}, {}", details.dns, val);
                     }
                     _ => {}
                 }
