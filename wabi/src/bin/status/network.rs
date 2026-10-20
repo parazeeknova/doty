@@ -160,7 +160,6 @@ fn main() {
         )
         .unwrap_or_default();
 
-        // Keep track of SSIDs to avoid duplicates in scan list
         let mut seen_ssids = HashSet::new();
 
         for line in wifi_list_out.lines() {
@@ -187,7 +186,8 @@ fn main() {
 
                     let mut tx_rate = String::new();
                     let mut rx_rate = String::new();
-                    let link_info = run_cmd("iw", &["dev", "wlo1", "link"]).unwrap_or_default();
+                    let link_dev = wifi_device.as_deref().unwrap_or("wlo1");
+                    let link_info = run_cmd("iw", &["dev", link_dev, "link"]).unwrap_or_default();
                     for l in link_info.lines() {
                         let trimmed = l.trim();
                         if trimmed.starts_with("rx bitrate:") {
@@ -216,7 +216,16 @@ fn main() {
                     }
                 }
 
-                if !seen_ssids.contains(&ssid) {
+                if let Some(existing) = networks.iter_mut().find(|n| n.ssid == ssid) {
+                    if active {
+                        existing.active = true;
+                        existing.bssid = bssid;
+                        existing.rate = rate;
+                        existing.signal = signal;
+                    } else if !existing.active && signal > existing.signal {
+                        existing.signal = signal;
+                    }
+                } else {
                     seen_ssids.insert(ssid.clone());
 
                     let (saved, autoconnect) = match saved_connections.get(&ssid) {
@@ -235,6 +244,47 @@ fn main() {
                         autoconnect,
                     });
                 }
+            }
+        }
+
+        // Fallback: if not connected according to wifi scan, check device status
+        if !connected {
+            let dev_out = run_cmd("nmcli", &["-t", "-f", "DEVICE,TYPE,STATE,CONNECTION", "dev"]).unwrap_or_default();
+            for line in dev_out.lines() {
+                let parts = split_nmcli_t_line(line);
+                if parts.len() >= 4 && parts[1] == "wifi" && parts[2].starts_with("connected") && !parts[3].is_empty() {
+                    connected = true;
+                    if active_ssid.is_empty() {
+                        active_ssid = parts[3].clone();
+                    }
+                }
+            }
+        }
+
+        // Ensure active network in the list has active = true
+        if connected && !active_ssid.is_empty() {
+            let mut found = false;
+            for net in networks.iter_mut() {
+                if net.ssid == active_ssid {
+                    net.active = true;
+                    found = true;
+                }
+            }
+            if !found {
+                let (saved, autoconnect) = match saved_connections.get(&active_ssid) {
+                    Some(&auto) => (true, auto),
+                    None => (true, true),
+                };
+                networks.push(WifiNetwork {
+                    ssid: active_ssid.clone(),
+                    bssid: details.bssid.clone(),
+                    signal: active_signal,
+                    rate: active_speed.clone(),
+                    security: details.security.clone(),
+                    active: true,
+                    saved,
+                    autoconnect,
+                });
             }
         }
     }

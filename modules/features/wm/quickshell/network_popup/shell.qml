@@ -45,8 +45,8 @@ Scope {
             if (root.expandedNetworkSsid === root.networks[i].ssid) {
                 if (root.networks[i].saved)
                     count += 3;
-                    // Connect, Forget, Auto
                 else
+                    // Connect, Forget, Auto
                     count += 1; // Connect
             }
         }
@@ -430,7 +430,8 @@ Scope {
                                 else
                                     root.expandedNetworkSsid = item.netData.ssid;
                             } else if (item.type === "connect") {
-                                if (item.netData.active) {
+                                var isNetActive = item.netData.active || (root.connected && root.activeSsid === item.netData.ssid);
+                                if (isNetActive) {
                                     Quickshell.execDetached(["nmcli", "device", "disconnect", root.wifiDevice || "wlo1"]);
                                 } else {
                                     var script = "SSID=\"$1\"; SECURITY=\"$2\"; if nmcli connection show id \"$SSID\" >/dev/null 2>&1; then nmcli device wifi connect \"$SSID\"; else if [ \"$SECURITY\" != \"--\" ] && [ -n \"$SECURITY\" ]; then pass=$(rofi -dmenu -password -p \"Password for $SSID\"); [ -n \"$pass\" ] && nmcli device wifi connect \"$SSID\" password \"$pass\"; else nmcli device wifi connect \"$SSID\"; fi; fi";
@@ -704,7 +705,8 @@ Scope {
                                 id: wifiToggleText
 
                                 text: "󰤨 Wi-Fi: " + (root.wifiEnabled ? "On" : "Off")
-                                color: (wifiToggleMouse.containsMouse || (win.activeSection === 0 && win.activeSubIndex === 0)) ? theme.accent : (root.wifiEnabled ? theme.accent : theme.fg_light)
+                                color: theme.accent
+                                opacity: (wifiToggleMouse.containsMouse || (win.activeSection === 0 && win.activeSubIndex === 0) || root.wifiEnabled) ? 1.0 : 0.6
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -738,7 +740,8 @@ Scope {
                                 id: airplaneToggleText
 
                                 text: "󰀝 Airplane: " + (root.airplaneMode ? "On" : "Off")
-                                color: (airplaneToggleMouse.containsMouse || (win.activeSection === 0 && win.activeSubIndex === 1)) ? theme.accent : (root.airplaneMode ? theme.accent : theme.fg_light)
+                                color: theme.accent
+                                opacity: (airplaneToggleMouse.containsMouse || (win.activeSection === 0 && win.activeSubIndex === 1) || root.airplaneMode) ? 1.0 : 0.6
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -775,10 +778,11 @@ Scope {
                             opacity: 0.15
                         }
 
-                        // --- SECTION 3: CONNECTION DETAILS COLLAPSIBLE ---
+                        // --- SECTION 3: CONNECTION DETAILS ---
                         Column {
                             width: parent.width
-                            spacing: 4
+                            spacing: 2
+                            visible: root.connected
 
                             Rectangle {
                                 width: parent.width
@@ -795,7 +799,7 @@ Scope {
                                         text: root.detailsExpanded ? "󰅁" : "󰅂"
                                         color: theme.accent
                                         font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 9
+                                        font.pixelSize: 8
                                         anchors.verticalCenter: parent.verticalCenter
                                         renderType: Text.NativeRendering
                                     }
@@ -804,8 +808,7 @@ Scope {
                                         text: "Details"
                                         color: theme.accent
                                         font.family: "FiraCode Nerd Font"
-                                        font.pixelSize: 9
-                                        font.bold: true
+                                        font.pixelSize: 8
                                         anchors.verticalCenter: parent.verticalCenter
                                         renderType: Text.NativeRendering
                                     }
@@ -823,10 +826,10 @@ Scope {
                             Column {
                                 width: parent.width
                                 spacing: 2
-                                visible: root.detailsExpanded && root.connected
+                                visible: root.detailsExpanded
 
                                 Text {
-                                    text: "  IP: " + root.details.ip_address
+                                    text: "  IP: " + (root.details.ip_address || "None")
                                     color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
@@ -834,7 +837,7 @@ Scope {
                                 }
 
                                 Text {
-                                    text: "  Gateway: " + root.details.gateway
+                                    text: "  Gateway: " + (root.details.gateway || "None")
                                     color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
@@ -842,7 +845,7 @@ Scope {
                                 }
 
                                 Text {
-                                    text: "  Subnet: " + root.details.subnet
+                                    text: "  DNS: " + (root.details.dns || "None")
                                     color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
@@ -850,7 +853,7 @@ Scope {
                                 }
 
                                 Text {
-                                    text: "  DNS: " + root.details.dns
+                                    text: "  Subnet: " + (root.details.subnet || "None")
                                     color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
@@ -858,7 +861,7 @@ Scope {
                                 }
 
                                 Text {
-                                    text: "  BSSID: " + root.details.bssid
+                                    text: "  Security: " + (root.details.security || "None")
                                     color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
@@ -866,33 +869,24 @@ Scope {
                                 }
 
                                 Text {
-                                    text: "  Security: " + root.details.security
+                                    text: "  BSSID: " + (root.details.bssid || "None")
                                     color: theme.accent
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
                                 }
-                            }
-
-                            Text {
-                                text: "  No connection active"
-                                color: theme.accent
-                                opacity: 0.5
-                                font.family: "FiraCode Nerd Font"
-                                font.pixelSize: 8
-                                renderType: Text.NativeRendering
-                                visible: root.detailsExpanded && !root.connected
                             }
                         }
 
-                        // --- SECTION 4: VPN SECTION ---
+                        // --- SECTION 4: VPNS & PROXIES ---
                         Column {
                             width: parent.width
                             spacing: 4
 
                             Text {
-                                text: "VPN"
+                                text: "VPNs & Proxies"
                                 color: theme.accent
+                                opacity: 0.5
                                 font.family: "FiraCode Nerd Font"
                                 font.pixelSize: 9
                                 font.bold: true
@@ -922,7 +916,8 @@ Scope {
                                     anchors.right: parent.right
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: root.warpConnected ? "disconnect" : "connect"
-                                    color: (warpMouse.containsMouse || (win.activeSection === 2 && win.activeSubIndex === 0)) ? theme.accent : theme.fg_light
+                                    color: theme.accent
+                                    opacity: (warpMouse.containsMouse || (win.activeSection === 2 && win.activeSubIndex === 0) || root.warpConnected) ? 1.0 : 0.6
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -981,7 +976,8 @@ Scope {
                                     anchors.right: parent.right
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: root.tailscaleConnected ? "disconnect" : "connect"
-                                    color: (tsMouse.containsMouse || (win.activeSection === 2 && win.activeSubIndex === 1)) ? theme.accent : theme.fg_light
+                                    color: theme.accent
+                                    opacity: (tsMouse.containsMouse || (win.activeSection === 2 && win.activeSubIndex === 1) || root.tailscaleConnected) ? 1.0 : 0.6
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -1035,7 +1031,8 @@ Scope {
                                             anchors.right: parent.right
                                             anchors.verticalCenter: parent.verticalCenter
                                             text: modelData.active ? "disconnect" : "connect"
-                                            color: (vpnMouse.containsMouse || (win.activeSection === 2 && win.activeSubIndex === (index + 2))) ? theme.accent : theme.fg_light
+                                            color: theme.accent
+                                            opacity: (vpnMouse.containsMouse || (win.activeSection === 2 && win.activeSubIndex === (index + 2)) || modelData.active) ? 1.0 : 0.6
                                             font.family: "FiraCode Nerd Font"
                                             font.pixelSize: 8
                                             renderType: Text.NativeRendering
@@ -1097,7 +1094,8 @@ Scope {
                                     anchors.right: parent.right
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: root.isScanning ? "󰑐 searching..." : "󰑐 refresh"
-                                    color: (scanMouse.containsMouse || root.isScanning) ? theme.accent : theme.fg_light
+                                    color: theme.accent
+                                    opacity: (scanMouse.containsMouse || root.isScanning) ? 1.0 : 0.6
                                     font.family: "FiraCode Nerd Font"
                                     font.pixelSize: 8
                                     renderType: Text.NativeRendering
@@ -1123,10 +1121,13 @@ Scope {
                                     model: root.networks
 
                                     delegate: Column {
+                                        id: netRowCol
+
                                         width: parent.width
                                         spacing: 2
 
-                                        // Scanned SSID Row
+                                        property bool isNetActive: modelData.active || (root.connected && root.activeSsid === modelData.ssid)
+
                                         Rectangle {
                                             width: parent.width
                                             height: 16
@@ -1145,11 +1146,11 @@ Scope {
                                                 spacing: 4
 
                                                 Text {
-                                                    text: (modelData.active ? "* " : "  ") + modelData.ssid
+                                                    text: (netRowCol.isNetActive ? "* " : "  ") + modelData.ssid
                                                     color: theme.accent
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
-                                                    font.bold: modelData.active
+                                                    font.bold: netRowCol.isNetActive
                                                     elide: Text.ElideRight
                                                     width: 140
                                                     renderType: Text.NativeRendering
@@ -1211,11 +1212,12 @@ Scope {
                                                         return item && item.type === "connect" && item.netIndex === index;
                                                     }
 
-                                                    text: modelData.active ? "Disconnect" : "Connect"
-                                                    color: (connMouse.containsMouse || connActionBtn.itemConnectFocused) ? theme.accent : theme.fg_light
+                                                    text: netRowCol.isNetActive ? "Disconnect" : "Connect"
+                                                    color: theme.accent
+                                                    opacity: (connMouse.containsMouse || connActionBtn.itemConnectFocused || netRowCol.isNetActive) ? 1.0 : 0.6
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
-                                                    font.bold: modelData.active
+                                                    font.bold: netRowCol.isNetActive
                                                     renderType: Text.NativeRendering
 
                                                     Rectangle {
@@ -1232,7 +1234,7 @@ Scope {
                                                         hoverEnabled: true
                                                         cursorShape: Qt.PointingHandCursor
                                                         onClicked: {
-                                                            if (modelData.active) {
+                                                            if (netRowCol.isNetActive) {
                                                                 Quickshell.execDetached(["nmcli", "device", "disconnect", root.wifiDevice || "wlo1"]);
                                                             } else {
                                                                 var script = "SSID=\"$1\"; SECURITY=\"$2\"; " + "if nmcli connection show id \"$SSID\" >/dev/null 2>&1; then " + "  nmcli device wifi connect \"$SSID\"; " + "else " + "  if [ \"$SECURITY\" != \"--\" ] && [ -n \"$SECURITY\" ]; then " + "    pass=$(rofi -dmenu -password -p \"Password for $SSID\"); " + "    [ -n \"$pass\" ] && nmcli device wifi connect \"$SSID\" password \"$pass\"; " + "  else " + "    nmcli device wifi connect \"$SSID\"; " + "  fi; " + "fi";
@@ -1255,7 +1257,8 @@ Scope {
 
                                                     visible: modelData.saved
                                                     text: "Forget"
-                                                    color: (forgetMouse.containsMouse || forgetActionBtn.itemForgetFocused) ? (forgetMouse.containsMouse ? theme.error : theme.accent) : theme.fg_light
+                                                    color: forgetMouse.containsMouse ? theme.error : theme.accent
+                                                    opacity: (forgetMouse.containsMouse || forgetActionBtn.itemForgetFocused) ? 1.0 : 0.6
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     renderType: Text.NativeRendering
@@ -1292,7 +1295,8 @@ Scope {
 
                                                     visible: modelData.saved
                                                     text: "Auto: " + (modelData.autoconnect ? "On" : "Off")
-                                                    color: (autoMouse.containsMouse || autoActionBtn.itemAutoFocused) ? theme.accent : (modelData.autoconnect ? theme.accent : theme.fg_light)
+                                                    color: theme.accent
+                                                    opacity: (autoMouse.containsMouse || autoActionBtn.itemAutoFocused || modelData.autoconnect) ? 1.0 : 0.6
                                                     font.family: "FiraCode Nerd Font"
                                                     font.pixelSize: 8
                                                     font.bold: modelData.autoconnect
@@ -1324,27 +1328,16 @@ Scope {
                                             // Additional details for scanned network
                                             Text {
                                                 anchors.horizontalCenter: parent.horizontalCenter
-                                                text: "Security: " + modelData.security + " | Rate: " + modelData.rate + (modelData.saved ? " | Saved" : "")
+                                                text: "Security: " + modelData.security + " | Rate: " + modelData.rate
                                                 color: theme.accent
                                                 opacity: 0.6
                                                 font.family: "FiraCode Nerd Font"
-                                                font.pixelSize: 7
+                                                font.pixelSize: 8
                                                 renderType: Text.NativeRendering
                                             }
                                         }
                                     }
                                 }
-                            }
-
-                            // Empty state indicator
-                            Text {
-                                visible: root.networks.length === 0
-                                text: root.isScanning ? "  󰑐 Searching for networks..." : "  No networks found (click refresh)"
-                                color: theme.accent
-                                opacity: root.isScanning ? 0.8 : 0.5
-                                font.family: "FiraCode Nerd Font"
-                                font.pixelSize: 8
-                                renderType: Text.NativeRendering
                             }
                         }
 
@@ -1367,6 +1360,7 @@ Scope {
                                     Text {
                                         text: root.moreExpanded ? "󰅁" : "󰅂"
                                         color: theme.accent
+                                        opacity: (moreMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 0)) ? 1.0 : 0.6
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         anchors.verticalCenter: parent.verticalCenter
@@ -1376,6 +1370,7 @@ Scope {
                                     Text {
                                         text: "More"
                                         color: theme.accent
+                                        opacity: (moreMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 0)) ? 1.0 : 0.6
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         font.bold: true
@@ -1385,7 +1380,10 @@ Scope {
                                 }
 
                                 MouseArea {
+                                    id: moreMouse
+
                                     anchors.fill: parent
+                                    hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: {
                                         root.moreExpanded = !root.moreExpanded;
@@ -1407,7 +1405,8 @@ Scope {
                                         id: settingsBtn
 
                                         text: "󰒓 Settings"
-                                        color: (settingsMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 1)) ? theme.accent : theme.fg_light
+                                        color: theme.accent
+                                        opacity: (settingsMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 1)) ? 1.0 : 0.6
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         renderType: Text.NativeRendering
@@ -1437,7 +1436,8 @@ Scope {
                                         id: restartBtn
 
                                         text: win.isRestartingWifi ? "󰑐 Restarting..." : "󰑐 Restart Wi-Fi"
-                                        color: (restartMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 2) || win.isRestartingWifi) ? theme.accent : theme.fg_light
+                                        color: theme.accent
+                                        opacity: (restartMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 2) || win.isRestartingWifi) ? 1.0 : 0.6
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         renderType: Text.NativeRendering
@@ -1474,8 +1474,9 @@ Scope {
                                     Text {
                                         id: flushDnsBtn
 
-                                        text: win.isDnsFlushed ? "󰄬 Flushed!" : "󰃢 Flush DNS"
-                                        color: (flushMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 3) || win.isDnsFlushed) ? theme.accent : theme.fg_light
+                                        text: win.isDnsFlushed ? "󰃢 Flushed!" : "󰃢 Flush DNS"
+                                        color: theme.accent
+                                        opacity: (flushMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 3) || win.isDnsFlushed) ? 1.0 : 0.6
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         renderType: Text.NativeRendering
@@ -1506,8 +1507,9 @@ Scope {
                                     Text {
                                         id: offloadBtn
 
-                                        text: win.isResettingNet ? "󰑐 Resetting..." : "󰌘 Offload Network"
-                                        color: (offloadMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 4) || win.isResettingNet) ? theme.accent : theme.fg_light
+                                        text: win.isResettingNet ? "󰌘 Resetting..." : "󰌘 Offload Network"
+                                        color: theme.accent
+                                        opacity: (offloadMouse.containsMouse || (win.activeSection === 4 && win.activeSubIndex === 4) || win.isResettingNet) ? 1.0 : 0.6
                                         font.family: "FiraCode Nerd Font"
                                         font.pixelSize: 9
                                         renderType: Text.NativeRendering
