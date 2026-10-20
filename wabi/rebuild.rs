@@ -318,6 +318,80 @@ fn update_flake_inputs(token: Option<&str>) -> AppUpdateResult {
     }
 }
 
+fn update_rea() -> AppUpdateResult {
+    let start = Instant::now();
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/home/parazeeknova".to_string());
+    let rea_bin = format!("{}/.npm-global/bin/rea", home);
+    let cmd = if std::path::Path::new(&rea_bin).exists() {
+        rea_bin
+    } else {
+        "rea".to_string()
+    };
+
+    let output = Command::new(&cmd).arg("update").output();
+    match output {
+        Ok(out) if out.status.success() => {
+            let stdout = String::from_utf8_lossy(&out.stdout);
+            let mut status_val = None;
+            let mut cur_ver = None;
+            let mut latest_ver = None;
+
+            for line in stdout.lines() {
+                let trim = line.trim();
+                if let Some(rest) = trim.strip_prefix("status:") {
+                    status_val = Some(rest.trim().to_string());
+                } else if let Some(rest) = trim.strip_prefix("currentVersion:") {
+                    cur_ver = Some(rest.trim().to_string());
+                } else if let Some(rest) = trim.strip_prefix("latestVersion:") {
+                    latest_ver = Some(rest.trim().to_string());
+                }
+            }
+
+            let app_status = match status_val.as_deref() {
+                Some("updated") => {
+                    let msg = format!(
+                        "Updated to v{}",
+                        latest_ver.as_deref().unwrap_or("latest")
+                    );
+                    AppStatus::Updated(msg)
+                }
+                _ => {
+                    let ver = cur_ver.or(latest_ver).unwrap_or_else(|| "up to date".to_string());
+                    if ver.starts_with('v') || ver == "up to date" {
+                        AppStatus::UpToDate(ver)
+                    } else {
+                        AppStatus::UpToDate(format!("v{}", ver))
+                    }
+                }
+            };
+
+            AppUpdateResult {
+                name: "REA",
+                status: app_status,
+                duration: start.elapsed(),
+                retries: 0,
+            }
+        }
+        Ok(out) => {
+            let stderr = String::from_utf8_lossy(&out.stderr);
+            let stdout = String::from_utf8_lossy(&out.stdout);
+            let err_msg = extract_error_msg(&stderr, &stdout);
+            AppUpdateResult {
+                name: "REA",
+                status: AppStatus::Warning(format!("rea update: {}", err_msg)),
+                duration: start.elapsed(),
+                retries: 0,
+            }
+        }
+        Err(e) => AppUpdateResult {
+            name: "REA",
+            status: AppStatus::Warning(format!("rea not found: {}", e)),
+            duration: start.elapsed(),
+            retries: 0,
+        },
+    }
+}
+
 fn main() {
     print_header("Starting Rust-powered Rebuild Pipeline");
 
@@ -356,7 +430,7 @@ fn main() {
     }
 
     // Step 1: Check and update standalone applications & Nix flake inputs in parallel
-    print_step("Checking and updating standalone applications and Nix flake inputs in parallel...");
+    print_step("Checking and updating applications, REA, and Nix flake inputs in parallel...");
 
     let (tx, rx) = std::sync::mpsc::channel();
     let mut in_flight: HashSet<&'static str> = HashSet::new();
@@ -368,6 +442,14 @@ fn main() {
     thread::spawn(move || {
         let res = update_flake_inputs(token_clone.as_deref());
         let _ = flake_tx.send(res);
+    });
+
+    // Spawn REA update thread in parallel
+    let rea_tx = tx.clone();
+    in_flight.insert("REA");
+    thread::spawn(move || {
+        let res = update_rea();
+        let _ = rea_tx.send(res);
     });
 
     println!("-> Compiling application updater tools...");

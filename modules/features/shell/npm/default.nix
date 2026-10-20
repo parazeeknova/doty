@@ -18,6 +18,7 @@
         "opencode-ai"
         "opencode-supermemory"
         "pyright"
+        "rea-agents"
         "supermemory"
       ];
 
