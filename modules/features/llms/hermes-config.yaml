@@ -350,7 +350,7 @@ onboarding:
     busy_input_prompt: true
 proxy:
   enabled: false
-_config_version: 50
+_config_version: 51
 platform_toolsets:
   cli:
     - a2a
