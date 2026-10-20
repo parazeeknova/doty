@@ -69,7 +69,10 @@
         "rea-agents@6.7.0",
         "mcp"
       ],
-      "enabled": true
+      "enabled": true,
+      "environment": {
+        "GHIDRA_INSTALL_DIR": "/run/current-system/sw/lib/ghidra"
+      }
     }
   },
   "plugin": [

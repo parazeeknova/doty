@@ -53,7 +53,6 @@
         bundletool
         scrcpy
         usbutils
-        jdk17
         gradle
         watchman
         eas-cli
@@ -63,7 +62,6 @@
       environment.sessionVariables = {
         ANDROID_HOME = "$HOME/Android/Sdk";
         ANDROID_SDK_ROOT = "$HOME/Android/Sdk";
-        JAVA_HOME = "${pkgs.jdk17.home}";
       };
 
       users.groups.adbusers = { };
@@ -89,7 +87,6 @@
             # -- Android & Mobile Development --
             set -gx ANDROID_HOME "$HOME/Android/Sdk"
             set -gx ANDROID_SDK_ROOT "$HOME/Android/Sdk"
-            set -gx JAVA_HOME "${pkgs.jdk17.home}"
 
             fish_add_path $HOME/Android/Sdk/emulator
             fish_add_path $HOME/Android/Sdk/platform-tools

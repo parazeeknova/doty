@@ -22,6 +22,7 @@
       environment.systemPackages = with pkgs; [
         # -- Web --
         google-chrome
+        vivaldi
         inputs.helium.packages.${pkgs.stdenv.hostPlatform.system}.default
         vesktop
         telegram-desktop

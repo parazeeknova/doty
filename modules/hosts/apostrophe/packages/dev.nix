@@ -221,6 +221,15 @@
       };
     in
     {
+      programs.java = {
+        enable = true;
+        package = pkgs.jdk21;
+      };
+
+      environment.sessionVariables = {
+        GHIDRA_INSTALL_DIR = "/run/current-system/sw/lib/ghidra";
+        JAVA_HOME = "${pkgs.jdk21.home}";
+      };
 
       environment.systemPackages = with pkgs; [
         devenv
@@ -245,6 +254,7 @@
         zig
         zigimports
         zig-zlint
+        jdk21
 
         # -- Package Managers --
         uv
@@ -282,6 +292,10 @@
         inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-cli
 
         # -- Dev Tools --
+        ghidra-bin
+        hopper
+        jadx
+        binwalk
         github-cli
         lazygit
         gitkraken
@@ -289,6 +303,9 @@
         diff-so-fancy
 
         # -- Tools --
+        procps
+        xvfb
+        xvfb-run
         httpie
         tmux
         tmuxPlugins.cpu

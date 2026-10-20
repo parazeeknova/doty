@@ -89,6 +89,10 @@
           # -- CUA / Hermes Computer Use --
           set -gx CUA_DRIVER_RS_ENABLE_WAYLAND "1"
           set -gx HERMES_CUA_DRIVER_CMD "/run/current-system/sw/bin/cua-driver"
+
+          # -- Reverse Engineering & Java --
+          set -gx GHIDRA_INSTALL_DIR "/run/current-system/sw/lib/ghidra"
+          set -gx JAVA_HOME "${pkgs.jdk21.home}"
         '';
       };
     };
