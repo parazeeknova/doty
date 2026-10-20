@@ -84,8 +84,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         update_args.push(&token_arg);
     }
 
-    let _flake_lock = FileLock::acquire("flake_update");
-
     let recently_updated = if let Ok(meta) = fs::metadata("flake.lock") {
         if let Ok(m) = meta.modified() {
             m.elapsed().map(|d| d.as_secs() < 120).unwrap_or(false)
@@ -96,18 +94,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         false
     };
 
-    let mut success = true;
-    if !recently_updated {
-        success = false;
-        for attempt in 1..=3 {
-            let status = Command::new("nix").args(&update_args).status()?;
-            if status.success() {
-                success = true;
-                break;
-            }
-            if attempt < 3 {
-                thread::sleep(Duration::from_secs(2));
-            }
+    if recently_updated {
+        println!("Hyprland plugins are already up to date!");
+        return Ok(());
+    }
+
+    let mut success = false;
+    for attempt in 1..=3 {
+        let status = Command::new("nix").args(&update_args).status()?;
+        if status.success() {
+            success = true;
+            break;
+        }
+        if attempt < 3 {
+            thread::sleep(Duration::from_secs(2));
         }
     }
 

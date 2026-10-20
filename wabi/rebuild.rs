@@ -20,19 +20,31 @@ impl FileLock {
                 .create_new(true)
                 .open(&lock_path)
             {
-                Ok(_) => return FileLock { path: lock_path },
+                Ok(mut f) => {
+                    let _ = write!(f, "{}", std::process::id());
+                    return FileLock { path: lock_path };
+                }
                 Err(_) => {
+                    if let Ok(content) = std::fs::read_to_string(&lock_path) {
+                        if let Ok(pid) = content.trim().parse::<u32>() {
+                            let proc_path = format!("/proc/{}", pid);
+                            if !std::path::Path::new(&proc_path).exists() {
+                                let _ = std::fs::remove_file(&lock_path);
+                                continue;
+                            }
+                        }
+                    }
                     if let Ok(meta) = std::fs::metadata(&lock_path) {
                         if let Ok(elapsed) = meta
                             .modified()
                             .and_then(|m| m.elapsed().map_err(std::io::Error::other))
                         {
-                            if elapsed.as_secs() > 300 {
+                            if elapsed.as_secs() > 120 {
                                 let _ = std::fs::remove_file(&lock_path);
                             }
                         }
                     }
-                    if start.elapsed().as_secs() > 180 {
+                    if start.elapsed().as_secs() > 60 {
                         eprintln!(
                             "Warning: Timed out waiting for file lock {:?}, proceeding anyway.",
                             lock_path
@@ -263,7 +275,6 @@ fn update_flake_inputs(token: Option<&str>) -> AppUpdateResult {
         update_args.push(&token_arg);
     }
 
-    let _flake_lock = FileLock::acquire("flake_update");
     let output = Command::new("nix").args(&update_args).output();
     match output {
         Ok(out) if out.status.success() => {
