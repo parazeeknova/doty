@@ -243,8 +243,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if cli_needs_update {
         println!("New cua CLI v{} available! Fetching hash...", latest_cli);
         let url = format!(
-            "https://github.com/trycua/cua/releases/download/cua-sdk-v{}/cua-x86_64-unknown-linux-gnu",
-            latest_cli
+            "https://github.com/trycua/cua/releases/download/cua-sdk-v{}/cua-cli-{}-linux-x64.tar.gz",
+            latest_cli, latest_cli
         );
         let hash = nix_prefetch_url_with_retry(&url, 3)?;
         println!("Fetched cua CLI hash: {}", hash);
