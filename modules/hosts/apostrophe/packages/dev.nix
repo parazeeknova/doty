@@ -165,11 +165,11 @@
       });
       t3code = pkgs.appimageTools.wrapType2 rec {
         pname = "t3code";
-        version = "0.0.46-nightly.20261015.3145";
+        version = "0.1.1-nightly.20261020.3386";
 
         src = pkgs.fetchurl {
           url = "https://github.com/pingdotgg/t3code/releases/download/v${version}/T3-Code-${version}-x86_64.AppImage";
-          sha256 = "08wjpb38zvfvpj2p5l9y1z0nyj862fdia8c9b8q32pzjkm446s2b";
+          sha256 = "19w29kmidpam5ig22kdmvlzr3njaiy1q408wg5z8pb5s7gzfzwbh";
         };
 
         extraPkgs =
