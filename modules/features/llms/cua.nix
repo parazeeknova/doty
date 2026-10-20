@@ -10,11 +10,11 @@
     let
       cua = pkgs.stdenv.mkDerivation rec {
         pname = "cua";
-        version = "0.4.1";
+        version = "0.5.0";
 
         src = pkgs.fetchurl {
           url = "https://github.com/trycua/cua/releases/download/cua-sdk-v${version}/cua-cli-${version}-linux-x64.tar.gz";
-          sha256 = "1hg3sfxzc79930adx1qr5a23j84xixzq7mf8c6ab8abk3fynhlf3";
+          sha256 = "01hk00h3f5g4i3wh1aq6hdfz0ir0mkklc4r4ghwzl1i1cqazfyva";
         };
 
         sourceRoot = ".";
@@ -35,11 +35,11 @@
 
       cua-driver = pkgs.stdenv.mkDerivation rec {
         pname = "cua-driver";
-        version = "0.34.1";
+        version = "0.37.0";
 
         src = pkgs.fetchurl {
           url = "https://github.com/trycua/cua/releases/download/cua-driver-rs-v${version}/cua-driver-rs-${version}-linux-x86_64-binary.tar.gz";
-          sha256 = "1vmgiza691gamj88pc671j774x89dgqp9h4lqlfm197frfyy47x4";
+          sha256 = "08snrnwq3zkkq9i7j8rahp4vx24miaw90b8ba5z20z6s21mkgb67";
         };
 
         sourceRoot = ".";
