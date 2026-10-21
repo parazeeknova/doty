@@ -51,7 +51,7 @@ hl.config({
 
 	decoration = {
 		rounding = 0,
-		rounding_power = 0,
+		rounding_power = 2,
 
 		active_opacity = active_opacity,
 		inactive_opacity = inactive_opacity,
@@ -89,7 +89,7 @@ hl.config({
 -- (not part of window geometry) so exact geometry restore keeps working.
 -- Bar color/blur follow glass mode via `hyprctl layoutmode syncbars`.
 hl.config({
-	plugin = {
+	plugin = #hl.get_loaded_plugins() > 0 and {
 		hyprbars = {
 			enabled = false,
 			bar_height = 26,
@@ -105,7 +105,7 @@ hl.config({
 			bar_part_of_window = false,
 			bar_blur = false,
 		},
-	},
+	} or {},
 })
 
 -- Close button, pinned right: bare "X" text, no background. Guarded:

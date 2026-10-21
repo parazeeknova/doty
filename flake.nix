@@ -2,6 +2,9 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
+    # Compositor capture exclusion and fail-closed Lennette launcher.
+    lennette-private.url = "github:parazeeknova/lennette/f6dbcf49e872fa49995e2fd0562b181b2580eed1?dir=packaging/hyprland";
+
     hyprland-preview-share-picker = {
       url = "git+https://github.com/WhySoBad/hyprland-preview-share-picker?submodules=1";
       inputs.nixpkgs.follows = "nixpkgs";

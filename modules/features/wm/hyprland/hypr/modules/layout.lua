@@ -13,7 +13,8 @@ hl.config({
 	dwindle = {
 		preserve_split = true,
 	},
-	plugin = {
+	-- Private overlays disable render plugins; do not configure absent plugins.
+	plugin = #hl.get_loaded_plugins() > 0 and {
 		scrolloverview = {
 			gesture_distance = 300,
 			scale = 0.65,
@@ -72,7 +73,7 @@ hl.config({
 			zones_left = "0-100",
 			zones_right = "0-100",
 		},
-	},
+	} or {},
 })
 
 local colors = {}

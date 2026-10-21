@@ -9,6 +9,9 @@
     }:
     {
 
+      imports = [ inputs.lennette-private.nixosModules.default ];
+      programs.lennettePrivateOverlay.enable = true;
+
       # -- Hyprland --
       programs.hyprland = {
         enable = true;
@@ -40,6 +43,9 @@
       environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
       home-manager.users.parazeeknova = { config, ... }: {
+        imports = [ inputs.lennette-private.homeManagerModules.default ];
+        programs.lennettePrivateOverlay.enable = true;
+
         wayland.windowManager.hyprland = {
           enable = true;
           package = null;
@@ -69,7 +75,6 @@
             safe_require('modules.misc')
             safe_require('modules.windowrules')
             safe_require('modules.workspace.rules')
-            safe_require('lennette')
           '';
         };
 

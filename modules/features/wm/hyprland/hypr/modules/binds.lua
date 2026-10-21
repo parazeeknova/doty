@@ -307,7 +307,11 @@ hl.bind(mainMod .. " + TAB", function()
 	hl.exec_cmd("sh -c 'sleep 0.35; hyprctl layoutmode syncoverview >/dev/null 2>&1'")
 end)
 hl.bind("ALT + TAB", function()
-	hl.plugin.scrolloverview.overview("toggle")
+	if hl.plugin.scrolloverview then
+		hl.plugin.scrolloverview.overview("toggle")
+	else
+		hl.dispatch(hl.dsp.window.cycle_next())
+	end
 end)
 hl.bind(
 	mainMod .. " + X",
