@@ -69,6 +69,7 @@
             safe_require('modules.misc')
             safe_require('modules.windowrules')
             safe_require('modules.workspace.rules')
+            safe_require('lennette')
           '';
         };
 
