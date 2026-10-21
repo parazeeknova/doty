@@ -317,3 +317,24 @@ hl.window_rule({
 	float = true,
 	size = { 300, 200 },
 })
+
+-- Lennette ambient copilot overlay: always float, no borders, stay pinned over other apps
+hl.window_rule({
+	name = "lennette-floating-overlay",
+	match = {
+		class = ".*[Ll]ennette.*",
+	},
+	float = true,
+	pin = true,
+	border_size = 0,
+})
+
+hl.window_rule({
+	name = "lennette-floating-overlay-title",
+	match = {
+		title = ".*[Ll]ennette.*",
+	},
+	float = true,
+	pin = true,
+	border_size = 0,
+})
