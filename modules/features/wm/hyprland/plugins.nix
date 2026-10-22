@@ -13,7 +13,10 @@
         pname = "hyprland-scroll-overview";
         version = "0.1";
         src = inputs.hyprland-scroll-overview;
-        patches = [ ./patches/scrolloverview-lua-bind.patch ];
+        patches = [
+          ./patches/scrolloverview-lua-bind.patch
+          ./patches/scrolloverview-hyprbars-abi.patch
+        ];
 
         dontUseCmakeConfigure = true;
 
@@ -195,7 +198,10 @@
         version = "git-c7216a9";
         src = "${inputs.hyprland-plugins}/hyprbars";
 
-        patches = [ ./patches/hyprbars-only-floating.patch ];
+        patches = [
+          ./patches/hyprbars-only-floating.patch
+          ./patches/hyprbars-overview-api.patch
+        ];
 
         dontUseCmakeConfigure = true;
 

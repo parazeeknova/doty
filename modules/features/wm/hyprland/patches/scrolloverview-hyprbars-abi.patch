@@ -1,0 +1,102 @@
+--- a/Window.cpp
++++ b/Window.cpp
+@@ -48,19 +48,8 @@
+     std::vector<std::function<void()>> restoreFns;
+ };
+ 
+-struct SHyprbarButtonMirror {
+-    std::string         cmd     = "";
+-    bool                userfg  = false;
+-    CHyprColor          fgcol   = CHyprColor(0, 0, 0, 0);
+-    CHyprColor          bgcol   = CHyprColor(0, 0, 0, 0);
+-    float               size    = 10.F;
+-    std::string         icon    = "";
+-    SP<Render::ITexture> iconTex;
+-};
+-
+-struct SHyprbarGlobalStateMirror {
+-    std::vector<SHyprbarButtonMirror> buttons;
+-};
++// Versioned C interface: never interpret another plugin's private C++ objects.
++using HyprbarButtonSizes = size_t (*)(float*, size_t, bool);
+ 
+ struct SOverviewWindowMetrics {
+     float renderScale             = 1.F;
+@@ -283,7 +272,7 @@
+     return decoration && decoration->getDecorationType() == DECORATION_CUSTOM && decoration->getDisplayName() == "Hyprbar";
+ }
+ 
+-static SHyprbarGlobalStateMirror* getOverviewHyprbarGlobalState() {
++static HyprbarButtonSizes getOverviewHyprbarButtonSizes() {
+     if (!g_pPluginSystem)
+         return nullptr;
+ 
+@@ -300,15 +289,7 @@
+     if (!hyprbarsHandle)
+         return nullptr;
+ 
+-    void* const symbol = dlsym(hyprbarsHandle, "g_pGlobalState");
+-    if (!symbol)
+-        return nullptr;
+-
+-    const auto STATEPTR = sc<UP<SHyprbarGlobalStateMirror>*>(symbol);
+-    if (!STATEPTR || !STATEPTR->get())
+-        return nullptr;
+-
+-    return STATEPTR->get();
++    return reinterpret_cast<HyprbarButtonSizes>(dlsym(hyprbarsHandle, "hyprbarsOverviewButtonSizesV1"));
+ }
+ 
+ static float getOverviewHyprbarLogicalHeight(const PHLWINDOW& window) {
+@@ -507,17 +488,18 @@
+     if (!monitor || !window || !decoration)
+         return;
+ 
+-    auto* const HYPRBARGLOBALSTATE    = getOverviewHyprbarGlobalState();
++    const auto   BUTTONS              = getOverviewHyprbarButtonSizes();
+     const bool   PARTOFWINDOW         = decoration->getDecorationFlags() & DECORATION_PART_OF_MAIN_WINDOW;
+     const int   previousBarTextSize   = ScrollOverview::Config::getValue<int>("plugin:hyprbars:bar_text_size");
+     const int   previousButtonPadding = ScrollOverview::Config::getValue<int>("plugin:hyprbars:bar_button_padding");
+     std::vector<float> previousButtonSizes;
+-    if (HYPRBARGLOBALSTATE) {
+-        previousButtonSizes.reserve(HYPRBARGLOBALSTATE->buttons.size());
+-        for (auto& button : HYPRBARGLOBALSTATE->buttons) {
+-            previousButtonSizes.push_back(button.size);
+-            button.size *= metrics.renderScale;
+-        }
++    if (BUTTONS) {
++        previousButtonSizes.resize(BUTTONS(nullptr, 0, false));
++        BUTTONS(previousButtonSizes.data(), previousButtonSizes.size(), false);
++        auto scaledSizes = previousButtonSizes;
++        for (auto& size : scaledSizes)
++            size *= metrics.renderScale;
++        BUTTONS(scaledSizes.data(), scaledSizes.size(), true);
+     }
+     ScrollOverview::Config::setValue("plugin:hyprbars:bar_text_size", std::max(1, sc<int>(std::round(previousBarTextSize * metrics.renderScale))));
+     ScrollOverview::Config::setValue("plugin:hyprbars:bar_button_padding", std::max(0, sc<int>(std::round(previousButtonPadding * metrics.renderScale))));
+@@ -557,10 +539,8 @@
+             BORDER->m_borderSizeCacheDirty = previousBorderCacheDirty;
+             BORDER->m_cachedBorderSize     = previousCachedBorderSize;
+         }
+-        if (HYPRBARGLOBALSTATE) {
+-            for (size_t i = 0; i < previousButtonSizes.size() && i < HYPRBARGLOBALSTATE->buttons.size(); ++i)
+-                HYPRBARGLOBALSTATE->buttons[i].size = previousButtonSizes[i];
+-        }
++        if (BUTTONS)
++            BUTTONS(previousButtonSizes.data(), previousButtonSizes.size(), true);
+         return;
+     }
+ 
+@@ -597,9 +577,9 @@
+             BORDER->m_borderSizeCacheDirty = previousBorderCacheDirty;
+             BORDER->m_cachedBorderSize     = previousCachedBorderSize;
+         }
+-        if (auto* const HYPRBARGLOBALSTATE = getOverviewHyprbarGlobalState()) {
+-            for (size_t i = 0; i < previousButtonSizes.size() && i < HYPRBARGLOBALSTATE->buttons.size(); ++i)
+-                HYPRBARGLOBALSTATE->buttons[i].size = previousButtonSizes[i];
++        if (const auto buttons = getOverviewHyprbarButtonSizes()) {
++            auto sizes = previousButtonSizes;
++            buttons(sizes.data(), sizes.size(), true);
+         }
+     });
+ }

@@ -1,0 +1,23 @@
+--- a/main.cpp
++++ b/main.cpp
+@@ -256,3 +256,20 @@
+     Desktop::Rule::windowEffects()->unregisterEffect(g_pGlobalState->titleColorRuleIdx);
+     Desktop::Rule::windowEffects()->unregisterEffect(g_pGlobalState->nobarRuleIdx);
+ }
++
++// Copy button sizes through a versioned C interface for overview renderers.
++// Callers never depend on the private SHyprButton layout or vector stride.
++extern "C" EXPORT size_t hyprbarsOverviewButtonSizesV1(float* sizes, size_t capacity, bool write) {
++    if (!g_pGlobalState)
++        return 0;
++    const size_t count = g_pGlobalState->buttons.size();
++    if (!sizes || capacity != count)
++        return count;
++    for (size_t i = 0; i < count; ++i) {
++        if (write)
++            g_pGlobalState->buttons[i].size = sizes[i];
++        else
++            sizes[i] = g_pGlobalState->buttons[i].size;
++    }
++    return count;
++}
