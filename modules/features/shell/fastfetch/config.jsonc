@@ -12,7 +12,7 @@
     {
       "type": "command",
       "key": "  ",
-      "keyColor": "38;2;246;188;112",
+      "keyColor": "38;2;235;193;108",
       "text": "splash=$(hyprctl splash);echo $splash"
     },
     {
@@ -28,35 +28,35 @@
       "type": "os",
       "key": "  󰣇 OS",
       "format": "{2}",
-      "keyColor": "38;2;246;188;112"
+      "keyColor": "38;2;235;193;108"
     },
     {
       "type": "kernel",
       "key": "   Kernel",
       "format": "{2}",
-      "keyColor": "38;2;246;188;112"
+      "keyColor": "38;2;235;193;108"
     },
     {
       "type": "packages",
       "key": "  󰏗 Packages",
-      "keyColor": "38;2;222;194;162"
+      "keyColor": "38;2;217;196;160"
     },
     {
       "type": "display",
       "key": "  󰍹 Display",
       "format": "{1}x{2} @ {3}Hz [{7}]",
-      "keyColor": "38;2;222;194;162"
+      "keyColor": "38;2;217;196;160"
     },
     {
       "type": "terminal",
       "key": "   Terminal",
-      "keyColor": "38;2;246;188;112"
+      "keyColor": "38;2;235;193;108"
     },
     {
       "type": "wm",
       "key": "   WM",
       "format": "{2}",
-      "keyColor": "38;2;246;188;112"
+      "keyColor": "38;2;235;193;108"
     },
     {
       "type": "custom",
@@ -76,24 +76,24 @@
       "type": "cpu",
       "format": "{1} @ {7}",
       "key": "   CPU",
-      "keyColor": "38;2;246;188;112"
+      "keyColor": "38;2;235;193;108"
     },
     {
       "type": "gpu",
       "format": "{1} {2}",
       "key": "  󰊴 GPU",
-      "keyColor": "38;2;246;188;112"
+      "keyColor": "38;2;235;193;108"
     },
     {
       "type": "gpu",
       "format": "{3}",
       "key": "   GPU Driver",
-      "keyColor": "38;2;222;194;162"
+      "keyColor": "38;2;217;196;160"
     },
     {
       "type": "memory",
       "key": "   Memory ",
-      "keyColor": "38;2;222;194;162"
+      "keyColor": "38;2;217;196;160"
     },
     {
       "type": "disk",

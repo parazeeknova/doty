@@ -7,21 +7,21 @@ onboarding = false
 name = "catppuccin"
 
 [theme.custom]
-sidebar_bg = "#251f17"
-active_row_bg = "#4f4539"
-selection_bg = "#4f4539"
-surface_dim = "#251f17"
-panel_bg = "#18120b"
-accent = "#f6bc70"
-blue = "#f6bc70"
-mauve = "#f6bc70"
+sidebar_bg = "#241f17"
+active_row_bg = "#4d4639"
+selection_bg = "#4d4639"
+surface_dim = "#241f17"
+panel_bg = "#17130b"
+accent = "#ebc16c"
+blue = "#ebc16c"
+mauve = "#ebc16c"
 red = "#ffb4ab"
-green = "#f6bc70"
-yellow = "#b9cda0"
-peach = "#dec2a2"
+green = "#ebc16c"
+yellow = "#b2cfa8"
+peach = "#d9c4a0"
 
 [ui]
-accent = "#f6bc70"
+accent = "#ebc16c"
 pane_gaps = false
 pane_borders = false
 pane_outer_borders = false

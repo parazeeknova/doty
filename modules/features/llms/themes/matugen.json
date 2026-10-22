@@ -2,14 +2,14 @@
   "$schema": "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json",
   "name": "matugen",
   "vars": {
-    "bg": "#18120b",
-    "bg_dark": "#251f17",
-    "bg_light": "#4f4539",
-    "fg": "#ede0d4",
-    "fg_light": "#d3c4b4",
-    "accent": "#f6bc70",
-    "secondary": "#dec2a2",
-    "tertiary": "#b9cda0",
+    "bg": "#17130b",
+    "bg_dark": "#241f17",
+    "bg_light": "#4d4639",
+    "fg": "#ebe1d4",
+    "fg_light": "#d1c5b4",
+    "accent": "#ebc16c",
+    "secondary": "#d9c4a0",
+    "tertiary": "#b2cfa8",
     "error": "#ffb4ab"
   },
   "colors": {
