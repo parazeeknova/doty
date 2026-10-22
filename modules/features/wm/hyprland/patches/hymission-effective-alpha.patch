@@ -1,18 +1,14 @@
+diff --git a/src/overview_controller.cpp b/src/overview_controller.cpp
+index 79a67c3..407a73b 100644
 --- a/src/overview_controller.cpp
 +++ b/src/overview_controller.cpp
-@@ -4023,12 +4023,10 @@ void hkShouldRenderWindow(void* rendererThisptr, PHLWINDOW window, PHLMONITOR mo
- }
- 
- float OverviewController::effectiveAlphaHook(void* windowThisptr) {
--    if (!m_effectiveAlphaOriginal)
--        return 0.0F;
--
--    const float originalAlpha = m_effectiveAlphaOriginal(windowThisptr);
-     if (!windowThisptr)
--        return originalAlpha;
-+        return 1.0F;
+@@ -2986 +2986 @@ bool OverviewController::nativeWindowRenderActive() const {
+-    return rawWindowRenderActive() || m_deactivatePending || StageController::renderingPreview();
++    return renderContext().m_privateOverlayCapture || rawWindowRenderActive() || m_deactivatePending || StageController::renderingPreview();
+@@ -4171,0 +4172,3 @@ bool OverviewController::shouldRenderWindowHook(const PHLWINDOW& window, const P
++    if (renderContext().m_privateOverlayCapture)
++        return m_shouldRenderWindowOriginal(g_pHyprRenderer.get(), window, monitor);
 +
-+    const float originalAlpha = reinterpret_cast<Desktop::View::CWindow*>(windowThisptr)->alphaTotal();
- 
-     const auto findInState = [&](const State& state) -> const ManagedWindow* {
-         const auto it = std::find_if(state.windows.begin(), state.windows.end(),
+@@ -4252,0 +4256,2 @@ Render::SWindowRenderPresentation OverviewController::effectiveAlphaHook(const D
++    if (renderContext().m_privateOverlayCapture)
++        return result;

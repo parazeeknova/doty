@@ -1,0 +1,13 @@
+diff --git a/scrollOverview.cpp b/scrollOverview.cpp
+index 015ecb4..8d0a87b 100644
+--- a/scrollOverview.cpp
++++ b/scrollOverview.cpp
+@@ -5548,5 +5547,0 @@ bool CScrollOverview::dispatchSubmapMouseClick(uint32_t button) {
+-    const auto INDEX = Hyprutils::String::strToNumber<int>((*KEYBIND)->metadata().argument);
+-    const auto MGR   = Config::Lua::mgr();
+-    if (!INDEX || !MGR)
+-        return false;
+-
+@@ -5569 +5564 @@ bool CScrollOverview::dispatchSubmapMouseClick(uint32_t button) {
+-    const auto RESULT = MGR->callLuaFnBind(*INDEX);
++    const auto RESULT = (*KEYBIND)->invoke();

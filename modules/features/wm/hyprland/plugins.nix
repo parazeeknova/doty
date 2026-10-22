@@ -8,21 +8,23 @@
       ...
     }:
     let
-      scrolloverview = pkgs.stdenv.mkDerivation {
+      pluginPkgs = inputs.lennette-private.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+      scrolloverview = pluginPkgs.gcc16Stdenv.mkDerivation {
         pname = "hyprland-scroll-overview";
         version = "0.1";
         src = inputs.hyprland-scroll-overview;
+        patches = [ ./patches/scrolloverview-lua-bind.patch ];
 
         dontUseCmakeConfigure = true;
 
-        inherit (pkgs.hyprland) buildInputs;
-        nativeBuildInputs = pkgs.hyprland.nativeBuildInputs ++ [
-          pkgs.hyprland
-          pkgs.gcc14
-          pkgs.pkg-config
-          pkgs.pixman
-          pkgs.libdrm
-          pkgs.lua5_4
+        inherit (pluginPkgs.hyprland) buildInputs;
+        nativeBuildInputs = pluginPkgs.hyprland.nativeBuildInputs ++ [
+          pluginPkgs.hyprland
+          pluginPkgs.gcc16
+          pluginPkgs.pkg-config
+          pluginPkgs.pixman
+          pluginPkgs.libdrm
+          pluginPkgs.lua5_5
         ];
 
         enableParallelBuilding = true;
@@ -43,12 +45,12 @@
         '';
       };
 
-      hyprglass = pkgs.stdenv.mkDerivation {
+      hyprglass = pluginPkgs.gcc16Stdenv.mkDerivation {
         pname = "hyprglass";
         version = "0.1";
         src = inputs.hyprglass;
 
-        # Upstream hyprglass v0.9.0 replaced damageSurface hook with a per-surface commit listener,
+        # Upstream hyprglass replaced damageSurface hooks with a per-surface commit listener,
         # so damageSurface hook conflict with scrolloverview is resolved without patching.
 
         postPatch = ''
@@ -60,13 +62,13 @@
 
         dontUseCmakeConfigure = true;
 
-        inherit (pkgs.hyprland) buildInputs;
-        nativeBuildInputs = pkgs.hyprland.nativeBuildInputs ++ [
-          pkgs.hyprland
-          pkgs.gcc14
-          pkgs.pkg-config
-          pkgs.pixman
-          pkgs.libdrm
+        inherit (pluginPkgs.hyprland) buildInputs;
+        nativeBuildInputs = pluginPkgs.hyprland.nativeBuildInputs ++ [
+          pluginPkgs.hyprland
+          pluginPkgs.gcc16
+          pluginPkgs.pkg-config
+          pluginPkgs.pixman
+          pluginPkgs.libdrm
         ];
 
         enableParallelBuilding = true;
@@ -86,22 +88,22 @@
         '';
       };
 
-      dynamic_cursors = pkgs.stdenv.mkDerivation {
+      dynamic_cursors = pluginPkgs.gcc16Stdenv.mkDerivation {
         pname = "hypr-dynamic-cursors";
         version = "0.1";
         src = inputs.hypr-dynamic-cursors;
 
         dontUseCmakeConfigure = true;
 
-        inherit (pkgs.hyprland) buildInputs;
-        nativeBuildInputs = pkgs.hyprland.nativeBuildInputs ++ [
-          pkgs.hyprland
-          pkgs.gcc14
-          pkgs.pkg-config
-          pkgs.pixman
-          pkgs.libdrm
-          pkgs.hyprcursor
-          pkgs.hyprgraphics
+        inherit (pluginPkgs.hyprland) buildInputs;
+        nativeBuildInputs = pluginPkgs.hyprland.nativeBuildInputs ++ [
+          pluginPkgs.hyprland
+          pluginPkgs.gcc16
+          pluginPkgs.pkg-config
+          pluginPkgs.pixman
+          pluginPkgs.libdrm
+          pluginPkgs.hyprcursor
+          pluginPkgs.hyprgraphics
         ];
 
         enableParallelBuilding = true;
@@ -122,41 +124,42 @@
         '';
       };
 
-      hypr_edgehover = pkgs.stdenv.mkDerivation {
+      hypr_edgehover = pluginPkgs.gcc16Stdenv.mkDerivation {
         pname = "hypr-edgehover";
         version = "0.1";
         src = inputs.hypr-edgehover;
 
         nativeBuildInputs = [
-          pkgs.cmake
-          pkgs.pkg-config
-          pkgs.hyprland
-          pkgs.gcc14
+          pluginPkgs.cmake
+          pluginPkgs.pkg-config
+          pluginPkgs.hyprland
+          pluginPkgs.gcc16
         ];
-        buildInputs = pkgs.hyprland.buildInputs;
+        buildInputs = pluginPkgs.hyprland.buildInputs;
 
         enableParallelBuilding = true;
       };
 
-      hymission = pkgs.stdenv.mkDerivation {
+      hymission = pluginPkgs.gcc16Stdenv.mkDerivation {
         pname = "hymission";
-        version = "0.7.1";
+        version = "0.11.0-master";
         src = inputs.hymission;
 
         patches = [ ./patches/hymission-effective-alpha.patch ];
+        cmakeFlags = [ "-DBUILD_TESTING=OFF" ];
 
         nativeBuildInputs = [
-          pkgs.cmake
-          pkgs.pkg-config
-          pkgs.hyprland
-          pkgs.gcc14
+          pluginPkgs.cmake
+          pluginPkgs.pkg-config
+          pluginPkgs.hyprland
+          pluginPkgs.gcc16
         ];
-        buildInputs = pkgs.hyprland.buildInputs ++ [
-          pkgs.lua5_4
-          pkgs.glib
-          pkgs.gtk4
-          pkgs.libadwaita
-          pkgs.gtk4-layer-shell
+        buildInputs = pluginPkgs.hyprland.buildInputs ++ [
+          pluginPkgs.lua5_5
+          pluginPkgs.glib
+          pluginPkgs.gtk4
+          pluginPkgs.libadwaita
+          pluginPkgs.gtk4-layer-shell
         ];
 
         postInstall = ''
@@ -168,17 +171,17 @@
         enableParallelBuilding = true;
       };
 
-      layoutmode = pkgs.stdenv.mkDerivation {
+      layoutmode = pluginPkgs.gcc16Stdenv.mkDerivation {
         pname = "hyprland-layoutmode";
         version = "0.2.1";
         src = ./layoutmode;
 
         nativeBuildInputs = [
-          pkgs.cmake
-          pkgs.pkg-config
-          pkgs.hyprland
+          pluginPkgs.cmake
+          pluginPkgs.pkg-config
+          pluginPkgs.hyprland
         ];
-        buildInputs = pkgs.hyprland.buildInputs;
+        buildInputs = pluginPkgs.hyprland.buildInputs;
 
         postInstall = ''
           ln -s "$out/lib/libhyprland-layoutmode.so" "$out/lib/liblayoutmode.so"
@@ -187,25 +190,25 @@
         enableParallelBuilding = true;
       };
 
-      hyprbars = pkgs.stdenv.mkDerivation {
+      hyprbars = pluginPkgs.gcc16Stdenv.mkDerivation {
         pname = "hyprbars";
-        version = "0.56.2-pin";
+        version = "git-c7216a9";
         src = "${inputs.hyprland-plugins}/hyprbars";
 
         patches = [ ./patches/hyprbars-only-floating.patch ];
 
         dontUseCmakeConfigure = true;
 
-        inherit (pkgs.hyprland) buildInputs;
-        nativeBuildInputs = pkgs.hyprland.nativeBuildInputs ++ [
-          pkgs.hyprland
-          pkgs.gcc14
-          pkgs.pkg-config
-          pkgs.pixman
-          pkgs.libdrm
-          pkgs.cairo
-          pkgs.pango
-          pkgs.lua5_4
+        inherit (pluginPkgs.hyprland) buildInputs;
+        nativeBuildInputs = pluginPkgs.hyprland.nativeBuildInputs ++ [
+          pluginPkgs.hyprland
+          pluginPkgs.gcc16
+          pluginPkgs.pkg-config
+          pluginPkgs.pixman
+          pluginPkgs.libdrm
+          pluginPkgs.cairo
+          pluginPkgs.pango
+          pluginPkgs.lua5_5
         ];
 
         enableParallelBuilding = true;
@@ -236,6 +239,11 @@
       ];
     in
     {
-      home-manager.users.parazeeknova.wayland.windowManager.hyprland.plugins = hyprPlugins;
+      home-manager.users.parazeeknova = {
+        wayland.windowManager.hyprland.plugins = hyprPlugins;
+        programs.lennettePrivateOverlay.allowedPluginPaths = map (
+          plugin: "${plugin}/lib/lib${plugin.pname}.so"
+        ) hyprPlugins;
+      };
     };
 }

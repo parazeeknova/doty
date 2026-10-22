@@ -2,8 +2,8 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    # Compositor capture exclusion and fail-closed Lennette launcher.
-    lennette-private.url = "github:parazeeknova/lennette/f6dbcf49e872fa49995e2fd0562b181b2580eed1?dir=packaging/hyprland";
+    # Local compatibility patch, used until this revision is published upstream.
+    lennette-private.url = "path:/home/parazeeknova/Projects/lennette/packaging/hyprland";
 
     hyprland-preview-share-picker = {
       url = "git+https://github.com/WhySoBad/hyprland-preview-share-picker?submodules=1";
@@ -11,27 +11,27 @@
     };
 
     hyprland-scroll-overview = {
-      url = "github:yayuuu/hyprland-scroll-overview";
+      url = "github:yayuuu/hyprland-scroll-overview/9a658551a962dd788017734bfb8b37c80d11d522";
       flake = false;
     };
 
     hyprglass = {
-      url = "github:hyprnux/hyprglass/hyprland-0.56";
+      url = "github:hyprnux/hyprglass/7c574b4c7aabc3364c7aae07584d896649179b18";
       flake = false;
     };
 
     hypr-dynamic-cursors = {
-      url = "github:VirtCode/hypr-dynamic-cursors/v0.56.2";
+      url = "github:VirtCode/hypr-dynamic-cursors/2a8d0b735328d874a78ca93b2f201649f712a74a";
       flake = false;
     };
 
     hypr-edgehover = {
-      url = "github:gfhdhytghd/hypr-edgehover";
+      url = "github:gfhdhytghd/hypr-edgehover/023bded40917630de7fd122ba45dba607930c206";
       flake = false;
     };
 
     hymission = {
-      url = "github:gfhdhytghd/hymission";
+      url = "github:gfhdhytghd/hymission/1d623faace3b5ff87ac5711847a9580461838bc4";
       flake = false;
     };
 
@@ -47,8 +47,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins/7644cecdb947060682891a0db2a0cdc5c0b9e704";
+      url = "github:hyprwm/hyprland-plugins/d2427d4d15b36df40468f5a58bbd67cdba19835d";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.hyprland.follows = "lennette-private/hyprland";
     };
     vscode-insiders = {
       url = "github:auguwu/vscode-insiders-nix";

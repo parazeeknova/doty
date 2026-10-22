@@ -52,7 +52,6 @@
           portalPackage = null;
           systemd.enable = false;
           configType = "lua";
-          plugins = [ ];
 
           extraConfig = ''
             -- Load main hyprland configuration modules

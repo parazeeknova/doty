@@ -46,8 +46,9 @@
 #include <hyprland/src/plugins/PluginAPI.hpp>
 #include <hyprland/src/SharedDefs.hpp>
 #include <hyprland/src/desktop/DesktopTypes.hpp>
-#include <hyprland/src/desktop/view/Window.hpp>
-#include <hyprland/src/desktop/Workspace.hpp>
+#include <hyprland/src/desktop/view/window/Window.hpp>
+#include <hyprland/src/desktop/view/window/WindowMetadata.hpp>
+#include <hyprland/src/workspace/HLWorkspace.hpp>
 #include <hyprland/src/desktop/state/WindowState.hpp>
 #include <hyprland/src/desktop/state/FocusState.hpp>
 #include <hyprland/src/desktop/state/GlobalWindowController.hpp>
@@ -61,7 +62,6 @@
 #include <hyprland/src/helpers/memory/Memory.hpp>
 #include <hyprland/src/config/ConfigValue.hpp>
 #include <hyprland/src/config/ConfigManager.hpp>
-#include <hyprland/src/debug/HyprCtl.hpp>
 #include <hyprland/src/config/supplementary/executor/Executor.hpp>
 #include <hyprland/src/devices/IPointer.hpp>
 #include <hyprland/src/output/Monitor.hpp>
@@ -72,7 +72,7 @@
 namespace {
 
 HANDLE g_handle = nullptr;
-SP<SHyprCtlCommand> g_hyprCmd;
+SP<IPC::Socket1::SCommand> g_hyprCmd;
 
 bool g_floating = false;
 
@@ -195,17 +195,17 @@ CBox clampToMonitor(const CBox& box, const PHLWINDOW& w) {
 }
 
 void saveWindowGeom(const PHLWINDOW& w) {
-    if (!w || !w->m_isMapped)
+    if (!w || !w->mapped())
         return;
     const auto ws = w->m_workspace;
-    if (!ws || ws->m_isSpecialWorkspace)
+    if (!ws || ws->type() == Workspace::eWorkspaceType::SPECIAL)
         return;
     if (Fullscreen::controller()->isFullscreen(w))
         return;
     const auto t = w->layoutTarget();
     if (!t || !t->floating())
         return;
-    const std::string cls = w->m_class;
+    const std::string cls = w->metadata().appID();
     if (cls.empty())
         return;
     const auto box = t->position();
@@ -228,7 +228,7 @@ void saveWindowGeom(const PHLWINDOW& w) {
 }
 
 void applyWindowGeom(const PHLWINDOW& w) {
-    if (!w || !w->m_isMapped)
+    if (!w || !w->mapped())
         return;
     const auto t = w->layoutTarget();
     if (!t || !t->floating())
@@ -240,7 +240,7 @@ void applyWindowGeom(const PHLWINDOW& w) {
         return;
     }
 
-    const std::string cls = w->m_class;
+    const std::string cls = w->metadata().appID();
     if (!cls.empty()) {
         const auto cit = g_floatGeomsByClass.find(cls);
         if (cit != g_floatGeomsByClass.end()) {
@@ -266,10 +266,10 @@ Layout::Tiled::CScrollingAlgorithm* scrollingFor(const PHLWORKSPACE& ws) {
 }
 
 bool qualifies(const PHLWINDOW& w) {
-    if (!w || !w->m_isMapped || w->m_isFloating)
+    if (!w || !w->mapped() || w->isFloating())
         return false;
     const auto ws = w->m_workspace;
-    if (!ws || ws->m_isSpecialWorkspace)
+    if (!ws || ws->type() == Workspace::eWorkspaceType::SPECIAL)
         return false;
     if (Fullscreen::controller()->isFullscreen(w))
         return false;
@@ -334,9 +334,9 @@ void syncBarTheme() {
 // In layoutmode, bars stay globally enabled in floating mode except when
 // the hymission overview is open (overview hides them so tiles aren't cluttered).
 bool overviewActive() {
-    if (!g_pHyprCtl)
+    if (!IPC::Socket1::sock())
         return false;
-    const std::string reply = g_pHyprCtl->getReply("hymission-overview-state");
+    const std::string reply = IPC::Socket1::sock()->invoke("hymission-overview-state");
     return reply.find("\"active\":true") != std::string::npos;
 }
 
@@ -369,10 +369,10 @@ void toFloating() {
 
     // remember natively-floating windows so the way back never tiles them
     for (const auto& w : Desktop::windowState()->windows()) {
-        if (!w->m_isFloating || !w->m_isMapped)
+        if (!w->isFloating() || !w->mapped())
             continue;
         const auto ws = w->m_workspace;
-        if (!ws || ws->m_isSpecialWorkspace)
+        if (!ws || ws->type() == Workspace::eWorkspaceType::SPECIAL)
             continue;
         if (Fullscreen::controller()->isFullscreen(w))
             continue;
@@ -464,7 +464,7 @@ void toTiling() {
         for (const auto& c : s.cols) {
             for (const auto& r : c.rows) {
                 auto w = findWin(r.win);
-                if (!w || !w->m_isFloating)
+                if (!w || !w->isFloating())
                     continue;
                 saveWindowGeom(w);
                 if (lastRetiled && alive(lastRetiled.get()))
@@ -477,10 +477,10 @@ void toTiling() {
     // newcomers (opened while floating): tile after everything else.
     // Natively-floating windows (predating our float) are left alone.
     for (const auto& w : std::vector<PHLWINDOW>(Desktop::windowState()->windows().begin(), Desktop::windowState()->windows().end())) {
-        if (!w->m_isFloating || !w->m_isMapped)
+        if (!w->isFloating() || !w->mapped())
             continue;
         const auto ws = w->m_workspace;
-        if (!ws || ws->m_isSpecialWorkspace)
+        if (!ws || ws->type() == Workspace::eWorkspaceType::SPECIAL)
             continue;
         if (Fullscreen::controller()->isFullscreen(w))
             continue;
@@ -557,10 +557,10 @@ void toggle() {
 }
 
 void onWindowOpen(PHLWINDOW w) {
-    if (!w || !w->m_isMapped)
+    if (!w || !w->mapped())
         return;
     const auto ws = w->m_workspace;
-    if (!ws || ws->m_isSpecialWorkspace)
+    if (!ws || ws->type() == Workspace::eWorkspaceType::SPECIAL)
         return;
     if (Fullscreen::controller()->isFullscreen(w))
         return;
@@ -569,12 +569,12 @@ void onWindowOpen(PHLWINDOW w) {
 
     if (g_floating) {
         try {
-            if (!w->m_isFloating)
+            if (!w->isFloating())
                 g_layoutManager->changeFloatingMode(w->layoutTarget());
             applyWindowGeom(w);
         } catch (...) {
         }
-    } else if (w->m_isFloating) {
+    } else if (w->isFloating()) {
         try {
             applyWindowGeom(w);
         } catch (...) {
@@ -587,7 +587,8 @@ int luaToggle(lua_State*) {
     return 0;
 }
 
-std::string hyprctlLayoutmode(eHyprCtlOutputFormat, std::string args) {
+IPC::Socket1::SResponse hyprctlLayoutmode(const IPC::Socket1::SRequest& request) {
+    const auto& args = request.command;
     // exact=false passes the remainder in various shapes ("toggle",
     // "layoutmode toggle", ...), so match leniently
     if (args.find("toggle") != std::string::npos)
@@ -624,10 +625,10 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         return {"layoutmode", "Global tiling/floating toggle", "parazeeknova",  "0.2.1"};
     }
 
-    g_hyprCmd = HyprlandAPI::registerHyprCtlCommand(g_handle, SHyprCtlCommand{
+    g_hyprCmd = HyprlandAPI::registerHyprCtlCommand(g_handle, IPC::Socket1::SCommand{
                                                                   .name  = "layoutmode",
-                                                                  .exact = false,
-                                                                  .fn    = hyprctlLayoutmode,
+                                                                  .match = IPC::Socket1::COMMAND_MATCH_PREFIX,
+                                                                  .handler = hyprctlLayoutmode,
                                                               });
     if (!g_hyprCmd)
         HyprlandAPI::addNotification(g_handle, "[layoutmode] failed to register hyprctl command", CHyprColor(1.F, 0.3F, 0.3F, 1.F), 5000);
@@ -636,7 +637,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     (void)openListener;
 
     static const auto updateRulesListener = Event::bus()->m_events.window.updateRules.listen([](PHLWINDOW w) {
-        if (!w || !w->m_isFloating || w->m_class.empty())
+        if (!w || !w->isFloating() || w->metadata().appID().empty())
             return;
         if (g_floatGeoms.find(w.get()) == g_floatGeoms.end())
             applyWindowGeom(w);
@@ -644,7 +645,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     (void)updateRulesListener;
 
     static const auto floatingListener = Event::bus()->m_events.window.floating.listen([](PHLWINDOW w) {
-        if (w && w->m_isFloating)
+        if (w && w->isFloating())
             applyWindowGeom(w);
     });
     (void)floatingListener;

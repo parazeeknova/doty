@@ -13,7 +13,7 @@ hl.config({
 	dwindle = {
 		preserve_split = true,
 	},
-	-- Private overlays disable render plugins; do not configure absent plugins.
+	-- Plugin configuration is applied after the matching plugin libraries load.
 	plugin = #hl.get_loaded_plugins() > 0 and {
 		scrolloverview = {
 			gesture_distance = 300,
