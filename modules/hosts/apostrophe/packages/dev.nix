@@ -165,11 +165,11 @@
       });
       t3code = pkgs.appimageTools.wrapType2 rec {
         pname = "t3code";
-        version = "0.1.1-nightly.20261020.3411";
+        version = "0.1.3-nightly.20261027.3748";
 
         src = pkgs.fetchurl {
           url = "https://github.com/pingdotgg/t3code/releases/download/v${version}/T3-Code-${version}-x86_64.AppImage";
-          hash = "sha512-aq2Nj7ovtCuGKMXrW58Q19wKbWx/qT0uymJ39iC2WW1i5owoPey+XhN8eDe9tPMCtSXQlvPAesJOhmuvvY8Wyw==";
+          hash = "sha512-0uLvXxLJ4mD9V9wUmMKrOd34QTUltaClD0OQuMmMtIujKnOuPo4QpPXPdjdrI1cZ8+l79pQPNAOW8A6i74Teew==";
         };
 
         extraPkgs =
