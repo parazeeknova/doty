@@ -78,7 +78,7 @@
     }
   },
   "plugin": [
-    "./supermemory-plugin.js"
+    "opencode-supermemory"
   ],
   "permission": {
     "supermemory_recall": "allow"

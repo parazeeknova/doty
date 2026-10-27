@@ -300,6 +300,11 @@ hl.bind(
 	)
 )
 hl.bind(mainMod .. " + TAB", function()
+	-- mutually exclusive with scrolloverview: close it first so both
+	-- overviews never stack, then toggle hymission.
+	if hl.plugin.scrolloverview then
+		hl.plugin.scrolloverview.overview("close")
+	end
 	if hl.plugin.hymission then
 		hl.plugin.hymission.toggle()
 	end
@@ -307,11 +312,18 @@ hl.bind(mainMod .. " + TAB", function()
 	hl.exec_cmd("sh -c 'sleep 0.35; hyprctl layoutmode syncoverview >/dev/null 2>&1'")
 end)
 hl.bind("ALT + TAB", function()
+	-- mutually exclusive with hymission: close it first so both
+	-- overviews never stack, then toggle scrolloverview.
+	if hl.plugin.hymission then
+		hl.plugin.hymission.close()
+	end
 	if hl.plugin.scrolloverview then
 		hl.plugin.scrolloverview.overview("toggle")
 	else
 		hl.dispatch(hl.dsp.window.cycle_next())
 	end
+	-- bars follow the overview state (hide while open, restore after)
+	hl.exec_cmd("sh -c 'sleep 0.35; hyprctl layoutmode syncoverview >/dev/null 2>&1'")
 end)
 hl.bind(
 	mainMod .. " + X",
