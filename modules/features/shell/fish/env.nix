@@ -40,7 +40,6 @@
           fish_add_path ~/.bun/bin
           fish_add_path ~/.npm-global/bin
           fish_add_path /home/parazeeknova/.cache/.bun/bin
-          fish_add_path /home/parazeeknova/.mimocode/bin
           fish_add_path /home/parazeeknova/.strix/bin
 
           # -- Wabi Theme System --
