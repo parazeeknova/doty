@@ -157,10 +157,10 @@
       };
       bun = pkgs.bun.overrideAttrs (oldAttrs: rec {
         pname = "bun";
-        version = "1.4.3";
+        version = "1.4.4";
         src = pkgs.fetchurl {
           url = "https://github.com/oven-sh/bun/releases/download/bun-v${version}/bun-linux-x64.zip";
-          sha256 = "063fh4iwnadqwx9g5wrp1afhkx2dgiw0cp7hhwzz0xcpv0l0awry";
+          sha256 = "0p1rrgy55nry189wdnrlfl3xib8pag2iavcs1yg1b00b5gxwp35z";
         };
       });
       t3code = pkgs.appimageTools.wrapType2 rec {
