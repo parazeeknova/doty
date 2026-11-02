@@ -64,6 +64,8 @@
         ];
       };
 
+      # Physical LUKS swap: backing device for zswap (see boot.zswap in
+      # configuration.nix) + hibernate target: 34G >= 32G RAM.
       swapDevices = [
         { device = "/dev/mapper/luks-fe7a0acb-6379-4025-aab3-05a299853e60"; }
       ];

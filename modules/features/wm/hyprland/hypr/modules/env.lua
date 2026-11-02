@@ -23,10 +23,10 @@ hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
 hl.env("QT_QPA_PLATFORMTHEME", "qt5ct")
 
--- NVIDIA Specific (Commented out for Optimus Offload to run Hyprland on Intel iGPU)
--- hl.env("GBM_BACKEND", "nvidia-drm")
--- hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
--- hl.env("LIBVA_DRIVER_NAME", "nvidia")
+-- NVIDIA Specific (dGPU-only / dMUX Ultimate mode: Hyprland runs on NVIDIA)
+hl.env("GBM_BACKEND", "nvidia-drm")
+hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
+hl.env("LIBVA_DRIVER_NAME", "nvidia")
 
 -- CUA / Hermes Wayland Driver
 hl.env("CUA_DRIVER_RS_ENABLE_WAYLAND", "1")

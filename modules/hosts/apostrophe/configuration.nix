@@ -215,11 +215,8 @@
 
       environment.pathsToLink = [ "/share/thumbnailers" ];
 
-      # -- Graphics --
-      services.xserver.videoDrivers = [
-        "modesetting"
-        "nvidia"
-      ];
+      # -- Graphics (dGPU-only / dMUX Ultimate mode, iGPU bypassed) --
+      services.xserver.videoDrivers = [ "nvidia" ];
       hardware.graphics.enable = true;
       hardware.nvidia = {
         modesetting.enable = true;
@@ -227,20 +224,43 @@
         nvidiaSettings = true;
         powerManagement = {
           enable = true;
-          finegrained = true;
+          # Finegrained runtime PM requires PRIME offload; must stay off in dGPU-only mode.
+          finegrained = false;
         };
         package = config.boot.kernelPackages.nvidiaPackages.stable;
-        dynamicBoost.enable = false;
-
-        prime = {
-          offload = {
-            enable = true;
-            enableOffloadCmd = true;
-          };
-          intelBusId = "PCI:0@0:2:0";
-          nvidiaBusId = "PCI:1@0:0:0";
-        };
+        # Dynamic Boost 2.0 via nvidia-powerd. Needs nvidia-powerd service (pulled in automatically).
+        dynamicBoost.enable = true;
+        # Keep GPU initialised across VT switches / suspend-resume on MUXed laptops.
+        nvidiaPersistenced = true;
       };
+
+      # Preserve VRAM across suspend so resume doesn't lose the display (dGPU-only).
+      boot.kernelParams = [ "nvidia.NVreg_PreserveVideoMemoryAllocations=1" ];
+
+      # -- 32GB RAM tuning --
+      # You have a real 34G disk swap partition, so the modern pick is zswap
+      # (compressed RAM cache in front of disk swap) instead of zram: zswap
+      # degrades gracefully by evicting cold pages to disk and has no hard
+      # capacity limit. Disk swap doubles as hibernate target (34G >= 32G RAM).
+      boot.zswap = {
+        enable = true;
+        compressor = "zstd";
+        maxPoolPercent = 25;
+        shrinkerEnabled = true;
+      };
+      # Userspace OOM killer as backstop under heavy memory pressure.
+      systemd.oomd.enable = true;
+      boot.tmp.useTmpfs = true;
+      boot.tmp.tmpfsSize = "50%";
+      boot.kernel.sysctl = {
+        "vm.swappiness" = 10;
+        "vm.vfs_cache_pressure" = 50;
+        "vm.dirty_background_ratio" = 5;
+        "vm.dirty_ratio" = 10;
+      };
+      # i7-12700H (20 threads) + 32GB: cap parallel Nix jobs so big builds can't OOM.
+      nix.settings.max-jobs = 12;
+      nix.settings.cores = 0;
 
       # -- Input --
       services.libinput.enable = true;
