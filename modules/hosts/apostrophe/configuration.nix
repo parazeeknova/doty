@@ -307,6 +307,10 @@
 
       # -- Misc --
       nixpkgs.config.allowUnfree = true;
+      # gtk2 is scheduled for removal before NixOS 27.05 (nixpkgs#410814) and
+      # evaluating it is now a hard error. onlyoffice still needs it, so warn
+      # instead of failing. TODO: drop this once onlyoffice migrates off gtk2.
+      nixpkgs.config.problems.handlers."gtk+".broken = "warn";
       nixpkgs.config.android_sdk.accept_license = true;
       nixpkgs.config.permittedInsecurePackages = [
         "electron-40.10.5"
