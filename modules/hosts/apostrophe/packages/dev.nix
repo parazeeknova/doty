@@ -25,11 +25,11 @@
       };
       terminal-browser = pkgs.stdenv.mkDerivation rec {
         pname = "terminal-browser";
-        version = "0.15.1";
+        version = "0.15.3";
 
         src = pkgs.fetchurl {
           url = "https://github.com/zenbu-labs/terminal-browser/releases/download/v${version}/terminal-browser-linux-x64.tar.gz";
-          sha256 = "1sx7radm65n3nkh1bxxjxj97rkrns3i7w6v6x0jm04bg7lfgg2qk";
+          sha256 = "0hcma05gn2wqagn3s8zslvk5m23n1a1pyzzhdkv2knsfamdrjki4";
         };
 
         nativeBuildInputs = with pkgs; [
