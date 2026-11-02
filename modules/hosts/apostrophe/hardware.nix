@@ -53,16 +53,9 @@
         ];
       };
 
-      fileSystems."/home/parazeeknova/secondary" = {
-        device = "/dev/mapper/crypted_second";
-        fsType = "btrfs";
-        options = [
-          "compress=zstd"
-          "noatime"
-          "nodiscard"
-          "x-systemd.requires=systemd-cryptsetup@crypted_second.service"
-        ];
-      };
+      # NOTE: second NVMe (nvme1n1) was repurposed for Windows; the
+      # /home/parazeeknova/secondary mount is gone. If you re-add a data disk,
+      # re-introduce a fileSystems entry + crypttab unlock here.
 
       # Physical LUKS swap: backing device for zswap (see boot.zswap in
       # configuration.nix) + hibernate target: 34G >= 32G RAM.

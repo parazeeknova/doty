@@ -29,11 +29,9 @@
 
       # -- Google Drive Sync Service --
       systemd.services.rclone-gdrive-sync = {
-        description = "Sync Google Drive to /home/parazeeknova/secondary/cloud-sync/gdrive/";
-        requires = [ "home-parazeeknova-secondary.mount" ];
+        description = "Sync Google Drive to /home/parazeeknova/cloud/";
         after = [
           "network-online.target"
-          "home-parazeeknova-secondary.mount"
           "sops-nix.service"
         ];
         wants = [ "network-online.target" ];
@@ -50,7 +48,7 @@
             mkdir -p /home/parazeeknova/.cache/rclone
             cp -f /run/secrets/rclone.conf /home/parazeeknova/.cache/rclone/rclone-runtime.conf
             chmod 600 /home/parazeeknova/.cache/rclone/rclone-runtime.conf
-            exec ${pkgs.rclone}/bin/rclone --config /home/parazeeknova/.cache/rclone/rclone-runtime.conf sync gdrive: /home/parazeeknova/secondary/cloud-sync/gdrive/ --fast-list --verbose
+            exec ${pkgs.rclone}/bin/rclone --config /home/parazeeknova/.cache/rclone/rclone-runtime.conf sync gdrive: /home/parazeeknova/cloud/ --fast-list --verbose
           '';
         };
       };
