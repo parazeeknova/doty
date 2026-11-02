@@ -75,6 +75,8 @@
       hardware.enableRedistributableFirmware = lib.mkDefault true;
 
       # Intel AX201 WiFi stability: maximum reliability, disable power saving, sleep states & buggy 11ax HE aggregation
+      # NOTE: no amsdu_size override - the AX201 firmware rejects amsdu_size=4
+      # (journal: "iwlmvm: Unsupported amsdu_size"), so the default applies.
       boot.extraModprobeConfig = ''
         options iwlwifi enable_ini=0
         options iwlwifi power_save=0
@@ -82,7 +84,6 @@
         options iwlwifi uapsd_disable=1
         options iwlwifi disable_11ax=1
         options iwlwifi 11n_disable=8
-        options iwlwifi amsdu_size=4
       '';
 
       # Keep Intel AX201 WiFi CNVi PCIe controller fully powered (prevent runtime suspend / D3 / L1.2)
